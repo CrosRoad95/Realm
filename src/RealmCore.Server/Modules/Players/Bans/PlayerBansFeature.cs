@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Bans;
+﻿using static RealmCore.Server.Modules.Players.PlayersResults;
+
+namespace RealmCore.Server.Modules.Players.Bans;
 
 public interface IPlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>
 {
@@ -10,11 +12,11 @@ public interface IPlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>
     event Action<IPlayerBansFeature, BanDto>? Added;
     event Action<IPlayerBansFeature, BanDto>? Deactivated;
 
-    void Add(int type, DateTime? until = null, string? reason = null, string? responsible = null);
+    bool Add(int type, DateTime? until = null, string? reason = null, string? responsible = null);
     /// <summary>
     /// Fetches X more bans from database, returning empty list when all bans were fetched.
     /// </summary>
-    Task<List<BanDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
+    Task<OneOf<BanDto[], NoBans>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
     /// <summary>
     /// Return true if ban of given type is currently active
     /// </summary>
@@ -26,7 +28,7 @@ public interface IPlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>
     /// <summary>
     /// Return active ban or default by given type
     /// </summary>
-    BanDto? GetByIdOrDefault(int type);
+    OneOf<BanDto, BanOfGivenTypeNotFound> GetBanByType(int type);
 }
 
 internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersistentData
@@ -91,7 +93,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         }
     }
 
-    public void Add(int type, DateTime? until = null, string? reason = null, string? responsible = null)
+    public bool Add(int type, DateTime? until = null, string? reason = null, string? responsible = null)
     {
         var banData = new BanData
         {
@@ -106,27 +108,28 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         _lock.Wait();
         try
         {
-            var ban = GetBanByType(type);
-            if (ban != null)
-                throw new InvalidOperationException(); // TODO: Replace with fluent exception
+            var ban = InternalGetBanByType(type);
+            var success = ban.Match(_ => false, notFound =>
+            {
+                _bans.Add(banData);
+                VersionIncreased?.Invoke();
+                Added?.Invoke(this, BanDto.Map(banData));
+                return true;
+            });
 
-            _bans.Add(banData);
+            return success;
         }
         finally
         {
             _lock.Release();
         }
-
-        VersionIncreased?.Invoke();
-        Added?.Invoke(this, BanDto.Map(banData));
     }
 
-    public async Task<List<BanDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<OneOf<BanDto[], NoBans>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         var last = _bans.LastOrDefault();
         if (last == null)
-            return [];
-
+            return new NoBans();
 
         await _lock.WaitAsync(cancellationToken);
         try
@@ -136,9 +139,11 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
                 .OrderByDescending(x => x.Id)
                 .Take(count);
 
-            var results = await query.ToListAsync(cancellationToken);
+            var results = await query.ToArrayAsync(cancellationToken);
+            if (results.Length == 0)
+                return new NoBans();
 
-            return results.Select(BanDto.Map).ToList();
+            return results.Select(BanDto.Map).ToArray();
         }
         finally
         {
@@ -157,6 +162,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
             if (ban != null)
             {
                 ban.Active = false;
+                removed = true;
             }
         }
         finally
@@ -179,14 +185,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         _lock.Wait();
         try
         {
-            foreach (var ban in _bans)
-            {
-                if (ban.Type == type && ban.IsActive(now))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return _bans.Any(x => x.Type == type && x.IsActive(now));
         }
         finally
         {
@@ -194,31 +193,30 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         }
     }
 
-    public BanDto? GetByIdOrDefault(int type)
+    private OneOf<BanData, BanOfGivenTypeNotFound> InternalGetBanByType(int type)
+    {
+        var now = _dateTimeProvider.Now;
+        var ban = _bans.FirstOrDefault(x => x.Type == type && x.IsActive(now));
+        if (ban == null)
+            return new BanOfGivenTypeNotFound();
+        return ban;
+    }
+    
+    public OneOf<BanDto, BanOfGivenTypeNotFound> GetBanByType(int type)
     {
         var now = _dateTimeProvider.Now;
         _lock.Wait();
         try
         {
-            foreach (var ban in _bans)
-            {
-                if (ban.Type == type && ban.IsActive(now))
-                {
-                    return BanDto.Map(ban);
-                }
-            }
-            return null;
+            var banDto = InternalGetBanByType(type).Match(BanDto.Map, notFound => null);
+            if(banDto == null)
+                return new BanOfGivenTypeNotFound();
+            return banDto;
         }
         finally
         {
             _lock.Release();
         }
-    }
-
-    private BanData? GetBanByType(int type)
-    {
-        var now = _dateTimeProvider.Now;
-        return _bans.FirstOrDefault(x => x.Type == type && x.IsActive(now));
     }
 
     public IEnumerator<BanDto> GetEnumerator()
