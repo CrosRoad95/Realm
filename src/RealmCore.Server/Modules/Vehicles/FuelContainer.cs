@@ -31,7 +31,7 @@ public class FuelContainer
         set
         {
             if (value)
-                Update(true);
+                _lastPosition = Vehicle.Position;
 
             _active = value;
             if (_vehicleFuelData != null)
@@ -154,7 +154,7 @@ public class FuelContainer
 
     public void Update(bool forceUpdate = false)
     {
-        if (!Vehicle.IsEngineOn && !forceUpdate)
+        if ((!Vehicle.IsEngineOn || !Active) && !forceUpdate)
         {
             _lastPosition = Vehicle.Position;
             return;
@@ -163,10 +163,18 @@ public class FuelContainer
             return;
 
         var traveledDistance = Vehicle.Position - _lastPosition;
-        if (_minimumDistanceThreshold > traveledDistance.Length() && !forceUpdate)
+        var traveledDistanceLength = traveledDistance.Length();
+        if(traveledDistanceLength > 50) // Vehicle probably teleported
+        {
+            _lastPosition = Vehicle.Position;
             return;
+        }
+
+        if (_minimumDistanceThreshold > traveledDistanceLength && !forceUpdate)
+            return;
+
         _lastPosition = Vehicle.Position;
-        var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistance.Length();
+        var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistanceLength;
 
         if(Vehicle.Driver is RealmPlayer player && player.Admin.NoClip)
             return;
