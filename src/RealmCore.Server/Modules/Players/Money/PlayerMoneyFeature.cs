@@ -16,14 +16,14 @@ public interface IPlayerMoneyFeature : IPlayerFeature
     void Take(decimal amount, bool force = false);
     bool TryTake(decimal amount, bool force = false);
     bool TryTake(decimal amount, Func<bool> action, bool force = false);
-    Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false);
+    Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false, CancellationToken cancellationToken = default);
     void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false);
     void SetLimitAndPrecision(decimal moneyLimit, byte precision);
 }
 
 internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData, IDisposable
 {
-    private readonly ReaderWriterLockSlimScoped _lock = new();
+    private readonly ReaderWriterLockSlimScopedAsync _lock = new();
     private decimal _money = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
@@ -49,7 +49,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             if (Math.Abs(value) > _moneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
-            using var _ = _lock.BeginWrite();
+            using var _ = _lock.Begin();
 
             if (_money == value)
                 return;
@@ -106,7 +106,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-        using var _ = _lock.BeginWrite();
+        using var _ = _lock.Begin();
 
         if (Math.Abs(_money) + amount > _moneyLimit)
             throw new GameplayException("Unable to give money beyond limit.");
@@ -141,7 +141,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public void Take(decimal amount, bool force = false)
     {
-        using var _ = _lock.BeginWrite();
+        using var _ = _lock.Begin();
         TakeMoneyCore(amount, force);
     }
 
@@ -149,7 +149,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public bool Has(decimal amount, bool force = false)
     {
-        using var _ = _lock.BeginWrite();
+        using var _ = _lock.Begin();
         return HasMoneyCore(amount, force);
     }
 
@@ -168,7 +168,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public bool TryTake(decimal amount, Func<bool> action, bool force = false)
     {
-        using var _ = _lock.BeginWrite();
+        using var _ = _lock.Begin();
         if (!HasMoneyCore(amount, force))
                 return false;
 
@@ -180,9 +180,9 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         return false;
     }
 
-    public async Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false)
+    public async Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false, CancellationToken cancellationToken = default)
     {
-        using var _ = _lock.BeginWrite();
+        using var _ = await _lock.BeginAsync(cancellationToken);
         if (!HasMoneyCore(amount, force))
             return false;
 

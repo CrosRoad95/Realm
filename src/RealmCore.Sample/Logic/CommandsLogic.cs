@@ -1873,18 +1873,24 @@ internal sealed class CommandsLogic
         {
             await player.Money.TryTakeAsync(10, async () =>
             {
+                await Task.Delay(1);
                 return true;
-            }, true);
+            }, true, token);
+            
+            await player.Money.TryTakeAsync(10, async () =>
+            {
+                return true;
+            }, true, token);
 
             await player.Money.TryTakeAsync(10, async () =>
             {
                 return false;
-            }, true);
+            }, true, token);
 
             await player.Money.TryTakeAsync(10, async () =>
             {
                 throw new Exception();
-            }, true);
+            }, true, token);
 
             _chatBox.OutputTo(player, "took 10 money");
         });

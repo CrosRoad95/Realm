@@ -49,3 +49,53 @@ public sealed class ReaderWriterLockSlimScoped
         };
     }
 }
+
+public sealed class ReaderWriterLockSlimScopedAsync
+{
+    private readonly SemaphoreSlim _lock;
+
+    private struct ReadLockScope : IDisposable
+    {
+        public SemaphoreSlim _lock;
+
+        public void Dispose()
+        {
+            _lock.Release();
+        }
+    }
+    
+    private struct WriteLockScope : IDisposable
+    {
+        public SemaphoreSlim _lock;
+
+        public void Dispose()
+        {
+            _lock.Release();
+        }
+    }
+
+    public ReaderWriterLockSlimScopedAsync()
+    {
+        _lock = new(1);
+    }
+
+    public IDisposable Begin(CancellationToken cancellationToken = default)
+    {
+        _lock.Wait(1000, cancellationToken);
+
+        return new ReadLockScope
+        {
+            _lock = _lock,
+        };
+    }
+
+    public async Task<IDisposable> BeginAsync(CancellationToken cancellationToken = default)
+    {
+        await _lock.WaitAsync(1000, cancellationToken);
+
+        return new ReadLockScope
+        {
+            _lock = _lock,
+        };
+    }
+}

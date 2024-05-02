@@ -467,4 +467,28 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         player.User.GetVersion().Should().Be(0);
         monitor1.OccurredEvents.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task AsyncMethodCallsInsideTryTakeAsyncShouldWork()
+    {
+        using var _ = new AssertionScope();
+
+        var server = CreateServer();
+        var player = CreatePlayer();
+        var money = player.Money;
+        money.Amount = 1000;
+
+        await money.TryTakeAsync(10, async () =>
+        {
+            await Task.Delay(1);
+            return true;
+        });
+
+        await money.TryTakeAsync(10, async () =>
+        {
+            await Task.Delay(1).ConfigureAwait(false);
+            return true;
+        });
+        money.Amount.Should().Be(980);
+    }
 }
