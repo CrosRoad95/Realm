@@ -383,8 +383,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldNotBeAbleToSetMoneyInPlayerEvents()
+    public void SettingMoneyInsideEventsShouldWork()
     {
+        using var _ = new AssertionScope();
+
         var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetInternal(1000000);
@@ -398,8 +400,8 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
             player.Money.Amount = 100;
         };
 
-        act.Should().Throw<LockRecursionException>();
-        player.Money.Amount.Should().Be(100);
+        act.Should().NotThrow();
+        player.Money.Amount.Should().Be(50);
     }
 
     [Fact]
