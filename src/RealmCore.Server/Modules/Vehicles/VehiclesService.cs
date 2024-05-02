@@ -52,7 +52,7 @@ internal sealed class VehiclesService : IVehiclesService
         try
         {
             SetActive(vehicleData.Id, vehicle);
-            vehicle.Persistence.Load(vehicleData);
+            vehicle.Persistence.Load(vehicleData, true);
             return vehicle;
         }
         catch (Exception)

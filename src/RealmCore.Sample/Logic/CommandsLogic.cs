@@ -1,12 +1,16 @@
-﻿using RealmCore.Resources.MapNames;
+﻿using Org.BouncyCastle.Utilities;
+using RealmCore.Resources.MapNames;
 using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
+using RenderWareIo.Structs.Col;
 using SlipeServer.Packets.Enums;
+using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Events;
+using System.Diagnostics;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.Sample.Logic;
@@ -29,6 +33,7 @@ internal sealed class CommandsLogic
     private readonly IMapNamesService _mapNamesService;
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IElementCollection _elementCollection;
     private readonly RealmDiscordService? _discordService;
 
     private class TestState
@@ -45,7 +50,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IVehicleLoader loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, RealmDiscordService? discordService = null)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IVehicleLoader loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, RealmDiscordService? discordService = null)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -63,6 +68,7 @@ internal sealed class CommandsLogic
         _mapNamesService = mapNamesService;
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;
+        _elementCollection = elementCollection;
         _discordService = discordService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
@@ -1938,6 +1944,32 @@ internal sealed class CommandsLogic
             if (_discordService == null || _discordService.SendMessage == null)
                 return;
             await _discordService.SendMessage(1135218612764934224, "test", token);
+        });
+
+
+        _commandService.AddAsyncCommandHandler("saveall", async (player, args, token) =>
+        {
+            var start = Stopwatch.GetTimestamp();
+            int i = 0;
+            foreach (var element in _elementCollection.GetAll().ToList())
+            {
+                if (element is RealmVehicle vehicle)
+                {
+                    await vehicle.GetRequiredService<ISaveService>().Save(token);
+                    i++;
+                }
+                else if (element is RealmPlayer plr)
+                {
+                    if (plr.User.IsSignedIn)
+                    {
+                        await plr.GetRequiredService<ISaveService>().Save(token);
+                        i++;
+                    }
+                }
+            }
+
+            var t = ((start - Stopwatch.GetTimestamp()) / Stopwatch.Frequency) * 1000;
+            _chatBox.OutputTo(player, $"Saved {i} elements in {t} ms");
         });
 
         AddInventoryCommands();
