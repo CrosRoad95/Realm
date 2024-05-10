@@ -13,6 +13,8 @@ public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUse
     bool IsOwner(int userId);
     bool IsOwner(RealmPlayer player);
     bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess);
+    bool TryRemoveAccess(int userId, byte? accessType = null);
+    bool TryRemoveAccess(RealmPlayer player, byte? accessType = null);
 }
 
 internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehiclePersistentData
@@ -40,9 +42,11 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
         }
     }
 
-    private bool InternalHasAccess(int userId)
+    private bool InternalHasAccess(int userId, byte? accessType = null)
     {
-        var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
+        var vehicleUserAccessData = _userAccesses
+            .Where(x => x.UserId == userId && (accessType == null || x.AccessType == accessType))
+            .FirstOrDefault();
         if (vehicleUserAccessData != null)
         {
             return true;
@@ -126,6 +130,24 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
     }
 
     public bool IsOwner(RealmPlayer player) => IsOwner(player.PersistentId);
+
+    public bool TryRemoveAccess(int userId, byte? accessType = null)
+    {
+        lock (_lock)
+        {
+            var vehicleUserAccessData = _userAccesses
+                .Where(x => x.UserId == userId && (accessType == null || x.AccessType == accessType))
+                .FirstOrDefault();
+
+            if (vehicleUserAccessData == null)
+                return false;
+
+            _userAccesses.Remove(vehicleUserAccessData);
+            return true;
+        }
+    }
+
+    public bool TryRemoveAccess(RealmPlayer player, byte? accessType = null) => TryRemoveAccess(player.PersistentId, accessType);
 
     public IEnumerator<VehicleUserAccessDto> GetEnumerator()
     {

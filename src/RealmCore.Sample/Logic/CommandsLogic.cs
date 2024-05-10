@@ -209,6 +209,11 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, "Stworzono pojazd.");
         });
         
+        _commandService.AddCommandHandler("removeowner", (player, args) =>
+        {
+            player.Vehicle!.Access.TryRemoveAccess(player);
+        });
+        
         _commandService.AddAsyncCommandHandler("converttopersistent", async (player, args, token) =>
         {
             if(player.Vehicle == null)
