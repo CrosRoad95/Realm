@@ -10,6 +10,7 @@ using SlipeServer.Packets.Enums;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Events;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using Color = System.Drawing.Color;
 
@@ -72,6 +73,18 @@ internal sealed class CommandsLogic
         _discordService = discordService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
+
+        _commandService.AddAsyncCommandHandler("cmdbasic", async ([CallingPlayer] RealmPlayer player, [Range(1, 20)] int a, int b) =>
+        {
+            await Task.Delay(100);
+            _chatBox.Output($"foo: {a}, {b}");
+        });
+        
+        _commandService.AddAsyncCommandHandler("cmdplr", async (RealmPlayer player, CancellationToken cancellationToken, int x) =>
+        {
+            _chatBox.Output($"foo: {player.Name} {cancellationToken} x={x}");
+        });
+
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
         {
             debounceCounter++;

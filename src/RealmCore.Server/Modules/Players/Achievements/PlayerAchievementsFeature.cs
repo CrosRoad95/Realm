@@ -64,6 +64,7 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
         {
             var achievement = GetById(achievementId);
             achievement.Value = JsonConvert.SerializeObject(value);
+            VersionIncreased?.Invoke();
         }
     }
 
@@ -162,6 +163,7 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
             else
                 Progressed?.Invoke(this, achievementId, achievement.Progress);
 
+            VersionIncreased?.Invoke();
             return true;
         }
     }

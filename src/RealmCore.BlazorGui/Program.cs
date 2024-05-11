@@ -47,4 +47,8 @@ app.MapRazorComponents<App>()
     .AddRealmBlazor()
     .AddInteractiveServerRenderMode();
 
+app.Map("asd", (int a, int b, int c) =>
+{
+
+});
 await app.RunAsync();

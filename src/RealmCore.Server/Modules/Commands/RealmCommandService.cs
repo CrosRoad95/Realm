@@ -1,4 +1,19 @@
-﻿namespace RealmCore.Server.Modules.Commands;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RealmCore.Server.Modules.Commands;
+
+[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
+public class CallingPlayerAttribute : Attribute { }
+
+[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
+public class PlayerSearchOptionsAttribute : Attribute
+{
+    public PlayerSearchOption PlayerSearchOption { get; }
+    public PlayerSearchOptionsAttribute(PlayerSearchOption playerSearchOption = PlayerSearchOption.All)
+    {
+        PlayerSearchOption = playerSearchOption;
+    }
+}
 
 public sealed class RealmCommandService
 {
@@ -37,6 +52,173 @@ public sealed class RealmCommandService
         public AsyncCommandInfo(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback) : base(commandName)
         {
             Callback = callback;
+        }
+    }
+    
+    internal sealed class DelegateAsyncCommandInfo : CommandInfo
+    {
+        public override bool IsAsync => true;
+        private readonly Delegate _callback;
+        private readonly ParameterInfo[] _parameters;
+
+        public DelegateAsyncCommandInfo(string commandName, Delegate callback) : base(commandName)
+        {
+            var method = callback.GetMethodInfo();
+            _parameters = method.GetParameters();
+            var parameterExpressions = new ParameterExpression[_parameters.Length];
+            int i = 0;
+            foreach (var item in method.GetParameters())
+            {
+                parameterExpressions[i++] = Expression.Parameter(item.ParameterType, item.Name);
+            }
+            var body = Expression.Call(Expression.Constant(callback.Target), method, parameterExpressions);
+            var func = Expression.Lambda(body, parameterExpressions);
+            _callback = func.Compile();
+        }
+
+        public async Task Invoke(RealmPlayer player, CommandArguments arguments, CancellationToken cancellationToken)
+        {
+            int i = 0;
+            var args = new object[_parameters.Length];
+            foreach (var parameterInfo in _parameters)
+            {
+                if(parameterInfo.ParameterType.IsSubclassOf(typeof(Player)))
+                {
+                    Player? plr = null;
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if (attribute is CallingPlayerAttribute)
+                        {
+                            plr = player;
+                            break;
+                        }
+                    }
+
+                    if(plr == null)
+                    {
+                        var playerSearchOption = PlayerSearchOption.All;
+                        var playerSearchOptionsAttribute = parameterInfo.GetCustomAttribute<PlayerSearchOptionsAttribute>();
+                        if(playerSearchOptionsAttribute != null)
+                        {
+                            playerSearchOption = playerSearchOptionsAttribute.PlayerSearchOption;
+                        }
+                        plr = arguments.ReadPlayer(playerSearchOption);
+                    }
+                    args[i++] = plr;
+                }
+                else if(parameterInfo.ParameterType == typeof(CancellationToken))
+                {
+                    args[i++] = cancellationToken;
+                }
+                else if(parameterInfo.ParameterType == typeof(string))
+                {
+                    var value = arguments.ReadArgument();
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(short))
+                {
+                    var value = arguments.ReadShort();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(ushort))
+                {
+                    var value = arguments.ReadUShort();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(byte))
+                {
+                    var value = arguments.ReadByte();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(uint))
+                {
+                    var value = arguments.ReadUInt();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(decimal))
+                {
+                    var value = arguments.ReadDecimal();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(float))
+                {
+                    var value = arguments.ReadFloat();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+                else if(parameterInfo.ParameterType == typeof(int))
+                {
+                    var value = arguments.ReadInt();
+                    foreach (var attribute in parameterInfo.GetCustomAttributes())
+                    {
+                        if(attribute is RangeAttribute range)
+                        {
+                            var valid = range.IsValid(value);
+                            if(!valid)
+                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
+                        }
+                    }
+                    args[i++] = value;
+                }
+            }
+            var result = _callback.DynamicInvoke(args);
+            if(result is Task task)
+            {
+                await task;
+            }
         }
     }
 
@@ -124,6 +306,24 @@ public sealed class RealmCommandService
         {
             throw new CommandExistsException($"Command with name '{commandName}' already exists");
         }
+    }
+
+    public void AddAsyncCommandHandler(string commandName, Delegate callback, string[]? requiredPolicies = null, string? description = null, string? category = null)
+    {
+        CheckIfCommandExists(commandName);
+
+        _commands.Add(commandName, new DelegateAsyncCommandInfo(commandName, callback)
+        {
+            RequiredPolicies = requiredPolicies,
+            Description = description,
+            Category = category
+        });
+
+        if (requiredPolicies != null)
+            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+        else
+            _logger.LogInformation("Created async command {commandName}", commandName);
+
     }
 
     public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
@@ -228,6 +428,20 @@ public sealed class RealmCommandService
                     }, token);
                 }
             }
+            else if (commandInfo is DelegateAsyncCommandInfo delegateAsyncCommandInfo)
+            {
+                var token = player.CreateCancellationToken();
+                if (player.User.HasClaim("commandsNoLimit"))
+                    await delegateAsyncCommandInfo.Invoke(player, commandArguments, token);
+                else
+                {
+                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
+                    await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
+                    {
+                        await delegateAsyncCommandInfo.Invoke(player, commandArguments, cancellationToken);
+                    }, token);
+                }
+            }
         }
         catch (RateLimitRejectedException ex)
         {
@@ -238,21 +452,35 @@ public sealed class RealmCommandService
         {
             if (ex.Argument != null)
             {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
-                _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
-            }
-            else
-            {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
-                if (string.IsNullOrWhiteSpace(ex.Argument))
-                    _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
-                else
-                    if (ex.Message != null)
+                if(ex.Index != null)
                 {
+                    _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
                     _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
                 }
                 else
-                    _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
+                {
+                    _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'. {ex.Message}");
+                }
+            }
+            else
+            {
+                if (ex.Index != null)
+                {
+                    _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
+                    if (string.IsNullOrWhiteSpace(ex.Argument))
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                    else
+                        if (ex.Message != null)
+                    {
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                    }
+                    else
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
+                }
+                else
+                {
+                    _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'. {ex.Message}");
+                }
             }
             _logger.LogWarning("Command argument exception was thrown while executing command {command} with arguments {commandArguments}, argument index: {argumentIndex}", command, arguments, ex.Index);
         }

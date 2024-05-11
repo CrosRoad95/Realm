@@ -8,6 +8,7 @@ public class CommandArguments
     private int _index;
 
     public int Index => _index;
+    public int CurrentArgument => _index - 1;
 
     public CommandArguments(RealmPlayer player, IElementSearchService searchService, string[] args)
     {
@@ -26,7 +27,7 @@ public class CommandArguments
     public void End()
     {
         if (_index < _args.Length)
-            throw new CommandArgumentException(_index, "Zbyt dużo argumentów.", null);
+            throw new CommandArgumentException(CurrentArgument, "Zbyt dużo argumentów.", null);
     }
 
     public string ReadAllAsString()
@@ -40,12 +41,12 @@ public class CommandArguments
         {
             var value = _args[_index++];
             if (string.IsNullOrWhiteSpace(value))
-                throw new CommandArgumentException(_index, "Argument jest pusty.", null);
+                throw new CommandArgumentException(CurrentArgument, "Argument jest pusty.", null);
             return value;
         }
         else
         {
-            throw new CommandArgumentException(_index, "Zbyt mało argumentów.", null);
+            throw new CommandArgumentException(null, "Zbyt mało argumentów.", null);
         }
     }
 
@@ -78,7 +79,7 @@ public class CommandArguments
         }
         catch (Exception)
         {
-            throw new CommandArgumentException(_index, "Podany argument jest nie poprawny.", null);
+            throw new CommandArgumentException(CurrentArgument, "Podany argument jest nie poprawny.", null);
         }
     }
 
@@ -93,7 +94,7 @@ public class CommandArguments
             }
             catch (Exception)
             {
-                throw new CommandArgumentException(_index, "Podany argument jest nie poprawny.", null);
+                throw new CommandArgumentException(CurrentArgument, "Podany argument jest nie poprawny.", null);
             }
         }
         argument = default;
@@ -121,7 +122,15 @@ public class CommandArguments
         var value = ReadArgument();
         if (int.TryParse(value, out var value2))
             return value2;
-        throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
+    }
+    
+    public float ReadFloat()
+    {
+        var value = ReadArgument();
+        if (float.TryParse(value, out var value2))
+            return value2;
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
 
     public byte ReadByte()
@@ -129,7 +138,7 @@ public class CommandArguments
         var value = ReadArgument();
         if (byte.TryParse(value, out var value2))
             return value2;
-        throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
 
     public ushort ReadUShort()
@@ -137,7 +146,15 @@ public class CommandArguments
         var value = ReadArgument();
         if (ushort.TryParse(value, out var value2))
             return value2;
-        throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
+    }
+
+    public short ReadShort()
+    {
+        var value = ReadArgument();
+        if (short.TryParse(value, out var value2))
+            return value2;
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
 
     public uint ReadUInt()
@@ -151,7 +168,7 @@ public class CommandArguments
         var value = ReadArgument();
         if (decimal.TryParse(value, out var value2))
             return value2;
-        throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
+        throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
 
     public virtual RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
@@ -161,8 +178,8 @@ public class CommandArguments
         if (users.Count == 1)
             return users[0];
         if (users.Count > 0)
-            throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
-        throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+            throw new CommandArgumentException(CurrentArgument, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
+        throw new CommandArgumentException(CurrentArgument, "Gracz o takiej nazwie nie został znaleziony", name);
     }
 
     public virtual bool TryReadPlayer(out RealmPlayer player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
@@ -176,8 +193,8 @@ public class CommandArguments
                 return true;
             }
             if (players.Count > 0)
-                throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
-            throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+                throw new CommandArgumentException(CurrentArgument, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
+            throw new CommandArgumentException(CurrentArgument, "Gracz o takiej nazwie nie został znaleziony", name);
         }
         player = default!;
         return false;
@@ -194,8 +211,8 @@ public class CommandArguments
                 return true;
             }
             if (players.Count > 0)
-                throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
-            throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+                throw new CommandArgumentException(CurrentArgument, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
+            throw new CommandArgumentException(CurrentArgument, "Gracz o takiej nazwie nie został znaleziony", name);
         }
         player = _player;
         return true;
@@ -206,7 +223,7 @@ public class CommandArguments
         pattern ??= ReadArgument();
         var players = _searchService.SearchPlayers(pattern).ToList();
         if (players.Count == 0 && !searchOption.HasFlag(PlayerSearchOption.AllowEmpty))
-            throw new CommandArgumentException(_index, "Nie znaleziono żadnego gracza.", pattern);
+            throw new CommandArgumentException(CurrentArgument, "Nie znaleziono żadnego gracza.", pattern);
         return players;
     }
 
@@ -215,7 +232,7 @@ public class CommandArguments
         pattern ??= ReadArgument();
         var vehicles = _searchService.SearchVehicles(pattern).ToList();
         if (vehicles.Count == 0)
-            throw new CommandArgumentException(_index, "Nie znaleziono żadnego pojazdu.", pattern);
+            throw new CommandArgumentException(CurrentArgument, "Nie znaleziono żadnego pojazdu.", pattern);
         return vehicles;
     }
 
@@ -234,7 +251,7 @@ public class CommandArguments
                 return value;
             }
         }
-        throw new CommandArgumentException(_index, null, str);
+        throw new CommandArgumentException(CurrentArgument, null, str);
     }
 
     public TEnum ReadEnumOrDefault<TEnum>(TEnum defaultValue = default) where TEnum : struct
