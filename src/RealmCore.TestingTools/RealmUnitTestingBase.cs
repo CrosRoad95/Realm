@@ -39,7 +39,7 @@ public abstract class RealmUnitTestingBase<TRealmTestingServer, TRealmPlayer> : 
 
 public abstract class RealmUnitTestingBase : RealmUnitTestingBase<RealmTestingServer, RealmTestingPlayer>
 {
-    protected override RealmTestingServer CreateServer(TestConfigurationProvider? configuration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected override RealmTestingServer CreateServer(TestConfigurationProvider? configuration = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null)
     {
         _server ??= new RealmTestingServer(configuration ?? new TestConfigurationProvider(""), configureBuilder, services =>
         {

@@ -2,7 +2,7 @@
 using SlipeServer.Server;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Mappers;
-using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Resources.Base;
 
 namespace RealmCore.Resources.Overlay;
 

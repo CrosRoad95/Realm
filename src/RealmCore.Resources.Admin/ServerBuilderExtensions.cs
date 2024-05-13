@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Resources.Base;
+using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Resources.Admin;

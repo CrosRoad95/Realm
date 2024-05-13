@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Server;
-
-namespace RealmCore.BlazorHelpers;
+﻿namespace RealmCore.BlazorHelpers;
 
 public static class ServiceCollectionExtensions
 {

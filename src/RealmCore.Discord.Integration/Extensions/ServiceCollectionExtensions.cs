@@ -1,5 +1,4 @@
-﻿using Greet;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Grpc;

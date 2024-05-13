@@ -29,7 +29,7 @@ public abstract class RealmDockerDatabaseIntegrationTestingBase<TRealmTestingSer
 
 public abstract class RealmDockerDatabaseIntegrationTestingBase : RealmDockerDatabaseIntegrationTestingBase<RealmTestingServer, RealmTestingPlayer>
 {
-    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null)
     {
         _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
         {

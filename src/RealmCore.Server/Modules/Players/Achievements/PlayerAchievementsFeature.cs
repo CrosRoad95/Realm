@@ -5,7 +5,7 @@ public interface IPlayerAchievementsFeature : IPlayerFeature, IEnumerable<Achiev
     event Action<IPlayerAchievementsFeature, int>? Unlocked;
     event Action<IPlayerAchievementsFeature, int, float>? Progressed;
 
-    T? GetAchievementValue<T>(int achievementId);
+    T? GetValue<T>(int achievementId);
     AchievementDto Get(int achievementId);
     bool HasReachedProgressThreshold(int achievementId, float progress);
     bool SetProgress(int achievementId, float progress, float maximumProgress);
@@ -68,7 +68,7 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
         }
     }
 
-    public T? GetAchievementValue<T>(int achievementId)
+    public T? GetValue<T>(int achievementId)
     {
         lock (_lock)
         {

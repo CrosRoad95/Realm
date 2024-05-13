@@ -4,39 +4,39 @@ namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static ServiceCollection AddCommand<TCommand>(this ServiceCollection services) where TCommand : class, IInGameCommand
+    public static IServiceCollection AddCommand<TCommand>(this IServiceCollection services) where TCommand : class, IInGameCommand
     {
         services.AddSingleton(new CommandTypeWrapper(typeof(TCommand)));
         services.AddTransient<TCommand>();
         return services;
     }
 
-    public static ServiceCollection AddSeederProvider<TSeederProvider>(this ServiceCollection services) where TSeederProvider : class, ISeederProvider
+    public static IServiceCollection AddSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, ISeederProvider
     {
         services.AddSingleton<ISeederProvider, TSeederProvider>();
         return services;
     }
 
-    public static ServiceCollection AddAsyncSeederProvider<TSeederProvider>(this ServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
+    public static IServiceCollection AddAsyncSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
     {
         services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
         return services;
     }
 
-    public static ServiceCollection AddInGameCommand<TInGameCommand>(this ServiceCollection services) where TInGameCommand : class, IInGameCommand
+    public static IServiceCollection AddInGameCommand<TInGameCommand>(this IServiceCollection services) where TInGameCommand : class, IInGameCommand
     {
         services.AddTransient<IInGameCommand>(x => x.GetRequiredService<TInGameCommand>());
         services.AddTransient<TInGameCommand>();
         return services;
     }
     
-    public static ServiceCollection AddServerLoader<TServerLoader>(this ServiceCollection services) where TServerLoader : class, IServerLoader
+    public static IServiceCollection AddServerLoader<TServerLoader>(this IServiceCollection services) where TServerLoader : class, IServerLoader
     {
         services.AddTransient<IServerLoader, TServerLoader>();
         return services;
     }
 
-    public static ServiceCollection AddPlayerScopedFeature<T1, T2>(this ServiceCollection services)
+    public static IServiceCollection AddPlayerScopedFeature<T1, T2>(this IServiceCollection services)
         where T1 : class, IPlayerFeature
         where T2: class, T1
     {
@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    public static ServiceCollection AddVehicleScopedFeature<T1, T2>(this ServiceCollection services)
+    public static IServiceCollection AddVehicleScopedFeature<T1, T2>(this IServiceCollection services)
         where T1 : class, IVehicleFeature
         where T2: class, T1
     {
@@ -54,13 +54,13 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    public static ServiceCollection AddPlayerJoinedPipeline<T>(this ServiceCollection services) where T : class, IPlayerJoinedPipeline
+    public static IServiceCollection AddPlayerJoinedPipeline<T>(this IServiceCollection services) where T : class, IPlayerJoinedPipeline
     {
         services.AddTransient<IPlayerJoinedPipeline, T>();
         return services;
     }
 
-    internal static ServiceCollection ConfigureRealmServices(this ServiceCollection services)
+    internal static IServiceCollection ConfigureRealmServices(this IServiceCollection services)
     {
         var consoleLogger = services.Where(x => x.ImplementationType == typeof(ConsoleLoggerProvider)).FirstOrDefault();
         if (consoleLogger != null)

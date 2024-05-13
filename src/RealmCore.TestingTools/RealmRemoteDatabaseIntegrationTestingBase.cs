@@ -15,9 +15,9 @@ public abstract class RealmRemoteDatabaseIntegrationTestingBase<TRealmTestingSer
 
 public abstract class RealmRemoteDatabaseIntegrationTestingBase : RealmRemoteDatabaseIntegrationTestingBase<RealmTestingServer, RealmTestingPlayer>
 {
-    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected override RealmTestingServer CreateServer(TestConfigurationProvider? configuration = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null)
     {
-        _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
+        _server ??= new RealmTestingServer(configuration ?? new TestConfigurationProvider(""), configureBuilder, services =>
         {
             services.AddRealmTestingServices(true);
             configureServices?.Invoke(services);

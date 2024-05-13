@@ -1,4 +1,6 @@
-﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+﻿using SlipeServer.Resources.Base;
+
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Resources.ClientInterface;

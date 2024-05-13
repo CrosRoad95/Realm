@@ -63,7 +63,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         return player.Client;
     }
 
-    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetValue<Configuration>("server"), (serverBuilder) =>
+    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetValue<Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
         var httpClient = new HttpClient(new PAttach120DelegatingHandler());
@@ -182,7 +182,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
 
 public class RealmTestingServer : RealmTestingServer<RealmTestingPlayer>
 {
-    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base(testConfigurationProvider, configureBuilder, configureServices)
+    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null) : base(testConfigurationProvider, configureBuilder, configureServices)
     {
 
     }

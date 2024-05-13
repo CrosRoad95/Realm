@@ -6,7 +6,7 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
 {
     protected abstract string GetConnectionString();
 
-    protected async Task<TRealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected async Task<TRealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {

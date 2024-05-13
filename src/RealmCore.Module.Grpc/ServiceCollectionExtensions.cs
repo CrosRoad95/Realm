@@ -1,7 +1,4 @@
-﻿using Discord;
-using Grpc.Core;
-using Grpc.Core.Logging;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RealmCore.Module.Grpc.Options;

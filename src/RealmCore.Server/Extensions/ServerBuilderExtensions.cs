@@ -38,6 +38,8 @@ public static class ServerBuilderExtensions
 
         serverBuilder.ConfigureServices(services =>
         {
+            services.AddHttpClient();
+
             // Options
             services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
             services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));

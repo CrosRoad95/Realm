@@ -2,7 +2,7 @@
 
 public static class ServiceCollectionExtensions
 {
-    public static ServiceCollection AddRealmTestingServices(this ServiceCollection services, bool integrationTests)
+    public static IServiceCollection AddRealmTestingServices(this IServiceCollection services, bool integrationTests)
     {
         if (!integrationTests)
         {

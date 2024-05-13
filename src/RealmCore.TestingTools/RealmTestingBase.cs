@@ -6,6 +6,6 @@ public abstract class RealmTestingBase<TRealmTestingServer, TRealmPlayer>
 {
     protected TRealmTestingServer? _server;
 
-    protected abstract TRealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null);
+    protected abstract TRealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<IServiceCollection>? configureServices = null);
     protected abstract TRealmPlayer CreatePlayer(string name = "TestPlayer");
 }

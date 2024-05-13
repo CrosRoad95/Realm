@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Resources.Base;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;

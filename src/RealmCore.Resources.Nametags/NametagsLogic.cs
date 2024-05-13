@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
+using SlipeServer.Resources.Base;
 
 namespace RealmCore.Resources.Nametags;
 
