@@ -19,11 +19,17 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IElementOutlineService, ElementOutlineService>();
+            services.AddElementOutlineServices();
         });
 
         builder.AddLuaEventHub<IElementOutlineEventHub, ElementOutlineResource>();
         builder.AddLogic<ElementOutlineLogic>();
+    }
+
+    public static IServiceCollection AddElementOutlineServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IElementOutlineService, ElementOutlineService>();
+        return services;
     }
 }
 

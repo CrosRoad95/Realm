@@ -7,15 +7,14 @@ public interface IRewardService
 
 internal sealed class RewardService : IRewardService
 {
-    private readonly IUserRewardRepository _userRewardRepository;
-
-    public RewardService(IUserRewardRepository userRewardRepository)
+    public RewardService()
     {
-        _userRewardRepository = userRewardRepository;
+
     }
 
     public async Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default)
     {
-        return await _userRewardRepository.TryAddReward(player.PersistentId, rewardId, cancellationToken);
+        var userRewardRepository = player.GetRequiredService<IUserRewardRepository>();
+        return await userRewardRepository.TryAddReward(player.PersistentId, rewardId, cancellationToken);
     }
 }

@@ -8,7 +8,7 @@ internal class NametagsResource : Resource
     };
 
     internal NametagsResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "Nametags")
+        : base(server, server.RootElement, "Nametags")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));

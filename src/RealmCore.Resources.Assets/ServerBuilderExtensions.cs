@@ -21,11 +21,17 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IAssetsService, AssetsService>();
-            services.AddSingleton<AssetsCollection>();
-            services.AddSingleton<IServerAssetsProvider>(x => x.GetRequiredService<AssetsCollection>());
+            services.AddAssetsServices();
         });
 
         builder.AddLogic<AssetsLogic>();
+    }
+
+    public static IServiceCollection AddAssetsServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IAssetsService, AssetsService>();
+        services.AddSingleton<AssetsCollection>();
+        services.AddSingleton<IServerAssetsProvider>(x => x.GetRequiredService<AssetsCollection>());
+        return services;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-internal sealed class ClientInterfaceResourceLogic
+internal sealed class ClientInterfaceResourceLogic : IHostedService
 {
     private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
@@ -11,9 +11,20 @@ internal sealed class ClientInterfaceResourceLogic
         _clientInterfaceService = clientInterfaceService;
         _elementFactory = elementFactory;
         _logger = logger;
+    }
 
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
         _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
         _elementFactory.ElementCreated += HandleElementCreated;
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _clientInterfaceService.ClientErrorMessage -= HandleClientErrorMessage;
+        _elementFactory.ElementCreated -= HandleElementCreated;
+        return Task.CompletedTask;
     }
 
     private void HandleElementCreated(IElementFactory elementFactory, Element element)

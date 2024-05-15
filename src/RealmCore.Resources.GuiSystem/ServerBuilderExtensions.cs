@@ -30,9 +30,15 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IGuiSystemService, GuiSystemService>();
+            services.AddGuiSystemServices();
         });
 
         builder.AddLogic<GuiSystemLogic>();
+    }
+
+    public static IServiceCollection AddGuiSystemServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IGuiSystemService, GuiSystemService>();
+        return services;
     }
 }

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.Sample\RealmCore.Sample.csproj" />
+    <ProjectReference Include="..\RealmCore.WebHosting\RealmCore.WebHosting.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -46,5 +47,17 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="C:\Users\sebaj\source\repos\RealmCore\src\RealmCore.BlazorGui\.editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Using Include="RealmCore.BlazorGui" />
+	  <Using Include="RealmCore.Discord.Integration.Extensions" />
+	  <Using Include="RealmCore.Module.Discord" />
+	  <Using Include="RealmCore.Module.Discord.Services" />
+	  <Using Include="RealmCore.Sample" />
+	  <Using Include="RealmCore.Server.Modules.Elements" />
+	  <Using Include="RealmCore.WebHosting" />
+	  <Using Include="SlipeServer.Hosting" />
+	  <Using Include="SlipeServer.Server.ServerBuilders" />
+	  <Using Include="System.Reflection" />
 	</ItemGroup>
 </Project>

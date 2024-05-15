@@ -17,10 +17,16 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IMapNamesService, MapNamesService>();
+            services.AddMapNamesServices();
         });
 
         builder.AddLuaEventHub<IMapNamesEventHub, MapNamesResource>();
         builder.AddLogic<MapNamesLogic>();
+    }
+
+    public static IServiceCollection AddMapNamesServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IMapNamesService, MapNamesService>();
+        return services;
     }
 }

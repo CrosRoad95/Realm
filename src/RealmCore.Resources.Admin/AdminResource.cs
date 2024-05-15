@@ -14,7 +14,7 @@ internal class AdminResource : Resource
     };
 
     internal AdminResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "Admin")
+        : base(server, server.RootElement, "Admin")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));

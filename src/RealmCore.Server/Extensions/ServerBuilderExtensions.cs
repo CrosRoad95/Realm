@@ -1,4 +1,6 @@
-﻿using SlipeServer.Server.Behaviour;
+﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+[assembly: InternalsVisibleTo("RealmCore.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace RealmCore.Server.Extensions;
 
@@ -10,6 +12,53 @@ public enum ExcludeResources
 
 public static class ServerBuilderExtensions
 {
+    public static ServerBuilder AddResources(this ServerBuilder serverBuilder, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
+    {
+        var commonOptions = new CommonResourceOptions();
+
+        serverBuilder.AddBrowserResource();
+        //serverBuilder.AddNoClipResource(new NoClipOptions
+        //{
+        //    Bind = null
+        //});
+        //serverBuilder.AddClientInterfaceResource(commonOptions);
+        //serverBuilder.AddElementOutlineResource();
+        //serverBuilder.AddAdminResource();
+        //serverBuilder.AddAFKResource();
+        //serverBuilder.AddMapNamesResource();
+        //serverBuilder.AddStatisticsCounterResource();
+        //serverBuilder.AddOverlayResource();
+        //serverBuilder.AddAssetsResource();
+        //serverBuilder.AddText3dResource();
+        //serverBuilder.AddNametagsResource();
+        //if (excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
+        //    serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
+        //serverBuilder.AddWatermarkResource();
+        //serverBuilder.AddScoreboard();
+        return serverBuilder;
+    }
+    
+    public static IServiceCollection AddResources(this IServiceCollection services, ExcludeResources? excludeResources = null)
+    {
+        services.AddBrowserServices();
+        services.AddNoClipServices();
+        services.AddClientInterfaceServices();
+        services.AddElementOutlineServices();
+        services.AddAdminServices();
+        services.AddAFKServices();
+        services.AddMapNamesServices();
+        services.AddStatisticsCounterServices();
+        services.AddOverlayServices();
+        services.AddAssetsServices();
+        services.AddText3dServices();
+        services.AddNametagsServices();
+        if (excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
+            services.AddBoneAttachServices();
+        services.AddWatermarkServices();
+        services.AddScoreboardServices();
+        return services;
+    }
+
     public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
     {
         var _serverConfiguration = configuration.GetSection("Server").Get<Configuration>();
@@ -36,87 +85,6 @@ public static class ServerBuilderExtensions
             serverBuilder.AddBehaviour<CollisionShapeBehaviour>();
         }
 
-        serverBuilder.ConfigureServices(services =>
-        {
-            services.AddHttpClient();
-
-            // Options
-            services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
-            services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
-            services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
-            services.Configure<GuiBrowserOptions>(configuration.GetSection("GuiBrowser"));
-            services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
-
-            var connectionString = configuration.GetValue<string>("Database:ConnectionString");
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-                var identityConfiguration = configuration.GetSection("Identity").Get<IdentityConfiguration>();
-                if (identityConfiguration == null)
-                    throw new Exception("Identity configuration is null");
-                services.AddRealmIdentity<MySqlDb>(identityConfiguration);
-            }
-
-            services.AddSingleton<HelpCommand>();
-            services.AddCommand<SaveCommand>(); 
-            services.AddCommand<ServerInfoCommand>(); 
-            services.AddCommand<ReloadElementsCommand>();
-        });
-
-        #region Resources
-
-        var commonOptions = new CommonResourceOptions();
-
-        serverBuilder.AddNoClipResource(new NoClipOptions
-        {
-            Bind = null
-        });
-
-        serverBuilder.AddClientInterfaceResource(commonOptions);
-        serverBuilder.AddElementOutlineResource();
-        serverBuilder.AddAdminResource();
-        serverBuilder.AddAFKResource();
-        serverBuilder.AddMapNamesResource();
-        serverBuilder.AddStatisticsCounterResource();
-        serverBuilder.AddOverlayResource();
-        serverBuilder.AddAssetsResource();
-        serverBuilder.AddText3dResource();
-        serverBuilder.AddNametagsResource();
-        if(excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
-            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
-        serverBuilder.AddWatermarkResource();
-        serverBuilder.AddScoreboard();
-        #endregion
-
-        #region Logics
-        serverBuilder.AddLogic<BrowserGuiLogic>();
-        serverBuilder.AddLogic<AdminResourceLogic>();
-        serverBuilder.AddLogic<AFKResourceLogic>();
-        serverBuilder.AddLogic<BoneAttachResourceLogic>();
-        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
-        serverBuilder.AddLogic<NametagResourceLogic>();
-        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
-        serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<AdministrationLogic>();
-        serverBuilder.AddLogic<FocusableElementsLogic>();
-        serverBuilder.AddLogic<PlayerHudLogic>();
-        serverBuilder.AddLogic<VehiclesTuningLogic>();
-        serverBuilder.AddLogic<PeristantVehicleLogic>();
-        serverBuilder.AddLogic<InventoryLogic>();
-        serverBuilder.AddLogic<PlayersLogic>();
-        serverBuilder.AddLogic<GuiLogic>();
-        serverBuilder.AddLogic<ServerListLogic>();
-        serverBuilder.AddLogic<VehicleAccessControllerLogic>();
-        serverBuilder.AddLogic<MapsLogic>();
-        serverBuilder.AddLogic<PlayersBindsLogic>();
-        serverBuilder.AddLogic<PlayTimeLogic>();
-        serverBuilder.AddLogic<PlayerBlipLogic>();
-        serverBuilder.AddLogic<PlayerMoneyLogic>();
-        serverBuilder.AddLogic<AFKLogic>();
-        serverBuilder.AddLogic<PlayerDailyVisitsLogic>();
-        serverBuilder.AddLogic<PlayerJoinedPipeline>();
-        #endregion
-
         #region Behaviours
         serverBuilder.AddBehaviour<ScopedCollisionShapeBehaviour>();
         #endregion
@@ -124,11 +92,11 @@ public static class ServerBuilderExtensions
         return serverBuilder;
     }
 
-    public static ServerBuilder WithGuiSystem(this ServerBuilder serverBuilder)
+    public static IServiceCollection WithGuiSystem(this IServiceCollection services)
     {
-        serverBuilder.AddScopedLogic<DxGuiSystemServiceLogic>();
-        serverBuilder.AddScopedLogic<ReactiveDxGuiLogic>();
-        return serverBuilder;
+        services.AddHostedService<DxGuiSystemHostedService>();
+        services.AddHostedService<ReactiveDxGuiHostedService>();
+        return services;
     }
 
 }

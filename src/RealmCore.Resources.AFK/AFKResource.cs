@@ -1,5 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server;
+﻿using SlipeServer.Server;
 using SlipeServer.Server.Resources;
 
 namespace RealmCore.Resources.AFK;
@@ -12,7 +11,7 @@ internal class AFKResource : Resource
     };
 
     internal AFKResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "AFK")
+        : base(server, server.RootElement, "AFK")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));

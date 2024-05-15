@@ -22,11 +22,17 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IOverlayService, OverlayService>();
+            services.AddOverlayServices();
         });
 
         builder.AddLuaEventHub<IHudEventHub, OverlayResource>();
 
         builder.AddLogic<OverlayLogic>();
+    }
+
+    public static IServiceCollection AddOverlayServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IOverlayService, OverlayService>();
+        return services;
     }
 }

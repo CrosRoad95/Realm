@@ -60,11 +60,30 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    internal static IServiceCollection ConfigureRealmServices(this IServiceCollection services)
+    public static IServiceCollection ConfigureRealmServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var consoleLogger = services.Where(x => x.ImplementationType == typeof(ConsoleLoggerProvider)).FirstOrDefault();
-        if (consoleLogger != null)
-            services.Remove(consoleLogger);
+        // Options
+        services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
+        services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
+        services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
+        services.Configure<GuiBrowserOptions>(configuration.GetSection("GuiBrowser"));
+        services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
+
+        var connectionString = configuration.GetValue<string>("Database:ConnectionString");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+            var identityConfiguration = configuration.GetSection("Identity").Get<IdentityConfiguration>();
+            if (identityConfiguration == null)
+                throw new Exception("Identity configuration is null");
+            services.AddRealmIdentity<MySqlDb>(identityConfiguration);
+        }
+
+        services.AddResources();
+        services.AddSingleton<HelpCommand>();
+        services.AddCommand<SaveCommand>();
+        services.AddCommand<ServerInfoCommand>();
+        services.AddCommand<ReloadElementsCommand>();
 
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -98,14 +117,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISaveService, SaveService>();
         services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
-        services.AddScoped<IGroupService, GroupService>();
+        services.AddSingleton<IGroupService, GroupService>();
         services.AddScoped<IFractionService, FractionService>();
-        services.AddScoped<IRewardService, RewardService>();
+        services.AddSingleton<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
-        services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
+        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IPlayersNotifications, PlayersNotifications>();
         services.AddScoped<INewsService, NewsService>();
-        services.AddScoped<IPlayerMoneyHistoryService, PlayerMoneyHistoryService>();
+        services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
         services.AddScoped<IPlayerUserService, PlayerUserService>();
@@ -186,6 +205,121 @@ public static class ServiceCollectionExtensions
         services.AddServerLoader<SeederServerLoader>();
         services.AddServerLoader<VehicleServerLoader>();
 
+        services.AddHostedService<BrowserGuiHostedService>();
+        services.AddHostedService<AdminResourceHostedService>();
+        services.AddHostedService<AFKResourceHostedService>();
+        services.AddHostedService<BoneAttachResourceHostedService>();
+        services.AddHostedService<ClientInterfaceResourceLogic>();
+        services.AddHostedService<NametagResourceHostedService>();
+        services.AddHostedService<StatisticsCounterResourceHostedService>();
+        services.AddHostedService<WatermarkResourceHostedService>();
+        services.AddHostedService<AdministrationHostedService>();
+        services.AddHostedService<FocusableElementsHostedService>();
+        services.AddHostedService<PlayerHudHostedService>();
+        services.AddHostedService<VehiclesTuningHostedService>();
+        services.AddHostedService<VehiclesInUseHostedService>();
+        services.AddHostedService<InventoryHostedService>();
+        services.AddHostedService<PlayersHostedService>();
+        services.AddHostedService<GuiHostedService>();
+        services.AddHostedService<ServerListHostedService>();
+        services.AddHostedService<VehicleAccessControllerLogic>();
+        services.AddHostedService<MapsHostedService>();
+        services.AddHostedService<PlayersBindsHostedService>();
+        services.AddHostedService<PlayTimeHostedService>();
+        services.AddHostedService<PlayerBlipHostedService>();
+        services.AddHostedService<PlayerMoneyHostedService>();
+        services.AddHostedService<AFKHostedService>();
+        services.AddHostedService<PlayerDailyVisitsHostedService>();
+        services.AddHostedService<PlayerJoinedPipelineHostedService>();
         return services;
     }
+}
+
+internal sealed class ServerLifecycle : IHostedService
+{
+    private readonly ILogger<ServerLifecycle> _logger;
+    private readonly IEnumerable<IServerLoader> _serverLoaders;
+    private readonly IOptions<GameplayOptions> _gameplayOptions;
+    private readonly RealmCommandService _realmCommandService;
+    private readonly IElementCollection _elementCollection;
+
+    public ServerLifecycle(ILogger<ServerLifecycle> logger, IEnumerable<IServerLoader> serverLoaders, IOptions<GameplayOptions> _gameplayOptions, RealmCommandService realmCommandService, CollisionShapeBehaviour collisionShapeBehaviour, IElementCollection elementCollection)
+    {
+        _logger = logger;
+        _serverLoaders = serverLoaders;
+        this._gameplayOptions = _gameplayOptions;
+        _realmCommandService = realmCommandService;
+        _elementCollection = elementCollection;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using var activity = Activity.StartActivity(nameof(StartAsync));
+
+        {
+            using var serverLoadersActivity = Activity.StartActivity("Loading server");
+            bool anyFailed = false;
+            foreach (var item in _serverLoaders)
+            {
+                using var serverLoaderActivity = Activity.StartActivity($"Loading {item}");
+                try
+                {
+                    await item.Load();
+                }
+                catch (Exception ex)
+                {
+                    anyFailed = true;
+                    serverLoaderActivity?.SetStatus(ActivityStatusCode.Error);
+                    _logger.LogError(ex, "Failed to load server loader.");
+                }
+            }
+            if (anyFailed)
+            {
+                throw new Exception("Server failed to load.");
+            }
+        }
+
+        CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
+        CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
+
+        _logger.LogInformation("Server started.");
+        _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
+        _logger.LogInformation("Created commands: {commandsCount}", _realmCommandService.Count);
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Server stopping.");
+        int i = 0;
+
+        foreach (var element in _elementCollection.GetAll())
+        {
+            try
+            {
+                if (element is RealmVehicle vehicle)
+                {
+                    await vehicle.GetRequiredService<ISaveService>().Save(CancellationToken.None);
+                    i++;
+                }
+                else if (element is RealmPlayer player)
+                {
+                    await player.GetRequiredService<ISaveService>().Save(CancellationToken.None);
+                    i++;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save element.");
+            }
+            finally
+            {
+                element.Destroy();
+            }
+        }
+
+        _logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
+        await Task.Delay(500, CancellationToken.None);
+    }
+
+    public static readonly ActivitySource Activity = new("RealmCore.RealmServer", "1.0.0");
 }

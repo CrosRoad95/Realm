@@ -1,5 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server.Resources;
+﻿using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 
 namespace RealmCore.Resources.StatisticsCounter;
@@ -13,7 +12,7 @@ internal class StatisticsCounterResource : Resource
     };
 
     internal StatisticsCounterResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "StatisticsCounter")
+        : base(server, server.RootElement, "StatisticsCounter")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));

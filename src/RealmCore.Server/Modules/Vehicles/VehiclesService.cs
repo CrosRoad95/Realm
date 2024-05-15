@@ -13,36 +13,19 @@ public interface IVehiclesService
 
 internal sealed class VehiclesService : IVehiclesService
 {
-    private readonly IVehicleRepository _vehicleRepository;
     private readonly IElementFactory _elementFactory;
-    private readonly ItemsCollection _itemsCollection;
-    private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly VehicleUpgradesCollection _vehicleUpgradesCollection;
-    private readonly VehicleEnginesCollection _vehicleEnginesCollection;
     private readonly IUsersInUse _activeUsers;
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly ILogger<VehicleService> _logger;
-    private readonly IVehicleLoader _loadService;
-    private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehicleService> logger, IVehicleLoader loadService)
+    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehicleService> logger)
     {
-        _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;
-        _itemsCollection = itemsCollection;
-        _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
-        _vehicleUpgradesCollection = vehicleUpgradeCollection;
-        _vehicleEnginesCollection = vehicleEnginesCollection;
         _activeUsers = activeUsers;
         _vehiclesInUse = vehiclesInUse;
         _logger = logger;
-        _loadService = loadService;
-        _jsonSerializerSettings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { DoubleConverter.Instance }
-        };
     }
 
     public async Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
@@ -66,7 +49,8 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (player.User.IsSignedIn)
         {
-            return await _vehicleRepository.GetVehiclesByUserId(player.PersistentId, null, cancellationToken);
+            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
+            return await vehicleRepository.GetVehiclesByUserId(player.PersistentId, null, cancellationToken);
         }
         return [];
     }
@@ -75,7 +59,8 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (player.User.IsSignedIn)
         {
-            return await _vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
+            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
+            return await vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
         }
         return [];
     }
@@ -117,7 +102,8 @@ internal sealed class VehiclesService : IVehiclesService
 
         var occupants = vehicle.Occupants.ToList();
         await vehicleService.Destroy(cancellationToken);
-        var persistentVehicle = await _loadService.LoadVehicleById(vehicleData.Id, cancellationToken);
+        var vehicleLoader = vehicle.GetRequiredService<IVehicleLoader>();
+        var persistentVehicle = await vehicleLoader.LoadVehicleById(vehicleData.Id, cancellationToken);
         persistentVehicle.SetLocation(location);
         foreach (var pair in occupants)
             persistentVehicle.AddPassenger(pair.Key, pair.Value);

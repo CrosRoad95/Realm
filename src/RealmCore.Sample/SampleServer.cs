@@ -1,97 +1,93 @@
-﻿using SlipeServer.Resources.DGS;
-using RealmCore.Resources.Addons.GuiSystem.DGS;
-using RealmCore.Logging;
+﻿using RealmCore.Logging;
 using Serilog.Events;
 using Serilog;
-using RealmCore.Sample.Logic;
-using RealmCore.Sample.Utilities;
 using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
-using RealmCore.Server.Modules.Chat;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
 using RealmCore.Module.Discord;
-using Microsoft.Extensions.Configuration;
+using SlipeServer.Server.ServerBuilders;
+using RealmCore.Server.Modules.Chat;
 
 [assembly: ExcludeFromCodeCoverage]
 
 namespace RealmCore.Sample;
 
-public class SampleServer : RealmServer
+public static class SampleServerExtensions
 {
-    static bool withDgs = true;
-
-    public SampleServer(IConfiguration configuration) : base(configuration, serverBuilder =>
+    public static IServiceCollection AddSampleServer(this IServiceCollection services)
     {
+        services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
+
+        #region In game command
+        services.AddInGameCommand<CreateGroupCommand>();
+        services.AddInGameCommand<GiveItemCommand>();
+        services.AddInGameCommand<GiveLicenseCommand>();
+        services.AddInGameCommand<InventoryCommand>();
+        services.AddInGameCommand<LicensesCommand>();
+        services.AddInGameCommand<TakeItemCommand>();
+        services.AddInGameCommand<AddPointsCommand>();
+        services.AddInGameCommand<JobsStatsCommand>();
+        services.AddInGameCommand<JobsStatsAllCommand>();
+        services.AddInGameCommand<GiveRewardCommand>();
+        services.AddInGameCommand<Display3dRing>();
+        services.AddInGameCommand<CurrencyCommand>();
+        #endregion
+
+        services.AddSingleton<IUserDataSaver, TestSaver>();
+
+        var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
+        services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
+
+        services.AddPlayerJoinedPipeline<PlayerBanPipeline>();
+        services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
+
+        services.AddDiscordSupport();
+        services.AddGuiSystemServices();
+
+        services.WithGuiSystem();
+
+        services.AddHostedService<PlayerJoinedHostedLogic>();
+        services.AddHostedService<SamplePickupsHostedService>();
+        services.AddHostedService<PlayerBindsHostedService>();
+        services.AddHostedService<ItemsHostedService>();
+        services.AddHostedService<VehicleUpgradesHostedService>();
+        services.AddHostedService<AchievementsHostedService>();
+        services.AddHostedService<WorldHostedService>();
+        services.AddHostedService<LevelsHostedService>();
+        services.AddHostedService<PlayerGameplayHostedService>();
+        services.AddHostedService<CommandsHostedService>();
+        services.AddHostedService<MapsHostedService>();
+        services.AddHostedService<ProceduralObjectsHostedService>();
+        services.AddHostedService<AssetsHostedService>();
+        services.AddHostedService<DefaultChatHostedService>();
+        services.AddHostedService<TestHostedService>();
+        return services;
+    }
+
+    public static ServerBuilder AddSampleServer(this ServerBuilder serverBuilder)
+    {
+        bool withDgs = true;
         if (withDgs)
         {
-            serverBuilder.WithGuiSystem();
-            serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
-            serverBuilder.AddGuiSystemResource(builder =>
-            {
-                builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-                builder.SetGuiProvider(DGSGuiProvider.Name);
-            }, new());
+            //serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
+            //serverBuilder.AddGuiSystemResource(builder =>
+            //{
+            //    builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+            //    builder.SetGuiProvider(DGSGuiProvider.Name);
+            //}, new());
         }
 
-        serverBuilder.AddBrowserResource();
         //serverBuilder.AddBrowserResource("../../../Server/BlazorGui/wwwroot", BrowserMode.Remote);
 
-        serverBuilder.AddLogic<PlayerJoinedLogic>();
-        serverBuilder.AddLogic<SamplePickupsLogic>();
-        serverBuilder.AddLogic<PlayerBindsLogic>();
-        serverBuilder.AddLogic<ItemsLogic>();
-        serverBuilder.AddLogic<VehicleUpgradesLogic>();
-        serverBuilder.AddLogic<AchievementsLogic>();
-        serverBuilder.AddLogic<WorldLogic>();
-        serverBuilder.AddLogic<LevelsLogic>();
-        serverBuilder.AddLogic<PlayerGameplayLogic>();
-        serverBuilder.AddScopedLogic<CommandsLogic>();
-        serverBuilder.AddLogic<MapsLogic>();
-        serverBuilder.AddLogic<ProceduralObjectsLogic>();
-        serverBuilder.AddLogic<AssetsLogic>();
-        serverBuilder.AddLogic<DefaultChatLogic>();
-        serverBuilder.AddLogic<TestLogic>();
 
-#if DEBUG
-        if (withDgs)
-        {
-            serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
-        }
-#endif
+        //#if DEBUG
+        //        if (withDgs)
+        //        {
+        //            serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
+        //        }
+        //#endif
 
-        serverBuilder.ConfigureServices(services =>
-        {
-            services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
-
-            #region In game command
-            services.AddInGameCommand<CreateGroupCommand>();
-            services.AddInGameCommand<GiveItemCommand>();
-            services.AddInGameCommand<GiveLicenseCommand>();
-            services.AddInGameCommand<InventoryCommand>();
-            services.AddInGameCommand<LicensesCommand>();
-            services.AddInGameCommand<TakeItemCommand>();
-            services.AddInGameCommand<AddPointsCommand>();
-            services.AddInGameCommand<JobsStatsCommand>();
-            services.AddInGameCommand<JobsStatsAllCommand>();
-            services.AddInGameCommand<GiveRewardCommand>();
-            services.AddInGameCommand<Display3dRing>();
-            services.AddInGameCommand<CurrencyCommand>();
-            #endregion
-
-            services.AddSingleton<IUserDataSaver, TestSaver>();
-
-            var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
-            services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
-
-            services.AddPlayerJoinedPipeline<PlayerBanPipeline>();
-            services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
-
-            services.AddDiscordSupport();
-        });
-
-        //serverBuilder.AddExtras(realmConfigurationProvider);
-    })
-    {
+        return serverBuilder;
     }
 }

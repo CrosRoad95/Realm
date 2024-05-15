@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Resources.Base;
 using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
@@ -19,11 +18,17 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<INametagsService, NametagsService>();
+            services.AddNametagsServices();
         });
 
         builder.AddLuaEventHub<INametagsEventHub, NametagsResource>();
 
         builder.AddLogic<NametagsLogic>();
+    }
+
+    public static IServiceCollection AddNametagsServices(this IServiceCollection services)
+    {
+        services.AddSingleton<INametagsService, NametagsService>();
+        return services;
     }
 }

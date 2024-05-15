@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddDiscordSupport(this IServiceCollection services)
     {
-        services.AddSingleton<RealmDiscordService>();
+        services.AddSingleton<DiscordService>();
         return services;
     }
 }

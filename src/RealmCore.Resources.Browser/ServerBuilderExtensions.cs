@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]
@@ -14,17 +13,22 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new BrowserResource(server, filesLocation);
-            resource.AddLuaEventHub<IBrowserEventHub>();
-
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
+            resource.AddLuaEventHub<IBrowserEventHub>();
         });
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IBrowserService, BrowserService>();
+            services.AddBrowserServices();
         });
 
         builder.AddLuaEventHub<IBrowserEventHub, BrowserResource>();
         builder.AddLogic<BrowserLogic>();
+    }
+
+    public static IServiceCollection AddBrowserServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IBrowserService, BrowserService>();
+        return services;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Resources.Base;
 using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
@@ -19,10 +18,16 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IAdminService, AdminService>();
+            services.AddAdminServices();
         });
 
         builder.AddLuaEventHub<IAdminEventHub, AdminResource>();
         builder.AddLogic<AdminLogic>();
+    }
+
+    public static IServiceCollection AddAdminServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IAdminService, AdminService>();
+        return services;
     }
 }

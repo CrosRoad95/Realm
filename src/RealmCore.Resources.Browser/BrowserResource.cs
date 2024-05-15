@@ -12,7 +12,7 @@ internal class BrowserResource : Resource
     };
 
     internal BrowserResource(MtaServer server, string? directoryPath)
-        : base(server, server.GetRequiredService<RootElement>(), "Browser")
+        : base(server, server.RootElement, "Browser")
     {
         var browserOptions = server.GetRequiredService<IOptions<BrowserOptions>>();
         foreach (var (path, content) in AdditionalFiles)

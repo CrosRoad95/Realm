@@ -8,7 +8,7 @@ internal class MapNamesResource : Resource
     };
 
     internal MapNamesResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "MapNames")
+        : base(server, server.RootElement, "MapNames")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));

@@ -42,10 +42,9 @@ internal class DiscordService : IDiscordService
 {
     private readonly Messaging.MessagingClient _messagingClient;
 
-    public DiscordService(GrpcChannel grpcChannel, Func<RealmDiscordService> realmDiscordServiceProvider)
+    public DiscordService(GrpcChannel grpcChannel, RealmDiscordService realmDiscordService)
     {
         _messagingClient = new(grpcChannel);
-        var realmDiscordService = realmDiscordServiceProvider();
         realmDiscordService.SendMessage = SendMessage;
         realmDiscordService.SendFile = SendFile;
         realmDiscordService.SendMessageToUser = SendMessageToUser;

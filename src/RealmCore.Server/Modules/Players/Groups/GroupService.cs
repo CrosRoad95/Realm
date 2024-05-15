@@ -12,11 +12,11 @@ public interface IGroupService
 
 internal sealed class GroupService : IGroupService
 {
-    private readonly IGroupRepository _groupRepository;
+    private readonly IServiceProvider _serviceProvider;
 
-    public GroupService(IGroupRepository groupRepository)
+    public GroupService(IServiceProvider serviceProvider)
     {
-        _groupRepository = groupRepository;
+        _serviceProvider = serviceProvider;
     }
 
     private Group Map(GroupData groupData)
@@ -38,7 +38,8 @@ internal sealed class GroupService : IGroupService
 
     public async Task<Group?> GetGroupByName(string groupName, CancellationToken cancellationToken = default)
     {
-        var groupData = await _groupRepository.GetByName(groupName, cancellationToken);
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        var groupData = await groupRepository.GetByName(groupName, cancellationToken);
         if (groupData == null)
             return null;
 
@@ -47,7 +48,8 @@ internal sealed class GroupService : IGroupService
 
     public async Task<Group?> GetGroupByNameOrShortCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
-        var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut, cancellationToken);
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        var groupData = await groupRepository.GetGroupByNameOrShortcut(groupName, shortcut, cancellationToken);
         if (groupData == null)
             return null;
 
@@ -56,18 +58,20 @@ internal sealed class GroupService : IGroupService
 
     public async Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
-        return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        return await groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
     }
 
     public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular, CancellationToken cancellationToken = default)
     {
-        if (await _groupRepository.ExistsByName(groupName, cancellationToken))
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        if (await groupRepository.ExistsByName(groupName, cancellationToken))
             throw new GroupNameInUseException(groupName);
 
-        if (await _groupRepository.ExistsByShortcut(shortcut, cancellationToken))
+        if (await groupRepository.ExistsByShortcut(shortcut, cancellationToken))
             throw new GroupShortcutInUseException(shortcut);
 
-        var groupData = await _groupRepository.Create(groupName, shortcut, (byte)groupKind, cancellationToken);
+        var groupData = await groupRepository.Create(groupName, shortcut, (byte)groupKind, cancellationToken);
         return Map(groupData);
     }
 
@@ -76,7 +80,8 @@ internal sealed class GroupService : IGroupService
         if (player.Groups.IsMember(groupId))
             return false;
 
-        var groupMemberData = await _groupRepository.TryAddMember(groupId, player.PersistentId, rank, rankName, cancellationToken);
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        var groupMemberData = await groupRepository.TryAddMember(groupId, player.PersistentId, rank, rankName, cancellationToken);
         if (groupMemberData == null)
             return false;
 
@@ -89,7 +94,8 @@ internal sealed class GroupService : IGroupService
         if (!player.Groups.IsMember(groupId))
             return false;
 
-        if (await _groupRepository.TryRemoveMember(groupId, player.PersistentId, cancellationToken))
+        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
+        if (await groupRepository.TryRemoveMember(groupId, player.PersistentId, cancellationToken))
         {
             player.Groups.RemoveGroupMember(groupId);
         }

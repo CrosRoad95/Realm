@@ -13,7 +13,7 @@ internal class GuiSystemResource : Resource
         ["ceguiProvider.lua"] = ResourceFiles.CeGuiProvider,
     };
 
-    internal GuiSystemResource(MtaServer server, GuiSystemOptions GuiSystemOptions) : base(server, server.GetRequiredService<RootElement>(), "GuiSystem")
+    internal GuiSystemResource(MtaServer server, GuiSystemOptions GuiSystemOptions) : base(server, server.RootElement, "GuiSystem")
     {
         _serverFilesProvider = server.GetRequiredService<IServerFilesProvider>();
         foreach (var (path, content) in AdditionalFiles)

@@ -1,5 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server.Resources;
+﻿using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 using System.Text;
 using RealmCore.Resources.Assets.Interfaces;
@@ -33,7 +32,7 @@ end
 """;
 
     internal AssetsResource(MtaServer server)
-        : base(server, server.GetRequiredService<RootElement>(), "Assets")
+        : base(server, server.RootElement, "Assets")
     {
         var serverAssetsProviders = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>();
         var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();

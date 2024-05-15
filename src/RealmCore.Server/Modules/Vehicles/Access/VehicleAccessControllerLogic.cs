@@ -1,15 +1,28 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-internal sealed class VehicleAccessControllerLogic
+internal sealed class VehicleAccessControllerLogic : IHostedService
 {
+    private readonly IElementFactory _elementFactory;
     private readonly IVehiclesAccessService _vehicleAccessService;
     private readonly ILogger<VehicleAccessControllerLogic> _logger;
 
     public VehicleAccessControllerLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerLogic> logger)
     {
+        _elementFactory = elementFactory;
         _vehicleAccessService = vehicleAccessService;
         _logger = logger;
-        elementFactory.ElementCreated += HandleElementCreated;
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _elementFactory.ElementCreated += HandleElementCreated;
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _elementFactory.ElementCreated -= HandleElementCreated;
+        return Task.CompletedTask;
     }
 
     private void HandleElementCreated(IElementFactory elementFactory, Element element)

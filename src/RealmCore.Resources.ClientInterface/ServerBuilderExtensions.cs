@@ -21,10 +21,16 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IClientInterfaceService, ClientInterfaceService>();
+            services.AddClientInterfaceServices();
         });
 
         builder.AddLuaEventHub<IClientInterfaceEventHub, ClientInterfaceResource>();
         builder.AddLogic<ClientInterfaceLogic>();
+    }
+
+    public static IServiceCollection AddClientInterfaceServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IClientInterfaceService, ClientInterfaceService>();
+        return services;
     }
 }
