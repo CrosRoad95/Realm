@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Gui;
+﻿using SlipeServer.Server.Elements.Enums;
+
+namespace RealmCore.Server.Modules.Players.Gui;
 
 public static class GuiHelpers
 {
@@ -12,8 +14,11 @@ public static class GuiHelpers
     {
         var logger = player.GetRequiredService<ILogger<TGui>>();
         var chatBox = player.GetRequiredService<ChatBox>();
-        player.SetBind(bind, player =>
+        player.SetBind(bind, (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             if (player.Gui.Current is TGui)
             {
                 player.Gui.Current = null;
@@ -37,8 +42,11 @@ public static class GuiHelpers
     {
         var logger = player.GetRequiredService<ILogger<TGui>>();
         var chatBox = player.GetRequiredService<ChatBox>();
-        player.SetBindAsync(bind, async (player, token) =>
+        player.SetBindAsync(bind, async (player, keyState, token) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             if (player.Gui.Current is TGui)
             {
                 player.Gui.Current = null;
@@ -70,8 +78,11 @@ public static class GuiHelpers
     {
         var logger = player.GetRequiredService<ILogger<TGui>>();
         var chatBox = player.GetRequiredService<ChatBox>();
-        player.SetBind(bind, player =>
+        player.SetBind(bind, (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             if (player.Gui.Current is TGui)
             {
                 player.Gui.Current = null;
@@ -95,8 +106,11 @@ public static class GuiHelpers
     {
         var logger = player.GetRequiredService<ILogger<TGui>>();
         var chatBox = player.GetRequiredService<ChatBox>();
-        player.SetBindAsync(bind, async (player, token) =>
+        player.SetBindAsync(bind, async (player, keyState, token) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             if (player.Gui.Current is TGui)
             {
                 player.Gui.Current = null;

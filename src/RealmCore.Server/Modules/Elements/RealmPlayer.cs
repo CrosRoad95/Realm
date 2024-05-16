@@ -23,6 +23,10 @@ internal struct FadeCameraScope : IAsyncDisposable
     }
 }
 
+internal abstract record BindHandlerBase(KeyState KeyState);
+internal record BindHandler(KeyState KeyState, Action<RealmPlayer, KeyState> Callback) : BindHandlerBase(KeyState);
+internal record AsyncBindHandler(KeyState KeyState, Func<RealmPlayer, KeyState, CancellationToken, Task> Callback) : BindHandlerBase(KeyState);
+
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
     private readonly object _lock = new();
@@ -42,8 +46,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private CultureInfo _culture = new("pl-PL");
     private RealmBlip? _blip = null;
 
-    private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = [];
-    private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = [];
+    private readonly Dictionary<string, BindHandlerBase> _binds = [];
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
     private readonly SemaphoreSlim _bindsDownLock = new(1);
@@ -297,6 +300,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public async Task<IAsyncDisposable> FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, this.CreateCancellationToken());
 
         Camera.Fade(cameraFade, fadeTime);
@@ -313,15 +318,33 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         return new FadeCameraScope(this, cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, fadeTime, cancellationToken);
     }
 
-    public void SetBindAsync(string key, Func<RealmPlayer, KeyState, CancellationToken, Task> callback)
+    public bool SetBindAsync(string key, Func<RealmPlayer, KeyState, CancellationToken, Task> callback, KeyState keyState = KeyState.Both)
     {
         _bindsLock.Wait();
         try
         {
-            CheckIfBindIsInUse(key);
+            if (IsBindInUseCore(key))
+                return false;
 
-            SetBind(key, KeyState.Both);
-            _asyncBinds[key] = callback;
+            SetBind(key, keyState);
+            _binds[key] = new AsyncBindHandler(KeyState.Both, callback);
+        }
+        finally
+        {
+            _bindsLock.Release();
+        }
+
+        return true;
+    }
+
+    public void SetBind(string key, Action<RealmPlayer, KeyState> callback, KeyState keyState = KeyState.Both)
+    {
+        _bindsLock.Wait();
+        try
+        {
+            IsBindInUseCore(key);
+            SetBind(key, keyState);
+            _binds[key] = new BindHandler(keyState, callback);
         }
         finally
         {
@@ -329,91 +352,35 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         }
     }
 
-    public void SetBindAsync(string key, Func<RealmPlayer, CancellationToken, Task> callback)
+    private bool IsBindInUseCore(string key)
+    {
+        if (_binds.ContainsKey(key))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool RemoveBind(string key)
     {
         _bindsLock.Wait();
         try
         {
-            CheckIfBindIsInUse(key);
-
-            SetBind(key, KeyState.Down);
-            _asyncBinds[key] = async (player, keyState, cancellationToken) =>
+            if (!!_binds.ContainsKey(key))
             {
-                if (keyState == KeyState.Down)
-                    await callback(this, cancellationToken);
-            };
-        }
-        finally
-        {
-            _bindsLock.Release();
-        }
-    }
-
-    private void CheckIfBindIsInUse(string key)
-    {
-        if (_asyncBinds.ContainsKey(key))
-        {
-            throw new BindAlreadyExistsException(key);
-        }
-        if (_asyncBinds.ContainsKey(key))
-        {
-            throw new BindAlreadyExistsException(key);
-        }
-    }
-
-    public void SetBind(string key, Action<RealmPlayer, KeyState> callback)
-    {
-        _bindsLock.Wait();
-        try
-        {
-            CheckIfBindIsInUse(key);
-            SetBind(key, KeyState.Both);
-            _binds[key] = callback;
-        }
-        finally
-        {
-            _bindsLock.Release();
-        }
-    }
-
-    public void SetBind(string key, Action<RealmPlayer> callback)
-    {
-        _bindsLock.Wait();
-        try
-        {
-            CheckIfBindIsInUse(key);
-            SetBind(key, KeyState.Down);
-            _binds[key] = (player, keyState) =>
-            {
-                if (keyState == KeyState.Down)
-                    callback(this);
-            };
-        }
-        finally
-        {
-            _bindsLock.Release();
-        }
-    }
-
-    public void RemoveBind(string key)
-    {
-        _bindsLock.Wait();
-        try
-        {
-            if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
-            {
-                _bindsLock.Release();
-                throw new BindDoesNotExistsException(key);
+                return false;
             }
             RemoveBind(key, KeyState.Both);
-            _asyncBinds.Remove(key);
             _binds.Remove(key);
+            return true;
         }
         finally
         {
             _bindsLock.Release();
         }
 
+        return false;
     }
 
     public void RemoveAllBinds()
@@ -421,12 +388,9 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         _bindsLock.Wait();
         try
         {
-            foreach (var pair in _asyncBinds)
-                RemoveBind(pair.Key, KeyState.Both);
             foreach (var pair in _binds)
-                RemoveBind(pair.Key, KeyState.Both);
+                RemoveBind(pair.Key, pair.Value.KeyState);
 
-            _asyncBinds.Clear();
             _binds.Clear();
         }
         finally
@@ -524,19 +488,15 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         {
             try
             {
-                bindCallback(this, keyState);
-            }
-            finally
-            {
-                TrySetCooldown(key, keyState, DateTime.Now.AddMilliseconds(400));
-            }
-        }
-
-        if (_asyncBinds.TryGetValue(key, out var asyncBindCallback))
-        {
-            try
-            {
-                await asyncBindCallback(this, keyState, this.CreateCancellationToken());
+                switch (bindCallback)
+                {
+                    case BindHandler bindHandler:
+                        bindHandler.Callback(this, keyState);
+                        break;
+                    case AsyncBindHandler asyncBindHandler:
+                        await asyncBindHandler.Callback(this, keyState, this.CreateCancellationToken());
+                        break;
+                }
             }
             finally
             {

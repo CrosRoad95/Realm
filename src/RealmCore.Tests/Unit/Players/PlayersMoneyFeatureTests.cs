@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Unit.Players;
+﻿using RealmCore.Server.Modules.Players.Money;
+
+namespace RealmCore.Tests.Unit.Players;
 
 public class PlayersMoneyFeatureTests : RealmUnitTestingBase
 {
@@ -254,6 +256,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
+        server.GetRequiredService<PlayerMoneyHostedService>().StartAsync(CancellationToken.None).Wait();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -492,5 +495,15 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
             return true;
         });
         money.Amount.Should().Be(980);
+    }
+
+    [Fact]
+    public async Task asdasd()
+    {
+        using var _ = new AssertionScope();
+
+        var asd = new NewRealmTestingServer();
+
+        ;
     }
 }

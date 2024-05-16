@@ -106,7 +106,7 @@ public class PlayersTests : RealmUnitTestingBase
     {
         #region Arrange
         var player = CreateServerWithOnePlayer();
-        player.SetBindAsync("x", (player, keyState) =>
+        player.SetBindAsync("x", (player, keyState, token) =>
         {
             throw new Exception("test123");
         });

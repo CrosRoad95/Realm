@@ -231,6 +231,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<AFKHostedService>();
         services.AddHostedService<PlayerDailyVisitsHostedService>();
         services.AddHostedService<PlayerJoinedPipelineHostedService>();
+
         return services;
     }
 }

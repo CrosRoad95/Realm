@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using RealmCore.Server.Modules.Inventories;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>
 {
@@ -55,42 +57,35 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
         }
     }
 
-    private void InternalUpdate(bool forceUpdate = false)
-    {
-        foreach (var item in _fuelContainers)
-        {
-            item.Update(forceUpdate);
-        }
-    }
-
     public void Update(bool forceUpdate = false)
     {
-        lock (_lock)
-        {
-            InternalUpdate(forceUpdate);
-        }
+        var active = Active;
+        if(active != null)
+            active.Update(forceUpdate);
     }
 
     public FuelContainer AddFuelContainer(short fuelType, float initialAmount, float maxCapacity, float fuelConsumptionPerOneKm, float minimumDistanceThreshold, bool makeActive = false)
     {
+        var fuelData = new VehicleFuelData
+        {
+            FuelType = fuelType,
+            Amount = initialAmount,
+            MaxCapacity = maxCapacity,
+            FuelConsumptionPerOneKm = fuelConsumptionPerOneKm,
+            MinimumDistanceThreshold = minimumDistanceThreshold,
+            Active = makeActive
+        };
+        var fuelContainer = new FuelContainer(Vehicle, fuelData);
+
         lock (_lock)
         {
-            var fuelData = new VehicleFuelData
-            {
-                FuelType = fuelType,
-                Amount = initialAmount,
-                MaxCapacity = maxCapacity,
-                FuelConsumptionPerOneKm = fuelConsumptionPerOneKm,
-                MinimumDistanceThreshold = minimumDistanceThreshold,
-                Active = makeActive
-            };
-            var fuelContainer = new FuelContainer(Vehicle, fuelData);
             _vehicleFuelData.Add(fuelData);
             _fuelContainers.Add(fuelContainer);
-            if(makeActive)
-                Active = fuelContainer;
-            return fuelContainer;
         }
+
+        if (makeActive)
+            Active = fuelContainer;
+        return fuelContainer;
     }
 
     public IEnumerator<FuelContainer> GetEnumerator()
@@ -121,7 +116,7 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
         if (active != null)
         {
             Active = active;
-            InternalUpdate(true);
+            Update(true);
         }
     }
 

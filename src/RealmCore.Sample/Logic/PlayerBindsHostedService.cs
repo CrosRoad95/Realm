@@ -1,4 +1,5 @@
 ﻿using RealmCore.Sample.Concepts.Gui;
+using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
 
@@ -51,13 +52,19 @@ internal sealed class PlayerBindsHostedService : IHostedService
 
     private void HandleSignedIn(RealmPlayer player)
     {
-        player.SetBind("num_0", player =>
+        player.SetBind("num_0", (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             player.Admin.NoClip = !player.Admin.NoClip;
         });
 
-        player.SetBind("F2", player =>
+        player.SetBind("F2", (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             var browserService = player.Browser;
             if (browserService.Visible)
             {
@@ -69,8 +76,11 @@ internal sealed class PlayerBindsHostedService : IHostedService
             }
         });
 
-        player.SetBind("F3", player =>
+        player.SetBind("F3", (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             var browserService = player.Browser;
             if(browserService.Visible)
             {
@@ -80,8 +90,11 @@ internal sealed class PlayerBindsHostedService : IHostedService
             browserService.Open("/realmUi/counter2");
         });
 
-        player.SetBind("F4", player =>
+        player.SetBind("F4", (player, keyState) =>
         {
+            if (keyState == KeyState.Up)
+                return;
+
             var browserService = player.Browser;
             if (browserService.Visible)
             {

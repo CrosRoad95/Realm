@@ -47,7 +47,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             value = Normalize(value);
 
             if (Math.Abs(value) > _moneyLimit)
-                throw new GameplayException("Unable to set money beyond limit.");
+                throw new GameplayException($"Unable to set money beyond limit ({_moneyLimit}).");
 
             using var _ = _lock.Begin();
 
