@@ -1,40 +1,47 @@
-﻿namespace RealmCore.Server.Modules.Domain;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public class ElementBag : IEnumerable<Element>, IDisposable
 {
+    private bool _disposed;
     private readonly object _lock = new();
     private readonly List<Element> _elements = [];
 
-    public bool Add(Element element)
+    public bool TryAdd(Element element)
     {
-        if (element.IsDestroyed)
-            throw new ElementDestroyedException(element);
-
         lock (_lock)
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(ElementBag));
+
+            if (element.IsDestroyed)
+                return false;
+
             if (_elements.Contains(element))
                 return false;
 
             _elements.Add(element);
             element.Destroyed += HandleDestroyed;
+
             if (element.IsDestroyed)
             {
-                _elements.Remove(element);
-                element.Destroyed -= HandleDestroyed;
+                if (_elements.Remove(element))
+                {
+                    element.Destroyed -= HandleDestroyed;
+                }
                 return false;
             }
         }
         return true;
     }
 
-    public bool Remove(Element element)
+    public bool TryRemove(Element element)
     {
-        if (element.IsDestroyed)
-            throw new ElementDestroyedException(element);
-
         lock (_lock)
         {
-            if(_elements.Remove(element))
+            if (element.IsDestroyed)
+                return false;
+
+            if (_elements.Remove(element))
             {
                 element.Destroyed -= HandleDestroyed;
                 return true;
@@ -54,21 +61,32 @@ public class ElementBag : IEnumerable<Element>, IDisposable
 
     public IEnumerator<Element> GetEnumerator()
     {
+        Element[] view;
         lock (_lock)
-            return new List<Element>(_elements).GetEnumerator();
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(ElementBag));
+
+            view = [.. _elements];
+        }
+
+        foreach (var element in view)
+            yield return element;
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public void Dispose()
     {
-        lock(_lock)
+        lock (_lock)
         {
             foreach (var element in _elements)
             {
                 element.Destroyed -= HandleDestroyed;
             }
             _elements.Clear();
+
+            _disposed = true;
         }
     }
 }

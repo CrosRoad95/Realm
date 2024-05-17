@@ -1748,12 +1748,12 @@ internal sealed class CommandsHostedService : IHostedService
             int a = 0;
             foreach (var foundPlayer in foundPlayers)
             {
-                if (player.SelectedElements.Remove(foundPlayer))
+                if (player.SelectedElements.TryRemove(foundPlayer))
                     a++;
             }
             foreach (var foundVehicle in foundVehicles)
             {
-                if (player.SelectedElements.Remove(foundVehicle))
+                if (player.SelectedElements.TryRemove(foundVehicle))
                     a++;
             }
             _chatBox.OutputTo(player, $"Deselected {a} elements.");
