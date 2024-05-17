@@ -2,8 +2,6 @@
 
 public interface IVehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>
 {
-    IReadOnlyCollection<int> Upgrades { get; }
-
     event Action<IVehicleUpgradesFeature, int>? UpgradeAdded;
     event Action<IVehicleUpgradesFeature, int>? UpgradeRemoved;
     internal event Action<IVehicleUpgradesFeature>? Rebuild;
@@ -22,14 +20,6 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature, IUsesVeh
     private readonly object _lock = new();
     private ICollection<VehicleUpgradeData> _upgrades = [];
 
-    public IReadOnlyCollection<int> Upgrades
-    {
-        get
-        {
-            lock (_lock)
-                return _upgrades.Select(x => x.UpgradeId).ToList().AsReadOnly();
-        }
-    }
 
     public event Action<IVehicleUpgradesFeature, int>? UpgradeAdded;
     public event Action<IVehicleUpgradesFeature, int>? UpgradeRemoved;
@@ -139,7 +129,18 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature, IUsesVeh
         return true;
     }
 
-    public IEnumerator<int> GetEnumerator() => Upgrades.GetEnumerator();
+    public IEnumerator<int> GetEnumerator()
+    {
+        int[] view;
+        lock (_lock)
+            view = [.. _upgrades.Select(x => x.UpgradeId)];
+
+        foreach (var upgradeId in view)
+        {
+            yield return upgradeId;
+        }
+    }
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public void Loaded(VehicleData vehicleData)

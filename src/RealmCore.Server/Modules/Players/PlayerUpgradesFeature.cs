@@ -87,8 +87,14 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserP
 
     public IEnumerator<int> GetEnumerator()
     {
+        int[] view;
         lock (_lock)
-            return new List<int>(_upgrades.Select(x => x.UpgradeId)).GetEnumerator();
+            view = [.. _upgrades.Select(x => x.UpgradeId)];
+
+        foreach (var upgradeId in view)
+        {
+            yield return upgradeId;
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

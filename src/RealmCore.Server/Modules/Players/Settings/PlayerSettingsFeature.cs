@@ -156,8 +156,14 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
 
     public IEnumerator<UserSettingDto> GetEnumerator()
     {
+        UserSettingData[] view;
         lock (_lock)
-            return new List<UserSettingDto>(_settings.Select(UserSettingDto.Map)).GetEnumerator();
+            view = [.. _settings];
+
+        foreach (var settingData in view)
+        {
+            yield return UserSettingDto.Map(settingData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

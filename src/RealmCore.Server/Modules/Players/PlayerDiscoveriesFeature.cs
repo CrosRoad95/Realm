@@ -61,8 +61,14 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IUse
 
     public IEnumerator<int> GetEnumerator()
     {
+        int[] view;
         lock (_lock)
-            return _discoveries.Select(x => x.DiscoveryId).ToList().GetEnumerator();
+            view = [.. _discoveries.Select(x => x.DiscoveryId)];
+
+        foreach (var discoveryId in view)
+        {
+            yield return discoveryId;
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

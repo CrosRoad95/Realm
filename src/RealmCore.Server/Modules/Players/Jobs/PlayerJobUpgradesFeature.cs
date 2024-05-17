@@ -96,8 +96,16 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IUse
 
     public IEnumerator<JobUpgradeDto> GetEnumerator()
     {
-        lock (_lock)
-            return new List<JobUpgradeDto>(_jobUpgrades.Select(JobUpgradeDto.Map)).GetEnumerator();
+        JobUpgradeData[] view;
+        {
+            lock (_lock)
+                view = [.. _jobUpgrades];
+        }
+
+        foreach (var jobUpgradeData in view)
+        {
+            yield return JobUpgradeDto.Map(jobUpgradeData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

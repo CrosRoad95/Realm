@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Achievements;
+﻿using System.Runtime;
+
+namespace RealmCore.Server.Modules.Players.Achievements;
 
 public interface IPlayerAchievementsFeature : IPlayerFeature, IEnumerable<AchievementDto>
 {
@@ -170,8 +172,14 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
 
     public IEnumerator<AchievementDto> GetEnumerator()
     {
+        AchievementData[] view;
         lock (_lock)
-            return new List<AchievementDto>(_achievements.Select(AchievementDto.Map)).GetEnumerator();
+            view = [.. _achievements];
+
+        foreach (var settingData in view)
+        {
+            yield return AchievementDto.Map(settingData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

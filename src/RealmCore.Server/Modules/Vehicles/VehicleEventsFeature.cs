@@ -37,8 +37,14 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature, IUsesVehicle
 
     public IEnumerator<VehicleEventDto> GetEnumerator()
     {
+        VehicleEventData[] view;
         lock (_lock)
-            return new List<VehicleEventDto>(_vehicleEvents.Select(VehicleEventDto.Map)).GetEnumerator();
+            view = [.. _vehicleEvents];
+
+        foreach (var notificationData in view)
+        {
+            yield return VehicleEventDto.Map(notificationData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

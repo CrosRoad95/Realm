@@ -1,4 +1,5 @@
-﻿using static RealmCore.Server.Modules.Players.PlayersResults;
+﻿using System.Runtime;
+using static RealmCore.Server.Modules.Players.PlayersResults;
 
 namespace RealmCore.Server.Modules.Players.Bans;
 
@@ -222,8 +223,14 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
     public IEnumerator<BanDto> GetEnumerator()
     {
         var now = _dateTimeProvider.Now;
+        BanData[] view;
         lock (_lock)
-            return new List<BanDto>(_bans.Where(x => x.IsActive(now)).Select(BanDto.Map)).GetEnumerator();
+            view = [.. _bans.Where(x => x.IsActive(now))];
+
+        foreach (var settingData in view)
+        {
+            yield return BanDto.Map(settingData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

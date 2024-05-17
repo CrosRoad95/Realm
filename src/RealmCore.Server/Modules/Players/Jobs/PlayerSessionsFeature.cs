@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs;
+﻿using System.ComponentModel;
+
+namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
 {
@@ -221,8 +223,16 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
 
     public IEnumerator<Session> GetEnumerator()
     {
-        lock (_lock)
-            return new List<Session>(_sessions).GetEnumerator();
+        Session[] view;
+        {
+            lock (_lock)
+                view = [.. _sessions];
+        }
+
+        foreach (var session in view)
+        {
+            yield return session;
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

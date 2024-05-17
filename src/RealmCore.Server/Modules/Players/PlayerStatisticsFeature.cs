@@ -185,8 +185,14 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
 
     public IEnumerator<UserStatDto> GetEnumerator()
     {
+        UserStatData[] view;
         lock (_lock)
-            return new List<UserStatDto>(_stats.Select(UserStatDto.Map)).GetEnumerator();
+            view = [.. _stats];
+
+        foreach (var userStatData in view)
+        {
+            yield return UserStatDto.Map(userStatData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

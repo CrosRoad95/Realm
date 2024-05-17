@@ -109,14 +109,20 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
 
     public IEnumerator<UserNotificationDto> GetEnumerator()
     {
+        UserNotificationData[] view;
         _lock.Wait();
         try
         {
-            return new List<UserNotificationDto>(_userNotificationDataList.Select(UserNotificationDto.Map)).GetEnumerator();
+            view = [.. _userNotificationDataList];
         }
         finally
         {
             _lock.Release();
+        }
+
+        foreach (var notificationData in view)
+        {
+            yield return UserNotificationDto.Map(notificationData);
         }
     }
 

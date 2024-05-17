@@ -119,25 +119,18 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, 
         }
     }
 
-    [return: NotNullIfNotNull(nameof(userJobStatisticsData))]
-    private static UserJobStatisticsDto? Map(JobStatisticsData? userJobStatisticsData)
-    {
-        if (userJobStatisticsData == null)
-            return null;
-
-        return new UserJobStatisticsDto
-        {
-            JobId = userJobStatisticsData.JobId,
-            Points = userJobStatisticsData.Points,
-            TimePlayed = userJobStatisticsData.TimePlayed,
-            UserId = userJobStatisticsData.UserId
-        };
-    }
-
     public IEnumerator<UserJobStatisticsDto> GetEnumerator()
     {
-        lock (_lock)
-            return _jobStatistics.Select(Map).ToList().GetEnumerator();
+        JobStatisticsData[] view;
+        {
+            lock (_lock)
+                view = [.. _jobStatistics];
+        }
+
+        foreach (var jobUpgradeData in view)
+        {
+            yield return UserJobStatisticsDto.Map(jobUpgradeData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

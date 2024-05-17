@@ -151,8 +151,15 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
 
     public IEnumerator<VehicleUserAccessDto> GetEnumerator()
     {
+        VehicleUserAccessData[] view;
+
         lock (_lock)
-            return new List<VehicleUserAccessDto>(_userAccesses.Select(VehicleUserAccessDto.Map)).GetEnumerator();
+            view = [.. _userAccesses];
+
+        foreach (var userAccessData in view)
+        {
+            yield return VehicleUserAccessDto.Map(userAccessData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

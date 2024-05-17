@@ -105,8 +105,14 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
 
     public IEnumerator<UserEventDto> GetEnumerator()
     {
+        UserEventData[] view;
         lock (_lock)
-            return _userEventData.Select(UserEventDto.Map).ToList().GetEnumerator();
+            view = [.. _userEventData];
+
+        foreach (var userEventData in view)
+        {
+            yield return UserEventDto.Map(userEventData);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
