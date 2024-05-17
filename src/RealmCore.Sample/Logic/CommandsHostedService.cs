@@ -273,7 +273,7 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.AddCommandHandler("savemyveh", (player, args) =>
         {
             var vehicle = player.Vehicle ?? throw new InvalidOperationException();
-            vehicle.GetRequiredService<ISaveService>().Save();
+            vehicle.GetRequiredService<IElementSaveService>().Save();
         });
 
         _commandService.AddCommandHandler("exclusivecv", (player, args) =>
@@ -1967,14 +1967,14 @@ internal sealed class CommandsHostedService : IHostedService
             {
                 if (element is RealmVehicle vehicle)
                 {
-                    await vehicle.GetRequiredService<ISaveService>().Save(token);
+                    await vehicle.GetRequiredService<IElementSaveService>().Save(token);
                     i++;
                 }
                 else if (element is RealmPlayer plr)
                 {
                     if (plr.User.IsSignedIn)
                     {
-                        await plr.GetRequiredService<ISaveService>().Save(token);
+                        await plr.GetRequiredService<IElementSaveService>().Save(token);
                         i++;
                     }
                 }
@@ -2025,7 +2025,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.AddCommandHandler("givedefaultinventory", (player, args) =>
         {
-            player.Inventory.CreatePrimaryInventory(20);
+            player.Inventory.CreatePrimary(20);
             _chatBox.OutputTo(player, "Inventory created");
         });
 

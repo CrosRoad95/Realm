@@ -5,12 +5,12 @@ public interface INewsService
     Task<List<NewsDto>> Get(int limit = 10, CancellationToken cancellationToken = default);
 }
 
-internal sealed class NewsService : INewsService
+internal sealed class PlayerNewsService : INewsService
 {
     private readonly INewsRepository _newsRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public NewsService(INewsRepository newsRepository, IDateTimeProvider dateTimeProvider)
+    public PlayerNewsService(INewsRepository newsRepository, IDateTimeProvider dateTimeProvider)
     {
         _newsRepository = newsRepository;
         _dateTimeProvider = dateTimeProvider;

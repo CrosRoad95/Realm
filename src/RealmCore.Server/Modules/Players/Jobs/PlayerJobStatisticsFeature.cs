@@ -1,11 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
+public record struct JobStatisticsSummary(ulong points, ulong timePlayed);
+
 public interface IPlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJobStatisticsDto>
 {
     void AddPoints(short jobId, ulong points);
     void AddPointsAndTimePlayed(short jobId, ulong points, ulong timePlayed);
     void AddTimePlayed(short jobId, ulong timePlayed);
-    (ulong, ulong) GetTotalPoints(short jobId);
+    JobStatisticsSummary GetSummary(short jobId);
 }
 
 internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, IUsesUserPersistentData
@@ -101,12 +103,12 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, 
         }
     }
 
-    public (ulong, ulong) GetTotalPoints(short jobId)
+    public JobStatisticsSummary GetSummary(short jobId)
     {
+        ulong totalPoints = 0;
+        ulong totalTimePlayed = 0;
         lock (_lock)
         {
-            ulong totalPoints = 0;
-            ulong totalTimePlayed = 0;
             foreach (var jobStatistic in _jobStatistics)
             {
                 if (jobStatistic.JobId == jobId)
@@ -115,8 +117,8 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, 
                     totalTimePlayed += jobStatistic.TimePlayed;
                 }
             }
-            return (totalPoints, totalTimePlayed);
         }
+        return new JobStatisticsSummary(totalPoints, totalTimePlayed);
     }
 
     public IEnumerator<UserJobStatisticsDto> GetEnumerator()

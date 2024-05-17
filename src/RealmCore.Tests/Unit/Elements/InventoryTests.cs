@@ -59,7 +59,7 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
         inventory.AddItem(itemsCollection, itemId, number);
 
         inventory.Number.Should().Be(expectedNumber);
@@ -73,7 +73,7 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
         inventory.AddItem(itemsCollection, 3, 2, null, true);
         inventory.AddItem(itemsCollection, 3, 3, null, true);
         inventory.AddItem(itemsCollection, 3, 2, null, true);
@@ -92,7 +92,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 3, 2, null, tryStack);
         inventory.AddItem(itemsCollection, 3, 22, null, tryStack);
@@ -115,7 +115,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -138,7 +138,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 1, 1);
 
@@ -152,7 +152,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 2, 1);
         inventory.AddItem(itemsCollection, 2, 1);
@@ -168,7 +168,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 2, 4);
         inventory.AddItem(itemsCollection, 2, 3);
@@ -184,7 +184,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item1 = inventory.AddItem(itemsCollection, 2, 1).First();
         var item2 = inventory.AddItem(itemsCollection, 2, 1).First();
@@ -203,7 +203,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item = inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 1 }).First();
         inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
@@ -222,7 +222,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
 
@@ -239,7 +239,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
         inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
@@ -256,7 +256,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
         var found = inventory.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
@@ -272,7 +272,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var act = () => inventory.AddItem(itemsCollection, 1, 0);
 
@@ -286,7 +286,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.HasSpace(200).Should().BeFalse();
         inventory.Size = 500;
@@ -300,7 +300,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.Size = 100;
         inventory.HasSpaceForItem(itemsCollection, 1).Should().BeTrue();
@@ -322,7 +322,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.ItemUsed += HandleItemUsed;
         inventory.Size = 100;
@@ -339,7 +339,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.Size = 100;
         var item = inventory.AddSingleItem(itemsCollection, 1);
@@ -353,7 +353,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item = inventory.AddSingleItem(itemsCollection, 1);
         inventory.RemoveItem(item);
@@ -367,7 +367,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 1, 20);
         inventory.RemoveItem(1, 20);
@@ -382,7 +382,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddSingleItem(itemsCollection, 1);
         inventory.RemoveItem(1);
@@ -396,7 +396,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, 1, 20);
         inventory.RemoveItem(30);
@@ -410,7 +410,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.Size = 100;
         inventory.AddItem(itemsCollection, 1, 4);
@@ -428,7 +428,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.Size = 100;
         inventory.AddItem(itemsCollection, 1, 4);
@@ -444,7 +444,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.Size = 5;
         var act = () => inventory.AddItem(itemsCollection, 1, 4);
@@ -460,7 +460,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         #region Arrange
         inventory.AddItem(itemsCollection, 1, 2);
@@ -488,7 +488,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         #region Arrange
         inventory.Clear();
@@ -519,7 +519,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata
         {
@@ -545,7 +545,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddSingleItem(itemsCollection, 1);
         inventory.HasItem(x => x.ItemId == itemId).Should().Be(has);
@@ -573,7 +573,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -592,7 +592,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -611,7 +611,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -634,7 +634,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -661,7 +661,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -680,7 +680,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         #region Arrange
         inventory.Clear();
@@ -708,7 +708,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -728,7 +728,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -748,7 +748,7 @@ public class InventoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         var metaData = new Metadata
         {
@@ -770,7 +770,7 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         void handleItemAdded(Inventory that, Item addedItem)
         {
@@ -797,7 +797,7 @@ public class InventoryTests : RealmUnitTestingBase
         var item1 = new Item(itemsCollection, 1, 2);
         var item2 = new Item(itemsCollection, 1, 2);
 
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, item1);
         inventory.AddItem(itemsCollection, item2);
@@ -823,7 +823,7 @@ public class InventoryTests : RealmUnitTestingBase
         });
         var item2 = new Item(itemsCollection, 1, 2);
 
-        var inventory = player.Inventory.CreatePrimaryInventory(100);
+        var inventory = player.Inventory.CreatePrimary(100);
 
         inventory.AddItem(itemsCollection, item1);
         inventory.AddItem(itemsCollection, item2);

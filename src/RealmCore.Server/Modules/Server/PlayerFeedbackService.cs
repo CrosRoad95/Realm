@@ -9,13 +9,13 @@ public interface IFeedbackService
     Task Rate(RealmPlayer player, int ratingId, int rating, CancellationToken cancellationToken = default);
 }
 
-internal sealed class FeedbackService : IFeedbackService
+internal sealed class PlayerFeedbackService : IFeedbackService
 {
     private readonly IRatingRepository _ratingRepository;
     private readonly IOpinionRepository _opinionRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public FeedbackService(IRatingRepository ratingRepository, IOpinionRepository opinionRepository, IDateTimeProvider dateTimeProvider)
+    public PlayerFeedbackService(IRatingRepository ratingRepository, IOpinionRepository opinionRepository, IDateTimeProvider dateTimeProvider)
     {
         _ratingRepository = ratingRepository;
         _opinionRepository = opinionRepository;

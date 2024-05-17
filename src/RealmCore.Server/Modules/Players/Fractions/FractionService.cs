@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Fractions;
 
-public interface IFractionService
+public interface IFractionsService
 {
     bool Exists(int fractionId);
     bool HasMember(int fractionId, int userId);
@@ -10,14 +10,14 @@ public interface IFractionService
     internal Task<bool> TryCreateFraction(int id, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default);
 }
 
-internal sealed class FractionService : IFractionService
+internal sealed class FractionService : IFractionsService
 {
     private readonly Dictionary<int, FractionDto> _fractions = [];
     private readonly object _lock = new();
     private readonly IFractionRepository _fractionRepository;
     private readonly IUsersInUse _usersInUse;
 
-    public event Action<IFractionService, FractionDto>? Created;
+    public event Action<IFractionsService, FractionDto>? Created;
 
     public FractionService(IFractionRepository fractionRepository, IUsersInUse usersInUse)
     {

@@ -28,7 +28,7 @@ public class HudTests : RealmUnitTestingBase
         player.Hud.RemoveLayer<SampleLayer>();
 
         layer.Disposed.Should().BeTrue();
-        player.Hud.Layers.Should().HaveCount(0);
+        player.Hud.Should().HaveCount(0);
         monitor.GetOccurredEvents().Should().BeEquivalentTo(["LayerAdded", "LayerRemoved"]);
     }
 
@@ -45,7 +45,7 @@ public class HudTests : RealmUnitTestingBase
         player.TriggerDisconnected(QuitReason.Quit);
 
         layer.Disposed.Should().BeTrue();
-        player.Hud.Layers.Should().HaveCount(0);
+        player.Hud.Should().HaveCount(0);
         monitor.GetOccurredEvents().Should().BeEquivalentTo(["LayerAdded", "LayerRemoved"]);
     }
 }

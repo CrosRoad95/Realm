@@ -26,7 +26,7 @@ public static class CollisionDetectionExtensions
             {
                 if (!player.Browser.Visible)
                 {
-                    player.Browser.Close();
+                    player.Browser.TryClose();
                 }
             }
         };
@@ -46,7 +46,7 @@ public static class CollisionDetectionExtensions
         {
             if (args.Element is RealmPlayer player)
             {
-                player.Gui.Close<TGui>();
+                player.Gui.TryClose<TGui>();
             }
         };
     }
@@ -72,7 +72,7 @@ public static class CollisionDetectionExtensions
         {
             if (args.Element is RealmPlayer player)
             {
-                player.Gui.Close<TGui>();
+                player.Gui.TryClose<TGui>();
             }
         };
     }
@@ -91,7 +91,7 @@ public static class CollisionDetectionExtensions
         {
             if (args.Element is RealmPlayer player)
             {
-                player.Gui.Close<TGui>();
+                player.Gui.TryClose<TGui>();
             }
         };
     }
@@ -110,7 +110,7 @@ public static class CollisionDetectionExtensions
         {
             if (args.Element is RealmPlayer player)
             {
-                player.Gui.Close<TGui>();
+                player.Gui.TryClose<TGui>();
             }
         };
     }

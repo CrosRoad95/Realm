@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IRewardService
+public interface IRewardsService
 {
     Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default);
 }
 
-internal sealed class RewardService : IRewardService
+internal sealed class RewardsService : IRewardsService
 {
-    public RewardService()
+    public RewardsService()
     {
 
     }

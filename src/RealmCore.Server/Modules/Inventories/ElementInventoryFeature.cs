@@ -6,7 +6,7 @@ public interface IElementInventoryFeature
 
     event Action<IElementInventoryFeature, Inventory>? PrimarySet;
 
-    Inventory CreatePrimaryInventory(uint defaultInventorySize);
+    Inventory CreatePrimary(uint defaultInventorySize);
     bool TryGetPrimary(out Inventory inventory);
 }
 
@@ -96,7 +96,7 @@ internal abstract class ElementInventoryFeature : IElementInventoryFeature
         return false;
     }
 
-    public Inventory CreatePrimaryInventory(uint inventorySize)
+    public Inventory CreatePrimary(uint inventorySize)
     {
         if (Primary == null)
         {

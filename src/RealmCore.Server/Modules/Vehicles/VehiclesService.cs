@@ -84,7 +84,7 @@ internal sealed class VehiclesService : IVehiclesService
         if (!vehicle.Persistence.IsLoaded)
             throw new PersistantVehicleNotLoadedException();
 
-        await vehicle.GetRequiredService<ISaveService>().Save();
+        await vehicle.GetRequiredService<IElementSaveService>().Save();
     }
 
     public async Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)

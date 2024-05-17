@@ -46,7 +46,7 @@ internal sealed class BrowserGuiHostedService : PlayerLifecycle, IHostedService
         if (previousGui is BrowserGui previousBrowserGui)
         {
             var browserService = player.Browser;
-            browserService.Close();
+            browserService.TryClose();
 
             _logger.LogInformation("Browser gui {guiPageType} closed", previousBrowserGui.GetType().Name);
         }

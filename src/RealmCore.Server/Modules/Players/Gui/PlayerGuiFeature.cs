@@ -11,8 +11,8 @@ public interface IPlayerGuiFeature : IPlayerFeature
 
     event Action<IPlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
 
-    bool Close<TGui>() where TGui : IPlayerGui;
-    bool Close();
+    bool TryClose<TGui>() where TGui : IPlayerGui;
+    bool TryClose();
     TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui;
 }
 
@@ -55,7 +55,7 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
 
     private void HandleSignedOut(IPlayerUserFeature userFeature, RealmPlayer player)
     {
-        Close();
+        TryClose();
     }
 
     public TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui
@@ -68,7 +68,7 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
         }
     }
 
-    public bool Close<TGui>() where TGui : IPlayerGui
+    public bool TryClose<TGui>() where TGui : IPlayerGui
     {
         lock (_lock)
         {
@@ -81,7 +81,7 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
         return false;
     }
 
-    public bool Close()
+    public bool TryClose()
     {
         lock (_lock)
         {

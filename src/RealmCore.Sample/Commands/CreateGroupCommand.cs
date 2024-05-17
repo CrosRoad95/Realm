@@ -6,11 +6,11 @@ namespace RealmCore.Sample.Commands;
 public sealed class CreateGroupCommand : IInGameCommand
 {
     private readonly ILogger<CreateGroupCommand> _logger;
-    private readonly IGroupService _groupService;
+    private readonly IGroupsService _groupService;
     private readonly ChatBox _chatBox;
 
     public string[] RequiredPolicies { get; } = [];
-    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, IGroupService groupService, ChatBox chatBox)
+    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, IGroupsService groupService, ChatBox chatBox)
     {
         _logger = logger;
         _groupService = groupService;

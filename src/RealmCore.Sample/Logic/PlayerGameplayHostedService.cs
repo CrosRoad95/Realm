@@ -140,7 +140,7 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
                 {
                     Bought = async () =>
                     {
-                        player.Gui.Close<BuyVehicleGui>();
+                        player.Gui.TryClose<BuyVehicleGui>();
                         if (realmVehicleForSale.TrySell())
                         {
                             vehicle = await _vehiclesService.ConvertToPersistantVehicle(vehicle);
@@ -162,7 +162,7 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
         else
         {
             player.CurrentInteractElement = null;
-            player.Gui.Close<BuyVehicleGui>();
+            player.Gui.TryClose<BuyVehicleGui>();
         }
     }
 }

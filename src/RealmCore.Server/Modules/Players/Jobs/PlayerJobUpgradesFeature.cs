@@ -5,7 +5,7 @@ public interface IPlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgr
     event Action<IPlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
     event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
 
-    IEnumerable<JobUpgradeDto> GetAllByJobId(short jobId);
+    JobUpgradeDto[] GetAllByJobId(short jobId);
     bool Has(short jobId, int upgradeId);
     bool TryAdd(short jobId, int upgradeId);
     bool TryRemove(short jobId, int upgradeId);
@@ -49,10 +49,10 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IUse
 
     private bool InternalHasUpgrade(short jobId, int upgradeId) => _jobUpgrades.Any(x => x.JobId == jobId && x.UpgradeId == upgradeId);
 
-    public IEnumerable<JobUpgradeDto> GetAllByJobId(short jobId)
+    public JobUpgradeDto[] GetAllByJobId(short jobId)
     {
         lock (_lock)
-            return new List<JobUpgradeDto>(_jobUpgrades.Where(x => x.JobId == jobId).Select(JobUpgradeDto.Map));
+            return _jobUpgrades.Where(x => x.JobId == jobId).Select(JobUpgradeDto.Map).ToArray();
     }
 
     public bool Has(short jobId, int upgradeId)

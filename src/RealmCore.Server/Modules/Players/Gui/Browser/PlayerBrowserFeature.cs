@@ -12,7 +12,7 @@ public interface IPlayerBrowserFeature : IPlayerFeature
     event Action<IPlayerBrowserFeature, bool>? VisibleChanged;
     event Action<IPlayerBrowserFeature>? Ready;
 
-    void Close();
+    bool TryClose();
     void Open(string path, IReadOnlyDictionary<string, string?>? queryParameters = null);
     void RelayReady();
 }
@@ -78,7 +78,7 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerBrowserFeature(IBrowserGuiService browserGuiService, IBrowserService browserService, PlayerContext playerContext)
+    public PlayerBrowserFeature(PlayerContext playerContext, IBrowserGuiService browserGuiService, IBrowserService browserService)
     {
         Key = browserGuiService.GenerateKey();
         _browserGuiService = browserGuiService;
@@ -97,17 +97,22 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
 
         if (queryParameters != null)
             path = QueryHelpers.AddQueryString(path, queryParameters);
+
         Path = path;
         Visible = true;
     }
 
-    public void Close()
+    public bool TryClose()
     {
         if (!IsReady)
             throw new BrowserNotReadyException();
 
+        if (!Visible)
+            return false;
+
         Path = BrowserConstants.DefaultPage;
         Visible = false;
+        return true;
     }
 
     public void RelayReady()

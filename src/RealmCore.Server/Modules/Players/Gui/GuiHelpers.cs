@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.Enums;
-
-namespace RealmCore.Server.Modules.Players.Gui;
+﻿namespace RealmCore.Server.Modules.Players.Gui;
 
 public static class GuiHelpers
 {

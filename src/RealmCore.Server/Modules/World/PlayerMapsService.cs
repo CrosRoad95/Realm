@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-internal sealed class ScopedMapService : IScopedMapsService
+internal sealed class PlayerMapsService : IPlayerMapsService
 {
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;
@@ -17,11 +17,11 @@ internal sealed class ScopedMapService : IScopedMapsService
         }
     }
 
-    public ScopedMapService(ILogger<MapsService> logger, MapsCollection mapsCollection, PlayerContext playerContext)
+    public PlayerMapsService(PlayerContext playerContext, ILogger<MapsService> logger, MapsCollection mapsCollection)
     {
+        _player = playerContext.Player;
         _logger = logger;
         _mapsCollection = mapsCollection;
-        _player = playerContext.Player;
     }
 
     public bool IsLoaded(string name)

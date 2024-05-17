@@ -68,7 +68,7 @@ internal sealed class PlayerBindsHostedService : IHostedService
             var browserService = player.Browser;
             if (browserService.Visible)
             {
-                browserService.Close();
+                browserService.TryClose();
             }
             else
             {
@@ -84,7 +84,7 @@ internal sealed class PlayerBindsHostedService : IHostedService
             var browserService = player.Browser;
             if(browserService.Visible)
             {
-                browserService.Close();
+                browserService.TryClose();
                 return;
             }
             browserService.Open("/realmUi/counter2");
@@ -98,7 +98,7 @@ internal sealed class PlayerBindsHostedService : IHostedService
             var browserService = player.Browser;
             if (browserService.Visible)
             {
-                browserService.Close();
+                browserService.TryClose();
                 return;
             }
             browserService.Open("/realmUi/index");

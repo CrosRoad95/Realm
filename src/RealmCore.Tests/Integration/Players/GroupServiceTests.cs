@@ -10,7 +10,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
     {
         var server = await CreateServerAsync();
 
-        var groupService = server.GetRequiredService<IGroupService>();
+        var groupService = server.GetRequiredService<IGroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
 
@@ -27,7 +27,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
 
-        var groupService = server.GetRequiredService<IGroupService>();
+        var groupService = server.GetRequiredService<IGroupsService>();
 
         var createGroup = async () => await groupService.CreateGroup("foo", "TG2", GroupKind.Regular);
 
@@ -42,7 +42,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
 
-        var groupService = server.GetRequiredService<IGroupService>();
+        var groupService = server.GetRequiredService<IGroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
         var group = await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
@@ -64,7 +64,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
 
-        var groupService = server.GetRequiredService<IGroupService>();
+        var groupService = server.GetRequiredService<IGroupsService>();
         var group = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
 
         await groupService.TryAddMember(player, group.id, 100, "Leader");

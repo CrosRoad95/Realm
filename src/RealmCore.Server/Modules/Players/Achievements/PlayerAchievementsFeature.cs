@@ -1,6 +1,4 @@
-﻿using System.Runtime;
-
-namespace RealmCore.Server.Modules.Players.Achievements;
+﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
 public interface IPlayerAchievementsFeature : IPlayerFeature, IEnumerable<AchievementDto>
 {

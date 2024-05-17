@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Groups;
 
-public interface IGroupService
+public interface IGroupsService
 {
     Task<bool> TryAddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
     Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular, CancellationToken cancellationToken = default);
@@ -10,11 +10,11 @@ public interface IGroupService
     Task<bool> RemoveMember(RealmPlayer player, int groupId, CancellationToken cancellationToken = default);
 }
 
-internal sealed class GroupService : IGroupService
+internal sealed class GroupsService : IGroupsService
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public GroupService(IServiceProvider serviceProvider)
+    public GroupsService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }

@@ -28,7 +28,7 @@ internal sealed class InventoryHostedService : PlayerLifecycle, IHostedService
         {
             if (player.User.IsSignedIn)
             {
-                var saveService = player.GetRequiredService<ISaveService>();
+                var saveService = player.GetRequiredService<IElementSaveService>();
                 await saveService.SaveNewInventory(inventory);
             }
         }
@@ -36,7 +36,7 @@ internal sealed class InventoryHostedService : PlayerLifecycle, IHostedService
         {
             if (vehicle.Persistence.IsLoaded)
             {
-                var saveService = vehicle.GetRequiredService<ISaveService>();
+                var saveService = vehicle.GetRequiredService<IElementSaveService>();
                 await saveService.SaveNewInventory(inventory);
             }
         }

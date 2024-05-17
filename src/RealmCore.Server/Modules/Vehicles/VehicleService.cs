@@ -14,9 +14,9 @@ internal sealed class VehicleService : IVehicleService
     private readonly RealmVehicle _vehicle;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IVehiclesInUse _vehiclesInUse;
-    private readonly ISaveService _saveService;
+    private readonly IElementSaveService _saveService;
 
-    public VehicleService(VehicleContext vehicleContext, IVehicleRepository vehicleRepository, IDateTimeProvider dateTimeProvider, IVehiclesInUse vehiclesInUse, ISaveService saveService)
+    public VehicleService(VehicleContext vehicleContext, IVehicleRepository vehicleRepository, IDateTimeProvider dateTimeProvider, IVehiclesInUse vehiclesInUse, IElementSaveService saveService)
     {
         _vehicle = vehicleContext.Vehicle;
         _vehicleRepository = vehicleRepository;

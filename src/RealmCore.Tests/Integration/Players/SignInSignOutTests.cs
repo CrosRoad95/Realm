@@ -119,7 +119,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 
         if (!player1.Inventory.TryGetPrimary(out var inventory1))
         {
-            inventory1 = player1.Inventory.CreatePrimaryInventory(20);
+            inventory1 = player1.Inventory.CreatePrimary(20);
         }
         inventory1.Number.Should().Be(0);
         inventory1.AddItem(itemsCollection, 1);

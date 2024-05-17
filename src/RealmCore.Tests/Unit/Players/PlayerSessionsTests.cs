@@ -79,7 +79,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var testJobSession = player.Sessions.BeginSession<TestJobSession>();
+        var testJobSession = player.Sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateMarkerObjective(withBlip);
         var elements = player.ElementFactory.CreatedElements.ToList();
         elements.Select(x => x.ElementType).Should().BeEquivalentTo(createdElementTypes);
@@ -96,7 +96,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var testJobSession = player.Sessions.BeginSession<TestJobSession>();
+        var testJobSession = player.Sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateMarkerObjective(false);
 
         bool completed = false;
@@ -119,7 +119,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var testJobSession = player.Sessions.BeginSession<TestJobSession>();
+        var testJobSession = player.Sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateOneOfObjective();
 
         bool completed = false;
@@ -139,7 +139,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var testJobSession = player.Sessions.BeginSession<TestJobSession>();
+        var testJobSession = player.Sessions.Begin<TestJobSession>();
         var myObject = player.ElementFactory.CreateObject(new Location(new Vector3(100, 100, 100), Vector3.Zero), (ObjectModel)1337);
         myObject.TrySetOwner(player);
         var objective = testJobSession.CreateTransportObjectObjective1();
@@ -165,15 +165,15 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var player = CreateServerWithOnePlayer();
 
         using var monitor = player.Sessions.Monitor();
-        player.Sessions.BeginSession<TestSession>();
+        player.Sessions.Begin<TestSession>();
         monitor.GetOccurredEvents().Should().BeEquivalentTo(["Started"]);
 
-        player.Sessions.TryGetSession(out TestSession foundSession1).Should().BeTrue();
-        player.Sessions.TryGetSession(out FailedToStartTestSession foundSession2).Should().BeFalse();
+        player.Sessions.TryGet(out TestSession foundSession1).Should().BeTrue();
+        player.Sessions.TryGet(out FailedToStartTestSession foundSession2).Should().BeFalse();
         player.Sessions.ToList().Should().BeEquivalentTo([foundSession1]);
 
-        var getSession1 = () => player.Sessions.GetSession<TestSession>();
-        var getSession2 = () => player.Sessions.GetSession<FailedToStartTestSession>();
+        var getSession1 = () => player.Sessions.Get<TestSession>();
+        var getSession2 = () => player.Sessions.Get<FailedToStartTestSession>();
 
         getSession1.Should().NotThrow();
         getSession2.Should().Throw<SessionNotFoundException>().Which.SessionType.Should().Be< FailedToStartTestSession>();
@@ -184,7 +184,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var beginSession = () =>  player.Sessions.BeginSession<FailedToStartTestSession>();
+        var beginSession = () =>  player.Sessions.Begin<FailedToStartTestSession>();
         using var monitor = player.Sessions.Monitor();
 
         beginSession.Should().Throw<InvalidOperationException>();
@@ -197,15 +197,15 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var beginSession = () => player.Sessions.BeginSession<TestSession>();
+        var beginSession = () => player.Sessions.Begin<TestSession>();
 
         var testSession = beginSession.Should().NotThrow().Subject;
         beginSession.Should().Throw<SessionAlreadyBegunException>();
 
         player.Sessions.Count.Should().Be(1);
 
-        player.Sessions.IsDuringSession<TestSession>().Should().BeTrue();
-        player.Sessions.IsDuringSession(testSession).Should().BeTrue();
+        player.Sessions.IsDuring<TestSession>().Should().BeTrue();
+        player.Sessions.IsDuring(testSession).Should().BeTrue();
     }
 
     [Fact]
@@ -213,9 +213,9 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
 
-        var end = () => player.Sessions.EndSession(session);
+        var end = () => player.Sessions.TryEnd(session);
 
         end.Should().NotThrow();
         end.Should().Throw<SessionNotFoundException>();
@@ -228,9 +228,9 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
 
-        var end = () => player.Sessions.EndSession<TestSession>();
+        var end = () => player.Sessions.TryEnd<TestSession>();
 
         end.Should().NotThrow();
         end.Should().Throw<SessionNotFoundException>();
@@ -243,10 +243,10 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        player.Sessions.BeginSession<TestSession>();
+        player.Sessions.Begin<TestSession>();
 
-        player.Sessions.TryEndSession<TestSession>().Should().BeTrue();
-        player.Sessions.TryEndSession<TestSession>().Should().BeFalse();
+        player.Sessions.TryEnd<TestSession>().Should().BeTrue();
+        player.Sessions.TryEnd<TestSession>().Should().BeFalse();
 
         player.Sessions.Should().BeEmpty();
     }
@@ -256,10 +256,10 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
 
-        player.Sessions.TryEndSession(session).Should().BeTrue();
-        player.Sessions.TryEndSession(session).Should().BeFalse();
+        player.Sessions.TryEnd(session).Should().BeTrue();
+        player.Sessions.TryEnd(session).Should().BeFalse();
 
         player.Sessions.Should().BeEmpty();
     }
@@ -269,7 +269,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
         using var monitorSession = session.Monitor();
         using var monitorSessions = player.Sessions.Monitor();
         player.TriggerDisconnected(QuitReason.Quit);
@@ -286,7 +286,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
 
         server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
         session.TryStop();
@@ -302,11 +302,11 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     {
         var player = CreateServerWithOnePlayer();
 
-        var session = player.Sessions.BeginSession<TestSession>();
+        var session = player.Sessions.Begin<TestSession>();
         var token = session.CreateCancellationToken();
         token.IsCancellationRequested.Should().BeFalse();
 
-        player.Sessions.EndSession<TestSession>();
+        player.Sessions.TryEnd<TestSession>();
         token.IsCancellationRequested.Should().BeTrue();
     }
 }

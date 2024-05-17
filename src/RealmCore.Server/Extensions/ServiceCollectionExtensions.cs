@@ -114,20 +114,20 @@ public static class ServiceCollectionExtensions
         #region Services
         services.AddSingleton<IPlayersService, PlayersService>();
         services.AddSingleton<IUsersService, UsersService>();
-        services.AddScoped<ISaveService, SaveService>();
+        services.AddScoped<IElementSaveService, ElementSaveService>();
         services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
-        services.AddSingleton<IGroupService, GroupService>();
-        services.AddScoped<IFractionService, FractionService>();
-        services.AddSingleton<IRewardService, RewardService>();
-        services.AddScoped<IFeedbackService, FeedbackService>();
+        services.AddSingleton<IGroupsService, GroupsService>();
+        services.AddScoped<IFractionsService, FractionService>();
+        services.AddSingleton<IRewardsService, RewardsService>();
+        services.AddScoped<IFeedbackService, PlayerFeedbackService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IPlayersNotifications, PlayersNotifications>();
-        services.AddScoped<INewsService, NewsService>();
+        services.AddScoped<INewsService, PlayerNewsService>();
         services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
-        services.AddScoped<IScopedMapsService, ScopedMapService>();
+        services.AddScoped<IPlayerMapsService, PlayerMapsService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
-        services.AddScoped<IPlayerUserService, PlayerUserService>();
+        services.AddScoped<IPlayerUserService, PlayersUsersService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<PlayersEventManager>();
@@ -299,12 +299,12 @@ internal sealed class ServerLifecycle : IHostedService
             {
                 if (element is RealmVehicle vehicle)
                 {
-                    await vehicle.GetRequiredService<ISaveService>().Save(CancellationToken.None);
+                    await vehicle.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
                     i++;
                 }
                 else if (element is RealmPlayer player)
                 {
-                    await player.GetRequiredService<ISaveService>().Save(CancellationToken.None);
+                    await player.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
                     i++;
                 }
             }

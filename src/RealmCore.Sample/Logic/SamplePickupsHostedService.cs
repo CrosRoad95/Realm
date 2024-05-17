@@ -40,15 +40,15 @@ internal class SamplePickupsHostedService : IHostedService
                 pickup.CollisionShape.ElementEntered += async (CollisionShape collisionShape, CollisionShapeHitEventArgs e) =>
                 {
                     var player = (RealmPlayer)element;
-                    if(player.Sessions.TryGetSession(out FractionSession pendingFractionSession))
+                    if(player.Sessions.TryGet(out FractionSession pendingFractionSession))
                     {
                         pendingFractionSession.Dispose();
                         _chatBox.OutputTo(player, $"Session ended in: {pendingFractionSession.Elapsed}");
-                        player.Sessions.EndSession(pendingFractionSession);
+                        player.Sessions.TryEnd(pendingFractionSession);
                     }
                     else
                     {
-                        var fractionSession = player.Sessions.BeginSession<FractionSession>();
+                        var fractionSession = player.Sessions.Begin<FractionSession>();
                         _chatBox.OutputTo(player, $"Session started");
                         fractionSession.TryStart();
                     }
@@ -64,9 +64,9 @@ internal class SamplePickupsHostedService : IHostedService
                     if (e.Element is not RealmPlayer player)
                         return;
 
-                    if (player.Sessions.TryGetSession(out JobSession jobSession))
+                    if (player.Sessions.TryGet(out JobSession jobSession))
                     {
-                        player.Sessions.EndSession(jobSession);
+                        player.Sessions.TryEnd(jobSession);
                         var elapsed = jobSession.Elapsed;
                         _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSession.CompletedObjectives}");
                         var elapsedSeconds = (ulong)jobSession.Elapsed.Seconds;
@@ -75,7 +75,7 @@ internal class SamplePickupsHostedService : IHostedService
                     }
                     else
                     {
-                        var testJob = player.Sessions.BeginSession<TestJob>();
+                        var testJob = player.Sessions.Begin<TestJob>();
                         _chatBox.OutputTo(player, $"Job started");
                         testJob.TryStart();
 

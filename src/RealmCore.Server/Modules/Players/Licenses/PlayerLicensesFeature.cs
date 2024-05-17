@@ -1,6 +1,4 @@
-﻿using System.Runtime;
-
-namespace RealmCore.Server.Modules.Players.Licenses;
+﻿namespace RealmCore.Server.Modules.Players.Licenses;
 
 public interface IPlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLicenseDto>
 {
@@ -8,7 +6,7 @@ public interface IPlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLice
     event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Suspended;
     event Action<IPlayerLicensesFeature, PlayerLicenseDto>? UnSuspended;
 
-    PlayerLicenseDto? Get(int licenseId);
+    bool TryGetById(int licenseId, out PlayerLicenseDto playerLicenseDto);
     bool Has(int licenseId, bool includeSuspended = false);
     bool IsSuspended(int licenseId);
     void Suspend(int licenseId, TimeSpan timeSpan, string? reason = null);
@@ -46,13 +44,19 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
             _licenses = [];
     }
 
-    public PlayerLicenseDto Get(int licenseId)
+    public bool TryGetById(int licenseId, out PlayerLicenseDto playerLicenseDto)
     {
         lock (_lock)
         {
             var userLicenseData = InternalGetById(licenseId);
-            return PlayerLicenseDto.Map(userLicenseData);
+            if(userLicenseData != null)
+            {
+                playerLicenseDto = PlayerLicenseDto.Map(userLicenseData);
+                return true;
+            }
         }
+        playerLicenseDto = null!;
+        return false;
     }
 
     public bool IsSuspended(int licenseId)

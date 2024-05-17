@@ -1,8 +1,8 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
-public interface IPlayerHudFeature : IPlayerFeature
+public interface IPlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>
 {
-    IReadOnlyList<IHudLayer> Layers { get; }
+    IHudLayer[] VisibleLayers { get; }
 
     event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
     event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
@@ -25,13 +25,13 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
     public event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
     public event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
 
-    public IReadOnlyList<IHudLayer> Layers
+    public IHudLayer[] VisibleLayers
     {
         get
         {
             lock (_lock)
             {
-                return [.. _hudLayers];
+                return _hudLayers.Where(x => x.Visible).ToArray();
             }
         }
     }
@@ -141,9 +141,27 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
 
     public void Dispose()
     {
-        foreach (var layer in Layers)
+        lock (_lock)
         {
-            RemoveLayer(layer);
+            foreach (var layer in _hudLayers)
+            {
+                RemoveLayer(layer);
+            }
         }
     }
+
+    public IEnumerator<IHudLayer> GetEnumerator()
+    {
+        IHudLayer[] view;
+        lock (_lock)
+            view = [.. _hudLayers];
+
+        foreach (var layer in view)
+        {
+            yield return layer;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 }

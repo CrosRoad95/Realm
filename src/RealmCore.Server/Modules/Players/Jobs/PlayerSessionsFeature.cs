@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace RealmCore.Server.Modules.Players.Jobs;
+﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
 {
@@ -9,17 +7,15 @@ public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
     event Action<IPlayerSessionsFeature, Session>? Started;
     event Action<IPlayerSessionsFeature, Session>? Ended;
 
-    TSession BeginSession<TSession>(params object[] parameters) where TSession : Session;
-    Session BeginSession(Type sessionType, params object[] parameters);
-    void EndSession<TSession>() where TSession : Session;
-    void EndSession<TSession>(TSession session) where TSession : Session;
-    TSession GetSession<TSession>();
-    bool IsDuringSession<TSession>();
-    bool IsDuringSession<TSession>(TSession session) where TSession : Session;
-    bool IsDuringSession(Type type);
-    bool TryEndSession<TSession>() where TSession : Session;
-    bool TryEndSession<TSession>(TSession session) where TSession : Session;
-    bool TryGetSession<TSession>(out TSession session);
+    TSession Begin<TSession>(params object[] parameters) where TSession : Session;
+    Session Begin(Type sessionType, params object[] parameters);
+    TSession Get<TSession>();
+    bool IsDuring<TSession>();
+    bool IsDuring<TSession>(TSession session) where TSession : Session;
+    bool IsDuring(Type type);
+    bool TryEnd<TSession>() where TSession : Session;
+    bool TryEnd<TSession>(TSession session) where TSession : Session;
+    bool TryGet<TSession>(out TSession session);
 }
 
 internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposable
@@ -45,7 +41,7 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         Player = playerContext.Player;
     }
 
-    public TSession BeginSession<TSession>(params object[] parameters) where TSession : Session
+    public TSession Begin<TSession>(params object[] parameters) where TSession : Session
     {
         TSession session;
         lock (_lock)
@@ -69,7 +65,7 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         return session;
     }
 
-    public Session BeginSession(Type sessionType, params object[] parameters)
+    public Session Begin(Type sessionType, params object[] parameters)
     {
         Session session;
         lock (_lock)
@@ -95,25 +91,25 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
 
     private bool IsDuringSessionCore<TSession>() => _sessions.OfType<TSession>().Any();
 
-    public bool IsDuringSession<TSession>()
+    public bool IsDuring<TSession>()
     {
         lock (_lock)
             return IsDuringSessionCore<TSession>();
     }
 
-    public bool IsDuringSession<TSession>(TSession session) where TSession : Session
+    public bool IsDuring<TSession>(TSession session) where TSession : Session
     {
         lock (_lock)
             return _sessions.Contains(session);
     }
     
-    public bool IsDuringSession(Type type)
+    public bool IsDuring(Type type)
     {
         lock (_lock)
             return _sessions.Any(x => x.GetType() == type);
     }
 
-    public bool TryGetSession<TSession>([NotNullWhen(true)] out TSession outSession)
+    public bool TryGet<TSession>([NotNullWhen(true)] out TSession outSession)
     {
         lock (_lock)
         {
@@ -131,7 +127,7 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         }
     }
 
-    public TSession GetSession<TSession>()
+    public TSession Get<TSession>()
     {
         lock (_lock)
         {
@@ -142,46 +138,7 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         }
     }
 
-    public void EndSession<TSession>() where TSession : Session
-    {
-        Session? session;
-        lock (_lock)
-        {
-            session = _sessions.OfType<TSession>().FirstOrDefault();
-            if (session == null)
-                throw new SessionNotFoundException(typeof(TSession));
-            try
-            {
-                session.Dispose();
-            }
-            finally
-            {
-                _sessions.Remove(session);
-                Ended?.Invoke(this, session);
-            }
-        }
-    }
-
-    public void EndSession<TSession>(TSession session) where TSession : Session
-    {
-        lock (_lock)
-        {
-            if (!_sessions.Contains(session))
-                throw new SessionNotFoundException(typeof(TSession));
-
-            try
-            {
-                session.Dispose();
-            }
-            finally
-            {
-                _sessions.Remove(session);
-                Ended?.Invoke(this, session);
-            }
-        }
-    }
-
-    public bool TryEndSession<TSession>() where TSession : Session
+    public bool TryEnd<TSession>() where TSession : Session
     {
         Session? session;
         lock (_lock)
@@ -202,7 +159,7 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         return true;
     }
 
-    public bool TryEndSession<TSession>(TSession session) where TSession : Session
+    public bool TryEnd<TSession>(TSession session) where TSession : Session
     {
         lock (_lock)
         {

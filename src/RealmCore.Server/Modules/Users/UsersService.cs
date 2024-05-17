@@ -166,7 +166,7 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetInactive(player.PersistentId))
             throw new InvalidOperationException();
 
-        await player.GetRequiredService<ISaveService>().Save(cancellationToken);
+        await player.GetRequiredService<IElementSaveService>().Save(cancellationToken);
         player.User.SignOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

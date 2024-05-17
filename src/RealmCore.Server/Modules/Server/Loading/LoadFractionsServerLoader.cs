@@ -2,9 +2,9 @@
 
 internal sealed class LoadFractionsServerLoader : IServerLoader
 {
-    private readonly IFractionService _fractionService;
+    private readonly IFractionsService _fractionService;
 
-    public LoadFractionsServerLoader(IFractionService fractionService)
+    public LoadFractionsServerLoader(IFractionsService fractionService)
     {
         _fractionService = fractionService;
     }

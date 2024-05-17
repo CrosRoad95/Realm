@@ -23,7 +23,7 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
-        await vehicle.GetRequiredService<ISaveService>().Save();
+        await vehicle.GetRequiredService<IElementSaveService>().Save();
         var vehiclePersistentId = vehicle.PersistentId;
         await vehiclesService.Destroy(vehicle);
 

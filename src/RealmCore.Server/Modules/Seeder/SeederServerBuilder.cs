@@ -8,9 +8,9 @@ internal sealed class SeederServerBuilder : IDisposable
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
     private readonly RoleManager<RoleData> _roleManager;
-    private readonly IGroupService _groupService;
+    private readonly IGroupsService _groupService;
     private readonly IElementFactory _elementFactory;
-    private readonly IFractionService _fractionService;
+    private readonly IFractionsService _fractionService;
     private readonly IGroupRepository _groupRepository;
     private readonly Text3dService _text3dService;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -24,7 +24,7 @@ internal sealed class SeederServerBuilder : IDisposable
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
-        IGroupService groupService, IElementFactory elementFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
+        IGroupsService groupService, IElementFactory elementFactory, IFractionsService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
     {
         _logger = logger;

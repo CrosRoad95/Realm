@@ -70,7 +70,7 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
 
         if (player.User.IsSignedIn)
         {
-            player.GetRequiredService<ISaveService>().ElementSaved += handleElementSaved;
+            player.GetRequiredService<IElementSaveService>().ElementSaved += handleElementSaved;
             player.TriggerDisconnected(QuitReason.Quit);
             await tcs.Task;
         }

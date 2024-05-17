@@ -3,7 +3,7 @@ using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
 namespace RealmCore.Server.Modules.Persistence;
 
-public interface ISaveService
+public interface IElementSaveService
 {
     event Action<Element>? ElementSaved;
 
@@ -11,7 +11,7 @@ public interface ISaveService
     Task SaveNewInventory(Inventory inventory, CancellationToken cancellationToken = default);
 }
 
-internal sealed partial class SaveService : ISaveService
+internal sealed partial class ElementSaveService : IElementSaveService
 {
     private readonly IDb _db;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
@@ -21,7 +21,7 @@ internal sealed partial class SaveService : ISaveService
     public event Action<Element>? ElementSaved;
     private readonly Element _element;
 
-    public SaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext, IInventoryRepository inventoryRepository)
+    public ElementSaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext, IInventoryRepository inventoryRepository)
     {
         _db = db;
         _userDataSavers = userDataSavers;
