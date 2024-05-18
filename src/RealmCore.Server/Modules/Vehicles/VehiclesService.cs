@@ -2,8 +2,8 @@
 
 public interface IVehiclesService
 {
-    Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default);
-    Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default);
+    Task<RealmVehicle?> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default);
+    Task<RealmVehicle?> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default);
     Task Destroy(RealmVehicle vehicle);
     Task<List<LightInfoVehicleDto>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
@@ -28,20 +28,20 @@ internal sealed class VehiclesService : IVehiclesService
         _logger = logger;
     }
 
-    public async Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
+    public async Task<RealmVehicle?> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
     {
         var vehicle = _elementFactory.CreateVehicle(location, model);
         var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle((ushort)model, _dateTimeProvider.Now, cancellationToken);
-        try
+
+        if (_vehiclesInUse.TrySetActive(vehicleData.Id, vehicle))
         {
-            SetActive(vehicleData.Id, vehicle);
             vehicle.Persistence.Load(vehicleData, true);
             return vehicle;
         }
-        catch (Exception)
+        else
         {
             vehicle.Destroy();
-            throw;
+            return null;
         }
     }
 
@@ -87,7 +87,7 @@ internal sealed class VehiclesService : IVehiclesService
         await vehicle.GetRequiredService<IElementSaveService>().Save();
     }
 
-    public async Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
+    public async Task<RealmVehicle?> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
         if (vehicle.Persistence.IsLoaded)
             throw new InvalidOperationException();
@@ -97,7 +97,11 @@ internal sealed class VehiclesService : IVehiclesService
         var location = vehicle.GetLocation();
 
         var vehicleData = await vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now, cancellationToken);
-        SetActive(vehicleData.Id, vehicle);
+        if (!_vehiclesInUse.TrySetActive(vehicleData.Id, vehicle))
+        {
+            return null;
+        }
+
         vehicle.Persistence.Load(vehicleData, true);
 
         var occupants = vehicle.Occupants.ToList();
@@ -109,11 +113,5 @@ internal sealed class VehiclesService : IVehiclesService
             persistentVehicle.AddPassenger(pair.Key, pair.Value);
 
         return persistentVehicle;
-    }
-
-    private void SetActive(int vehicleId, RealmVehicle vehicle)
-    {
-        if (!_vehiclesInUse.TrySetActive(vehicleId, vehicle))
-            throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
     }
 }

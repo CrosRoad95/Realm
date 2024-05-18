@@ -1,11 +1,16 @@
-﻿
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
-internal sealed class AssetsHostedService : IHostedService
+internal sealed class AssetsManager : BackgroundService
 {
     private const string _basePath = "../../../Server/Assets";
+    private readonly AssetsCollection _assetsCollection;
 
-    public AssetsHostedService(AssetsCollection assetsCollection)
+    public AssetsManager(AssetsCollection assetsCollection)
+    {
+        _assetsCollection = assetsCollection;
+    }
+
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if (Directory.Exists(_basePath))
         {
@@ -16,20 +21,12 @@ internal sealed class AssetsHostedService : IHostedService
                 switch (Path.GetDirectoryName(fileName))
                 {
                     case "Fonts":
-                        assetsCollection.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
+                        _assetsCollection.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
                         break;
                 }
             }
         }
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
         return Task.CompletedTask;
     }
 }

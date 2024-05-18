@@ -8,8 +8,8 @@ public interface ICommandThrottlingPolicy
 
 internal sealed class CommandThrottlingPolicy : ICommandThrottlingPolicy
 {
-    Polly.RateLimit.RateLimitPolicy _policy;
-    Polly.RateLimit.AsyncRateLimitPolicy _policyAsync;
+    private readonly RateLimitPolicy _policy;
+    private readonly AsyncRateLimitPolicy _policyAsync;
 
     public CommandThrottlingPolicy()
     {

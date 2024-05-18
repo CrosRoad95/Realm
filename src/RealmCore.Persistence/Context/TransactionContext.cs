@@ -42,7 +42,7 @@ internal sealed class TransactionContext : ITransactionContext
     {
         var executionStrategy = _db.Database.CreateExecutionStrategy();
 
-        return await executionStrategy.ExecuteAsync<T>(async () =>
+        return await executionStrategy.ExecuteAsync(async () =>
         {
             await using var transaction = await _db.Database.BeginTransactionAsync(_isolationLevel, cancellationToken);
             try

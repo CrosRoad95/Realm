@@ -27,7 +27,7 @@ public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
         player.User.IsLoggedIn.Should().BeTrue();
         await signIn.Should().ThrowAsync<UserAlreadySignedInException>();
 
-        var userId = registerResult.Match<int>(registered =>
+        var userId = registerResult.Match(registered =>
         {
             return registered.id;
         }, failedToLogin =>

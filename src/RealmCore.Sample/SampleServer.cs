@@ -59,7 +59,7 @@ public static class SampleServerExtensions
         services.AddHostedService<CommandsHostedService>();
         services.AddHostedService<MapsHostedService>();
         services.AddHostedService<ProceduralObjectsHostedService>();
-        services.AddHostedService<AssetsHostedService>();
+        services.AddHostedService<AssetsManager>();
         services.AddHostedService<DefaultChatHostedService>();
         services.AddHostedService<TestHostedService>();
         return services;
