@@ -113,7 +113,7 @@ internal sealed class PlayerBindsHostedService : IHostedService
             state.Money = (double)player.Money.Amount;
 
             var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
-            var vehiclesWithModelAndPositionDTos = await vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
+            var vehiclesWithModelAndPositionDTos = await vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
             state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDto
             {
                 Id = x.Id,

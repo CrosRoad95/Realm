@@ -20,7 +20,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
     private void HandlePlayerJoined(Player plr)
     {
         var player = (TPlayer)plr;
-        player.User.SignedIn += HandleSignedIn;
+        player.User.LoggedIn += HandleSignedIn;
         player.Disconnected += HandleDisconnected;
         PlayerJoined(player);
     }
@@ -33,7 +33,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
     {
         var player = (TPlayer)plr;
-        player.User.SignedIn -= HandleSignedIn;
+        player.User.LoggedIn -= HandleSignedIn;
         player.Disconnected -= HandleDisconnected;
         PlayerLeft(player);
     }

@@ -10,8 +10,8 @@ public class VehicleEventRepositoryTests : RealmRemoteDatabaseIntegrationTesting
         var player = await CreatePlayerAsync();
         var vehicle1 = await CreateVehicleAsync();
         var vehicle2 = await CreateVehicleAsync();
-        var vehicleId1 = vehicle1.PersistentId;
-        var vehicleId2 = vehicle2.PersistentId;
+        var vehicleId1 = vehicle1.VehicleId;
+        var vehicleId2 = vehicle2.VehicleId;
 
         var dateTimeProvider = server.GetRequiredService<IDateTimeProvider>();
         var vehicleEventRepository = server.GetRequiredService<IVehicleEventRepository>();

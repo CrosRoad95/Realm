@@ -52,7 +52,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
         Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, true);
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
         {
@@ -66,7 +66,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _stats = [];
 

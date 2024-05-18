@@ -201,7 +201,7 @@ internal sealed class CommandsHostedService : IHostedService
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.AddPart(1, 1337);
             vehicle.Access.AddAsOwner(player);
-            _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.PersistentId}");
+            _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.VehicleId}");
         });
         
         _commandService.AddCommandHandler("cvveh", (player, args) =>
@@ -228,7 +228,7 @@ internal sealed class CommandsHostedService : IHostedService
             }
             var vehicle = await _vehiclesService.ConvertToPersistantVehicle(player.Vehicle, token);
             vehicle.Access.AddAsOwner(player);
-            _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.PersistentId}");
+            _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.VehicleId}");
         });
 
         _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
@@ -1614,7 +1614,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.AddAsyncCommandHandler("signout", async (player, args, token) =>
         {
-            await _usersService.SignOut(player, token);
+            await _usersService.LogOut(player, token);
         });
 
         //_commandService.AddAsyncCommandHandler("updateLastNewsRead", async (player, args) =>
@@ -1947,7 +1947,7 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.AddCommandHandler("activefuelcontainer", (player, args) =>
         {
             var active = player.Vehicle?.Fuel.Active?.FuelType;
-            _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.PersistentId}");
+            _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.VehicleId}");
             _chatBox.OutputTo(player, $"Active container: {active}");
         });
 
@@ -1972,7 +1972,7 @@ internal sealed class CommandsHostedService : IHostedService
                 }
                 else if (element is RealmPlayer plr)
                 {
-                    if (plr.User.IsSignedIn)
+                    if (plr.User.IsLoggedIn)
                     {
                         await plr.GetRequiredService<IElementSaveService>().Save(token);
                         i++;

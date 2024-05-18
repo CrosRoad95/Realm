@@ -8,10 +8,10 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly IUsersInUse _activeUsers;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
-    private readonly IPlayersService _playersService;
+    private readonly IElementSearchService _elementSearchService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementSearchService elementSearchService) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -19,7 +19,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _activeUsers = activeUsers;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
-        _playersService = playersService;
+        _elementSearchService = elementSearchService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -111,7 +111,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
     private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
     {
-        if (_playersService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
+        if (_elementSearchService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
             throw new UserNameInUseException(player.Name);
 
         var start = Stopwatch.GetTimestamp();
@@ -212,9 +212,9 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         {
             plr.Destroyed -= HandlePlayerDestroyed;
             _playerResources.TryRemove(player, out var _);
-            if (player.User.IsSignedIn)
+            if (player.User.IsLoggedIn)
             {
-                if (_activeUsers.TrySetInactive(player.PersistentId))
+                if (_activeUsers.TrySetInactive(player.UserId))
                     _playersEventManager.RelayUnloading(player);
 
                 await player.GetRequiredService<IElementSaveService>().Save();

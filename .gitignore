@@ -9,8 +9,7 @@ RealmRPG/Server/types.ts
 RealmRPG/
 *.local.json
 *.nupkg
-*.exe
-/src/RealmCore.Console/Server/BlazorGui
+*.ex
 *.keys
 src/RealmCore.BlazorGui/Properties/PublishProfiles/
 *.user

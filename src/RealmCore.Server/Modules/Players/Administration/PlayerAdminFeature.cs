@@ -137,7 +137,7 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
     {
         _playerUserFeature = playerUserFeature;
         Player = playerContext.Player;
-        playerUserFeature.SignedOut += HandleSignedOut;
+        playerUserFeature.LoggedOut += HandleSignedOut;
     }
 
     public void SetTools(IEnumerable<AdminTool> adminTools)
@@ -174,6 +174,6 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
 
     public void Dispose()
     {
-        _playerUserFeature.SignedOut -= HandleSignedOut;
+        _playerUserFeature.LoggedOut -= HandleSignedOut;
     }
 }

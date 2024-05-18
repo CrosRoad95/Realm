@@ -65,13 +65,13 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         _userData = userData;
         _money = userData.Money;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         Amount = 0;
     }

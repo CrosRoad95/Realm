@@ -15,6 +15,6 @@ internal sealed class RewardsService : IRewardsService
     public async Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default)
     {
         var userRewardRepository = player.GetRequiredService<IUserRewardRepository>();
-        return await userRewardRepository.TryAddReward(player.PersistentId, rewardId, cancellationToken);
+        return await userRewardRepository.TryAddReward(player.UserId, rewardId, cancellationToken);
     }
 }

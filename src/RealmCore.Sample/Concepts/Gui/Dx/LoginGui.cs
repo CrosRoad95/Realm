@@ -49,12 +49,21 @@ public sealed class LoginGui : DxGui, IGuiHandlers
 
                 try
                 {
-                    if (await _usersService.SignIn(formContext.Player, user))
+                    var result = await _usersService.LogIn(formContext.Player, user);
+                    result.Switch(loggedIn =>
                     {
                         formContext.Player.Gui.Current = null;
                         formContext.SuccessResponse();
-                        return;
-                    }
+                    }, userDisabled =>
+                    {
+
+                    }, playerAlreadyLoggedIn =>
+                    {
+
+                    }, userAlreadyInUse =>
+                    {
+
+                    });
                 }
                 catch (Exception ex)
                 {

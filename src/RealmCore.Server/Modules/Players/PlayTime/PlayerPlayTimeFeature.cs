@@ -63,13 +63,13 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
     }
 
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         _totalPlayTime = userData.PlayTime;
         _playTimes = userData.PlayTimes;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _totalPlayTime = 0;
     }

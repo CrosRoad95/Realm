@@ -2,9 +2,17 @@
 
 public interface IElementSearchService
 {
-    IEnumerable<RealmPlayer> SearchPlayers(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null);
-    IEnumerable<RealmVehicle> SearchVehicles(string pattern, VehicleSearchOption searchOptions = VehicleSearchOption.All, RealmVehicle? ignore = null);
+    RealmPlayer? FindPlayer(string pattern, PlayerSearchOptions options = default);
+    RealmVehicle? FindVehicle(string pattern, VehicleSearchOptions options = default);
+    IEnumerable<RealmPlayer> SearchPlayers(string pattern, PlayerSearchOptions options = default);
+    IEnumerable<RealmVehicle> SearchVehicles(string pattern, VehicleSearchOptions options = default);
+    bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All);
+    bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignored = null);
 }
+
+public record struct VehicleSearchOptions(VehicleSearchOption searchOptions = VehicleSearchOption.All, RealmVehicle? ignore = null);
+
+public record struct PlayerSearchOptions(PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null);
 
 public sealed class ElementSearchService : IElementSearchService
 {
@@ -17,201 +25,281 @@ public sealed class ElementSearchService : IElementSearchService
         _elementCollection = elementCollection;
     }
 
-    public IEnumerable<RealmVehicle> SearchVehicles(string pattern, VehicleSearchOption searchOptions = VehicleSearchOption.All, RealmVehicle? ignore = null)
+    public RealmPlayer? FindPlayer(string pattern, PlayerSearchOptions options = default)
     {
-        foreach (var vehicle in SearchVehiclesInner(pattern, searchOptions))
+        var players = SearchPlayers(pattern, options).ToArray();
+
+        if (players.Length == 1)
+            return players[0];
+
+        return null;
+    }
+    
+    public RealmVehicle? FindVehicle(string pattern, VehicleSearchOptions options = default)
+    {
+        var vehicles = SearchVehicles(pattern, options).ToArray();
+
+        if (vehicles.Length == 1)
+            return vehicles[0];
+
+        return null;
+    }
+    
+    public IEnumerable<RealmPlayer> SearchPlayers(string pattern, PlayerSearchOptions options = default)
+    {
+        foreach (var vehicle in SearchPlayersCore(pattern, options))
         {
-            if (ignore != null && ignore == vehicle)
+            if (options.ignore != null && options.ignore == vehicle)
+                continue;
+            yield return vehicle;
+        }
+    }
+    
+    public IEnumerable<RealmVehicle> SearchVehicles(string pattern, VehicleSearchOptions options = default)
+    {
+        foreach (var vehicle in SearchVehiclesCore(pattern, options.searchOptions))
+        {
+            if (options.ignore != null && options.ignore == vehicle)
                 continue;
             yield return vehicle;
         }
     }
 
-    public IEnumerable<RealmVehicle> SearchVehiclesInner(string pattern, VehicleSearchOption searchOptions = VehicleSearchOption.All)
+    public bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignored = null)
+    {
+        var player = _elementCollection.GetByType<RealmPlayer>()
+            .Where(x => string.Equals(x.Name, name, searchOptions.HasFlag(PlayerSearchOption.CaseInsensitive) ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture))
+            .FirstOrDefault();
+
+        if (player == null)
+        {
+            foundPlayer = null;
+            return false;
+        }
+
+        if (searchOptions.HasFlag(PlayerSearchOption.LoggedIn))
+        {
+            if (!player.User.IsLoggedIn)
+            {
+                foundPlayer = null;
+                return false;
+            }
+        }
+
+        if (ignored != null && player == ignored)
+        {
+            foundPlayer = null;
+            return false;
+        }
+
+        foundPlayer = player;
+        return true;
+    }
+
+    public bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All)
+    {
+        if (serial.Length != 32)
+            throw new ArgumentException(nameof(serial));
+
+        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
+        {
+            if (string.Equals(player.Client.Serial, serial, searchOptions.HasFlag(PlayerSearchOption.CaseInsensitive) ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture))
+            {
+                if (searchOptions.HasFlag(PlayerSearchOption.LoggedIn))
+                {
+                    if (!player.User.IsLoggedIn)
+                    {
+                        foundPlayer = null;
+                        return false;
+                    }
+                }
+                foundPlayer = player;
+                return true;
+            }
+        }
+        foundPlayer = null;
+        return false;
+    }
+
+    private IEnumerable<RealmVehicle> SearchVehiclesCore(string pattern, VehicleSearchOption searchOptions = VehicleSearchOption.All)
     {
         var match = Regexes.SpecialSearchSwitch().Match(pattern);
-        if (match.Success)
+        if (!match.Success)
+            yield break;
+
+        var search = match.Groups["Search"].Value;
+        if (!Enum.TryParse<SearchSwitch>(search, true, out var searchSwitch))
+            throw new UnknownSearchSwitchException(match.Groups["Character"].Value);
+
+        var allExceptMe = char.IsUpper(search, 0);
+        switch (searchSwitch)
         {
-            var search = match.Groups["Search"].Value;
-            if (Enum.TryParse<SearchSwitch>(search, true, out var searchSwitch))
-            {
-                var allExceptMe = char.IsUpper(search, 0);
-                switch (searchSwitch)
+            case SearchSwitch.N:
+                if (match.Groups["Argument"].Success)
                 {
-                    case SearchSwitch.N:
-                        if (match.Groups["Argument"].Success)
-                        {
-                            if (int.TryParse(match.Groups["Argument"].Value, out var number))
-                            {
-                                if (number <= 0)
-                                    throw new ArgumentOutOfRangeException(nameof(number));
+                    if (int.TryParse(match.Groups["Argument"].Value, out var number))
+                    {
+                        if (number <= 0)
+                            throw new ArgumentOutOfRangeException(nameof(number));
 
-                                foreach (var item in _elementCollection.GetByType<RealmVehicle>().OrderBy(x => x.DistanceToSquared(_player)).Take(number))
-                                {
-                                    if (allExceptMe && item == _player.Vehicle)
-                                        continue;
-
-                                    yield return item;
-                                }
-                            }
-                            else
-                            {
-                                throw new ArgumentException();
-                            }
-                        }
-                        else
-                        {
-                            foreach (var item in _elementCollection.GetByType<RealmVehicle>().OrderBy(x => x.DistanceToSquared(_player)))
-                            {
-                                if (allExceptMe && item == _player.Vehicle)
-                                    continue;
-
-                                yield return item;
-                                break;
-                            }
-                        }
-                        break;
-                    case SearchSwitch.R:
-                        if (int.TryParse(match.Groups["Argument"].Value, out var range))
-                        {
-                            if (range < 0)
-                                throw new ArgumentOutOfRangeException(nameof(range));
-
-                            foreach (var item in _elementCollection.GetByType<RealmVehicle>().Where(x => x.DistanceToSquared(_player) < (range * range)))
-                            {
-                                if (allExceptMe && item == _player.Vehicle)
-                                    continue;
-
-                                yield return item;
-                            }
-                        }
-                        else
-                        {
-                            throw new ArgumentException();
-                        }
-                        break;
-                    case SearchSwitch.A:
-                        foreach (var item in _elementCollection.GetByType<RealmVehicle>())
+                        foreach (var item in _elementCollection.GetByType<RealmVehicle>().OrderBy(x => x.DistanceToSquared(_player)).Take(number))
                         {
                             if (allExceptMe && item == _player.Vehicle)
                                 continue;
 
                             yield return item;
                         }
-                        break;
-                    case SearchSwitch.C:
-                        if(_player.Vehicle != null)
-                        {
-                            yield return _player.Vehicle;
-                        }
-                        break;
-                    default:
-                        throw new NotSupportedSwitchException(searchSwitch);
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
                 }
-            }
-            else
-            {
-                throw new UnknownSearchSwitchException(match.Groups["Character"].Value);
-            }
+                else
+                {
+                    foreach (var item in _elementCollection.GetByType<RealmVehicle>().OrderBy(x => x.DistanceToSquared(_player)))
+                    {
+                        if (allExceptMe && item == _player.Vehicle)
+                            continue;
+
+                        yield return item;
+                        break;
+                    }
+                }
+                break;
+            case SearchSwitch.R:
+                if (int.TryParse(match.Groups["Argument"].Value, out var range))
+                {
+                    if (range < 0)
+                        throw new ArgumentOutOfRangeException(nameof(range));
+
+                    foreach (var item in _elementCollection.GetByType<RealmVehicle>().Where(x => x.DistanceToSquared(_player) < (range * range)))
+                    {
+                        if (allExceptMe && item == _player.Vehicle)
+                            continue;
+
+                        yield return item;
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+                break;
+            case SearchSwitch.A:
+                foreach (var item in _elementCollection.GetByType<RealmVehicle>())
+                {
+                    if (allExceptMe && item == _player.Vehicle)
+                        continue;
+
+                    yield return item;
+                }
+                break;
+            case SearchSwitch.C:
+                if(_player.Vehicle != null)
+                {
+                    yield return _player.Vehicle;
+                }
+                break;
+            default:
+                throw new NotSupportedSwitchException(searchSwitch);
         }
     }
 
-    public IEnumerable<RealmPlayer> SearchPlayers(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    private IEnumerable<RealmPlayer> SearchPlayersCore(string pattern, PlayerSearchOptions playerSearchOptions = default)
     {
         var match = Regexes.SpecialSearchSwitch().Match(pattern);
-        if (match.Success)
+
+        if (!match.Success)
         {
-            var search = match.Groups["Search"].Value;
-            if (Enum.TryParse<SearchSwitch>(search, true, out var searchSwitch))
+            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
             {
-                var allExceptMe = char.IsUpper(search, 0);
-                switch (searchSwitch)
+                if (playerSearchOptions.ignore != null && playerSearchOptions.ignore == player)
+                    continue;
+
+                if (playerSearchOptions.searchOptions.HasFlag(PlayerSearchOption.LoggedIn))
                 {
-                    case SearchSwitch.N:
-                        if (match.Groups["Argument"].Success)
-                        {
-                            if(int.TryParse(match.Groups["Argument"].Value, out var number))
-                            {
-                                if (number <= 0)
-                                    throw new ArgumentOutOfRangeException(nameof(number));
+                    if (!player.User.IsLoggedIn)
+                        continue;
+                }
 
-                                foreach (var item in _elementCollection.GetByType<RealmPlayer>().OrderBy(x => x.DistanceToSquared(_player)).Take(number))
-                                {
-                                    if (allExceptMe && item == _player)
-                                        continue;
+                if (player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+                    yield return player;
+            }
 
-                                    yield return item;
-                                }
-                            }
-                            else
-                            {
-                                throw new ArgumentException();
-                            }
-                        }
-                        else
-                        {
-                            foreach (var item in _elementCollection.GetByType<RealmPlayer>().OrderBy(x => x.DistanceToSquared(_player)))
-                            {
-                                if (allExceptMe && item == _player)
-                                    continue;
+            yield break;
+        }
 
-                                yield return item;
-                                break;
-                            }
-                        }
-                        break;
-                    case SearchSwitch.R:
-                        if (int.TryParse(match.Groups["Argument"].Value, out var range))
-                        {
-                            if (range < 0)
-                                throw new ArgumentOutOfRangeException(nameof(range));
+        var search = match.Groups["Search"].Value;
+        if (!Enum.TryParse<SearchSwitch>(search, true, out var searchSwitch))
+            throw new UnknownSearchSwitchException(match.Groups["Character"].Value);
 
-                            foreach (var item in _elementCollection.GetByType<RealmPlayer>().Where(x => x.DistanceToSquared(_player) < (range * range)))
-                            {
-                                if (allExceptMe && item == _player)
-                                    continue;
+        var allExceptMe = char.IsUpper(search, 0);
+        switch (searchSwitch)
+        {
+            case SearchSwitch.N:
+                if (match.Groups["Argument"].Success)
+                {
+                    if(int.TryParse(match.Groups["Argument"].Value, out var number))
+                    {
+                        if (number <= 0)
+                            throw new ArgumentOutOfRangeException(nameof(number));
 
-                                yield return item;
-                            }
-                        }
-                        else
-                        {
-                            throw new ArgumentException();
-                        }
-                        break;
-                    case SearchSwitch.A:
-                        foreach (var item in _elementCollection.GetByType<RealmPlayer>())
+                        foreach (var item in _elementCollection.GetByType<RealmPlayer>().OrderBy(x => x.DistanceToSquared(_player)).Take(number))
                         {
                             if (allExceptMe && item == _player)
                                 continue;
 
                             yield return item;
                         }
-                        break;
-                    default:
-                        throw new NotSupportedSwitchException(searchSwitch);
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
                 }
-            }
-            else
-            {
-                throw new UnknownSearchSwitchException(match.Groups["Character"].Value);
-            }
-        }
+                else
+                {
+                    foreach (var item in _elementCollection.GetByType<RealmPlayer>().OrderBy(x => x.DistanceToSquared(_player)))
+                    {
+                        if (allExceptMe && item == _player)
+                            continue;
 
-        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-        {
-            if (ignore != null && ignore == player)
-                continue;
+                        yield return item;
+                        break;
+                    }
+                }
+                break;
+            case SearchSwitch.R:
+                if (int.TryParse(match.Groups["Argument"].Value, out var range))
+                {
+                    if (range < 0)
+                        throw new ArgumentOutOfRangeException(nameof(range));
 
-            if (searchOptions.HasFlag(PlayerSearchOption.LoggedIn))
-            {
-                if (!player.User.IsSignedIn)
-                    continue;
-            }
+                    foreach (var item in _elementCollection.GetByType<RealmPlayer>().Where(x => x.DistanceToSquared(_player) < (range * range)))
+                    {
+                        if (allExceptMe && item == _player)
+                            continue;
 
-            if (player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
-                yield return player;
+                        yield return item;
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+                break;
+            case SearchSwitch.A:
+                foreach (var item in _elementCollection.GetByType<RealmPlayer>())
+                {
+                    if (allExceptMe && item == _player)
+                        continue;
+
+                    yield return item;
+                }
+                break;
+            default:
+                throw new NotSupportedSwitchException(searchSwitch);
         }
     }
-
 }

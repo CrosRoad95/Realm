@@ -8,7 +8,7 @@ public class UserNotificationRepositoryTests : RealmRemoteDatabaseIntegrationTes
     {
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
-        var userId = player.PersistentId;
+        var userId = player.UserId;
 
         var dateTimeProvider = server.GetRequiredService<IDateTimeProvider>();
         var userNotificationRepository = server.GetRequiredService<IUserNotificationRepository>();

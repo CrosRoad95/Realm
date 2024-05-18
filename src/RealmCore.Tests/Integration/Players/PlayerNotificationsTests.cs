@@ -25,7 +25,7 @@ public class PlayerNotificationsTests : RealmRemoteDatabaseIntegrationTestingBas
             Title = "test title",
             Content = "test desc",
             Excerpt = "excerpt",
-            UserId = player.PersistentId,
+            UserId = player.UserId,
             ReadTime = null,
             SentTime = server.DateTimeProvider.Now
         });

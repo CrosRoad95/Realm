@@ -32,13 +32,13 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock(_lock)
             _licenses = userData.Licenses;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock(_lock)
             _licenses = [];

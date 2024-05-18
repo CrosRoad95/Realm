@@ -20,19 +20,19 @@ internal sealed class MoneyHistoryService : IMoneyHistoryService
     {
         var userMoneyHistoryRepository = player.GetRequiredService<IUserMoneyHistoryRepository>();
         var amount = player.Money.Amount;
-        await userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
+        await userMoneyHistoryRepository.Add(player.UserId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
     }
     
     public async Task Add(RealmPlayer player, decimal amount, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default)
     {
         var userMoneyHistoryRepository = player.GetRequiredService<IUserMoneyHistoryRepository>();
-        await userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
+        await userMoneyHistoryRepository.Add(player.UserId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
     }
 
     public async Task<List<UserMoneyHistoryDto>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
         var userMoneyHistoryRepository = player.GetRequiredService<IUserMoneyHistoryRepository>();
-        var moneyHistory = await userMoneyHistoryRepository.Get(player.PersistentId, limit, cancellationToken);
+        var moneyHistory = await userMoneyHistoryRepository.Get(player.UserId, limit, cancellationToken);
 
         return moneyHistory.Select(UserMoneyHistoryDto.Map).ToList();
     }

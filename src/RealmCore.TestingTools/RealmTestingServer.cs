@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Headers;
 using RealmCore.WebHosting;
+using Xunit.Sdk;
 
 namespace RealmCore.TestingTools;
 
@@ -144,13 +145,13 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         return GetRequiredService<IElementFactory>().CreateVehicle(Location.Zero, (VehicleModel)404);
     }
 
-    public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)
+    public async Task<RealmPlayer> LoginPlayer(RealmPlayer player)
     {
         var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
 
         if (user == null)
         {
-            await GetRequiredService<IUsersService>().SignUp(player.Name, "asdASD123!@#");
+            await GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
 
             user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
         }
@@ -158,14 +159,27 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         if (user == null)
             throw new InvalidOperationException();
 
-        var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
-        success.Should().BeTrue();
+        var success = await player.GetRequiredService<IUsersService>().LogIn(player, user);
+        success.Switch(loggedIn =>
+        {
+            // Ok
+        }, userDisabled =>
+        {
+            throw new XunitException("User should not be disabled");
+        }, playerAlreadyLoggedIn =>
+        {
+            throw new XunitException("Player should not be already logged in");
+        }, userAlreadyInUse =>
+        {
+            throw new XunitException("Player should not be already in use");
+        });
+
         return player;
     }
 
     public async Task SignOutPlayer(RealmPlayer player)
     {
-        await player.GetRequiredService<IUsersService>().SignOut(player);
+        await player.GetRequiredService<IUsersService>().LogOut(player);
     }
 
     public async Task<UserData> CreateAccount(string userName)

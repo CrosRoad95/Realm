@@ -112,7 +112,6 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Services
-        services.AddSingleton<IPlayersService, PlayersService>();
         services.AddSingleton<IUsersService, UsersService>();
         services.AddScoped<IElementSaveService, ElementSaveService>();
         services.AddScoped<IVehicleLoader, VehicleLoader>();

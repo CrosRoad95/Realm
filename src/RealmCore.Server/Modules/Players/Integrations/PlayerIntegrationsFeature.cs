@@ -27,13 +27,13 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IU
 
     public event Action? VersionIncreased;
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         if (userData.DiscordIntegration != null)
             Discord.Integrate(userData.DiscordIntegration.DiscordUserId);
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         Discord.TryRemove();
     }

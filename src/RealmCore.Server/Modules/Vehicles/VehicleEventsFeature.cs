@@ -28,7 +28,7 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature, IUsesVehicle
             _vehicleEvents.Add(new VehicleEventData
             {
                 DateTime = _dateTimeProvider.Now,
-                VehicleId = Vehicle.PersistentId,
+                VehicleId = Vehicle.VehicleId,
                 EventType = eventType,
                 Metadata = metadata,
             });

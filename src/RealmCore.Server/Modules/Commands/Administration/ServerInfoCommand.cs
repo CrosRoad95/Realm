@@ -23,7 +23,7 @@ internal class ServerInfoCommand : IInGameCommand
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _server.StartDatetime);
-        _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.User.IsSignedIn).Count());
+        _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.User.IsLoggedIn).Count());
         _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<RealmVehicle>());
         _logger.LogInformation("Elements count: {elementsCount}", _elementCollection.Count);
         _logger.LogInformation("Loaded global maps: {loadedMaps}", string.Join(", ", _mapsService.LoadedMaps));

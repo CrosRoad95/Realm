@@ -29,8 +29,8 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
         {
             if(player is RealmPlayer realmPlayer)
             {
-                await _server.SignInPlayer(realmPlayer);
-                realmPlayer.PersistentId.Should().NotBe(0);
+                await _server.LoginPlayer(realmPlayer);
+                realmPlayer.UserId.Should().NotBe(0);
             }
         }
         return player;
@@ -56,7 +56,7 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
             throw new Exception("Server not created.");
         var vehiclesService = _server.GetRequiredService<IVehiclesService>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
-        vehicle.PersistentId.Should().NotBe(0);
+        vehicle.VehicleId.Should().NotBe(0);
         return vehicle;
     }
 
@@ -68,7 +68,7 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
             tcs.SetResult();
         }
 
-        if (player.User.IsSignedIn)
+        if (player.User.IsLoggedIn)
         {
             player.GetRequiredService<IElementSaveService>().ElementSaved += handleElementSaved;
             player.TriggerDisconnected(QuitReason.Quit);

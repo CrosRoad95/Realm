@@ -27,7 +27,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IUse
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
         {
@@ -39,7 +39,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IUse
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
             _jobUpgrades = [];

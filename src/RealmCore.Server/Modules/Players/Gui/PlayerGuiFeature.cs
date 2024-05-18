@@ -50,7 +50,7 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
     {
         _userFeature = userFeature;
         Player = playerContext.Player;
-        userFeature.SignedOut += HandleSignedOut;
+        userFeature.LoggedOut += HandleSignedOut;
     }
 
     private void HandleSignedOut(IPlayerUserFeature userFeature, RealmPlayer player)
@@ -96,6 +96,6 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
 
     public void Dispose()
     {
-        _userFeature.SignedOut -= HandleSignedOut;
+        _userFeature.LoggedOut -= HandleSignedOut;
     }
 }

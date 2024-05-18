@@ -26,7 +26,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         _db = db;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         _lock.Wait();
         try
@@ -39,7 +39,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _lock.Wait();
         try
@@ -63,7 +63,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         try
         {
             var query = _db.UserEvents
-                .Where(x => x.UserId == Player.PersistentId && x.Id < last.Id)
+                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
                 .OrderByDescending(x => x.Id)
                 .Take(count);
 

@@ -102,7 +102,7 @@ public sealed class RealmCommandService
                         {
                             playerSearchOption = playerSearchOptionsAttribute.PlayerSearchOption;
                         }
-                        plr = arguments.ReadPlayer(playerSearchOption);
+                        plr = arguments.ReadPlayer(new(playerSearchOption));
                     }
                     args[i++] = plr;
                 }
@@ -367,7 +367,7 @@ public sealed class RealmCommandService
         if (!_commands.TryGetValue(command, out var commandInfo))
             return;
 
-        if (!player.User.IsSignedIn)
+        if (!player.User.IsLoggedIn)
             return;
 
         using var activity = Activity.StartActivity("CommandHandler");

@@ -17,7 +17,7 @@ public abstract class RealmUnitTestingBase<TRealmTestingServer, TRealmPlayer> : 
 
         if(player is RealmPlayer realmPlayer)
         {
-            realmPlayer.User.SignIn(new UserData
+            realmPlayer.User.Login(new UserData
             {
                 UserName = player.Name
             }, new ClaimsPrincipal

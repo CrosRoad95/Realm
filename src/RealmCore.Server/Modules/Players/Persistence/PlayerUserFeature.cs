@@ -2,8 +2,8 @@
 
 public interface IUsesUserPersistentData
 {
-    void SignIn(UserData userData);
-    void SignOut();
+    void LogIn(UserData userData);
+    void LogOut();
     event Action? VersionIncreased;
 }
 
@@ -15,12 +15,12 @@ public interface IPlayerUserFeature : IPlayerFeature
     string Nick { get; }
     string UserName { get; }
     DateTime? LastNewsReadDateTime { get; }
-    bool IsSignedIn { get; }
+    bool IsLoggedIn { get; }
     DateTime? RegisteredDateTime { get; }
     string[] AuthorizedPolicies { get; }
 
-    event Action<IPlayerUserFeature, RealmPlayer>? SignedIn;
-    event Action<IPlayerUserFeature, RealmPlayer>? SignedOut;
+    event Action<IPlayerUserFeature, RealmPlayer>? LoggedIn;
+    event Action<IPlayerUserFeature, RealmPlayer>? LoggedOut;
 
     IReadOnlyList<string> GetClaims();
     IReadOnlyList<string> GetRoles();
@@ -29,8 +29,8 @@ public interface IPlayerUserFeature : IPlayerFeature
     bool HasAuthorizedPolicy(string policy);
     bool HasClaim(string type, string? value = null);
     bool IsInRole(string role);
-    void SignIn(UserData user, ClaimsPrincipal claimsPrincipal);
-    void SignOut();
+    void Login(UserData user, ClaimsPrincipal claimsPrincipal);
+    void LogOut();
     bool TryRemoveClaim(string type, string? value = null);
     bool TryRemoveRole(string role);
     void UpdateLastNewsRead();
@@ -56,7 +56,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
     public UserData UserData => _user ?? throw new UserNotSignedInException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new UserNotSignedInException();
-    public bool IsSignedIn => _user != null;
+    public bool IsLoggedIn => _user != null;
     public int Id => _user?.Id ?? -1;
     public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
@@ -72,8 +72,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         }
     }
 
-    public event Action<IPlayerUserFeature, RealmPlayer>? SignedIn;
-    public event Action<IPlayerUserFeature, RealmPlayer>? SignedOut;
+    public event Action<IPlayerUserFeature, RealmPlayer>? LoggedIn;
+    public event Action<IPlayerUserFeature, RealmPlayer>? LoggedOut;
 
     public RealmPlayer Player { get; init; }
 
@@ -84,7 +84,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         _userEventRepository = userEventRepository;
     }
 
-    public void SignIn(UserData user, ClaimsPrincipal claimsPrincipal)
+    public void Login(UserData user, ClaimsPrincipal claimsPrincipal)
     {
         if (user == null)
             throw new InvalidOperationException();
@@ -98,25 +98,25 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                 if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                 {
                     usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
-                    usesPlayerPersistentData.SignIn(user);
+                    usesPlayerPersistentData.LogIn(user);
                 }
             }
-            SignedIn?.Invoke(this, Player);
+            LoggedIn?.Invoke(this, Player);
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
         {
-            if (IsSignedIn)
+            if (IsLoggedIn)
             {
                 if (_user == null)
                     throw new InvalidOperationException();
 
                 _user = null;
                 _claimsPrincipal = null;
-                SignedOut?.Invoke(this, Player);
+                LoggedOut?.Invoke(this, Player);
                 ClearAuthorizedPoliciesCache();
 
                 foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
@@ -124,7 +124,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                     if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                     {
                         usesPlayerPersistentData.VersionIncreased -= IncreaseVersion;
-                        usesPlayerPersistentData.SignOut();
+                        usesPlayerPersistentData.LogOut();
                     }
                 }
             }

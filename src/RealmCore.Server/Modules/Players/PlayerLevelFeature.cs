@@ -38,7 +38,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         _levelsCollection = levelsCollection;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         using var _ = _writerLockSlim.BeginWrite();
 
@@ -50,7 +50,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         ExperienceChanged?.Invoke(this, before, _experience);
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         using var _ = _writerLockSlim.BeginWrite();
 

@@ -22,13 +22,13 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IUse
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
             _discoveries = userData.Discoveries;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
             _discoveries = [];

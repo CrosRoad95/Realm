@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Users;
+﻿using static RealmCore.Server.Modules.Users.UsersResults;
+
+namespace RealmCore.Server.Modules.Users;
 
 public interface IUsersService
 {
@@ -7,10 +9,10 @@ public interface IUsersService
 
     Task<bool> AddToRole(RealmPlayer player, string role);
     ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
-    Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default);
-    Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default);
-    Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default);
-    Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default);
+    Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user);
+    Task<OneOf<LoggedOut, PlayerNotLoggedIn>> LogOut(RealmPlayer player, CancellationToken cancellationToken = default);
+    Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player);
+    Task<OneOf<Registered, FailedToRegister>> Register(string username, string password);
 }
 
 internal sealed class UsersService : IUsersService
@@ -36,7 +38,7 @@ internal sealed class UsersService : IUsersService
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
     }
 
-    public async Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Registered, FailedToRegister>> Register(string username, string password)
     {
         var user = new UserData
         {
@@ -48,46 +50,29 @@ internal sealed class UsersService : IUsersService
         if (identityResult.Succeeded)
         {
             _logger.LogInformation("Created a user of id {userId} {userName}", user.Id, username);
-            return user.Id;
+            return new Registered(user.Id);
         }
 
         _logger.LogError("Failed to create a user {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
-        throw new Exception("Failed to create a user");
+        return new FailedToRegister();
     }
 
-    public async Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default)
+    public async Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player)
     {
         var serial = player.Client.GetSerial();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var userData = await userManager.GetUserBySerial(serial, cancellationToken) ?? throw new Exception("No account found.");
+        var userData = await userManager.GetUserBySerial(serial, CancellationToken.None) ?? throw new Exception("No account found.");
+        
         if (!userData.QuickLogin)
-            throw new Exception("Quick login not enabled");
+            return new QuickLoginDisabled();
 
-        return await SignIn(player, userData, cancellationToken);
-    }
+        var result = await LogIn(player, userData);
 
-    private void UpdateLastData(RealmPlayer player)
-    {
-        var user = player.User.UserData;
-        if (user != null)
-        {
-            user.LastLoginDateTime = _dateTimeProvider.Now;
-            var client = player.Client;
-            user.LastIp = client.IPAddress?.ToString();
-            user.LastSerial = client.Serial;
-            user.RegisterSerial ??= client.Serial;
-            user.RegisterIp ??= user.LastIp;
-            user.RegisteredDateTime ??= _dateTimeProvider.Now; ;
-            user.Nick = player.Name;
-        }
-    }
-
-    private async Task<string?> AuthorizePolicies(RealmPlayer player)
-    {
-        foreach (var policy in _authorizationPoliciesProvider.Policies)
-            if (!await AuthorizePolicy(player, policy))
-                return policy;
-        return null;
+        return result.Match<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>>(loggedIn => loggedIn,
+            userDisabled => userDisabled,
+            playerAlreadyLoggedIn => playerAlreadyLoggedIn,
+            userAlreadyInUse => userAlreadyInUse
+            );
     }
 
     public async Task<bool> AddToRole(RealmPlayer player, string role)
@@ -103,21 +88,18 @@ internal sealed class UsersService : IUsersService
         return false;
     }
 
-    public async Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default)
+    public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user)
     {
-        if (player == null)
-            throw new NullReferenceException(nameof(player));
-
-        if (user.IsDisabled)
-            throw new UserDisabledException(user.Id);
-
-        if (player.User.IsSignedIn)
-            throw new UserAlreadySignedInException();
-
         using var _ = _logger.BeginElement(player);
 
+        if (user.IsDisabled)
+            return new UserDisabled(user.Id);
+
+        if (player.User.IsLoggedIn)
+            return new PlayerAlreadyLoggedIn();
+
         if (!_activeUsers.TrySetActive(user.Id, player))
-            throw new Exception("Failed to login to already active account.");
+            return new UserAlreadyInUse();
 
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
@@ -137,42 +119,42 @@ internal sealed class UsersService : IUsersService
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-            player.User.SignIn(user, claimsPrincipal);
+            player.User.Login(user, claimsPrincipal);
 
             await AuthorizePolicies(player);
-            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
+            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             UpdateLastData(player);
 
-            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name, cancellationToken);
+            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name);
             SignedIn?.Invoke(player);
-            return true;
-
+            return new LoggedIn(user.Id);
         }
         catch (Exception ex)
         {
-            if (player.User.IsSignedIn)
-                player.User.SignOut();
+            if (player.User.IsLoggedIn)
+                player.User.LogOut();
             _activeUsers.TrySetInactive(user.Id);
             _logger.LogError(ex, "Failed to sign in a user.");
             throw;
         }
     }
 
-    public async Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default)
+    public async Task<OneOf<LoggedOut, PlayerNotLoggedIn>> LogOut(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (!player.User.IsSignedIn)
-            throw new UserNotSignedInException();
+        if (!player.User.IsLoggedIn)
+            return new PlayerNotLoggedIn();
 
-        if (!_activeUsers.TrySetInactive(player.PersistentId))
-            throw new InvalidOperationException();
+        var id = player.UserId;
+        _activeUsers.TrySetInactive(id);
 
         await player.GetRequiredService<IElementSaveService>().Save(cancellationToken);
-        player.User.SignOut();
+        player.User.LogOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
         player.Dimension = 0;
         SignedOut?.Invoke(player);
+        return new LoggedOut(id);
     }
 
     public async ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy)
@@ -183,5 +165,29 @@ internal sealed class UsersService : IUsersService
         var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
         player.User.SetAuthorizedPolicyState(policy, result.Succeeded);
         return result.Succeeded;
+    }
+
+    private async Task<string?> AuthorizePolicies(RealmPlayer player)
+    {
+        foreach (var policy in _authorizationPoliciesProvider.Policies)
+            if (!await AuthorizePolicy(player, policy))
+                return policy;
+        return null;
+    }
+
+    private void UpdateLastData(RealmPlayer player)
+    {
+        var user = player.User.UserData;
+        if (user != null)
+        {
+            user.LastLoginDateTime = _dateTimeProvider.Now;
+            var client = player.Client;
+            user.LastIp = client.IPAddress?.ToString();
+            user.LastSerial = client.Serial;
+            user.RegisterSerial ??= client.Serial;
+            user.RegisterIp ??= user.LastIp;
+            user.RegisteredDateTime ??= _dateTimeProvider.Now; ;
+            user.Nick = player.Name;
+        }
     }
 }

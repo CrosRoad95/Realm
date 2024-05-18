@@ -33,7 +33,7 @@ internal sealed class PlayersNotifications : IPlayersNotifications
 
     public async Task<UserNotificationDto> Create(RealmPlayer player, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default)
     {
-        var notificationData = await _userNotificationRepository.Create(player.PersistentId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
+        var notificationData = await _userNotificationRepository.Create(player.UserId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
         player?.Notifications.RelayCreated(notificationData);
         var userNotificationDto = UserNotificationDto.Map(notificationData);
         Created?.Invoke(userNotificationDto);
@@ -53,7 +53,7 @@ internal sealed class PlayersNotifications : IPlayersNotifications
 
     public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.Get(player.PersistentId, limit, cancellationToken);
+        return await _userNotificationRepository.Get(player.UserId, limit, cancellationToken);
     }
 
     public async Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
@@ -63,7 +63,7 @@ internal sealed class PlayersNotifications : IPlayersNotifications
 
     public async Task<int> CountUnread(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.CountUnread(player.PersistentId, cancellationToken);
+        return await _userNotificationRepository.CountUnread(player.UserId, cancellationToken);
     }
 
     public async Task<int> CountUnread(int userId, CancellationToken cancellationToken = default)

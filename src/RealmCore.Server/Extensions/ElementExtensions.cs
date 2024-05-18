@@ -70,7 +70,7 @@ public static class ElementExtensions
             throw new NullReferenceException(nameof(element));
 
         if (element.IsDestroyed)
-            throw new ElementDestroyedException(element);
+            return new CancellationToken(true);
 
         var cancellationTokenSource = new CancellationTokenSource();
 

@@ -271,11 +271,11 @@ public class PlayersTests : RealmUnitTestingBase
         #region Arrange
         var player = CreateServerWithOnePlayer();
 
-        var playersService = player.GetRequiredService<IPlayersService>();
+        var elementSearchService = player.GetRequiredService<IElementSearchService>();
         #endregion
 
         #region Act
-        bool found = playersService.TryGetPlayerByName(nick, out var foundPlayer, PlayerSearchOption.None);
+        bool found = elementSearchService.TryGetPlayerByName(nick, out var foundPlayer, PlayerSearchOption.None);
         #endregion
 
         #region Assert
@@ -304,7 +304,7 @@ public class PlayersTests : RealmUnitTestingBase
         #endregion
 
         #region Act
-        var found = searchService.SearchPlayers(pattern, PlayerSearchOption.None);
+        var found = searchService.SearchPlayers(pattern, new(PlayerSearchOption.None));
         #endregion
 
         #region Assert

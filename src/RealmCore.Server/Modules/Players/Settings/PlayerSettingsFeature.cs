@@ -48,13 +48,13 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
     }
 
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
             _settings = userData.Settings;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         Reset();
     }

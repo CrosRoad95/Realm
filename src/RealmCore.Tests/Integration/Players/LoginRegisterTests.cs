@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
+public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
@@ -14,7 +14,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
         {
             var player = await CreatePlayerAsync(false);
             player.Name = name;
-            await server.SignInPlayer(player);
+            await server.LoginPlayer(player);
             player.Spawn(new Vector3(1, 2, 3));
 
             player.PlayTime.InternalSetTotalPlayTime(1337);
@@ -26,7 +26,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
             player.Statistics.Increase(1, 1);
             player.Statistics.Increase(2, 2);
 
-            await player.GetRequiredService<IUsersService>().SignOut(player);
+            await player.GetRequiredService<IUsersService>().LogOut(player);
             player.TriggerDisconnected(QuitReason.Quit);
 
             player.Money.Amount.Should().Be(0);
@@ -51,12 +51,12 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
         {
             var player = await CreatePlayerAsync(false);
             player.Name = name;
-            await server.SignInPlayer(player);
+            await server.LoginPlayer(player);
             player.TrySpawnAtLastPosition().Should().BeTrue();
 
             assert(server, player);
 
-            await player.GetRequiredService<IUsersService>().SignOut(player);
+            await player.GetRequiredService<IUsersService>().LogOut(player);
             player.TriggerDisconnected(QuitReason.Quit);
         }
     }
@@ -68,7 +68,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 
         {
             var player = server.CreatePlayer();
-            await server.SignInPlayer(player);
+            await server.LoginPlayer(player);
 
             for (int i = 0; i < 25; i++)
             {
@@ -79,7 +79,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 
         {
             var player = server.CreatePlayer();
-            await server.SignInPlayer(player);
+            await server.LoginPlayer(player);
             var events = player.Events;
             var initialCount1 = events.Count();
             var fetched1 = await events.FetchMore();
@@ -113,7 +113,7 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 
         var playerName = $"FakeInvPlayer{Guid.NewGuid()}";
         var player1 = server.CreatePlayer(playerName);
-        await server.SignInPlayer(player1);
+        await server.LoginPlayer(player1);
 
         if (!player1.Inventory.TryGetPrimary(out var inventory1))
         {
@@ -128,14 +128,14 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
         await DisconnectPlayer(player1);
 
         var player2 = server.CreatePlayer(playerName);
-        await server.SignInPlayer(player2);
+        await server.LoginPlayer(player2);
         var inventory2 = player2.Inventory.Primary!;
         inventory2.RemoveItem(1, 1);
         player2.Inventory.Primary!.Number.Should().Be(2);
         await DisconnectPlayer(player2);
 
         var player3 = server.CreatePlayer(playerName);
-        await server.SignInPlayer(player3);
+        await server.LoginPlayer(player3);
         var inventory3 = player2.Inventory.Primary!;
         player2.Inventory.Primary!.Number.Should().Be(2);
     }

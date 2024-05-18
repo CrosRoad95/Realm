@@ -32,7 +32,7 @@ public class InventoryRepositoryTests : RealmRemoteDatabaseIntegrationTestingBas
 
         await server.SignOutPlayer(player);
         await repository.CreateInventoryForUserId(id, 24);
-        await server.SignInPlayer(player);
+        await server.LoginPlayer(player);
 
         player.Inventory.Primary!.Size.Should().Be(24);
     }

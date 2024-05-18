@@ -27,7 +27,7 @@ internal abstract record BindHandlerBase(KeyState KeyState);
 internal record BindHandler(KeyState KeyState, Action<RealmPlayer, KeyState> Callback) : BindHandlerBase(KeyState);
 internal record AsyncBindHandler(KeyState KeyState, Func<RealmPlayer, KeyState, CancellationToken, Task> Callback) : BindHandlerBase(KeyState);
 
-public class RealmPlayer : Player, IDisposable, IPersistentElement
+public class RealmPlayer : Player, IDisposable
 {
     private readonly object _lock = new();
     private readonly AtomicBool _inToggleControlScopeFlag = new();
@@ -167,7 +167,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     }
 
     public CultureInfo Culture { get => _culture; set => _culture = value; }
-    public int PersistentId => User.Id;
+    public int UserId => User.Id;
 
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public new IPlayerMoneyFeature Money { get; init; }

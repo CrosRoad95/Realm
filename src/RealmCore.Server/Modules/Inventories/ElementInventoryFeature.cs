@@ -34,12 +34,12 @@ internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerI
         _itemsCollection = itemsCollection;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         Load(Player, userData.Inventories, _itemsCollection);
     }
 
-    public void SignOut()
+    public void LogOut()
     {
 
     }

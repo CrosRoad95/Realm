@@ -53,7 +53,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         member.RankName.Should().Be("Leader");
         member.Rank.Should().Be(1);
         group2.Value.members.Should().HaveCount(1);
-        group2.Value.members[0].userId.Should().Be(player.PersistentId);
+        group2.Value.members[0].userId.Should().Be(player.UserId);
     }
 
     //[Fact]
@@ -66,7 +66,7 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         var group = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
 
         await groupService.TryAddMember(player, group.id, 100, "Leader");
-        var removed = await groupService.RemoveMember(player, player.PersistentId);
+        var removed = await groupService.RemoveMember(player, player.UserId);
 
         player.Groups.IsMember(group.id).Should().BeFalse();
         var group2 = await groupService.GetGroupByName("Test group4");

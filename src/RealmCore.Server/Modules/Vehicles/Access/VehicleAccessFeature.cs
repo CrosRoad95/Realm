@@ -71,14 +71,14 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
 
     public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess)
     {
-        var userId = player.PersistentId;
+        var userId = player.UserId;
         return TryGetAccess(userId, out vehicleAccess);
     }
 
     public bool HasAccess(RealmPlayer player)
     {
         lock (_lock)
-            return InternalHasAccess(player.PersistentId);
+            return InternalHasAccess(player.UserId);
     }
 
     public bool HasAccess(int userId)
@@ -109,7 +109,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
 
     public VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
-        return AddAccess(player.PersistentId, accessType, customValue);
+        return AddAccess(player.UserId, accessType, customValue);
     }
 
     public VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null)
@@ -129,7 +129,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
         return false;
     }
 
-    public bool IsOwner(RealmPlayer player) => IsOwner(player.PersistentId);
+    public bool IsOwner(RealmPlayer player) => IsOwner(player.UserId);
 
     public bool TryRemoveAccess(int userId, byte? accessType = null)
     {
@@ -147,7 +147,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
         }
     }
 
-    public bool TryRemoveAccess(RealmPlayer player, byte? accessType = null) => TryRemoveAccess(player.PersistentId, accessType);
+    public bool TryRemoveAccess(RealmPlayer player, byte? accessType = null) => TryRemoveAccess(player.UserId, accessType);
 
     public IEnumerator<VehicleUserAccessDto> GetEnumerator()
     {

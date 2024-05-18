@@ -17,9 +17,9 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUsersInUse _activeUsers;
     private readonly IVehiclesInUse _vehiclesInUse;
-    private readonly ILogger<VehicleService> _logger;
+    private readonly ILogger<VehiclesService> _logger;
 
-    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehicleService> logger)
+    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger)
     {
         _elementFactory = elementFactory;
         _dateTimeProvider = dateTimeProvider;
@@ -47,20 +47,20 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (player.User.IsSignedIn)
+        if (player.User.IsLoggedIn)
         {
             var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
-            return await vehicleRepository.GetVehiclesByUserId(player.PersistentId, null, cancellationToken);
+            return await vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
         }
         return [];
     }
 
     public async Task<List<LightInfoVehicleDto>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (player.User.IsSignedIn)
+        if (player.User.IsLoggedIn)
         {
             var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
-            return await vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
+            return await vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
         }
         return [];
     }

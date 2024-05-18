@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Commands;
+﻿using RealmCore.Server.Modules.Search;
+
+namespace RealmCore.Server.Modules.Commands;
 
 public class CommandArguments
 {
@@ -171,10 +173,10 @@ public class CommandArguments
         throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
 
-    public virtual RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    public virtual RealmPlayer ReadPlayer(PlayerSearchOptions playerSearchOptions = default)
     {
         var name = ReadArgument();
-        var users = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
+        var users = _searchService.SearchPlayers(name, playerSearchOptions).ToList();
         if (users.Count == 1)
             return users[0];
         if (users.Count > 0)
@@ -182,11 +184,11 @@ public class CommandArguments
         throw new CommandArgumentException(CurrentArgument, "Gracz o takiej nazwie nie został znaleziony", name);
     }
 
-    public virtual bool TryReadPlayer(out RealmPlayer player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    public virtual bool TryReadPlayer(out RealmPlayer player, PlayerSearchOptions playerSearchOptions = default)
     {
         if (TryReadArgument(out string? name) && name != null)
         {
-            var players = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
+            var players = _searchService.SearchPlayers(name, playerSearchOptions).ToList();
             if (players.Count == 1)
             {
                 player = players[0];
@@ -200,11 +202,11 @@ public class CommandArguments
         return false;
     }
     
-    public virtual bool TryReadPlayerOrDefault(out RealmPlayer player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    public virtual bool TryReadPlayerOrDefault(out RealmPlayer player, PlayerSearchOptions playerSearchOptions = default)
     {
         if (TryReadArgument(out string? name) && name != null)
         {
-            var players = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
+            var players = _searchService.SearchPlayers(name, playerSearchOptions).ToList();
             if (players.Count == 1)
             {
                 player = players[0];

@@ -31,13 +31,13 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
             _achievements = userData.Achievements;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
             _achievements = [];

@@ -33,7 +33,7 @@ public sealed class RegisterDxGui : DxGui, IGuiHandlers
 
                 try
                 {
-                    var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
+                    var userId = await _usersService.Register(registerData.Login, registerData.Password);
 
                     formContext.Player.Gui.SetCurrentWithDI<LoginGui>();
                 }

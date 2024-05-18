@@ -40,14 +40,14 @@ public class DefaultChatHostedService : PlayerLifecycle, IHostedService
         {
             case "say":
                 var player = (RealmPlayer)plr;
-                if (player.User.IsSignedIn)
+                if (player.User.IsLoggedIn)
                 {
                     var messageContent = string.Join(' ', arguments.Arguments);
                     string message = $"{player.Name}: {messageContent}";
                     string messageWithColors = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{messageContent}";
                     foreach (var targetPlayer in _elementCollection.GetByType<RealmPlayer>())
                     {
-                        if (targetPlayer.User.IsSignedIn)
+                        if (targetPlayer.User.IsLoggedIn)
                             _chatBox.OutputTo(targetPlayer, messageWithColors, Color.White, true);
                     }
 

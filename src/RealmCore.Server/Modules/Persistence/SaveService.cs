@@ -108,7 +108,7 @@ internal sealed partial class ElementSaveService : IElementSaveService
 
     private async Task<bool> SavePlayer(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (!player.User.IsSignedIn)
+        if (!player.User.IsLoggedIn)
             return false;
 
         var userData = player.User.UserData;
@@ -201,8 +201,8 @@ internal sealed partial class ElementSaveService : IElementSaveService
         {
             int inventoryId = _element switch
             {
-                RealmPlayer player => await SaveNewPlayerInventory(inventory, player.PersistentId, cancellationToken),
-                RealmVehicle vehicle => await SaveNewVehicleInventory(inventory, vehicle.PersistentId, cancellationToken),
+                RealmPlayer player => await SaveNewPlayerInventory(inventory, player.UserId, cancellationToken),
+                RealmVehicle vehicle => await SaveNewVehicleInventory(inventory, vehicle.VehicleId, cancellationToken),
                 _ => 0
             };
 

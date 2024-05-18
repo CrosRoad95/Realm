@@ -26,7 +26,7 @@ internal sealed class InventoryHostedService : PlayerLifecycle, IHostedService
 
         if (inventory.Owner is RealmPlayer player)
         {
-            if (player.User.IsSignedIn)
+            if (player.User.IsLoggedIn)
             {
                 var saveService = player.GetRequiredService<IElementSaveService>();
                 await saveService.SaveNewInventory(inventory);

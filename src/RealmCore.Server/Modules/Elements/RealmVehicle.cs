@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmVehicle : Vehicle, IPersistentElement
+public class RealmVehicle : Vehicle
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
     private VehicleAccessController _accessController = VehicleDefaultAccessController.Instance;
 
     public IServiceProvider ServiceProvider => _serviceProvider;
-    public int PersistentId => Persistence.Id;
+    public int VehicleId => Persistence.Id;
 
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public IVehicleAccessFeature Access { get; init; }

@@ -4,7 +4,7 @@
 public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     [Fact]
-    public async Task TestSignInFlow()
+    public async Task TestLogInFlow()
     {
         #region Arrange
         var server = await CreateServerAsync();
@@ -17,23 +17,33 @@ public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
         #endregion
 
         #region Act
-        var userId = await usersService.SignUp(login, password);
+        var registerResult = await usersService.Register(login, password);
         var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login, server.DateTimeProvider.Now) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
-        var signIn = async () => await usersService.SignIn(player, user);
+        var signIn = async () => await usersService.LogIn(player, user);
 
         await signIn.Should().NotThrowAsync();
-        player.User.IsSignedIn.Should().BeTrue();
+        player.User.IsLoggedIn.Should().BeTrue();
         await signIn.Should().ThrowAsync<UserAlreadySignedInException>();
+
+        var userId = registerResult.Match<int>(registered =>
+        {
+            return registered.id;
+        }, failedToLogin =>
+        {
+            throw new Exception("Failed to login");
+        });
+
+
         var lastNick = await userManager.GetLastNickName(userId);
         #endregion
 
         #region Assert
         validPassword.Should().BeTrue();
         lastNick.Should().StartWith("TestPlayer");
-        player.User.IsSignedIn.Should().BeTrue();
-        player.PersistentId.Should().Be(userId);
+        player.User.IsLoggedIn.Should().BeTrue();
+        player.UserId.Should().Be(userId);
         #endregion
     }
 }

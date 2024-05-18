@@ -21,7 +21,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature, IUsesUserPersi
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         _lock.Wait();
         try
@@ -34,7 +34,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature, IUsesUserPersi
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _lock.Wait();
         try

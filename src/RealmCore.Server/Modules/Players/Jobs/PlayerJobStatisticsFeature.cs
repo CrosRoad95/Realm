@@ -28,13 +28,13 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, 
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
             _jobStatistics = userData.JobStatistics;
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
             _jobStatistics = [];

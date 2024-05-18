@@ -25,7 +25,7 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserP
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
         {
@@ -37,7 +37,7 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserP
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         lock (_lock)
         {

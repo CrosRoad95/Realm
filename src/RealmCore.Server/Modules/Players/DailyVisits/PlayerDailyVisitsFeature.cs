@@ -26,6 +26,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
             _dailyVisitsData.LastVisit = value;
         }
     }
+
     public int VisitsInRow
     {
         get => _dailyVisitsData?.VisitsInRow ?? throw new UserNotSignedInException(); set
@@ -35,6 +36,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
             _dailyVisitsData.VisitsInRow = value;
         }
     }
+
     public int VisitsInRowRecord
     {
         get => _dailyVisitsData?.VisitsInRowRecord ?? throw new UserNotSignedInException(); set
@@ -56,7 +58,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
         Player = playerContext.Player;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         lock (_lock)
         {
@@ -77,7 +79,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _dailyVisitsData = null;
     }

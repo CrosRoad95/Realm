@@ -29,7 +29,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _db = db;
     }
 
-    public void SignIn(UserData userData)
+    public void LogIn(UserData userData)
     {
         _lock.Wait();
         try
@@ -42,7 +42,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         }
     }
 
-    public void SignOut()
+    public void LogOut()
     {
         _lock.Wait();
         try
@@ -93,7 +93,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
                 return [];
 
             var query = _db.UserNotifications
-                .Where(x => x.UserId == Player.PersistentId && x.Id < last.Id)
+                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
                 .OrderByDescending(x => x.Id)
                 .Take(count);
 
