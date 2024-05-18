@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "UserTests";
-
     [Fact]
     public async Task TestSignInFlow()
     {

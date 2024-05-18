@@ -1729,12 +1729,12 @@ internal sealed class CommandsHostedService : IHostedService
             int a = 0;
             foreach (var foundPlayer in foundPlayers)
             {
-                if (player.SelectedElements.Add(foundPlayer))
+                if (player.SelectedElements.TryAdd(foundPlayer))
                     a++;
             }
             foreach (var foundVehicle in foundVehicles)
             {
-                if (player.SelectedElements.Add(foundVehicle))
+                if (player.SelectedElements.TryAdd(foundVehicle))
                     a++;
             }
             _chatBox.OutputTo(player, $"Selected {a} elements.");

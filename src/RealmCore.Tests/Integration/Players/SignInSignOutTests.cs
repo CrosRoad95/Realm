@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "RealmPlayerTests";
-
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
     {

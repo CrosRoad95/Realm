@@ -6,8 +6,6 @@ namespace RealmCore.Tests.Integration.Vehicles;
 [Collection("IntegrationTests")]
 public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "VehiclesPersistence";
-
     [Fact]
     public async Task Test1()
     {

@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class TransactionContextTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "TransactionContextTests";
-
     [InlineData(true)]
     [InlineData(false)]
     [Theory]

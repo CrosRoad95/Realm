@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class FractionRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "FractionRepositoryTests";
-
     [Fact]
     public async Task FractionRepositoryShouldWork()
     {

@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class PlayersTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "PlayersTests";
-
     [InlineData(new string[] { }, false)]
     [InlineData(new string[] { "Admin" }, true)]
     [Theory]

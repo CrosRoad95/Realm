@@ -4,8 +4,6 @@ public abstract class RealmRemoteDatabaseIntegrationTestingBase<TRealmTestingSer
     where TRealmTestingServer : RealmTestingServer<TRealmPlayer>
     where TRealmPlayer : Player
 {
-    protected abstract string DatabaseName { get; }
-
     protected override string GetConnectionString()
     {
         var connectionString = Environment.GetEnvironmentVariable("RealmCoreTestingDatabaseConnectionString");

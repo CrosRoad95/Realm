@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class VehicleEventRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "VehicleEventRepositoryTests";
-
     [Fact]
     public async Task VehicleEventRepositoryShouldWork()
     {

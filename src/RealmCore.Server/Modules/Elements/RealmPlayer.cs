@@ -711,7 +711,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         if (_blip != null)
             return false;
 
-        _blip = GetRequiredService<IElementFactory>().CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
+        _blip = ElementFactory.CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
         {
             blip.Color = color;
         });
@@ -725,7 +725,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         if(_blip != null)
         {
             _blip.Position = Position;
-            // TODO: update interior and dimension only if needed
             _blip.Interior = Interior;
             _blip.Dimension = Dimension;
         }

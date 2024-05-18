@@ -3,8 +3,6 @@
 [Collection("IntegrationTests")]
 public class PlayerNotificationsTests : RealmRemoteDatabaseIntegrationTestingBase
 {
-    protected override string DatabaseName => "PlayerNotificationsTests";
-
     [Fact]
     public async Task Test1()
     {
