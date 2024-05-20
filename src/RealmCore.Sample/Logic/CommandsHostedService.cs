@@ -197,6 +197,9 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.AddAsyncCommandHandler("cvprivate", async (player, args, token) =>
         {
             var vehicle = await _vehiclesService.CreatePersistantVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404, token);
+            if (vehicle == null)
+                return;
+
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.AddPart(1, 1337);
@@ -227,6 +230,9 @@ internal sealed class CommandsHostedService : IHostedService
                 return;
             }
             var vehicle = await _vehiclesService.ConvertToPersistantVehicle(player.Vehicle, token);
+            if (vehicle == null)
+                return;
+
             vehicle.Access.AddAsOwner(player);
             _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.VehicleId}");
         });
@@ -397,6 +403,9 @@ internal sealed class CommandsHostedService : IHostedService
 
             {
                 var vehicle = await _vehiclesService.CreatePersistantVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404, token);
+                if (vehicle == null)
+                    return;
+
                 vehicle.Upgrades.AddUpgrade(1);
                 vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                 vehicle.PartDamage.AddPart(1, 1337);

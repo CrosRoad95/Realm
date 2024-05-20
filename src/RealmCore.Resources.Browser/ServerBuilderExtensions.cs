@@ -22,13 +22,13 @@ public static class ServerBuilderExtensions
             services.AddBrowserServices();
         });
 
-        builder.AddLuaEventHub<IBrowserEventHub, BrowserResource>();
         builder.AddLogic<BrowserLogic>();
     }
 
     public static IServiceCollection AddBrowserServices(this IServiceCollection services)
     {
         services.AddSingleton<IBrowserService, BrowserService>();
+        services.AddLuaEventHub<IBrowserEventHub, BrowserResource>();
         return services;
     }
 }

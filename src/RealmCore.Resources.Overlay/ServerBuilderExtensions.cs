@@ -25,13 +25,12 @@ public static class ServerBuilderExtensions
             services.AddOverlayServices();
         });
 
-        builder.AddLuaEventHub<IHudEventHub, OverlayResource>();
-
         builder.AddLogic<OverlayLogic>();
     }
 
     public static IServiceCollection AddOverlayServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<IHudEventHub, OverlayResource>();
         services.AddSingleton<IOverlayService, OverlayService>();
         return services;
     }

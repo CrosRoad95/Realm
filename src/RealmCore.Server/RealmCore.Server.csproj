@@ -20,11 +20,11 @@
 		<PackageReference Include="Quartz" Version="3.8.1" />
 		<PackageReference Include="Serilog" Version="3.1.1" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-		<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20240514-140918" />
-		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20240514-140918" />
-		<PackageReference Include="SlipeServer.Resources.Scoreboard" Version="0.1.0-CI-20240514-140918" />
-		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20240514-140918" />
-		<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20240514-140918" />
+		<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20240520-041716" />
+		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20240520-041716" />
+		<PackageReference Include="SlipeServer.Resources.Scoreboard" Version="0.1.0-CI-20240520-041716" />
+		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20240520-041716" />
+		<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20240520-041716" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -220,6 +220,10 @@
 		<Using Include="OneOf" />
 		<Using Include="SlipeServer.Resources.Base" />
 		<Using Include="SlipeServer.Server.Behaviour" />
+		<Using Include="SlipeServer.Server.PacketHandling.Handlers" />
+		<Using Include="SlipeServer.Server.PacketHandling.Handlers.Middleware" />
+		<Using Include="SlipeServer.Packets.Definitions.Explosions" />
+		<Using Include="RealmCore.Server.PacketHandling" />
 	</ItemGroup>
 
 </Project>

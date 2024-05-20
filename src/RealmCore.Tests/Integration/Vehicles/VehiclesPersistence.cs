@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Pickups;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 
@@ -19,6 +20,9 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         var loadService = server.GetRequiredService<IVehicleLoader>();
 
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
+        if (vehicle == null)
+            throw new NullReferenceException();
+
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
         await vehicle.GetRequiredService<IElementSaveService>().Save();
@@ -37,6 +41,8 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         var loadService = server.GetRequiredService<IVehicleLoader>();
         var activeVehicles = server.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
+        if (vehicle == null)
+            throw new NullReferenceException();
         var id = vehicle.VehicleId;
         activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
         activeVehicles.IsActive(id).Should().BeTrue();
@@ -59,6 +65,8 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var loadService = server.GetRequiredService<IVehicleLoader>();
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
+        if (vehicle1 == null)
+            throw new NullReferenceException();
         vehicle1.Access.AddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;
         vehicle1.Upgrades.AddUpgrade(250, false);

@@ -21,13 +21,12 @@ public static class ServerBuilderExtensions
             services.AddNametagsServices();
         });
 
-        builder.AddLuaEventHub<INametagsEventHub, NametagsResource>();
-
         builder.AddLogic<NametagsLogic>();
     }
 
     public static IServiceCollection AddNametagsServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<INametagsEventHub, NametagsResource>();
         services.AddSingleton<INametagsService, NametagsService>();
         return services;
     }

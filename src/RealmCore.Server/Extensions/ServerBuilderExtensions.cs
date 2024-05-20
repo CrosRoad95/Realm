@@ -1,4 +1,9 @@
-﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+﻿using RealmCore.Resources.Addons.GuiSystem.DGS;
+using SlipeServer.Resources.DGS;
+using SlipeServer.Server.ServerBuilders;
+using System.Net.Http;
+
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
@@ -7,7 +12,8 @@ namespace RealmCore.Server.Extensions;
 [Flags]
 public enum ExcludeResources
 {
-    BoneAttach = 0x01
+    BoneAttach = 0x1,
+    DGS = 0x2,
 }
 
 public static class ServerBuilderExtensions
@@ -21,20 +27,29 @@ public static class ServerBuilderExtensions
         //{
         //    Bind = null
         //});
-        //serverBuilder.AddClientInterfaceResource(commonOptions);
-        //serverBuilder.AddElementOutlineResource();
-        //serverBuilder.AddAdminResource();
-        //serverBuilder.AddAFKResource();
-        //serverBuilder.AddMapNamesResource();
-        //serverBuilder.AddStatisticsCounterResource();
-        //serverBuilder.AddOverlayResource();
-        //serverBuilder.AddAssetsResource();
-        //serverBuilder.AddText3dResource();
-        //serverBuilder.AddNametagsResource();
-        //if (excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
-        //    serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
-        //serverBuilder.AddWatermarkResource();
-        //serverBuilder.AddScoreboard();
+        serverBuilder.AddClientInterfaceResource(commonOptions);
+        serverBuilder.AddElementOutlineResource();
+        serverBuilder.AddAdminResource();
+        serverBuilder.AddAFKResource();
+        serverBuilder.AddMapNamesResource();
+        serverBuilder.AddStatisticsCounterResource();
+        serverBuilder.AddOverlayResource();
+        serverBuilder.AddAssetsResource();
+        serverBuilder.AddText3dResource();
+        serverBuilder.AddNametagsResource();
+        serverBuilder.AddWatermarkResource();
+        serverBuilder.AddScoreboard();
+        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
+            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
+        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.DGS))
+        {
+            serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
+            serverBuilder.AddGuiSystemResource(builder =>
+            {
+                builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+                builder.SetGuiProvider(DGSGuiProvider.Name);
+            }, new());
+        }
         return serverBuilder;
     }
     
@@ -52,44 +67,11 @@ public static class ServerBuilderExtensions
         services.AddAssetsServices();
         services.AddText3dServices();
         services.AddNametagsServices();
-        if (excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
-            services.AddBoneAttachServices();
         services.AddWatermarkServices();
         services.AddScoreboardServices();
+        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
+            services.AddBoneAttachServices();
         return services;
-    }
-
-    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
-    {
-        var _serverConfiguration = configuration.GetSection("Server").Get<Configuration>();
-        if (_serverConfiguration == null)
-            throw new InvalidOperationException("Server configuration is null");
-
-        serverBuilder.UseConfiguration(_serverConfiguration);
-        if (serverBuilderDefaultBehaviours != null)
-        {
-            if (serverBuilderDefaultBehaviours != ServerBuilderDefaultBehaviours.None)
-            {
-                serverBuilder.AddDefaults(exceptBehaviours: serverBuilderDefaultBehaviours.Value);
-            }
-        }
-        else
-        {
-            serverBuilder.AddResourceServer<RealmResourceServer>();
-            var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour | ServerBuilderDefaultBehaviours.NicknameChangeBehaviour;
-#if DEBUG
-            serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
-#else
-            serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
-#endif
-            serverBuilder.AddBehaviour<CollisionShapeBehaviour>();
-        }
-
-        #region Behaviours
-        serverBuilder.AddBehaviour<ScopedCollisionShapeBehaviour>();
-        #endregion
-
-        return serverBuilder;
     }
 
     public static IServiceCollection WithGuiSystem(this IServiceCollection services)

@@ -9,12 +9,13 @@ configuration.AddUserSecrets(Assembly.GetEntryAssembly()!);
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddHttpClient();
-builder.Services.AddRealmServer<RealmPlayer>(builder.Configuration, builder =>
+
+builder.AddRealmServer<RealmPlayer>(builder.Configuration, builder =>
 {
     builder.AddSampleServer();
 });
+
 builder.AddRealmBlazorGuiSupport();
 builder.AddRealmServerDiscordBotIntegration();
 builder.Services.AddSingleton<RealmDiscordService>();
@@ -22,17 +23,6 @@ builder.Services.AddSampleServer();
 builder.Services.AddDiscordStatusChannelUpdateHandler<SampleDiscordStatusChannelUpdateHandler>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-builder.ConfigureMtaServers(configure =>
-{
-    var isDevelopment = builder.Environment.IsDevelopment();
-    var exceptBehaviours = isDevelopment ? ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour : ServerBuilderDefaultBehaviours.None;
-
-    configure.AddDefaultPacketHandlers();
-    configure.AddDefaultBehaviours(exceptBehaviours);
-    configure.StartResourceServers();
-    configure.StartAllServers();
-});
 
 var app = builder.Build();
 

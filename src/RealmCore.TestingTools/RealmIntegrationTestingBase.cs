@@ -56,6 +56,8 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
             throw new Exception("Server not created.");
         var vehiclesService = _server.GetRequiredService<IVehiclesService>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
+        if (vehicle == null)
+            throw new NullReferenceException();
         vehicle.VehicleId.Should().NotBe(0);
         return vehicle;
     }

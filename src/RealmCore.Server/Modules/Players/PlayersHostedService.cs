@@ -8,10 +8,10 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly IUsersInUse _activeUsers;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
-    private readonly IElementSearchService _elementSearchService;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementSearchService elementSearchService) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IHostEnvironment hostEnvironment) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -19,7 +19,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _activeUsers = activeUsers;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
-        _elementSearchService = elementSearchService;
+        _hostEnvironment = hostEnvironment;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -111,12 +111,12 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
     private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
     {
-        if (_elementSearchService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
+        var elementSearchService = player.GetRequiredService<IElementSearchService>();
+        if (elementSearchService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
             throw new UserNameInUseException(player.Name);
 
         var start = Stopwatch.GetTimestamp();
-        var resources = _resourceProvider.GetResources();
-        if (resources.Count() == 0)
+        if (RealmResourceServer._resourceCounter == 0)
             throw new InvalidOperationException("No resources found");
 
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
@@ -187,13 +187,20 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             {
                 return;
             }
-            string what = "Wystąpił nieznany błąd.";
+            string what = "Wystąpił nieznany błąd";
             if(ex is BrowserLoadingTimeoutException)
             {
-                what = "Gui przeglądarki ładowało się zbyt długo.";
+                what = "Gui przeglądarki ładowało się zbyt długo";
             }
-            var traceId = System.Diagnostics.Activity.Current?.TraceId.ToString() ?? "<nieznany>";
+            
+            var traceId = handlePlayerJoinedActivity?.Id ?? "<nieznany>";
             var message = $"{what}. Jeżeli błąd się powtórzy zgłoś się do administracji.\n\nTrace id: {traceId}";
+            if (_hostEnvironment.IsDevelopment())
+            {
+                _clientConsole.OutputTo(player, "Exception message:");
+                _clientConsole.OutputTo(player, ex.ToString());
+                _clientConsole.OutputTo(player, "");
+            }
             _clientConsole.OutputTo(player, message);
             player.Kick(message);
         }

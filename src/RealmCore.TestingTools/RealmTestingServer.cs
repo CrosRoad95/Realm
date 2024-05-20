@@ -75,7 +75,6 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         //var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
         //saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
-        serverBuilder.ConfigureServer(testConfigurationProvider ?? new(""), ServerBuilderDefaultBehaviours.None, excludeResources: ExcludeResources.BoneAttach);
         serverBuilder.ConfigureServices(services =>
         {
             services.AddSingleton(httpClient);

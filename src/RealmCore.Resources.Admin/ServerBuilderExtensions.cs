@@ -21,12 +21,12 @@ public static class ServerBuilderExtensions
             services.AddAdminServices();
         });
 
-        builder.AddLuaEventHub<IAdminEventHub, AdminResource>();
         builder.AddLogic<AdminLogic>();
     }
 
     public static IServiceCollection AddAdminServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<IAdminEventHub, AdminResource>();
         services.AddSingleton<IAdminService, AdminService>();
         return services;
     }

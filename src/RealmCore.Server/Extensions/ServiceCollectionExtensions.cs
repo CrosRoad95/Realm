@@ -1,4 +1,6 @@
-﻿using RealmCore.Server.Modules.Players.Settings;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RealmCore.Server.Modules.Players.Settings;
+using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Server.Extensions;
 
@@ -109,6 +111,8 @@ public static class ServiceCollectionExtensions
         #region Security
         services.AddSingleton<IUsersInUse, UsersInUse>();
         services.AddSingleton<IVehiclesInUse, VehiclesInUse>();
+        services.AddSingleton<IAntiCheat, AntiCheat>();
+        services.AddHostedService<AntiCheatService>();
         #endregion
 
         #region Services
@@ -132,6 +136,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PlayersEventManager>();
         services.AddSingleton<ISchedulerService, SchedulerService>();
         services.AddSingleton<IVehiclesService, VehiclesService>();
+        services.AddSingleton<CollisionShapeBehaviour>();
+        services.AddSingleton<ScopedCollisionShapeBehaviour>();
         #endregion
 
         #region Player features
@@ -230,6 +236,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<AFKHostedService>();
         services.AddHostedService<PlayerDailyVisitsHostedService>();
         services.AddHostedService<PlayerJoinedPipelineHostedService>();
+        services.AddHostedService<ServerLifecycle>();
 
         return services;
     }
@@ -238,28 +245,35 @@ public static class ServiceCollectionExtensions
 internal sealed class ServerLifecycle : IHostedService
 {
     private readonly ILogger<ServerLifecycle> _logger;
-    private readonly IEnumerable<IServerLoader> _serverLoaders;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly RealmCommandService _realmCommandService;
     private readonly IElementCollection _elementCollection;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly MtaServer _mtaServer;
+    private readonly ScopedCollisionShapeBehaviour _scopedCollisionShapeBehaviour;
 
-    public ServerLifecycle(ILogger<ServerLifecycle> logger, IEnumerable<IServerLoader> serverLoaders, IOptions<GameplayOptions> _gameplayOptions, RealmCommandService realmCommandService, CollisionShapeBehaviour collisionShapeBehaviour, IElementCollection elementCollection)
+    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, BasicHttpServer basicHttpServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour)
     {
         _logger = logger;
-        _serverLoaders = serverLoaders;
-        this._gameplayOptions = _gameplayOptions;
+        _gameplayOptions = gameplayOptions;
         _realmCommandService = realmCommandService;
         _elementCollection = elementCollection;
+        _serviceProvider = serviceProvider;
+        _mtaServer = mtaServer;
+        _scopedCollisionShapeBehaviour = scopedCollisionShapeBehaviour;
+        _mtaServer.AddResourceServer(new RealmResourceServer(basicHttpServer));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var activity = Activity.StartActivity(nameof(StartAsync));
 
+        using var scope = _serviceProvider.CreateScope();
+        var serverLoaders = scope.ServiceProvider.GetRequiredService<IEnumerable<IServerLoader>>();
         {
             using var serverLoadersActivity = Activity.StartActivity("Loading server");
             bool anyFailed = false;
-            foreach (var item in _serverLoaders)
+            foreach (var item in serverLoaders)
             {
                 using var serverLoaderActivity = Activity.StartActivity($"Loading {item}");
                 try
@@ -281,6 +295,8 @@ internal sealed class ServerLifecycle : IHostedService
 
         CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
         CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
+
+        _mtaServer.Start();
 
         _logger.LogInformation("Server started.");
         _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);

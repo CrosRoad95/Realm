@@ -22,12 +22,12 @@ public static class ServerBuilderExtensions
             services.AddElementOutlineServices();
         });
 
-        builder.AddLuaEventHub<IElementOutlineEventHub, ElementOutlineResource>();
         builder.AddLogic<ElementOutlineLogic>();
     }
 
     public static IServiceCollection AddElementOutlineServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<IElementOutlineEventHub, ElementOutlineResource>();
         services.AddSingleton<IElementOutlineService, ElementOutlineService>();
         return services;
     }

@@ -13,10 +13,12 @@ public interface IGroupsService
 internal sealed class GroupsService : IGroupsService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScope _serviceScope;
 
     public GroupsService(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
+        _serviceScope = serviceProvider.CreateScope();
+        _serviceProvider = _serviceScope.ServiceProvider;
     }
 
     private Group Map(GroupData groupData)

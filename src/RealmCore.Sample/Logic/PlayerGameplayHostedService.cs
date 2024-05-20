@@ -144,6 +144,8 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
                         if (realmVehicleForSale.TrySell())
                         {
                             vehicle = await _vehiclesService.ConvertToPersistantVehicle(vehicle);
+                            if (vehicle == null)
+                                throw new NullReferenceException();
                             vehicle.Access.AddAsOwner(player);
                             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                         }

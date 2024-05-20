@@ -24,12 +24,12 @@ public static class ServerBuilderExtensions
             services.AddClientInterfaceServices();
         });
 
-        builder.AddLuaEventHub<IClientInterfaceEventHub, ClientInterfaceResource>();
         builder.AddLogic<ClientInterfaceLogic>();
     }
 
     public static IServiceCollection AddClientInterfaceServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<IClientInterfaceEventHub, ClientInterfaceResource>();
         services.AddSingleton<IClientInterfaceService, ClientInterfaceService>();
         return services;
     }

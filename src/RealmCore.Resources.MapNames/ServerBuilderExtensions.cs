@@ -20,12 +20,12 @@ public static class ServerBuilderExtensions
             services.AddMapNamesServices();
         });
 
-        builder.AddLuaEventHub<IMapNamesEventHub, MapNamesResource>();
         builder.AddLogic<MapNamesLogic>();
     }
 
     public static IServiceCollection AddMapNamesServices(this IServiceCollection services)
     {
+        services.AddLuaEventHub<IMapNamesEventHub, MapNamesResource>();
         services.AddSingleton<IMapNamesService, MapNamesService>();
         return services;
     }

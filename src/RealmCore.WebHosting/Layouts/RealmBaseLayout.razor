@@ -64,17 +64,16 @@
 
         var browserGuiService = _server.GetRequiredService<IBrowserGuiService>();
 
-        if (HttpContext == null)
+        if (HttpContext == null && BrowserKey != null)
         {
-            var claim = authenticationState.User.FindFirst(x => x.Type == BrowserConstants.ClaimType);
-            if(claim != null)
+            if (browserGuiService.TryGetPlayerByKey(BrowserKey, out var player) && player != null)
             {
-                if (browserGuiService.TryGetPlayerByKey(claim.Value, out var player) && player != null)
-                {
-                    _player = player;
-                    Ready();
-                }
-                return;
+                _player = player;
+                Ready();
+            }
+            else
+            {
+                ;
             }
             return;
         }
@@ -82,6 +81,8 @@
         if (BrowserKey == null)
             return;
 
+        if (true)
+            return;
         var claims = new List<Claim>
         {
             new Claim(BrowserConstants.ClaimType, BrowserKey),
@@ -96,5 +97,6 @@
         {
             IsPersistent = true
         });
+        ;
     }
 }

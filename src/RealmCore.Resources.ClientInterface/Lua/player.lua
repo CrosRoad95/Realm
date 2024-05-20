@@ -1,5 +1,4 @@
-﻿outputChatBox("asd");
-local sx,sy = guiGetScreenSize()
+﻿local sx,sy = guiGetScreenSize()
 --local hoveredElement = nil;
 setElementData(localPlayer, "translations", {}, false)
 triggerServerEventWithId("sendLocalizationCode", getLocalization().code)

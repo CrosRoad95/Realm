@@ -11,7 +11,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="SlipeServer.Hosting" Version="0.1.0-CI-20240512-213356" />
+	  <PackageReference Include="SlipeServer.Hosting" Version="0.1.0-CI-20240519-204403" />
 	</ItemGroup>
 
 	<ItemGroup>
