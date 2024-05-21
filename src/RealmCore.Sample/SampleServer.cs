@@ -63,32 +63,7 @@ public static class SampleServerExtensions
         services.AddHostedService<AssetsManager>();
         services.AddHostedService<DefaultChatHostedService>();
         services.AddHostedService<TestHostedService>();
+        services.AddHostedService<AntiCheatHostedService>();
         return services;
-    }
-
-    public static ServerBuilder AddSampleServer(this ServerBuilder serverBuilder)
-    {
-        bool withDgs = true;
-        if (withDgs)
-        {
-            //serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
-            //serverBuilder.AddGuiSystemResource(builder =>
-            //{
-            //    builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-            //    builder.SetGuiProvider(DGSGuiProvider.Name);
-            //}, new());
-        }
-
-        //serverBuilder.AddBrowserResource("../../../Server/BlazorGui/wwwroot", BrowserMode.Remote);
-
-
-        //#if DEBUG
-        //        if (withDgs)
-        //        {
-        //            serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
-        //        }
-        //#endif
-
-        return serverBuilder;
     }
 }

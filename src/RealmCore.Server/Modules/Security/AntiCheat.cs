@@ -4,13 +4,16 @@ namespace RealmCore.Server.Modules.Security;
 public enum KnownAntiCheatViolation
 {
     ExplosionSpam,
+    ExplosionOutsideRange,
 }
 
 public record AntiCheatViolationDetails();
 
 public interface IAntiCheat
 {
-    void ReportViolation(RealmPlayer player, KnownAntiCheatViolation violation, AntiCheatViolationDetails? details);
+    event Action<RealmPlayer, int, AntiCheatViolationDetails?>? ViolationReported;
+
+    void ReportViolation(RealmPlayer player, KnownAntiCheatViolation violation, AntiCheatViolationDetails? details = null);
 }
 
 internal sealed class AntiCheat : IAntiCheat
@@ -28,7 +31,7 @@ internal sealed class AntiCheat : IAntiCheat
         ViolationReported?.Invoke(player, (int)violation, details);
     }
 
-    public void ReportViolation(RealmPlayer player, int violation, AntiCheatViolationDetails? details)
+    public void ReportViolation(RealmPlayer player, int violation, AntiCheatViolationDetails? details = null)
     {
         ViolationReported?.Invoke(player, violation, details);
     }

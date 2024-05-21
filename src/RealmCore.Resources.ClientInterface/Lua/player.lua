@@ -34,3 +34,13 @@ addEventHandler( "onClientCursorMove", root,
 addEventHandler ( "onClientClick", root, function(button, state, absoluteX, absoluteY, worldX, worldY, worldZ, clickedElement)
     triggerServerEventWithId("clickedElementChanged", clickedElement)
 end)
+
+addCommandHandler("boom", function()
+    outputChatBox("boom")
+    local x,y,z = getElementPosition(localPlayer)
+    createExplosion (x,y + 20,z, 1)
+end)
+addCommandHandler("boomfar", function()
+    outputChatBox("boom")
+    createExplosion (1000, 1000, 1000, 1)
+end)

@@ -1,5 +1,4 @@
 ﻿namespace RealmCore.Sample.Logic;
-
 internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 {
     private readonly IElementFactory _elementFactory;
