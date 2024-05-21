@@ -142,7 +142,7 @@ internal sealed partial class ElementSaveService : IElementSaveService
             foreach (var item in inventory.Items)
             {
                 var existingItem = existingInventoryData.InventoryItems.FirstOrDefault(x => x.Id == item.Id);
-                var itemData = Item.CreateData(item);
+                var itemData = InventoryItem.CreateData(item);
                 if (existingItem == null)
                 {
                     existingInventoryData.InventoryItems.Add(itemData);

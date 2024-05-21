@@ -111,7 +111,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1,
         };
@@ -184,7 +184,7 @@ public class InventoryTests : RealmUnitTestingBase
         var item2 = inventory.AddItem(itemsCollection, 2, 1).First();
         inventory.AddItem(itemsCollection, 6, 1);
 
-        inventory.GetItemsById(2).Should().BeEquivalentTo(new List<Item>
+        inventory.GetItemsById(2).Should().BeEquivalentTo(new List<InventoryItem>
         {
             item1, item2
         });
@@ -199,11 +199,11 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var item = inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 1 }).First();
-        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
-        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 3 });
+        var item = inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 1 }).First();
+        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 2 });
+        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 3 });
 
-        inventory.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<Item>
+        inventory.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<InventoryItem>
         {
             item
         });
@@ -218,9 +218,9 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
+        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
 
-        inventory.GetSingleItemByIdWithMetadata(1, new Metadata
+        inventory.GetSingleItemByIdWithMetadata(1, new ItemMetadata
         {
             ["foo"] = 1
         }).Should().BeEquivalentTo(item);
@@ -235,9 +235,9 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
-        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
-        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 3 });
+        inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
+        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 2 });
+        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 3 });
 
         inventory.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
         inventory.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
@@ -252,8 +252,8 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
-        var found = inventory.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
+        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
+        var found = inventory.TryGetByIdAndMetadata(1, new ItemMetadata { ["foo"] = 1 }, out InventoryItem foundItem);
 
         found.Should().BeTrue();
         item.Should().Be(foundItem);
@@ -304,7 +304,7 @@ public class InventoryTests : RealmUnitTestingBase
         inventory.HasSpaceForItem(itemsCollection, 1, 101).Should().BeFalse();
     }
 
-    private void HandleItemUsed(Inventory inventory, Item usedItem, ItemAction flags)
+    private void HandleItemUsed(Inventory inventory, InventoryItem usedItem, ItemAction flags)
     {
         usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
     }
@@ -320,7 +320,7 @@ public class InventoryTests : RealmUnitTestingBase
 
         inventory.ItemUsed += HandleItemUsed;
         inventory.Size = 100;
-        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["counter"] = 10 });
+        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["counter"] = 10 });
 
         inventory.TryUseItem(item, ItemAction.Use).Should().BeTrue();
         item.GetMetadata("counter").Should().Be(9);
@@ -487,7 +487,7 @@ public class InventoryTests : RealmUnitTestingBase
         #region Arrange
         inventory.Clear();
         var destinationInventory = new Inventory(player, 10);
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -515,7 +515,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata
+        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata
         {
             ["number"] = 123,
             ["string"] = "123",
@@ -553,9 +553,9 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var inventory = new Inventory(player, 10, 0, new List<Item>
+        var inventory = new Inventory(player, 10, 0, new List<InventoryItem>
         {
-            new Item(itemsCollection, 1, 1)
+            new InventoryItem(itemsCollection, 1, 1)
         });
         inventory.Number.Should().Be(1);
     }
@@ -569,7 +569,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -588,7 +588,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -607,7 +607,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -617,7 +617,7 @@ public class InventoryTests : RealmUnitTestingBase
 
         item.RemoveMetadata("foo");
 
-        monitoredItem.Should().Raise(nameof(Item.MetadataRemoved));
+        monitoredItem.Should().Raise(nameof(InventoryItem.MetadataRemoved));
         item.MetaData.Should().BeEmpty();
     }
 
@@ -630,7 +630,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -641,8 +641,8 @@ public class InventoryTests : RealmUnitTestingBase
         item.ChangeMetadata<int>("foo", x => x + 1);
         ((int?)item.GetMetadata("foo")).Should().Be(2);
 
-        monitoredItem.Should().Raise(nameof(Item.MetadataChanged));
-        item.MetaData.Should().BeEquivalentTo(new Metadata
+        monitoredItem.Should().Raise(nameof(InventoryItem.MetadataChanged));
+        item.MetaData.Should().BeEquivalentTo(new ItemMetadata
         {
             ["foo"] = 2
         });
@@ -657,7 +657,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -704,7 +704,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -724,7 +724,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -744,7 +744,7 @@ public class InventoryTests : RealmUnitTestingBase
         Seed(server);
         var inventory = player.Inventory.CreatePrimary(100);
 
-        var metaData = new Metadata
+        var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
@@ -766,7 +766,7 @@ public class InventoryTests : RealmUnitTestingBase
 
         var inventory = player.Inventory.CreatePrimary(100);
 
-        void handleItemAdded(Inventory that, Item addedItem)
+        void handleItemAdded(Inventory that, InventoryItem addedItem)
         {
             if(that.Number < 5)
             {
@@ -788,8 +788,8 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var item1 = new Item(itemsCollection, 1, 2);
-        var item2 = new Item(itemsCollection, 1, 2);
+        var item1 = new InventoryItem(itemsCollection, 1, 2);
+        var item2 = new InventoryItem(itemsCollection, 1, 2);
 
         var inventory = player.Inventory.CreatePrimary(100);
 
@@ -812,10 +812,10 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var item1 = new Item(itemsCollection, 1, 2, new(){
+        var item1 = new InventoryItem(itemsCollection, 1, 2, new(){
             ["a"] = 1
         });
-        var item2 = new Item(itemsCollection, 1, 2);
+        var item2 = new InventoryItem(itemsCollection, 1, 2);
 
         var inventory = player.Inventory.CreatePrimary(100);
 

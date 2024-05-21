@@ -40,19 +40,19 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
         base.Dispose();
     }
 
-    private void HandleItemAdded(Inventory inventory, Item item)
+    private void HandleItemAdded(Inventory inventory, InventoryItem item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
         ChangeState(x => x.Number, (double)inventory.Number);
     }
 
-    private void HandleItemRemoved(Inventory inventory, Item item)
+    private void HandleItemRemoved(Inventory inventory, InventoryItem item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
         ChangeState(x => x.Number, (double)inventory.Number);
     }
 
-    private void HandleItemChanged(Inventory inventory, Item item)
+    private void HandleItemChanged(Inventory inventory, InventoryItem item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
         ChangeState(x => x.Number, (double)inventory.Number);
@@ -84,7 +84,7 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
         {
             case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();
-                if (_inventory.TryGetByLocalId(useItemData.LocalId, out Item item))
+                if (_inventory.TryGetByLocalId(useItemData.LocalId, out InventoryItem item))
                     _inventory.TryUseItem(item, useItemData.ItemAction);
                 break;
             default:

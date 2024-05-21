@@ -67,7 +67,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         inventory.ItemRemoved += HandleInventoryItemRemoved;
     }
 
-    private void HandleInventoryItemRemoved(Inventory inventory, Item item)
+    private void HandleInventoryItemRemoved(Inventory inventory, InventoryItem item)
     {
         var itemId = item.ItemId;
         switch (itemId)
@@ -85,7 +85,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         }
     }
 
-    private void HandleInventoryItemAdded(Inventory inventory, Item item)
+    private void HandleInventoryItemAdded(Inventory inventory, InventoryItem item)
     {
         var itemId = item.ItemId;
         switch (itemId)
@@ -103,7 +103,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         }
     }
 
-    private Task Use(Inventory inventory, Item item, ItemAction action)
+    private Task Use(Inventory inventory, InventoryItem item, ItemAction action)
     {
         switch (action)
         {

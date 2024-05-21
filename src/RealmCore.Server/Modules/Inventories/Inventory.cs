@@ -2,12 +2,12 @@
 
 public class Inventory
 {
-    private readonly List<Item> _items = [];
+    private readonly List<InventoryItem> _items = [];
     private readonly ReaderWriterLockSlimScoped _lock = new(LockRecursionPolicy.SupportsRecursion);
-    public event Action<Inventory, Item>? ItemAdded;
-    public event Action<Inventory, Item>? ItemRemoved;
-    public event Action<Inventory, Item>? ItemChanged;
-    public event Action<Inventory, Item, ItemAction>? ItemUsed;
+    public event Action<Inventory, InventoryItem>? ItemAdded;
+    public event Action<Inventory, InventoryItem>? ItemRemoved;
+    public event Action<Inventory, InventoryItem>? ItemChanged;
+    public event Action<Inventory, InventoryItem, ItemAction>? ItemUsed;
     public event Action<Inventory, decimal>? SizeChanged;
 
     private decimal _size;
@@ -39,12 +39,12 @@ public class Inventory
         }
     }
 
-    public IReadOnlyList<Item> Items
+    public IReadOnlyList<InventoryItem> Items
     {
         get
         {
             using var _ = _lock.BeginRead();
-            return new List<Item>(_items);
+            return new List<InventoryItem>(_items);
         }
     }
 
@@ -54,7 +54,7 @@ public class Inventory
         _size = size;
     }
 
-    internal Inventory(Element owner, decimal size, int id, IEnumerable<Item> items)
+    internal Inventory(Element owner, decimal size, int id, IEnumerable<InventoryItem> items)
     {
         Owner = owner;
         _size = size;
@@ -68,13 +68,13 @@ public class Inventory
         return _items.Any(x => x.ItemId == itemId);
     }
 
-    public bool HasItem(Func<Item, bool> callback)
+    public bool HasItem(Func<InventoryItem, bool> callback)
     {
         using var _ = _lock.BeginRead();
         return _items.Any(callback);
     }
 
-    public bool HasItem(Item item)
+    public bool HasItem(InventoryItem item)
     {
         using var _ = _lock.BeginRead();
         return _items.Contains(item);
@@ -92,19 +92,19 @@ public class Inventory
         return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
     }
 
-    public IReadOnlyList<Item> GetItemsById(uint itemId)
+    public IReadOnlyList<InventoryItem> GetItemsById(uint itemId)
     {
         using var _ = _lock.BeginRead();
-        return new List<Item>(_items.Where(x => x.ItemId == itemId));
+        return new List<InventoryItem>(_items.Where(x => x.ItemId == itemId));
     }
 
-    public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
+    public IReadOnlyList<InventoryItem> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
         using var _ = _lock.BeginRead();
-        return new List<Item>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
+        return new List<InventoryItem>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
     }
 
-    public Item? GetSingleItemByIdWithMetadata(uint itemId, Metadata metadata)
+    public InventoryItem? GetSingleItemByIdWithMetadata(uint itemId, ItemMetadata metadata)
     {
         using var _ = _lock.BeginRead();
         return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
@@ -116,28 +116,28 @@ public class Inventory
         return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
     }
 
-    public bool TryGetByLocalId(string localId, out Item item)
+    public bool TryGetByLocalId(string localId, out InventoryItem item)
     {
         using var _ = _lock.BeginRead();
         item = _items.FirstOrDefault(x => x.LocalId == localId)!;
         return item != null;
     }
 
-    public bool TryGetByItemId(uint itemId, out Item item)
+    public bool TryGetByItemId(uint itemId, out InventoryItem item)
     {
         using var _ = _lock.BeginRead();
         item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
         return item != null;
     }
 
-    public bool TryGetByIdAndMetadata(uint itemId, Metadata metadata, out Item item)
+    public bool TryGetByIdAndMetadata(uint itemId, ItemMetadata metadata, out InventoryItem item)
     {
         using var _ = _lock.BeginRead();
         item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
         return item != null;
     }
 
-    public Item AddSingleItem(ItemsCollection itemsCollection, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
+    public InventoryItem AddSingleItem(ItemsCollection itemsCollection, uint itemId, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
     {
         using var _ = _lock.BeginWrite();
         var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
@@ -146,7 +146,7 @@ public class Inventory
         return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
     }
 
-    public IEnumerable<Item> AddItem(ItemsCollection itemsCollection, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
+    public IEnumerable<InventoryItem> AddItem(ItemsCollection itemsCollection, uint itemId, uint number = 1, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
@@ -159,7 +159,7 @@ public class Inventory
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
         using var _ = _lock.BeginWrite();
-        List<Item> newItems = [];
+        List<InventoryItem> newItems = [];
         if (tryStack)
         {
             foreach (var item in _items.Where(x => x.ItemId == itemId))
@@ -177,7 +177,7 @@ public class Inventory
         {
             var thisItemNumber = Math.Min(number, itemsCollectionItem.StackSize);
             number -= thisItemNumber;
-            var item = new Item(itemsCollection, itemId, number, metadata)
+            var item = new InventoryItem(itemsCollection, itemId, number, metadata)
             {
                 Number = thisItemNumber
             };
@@ -196,12 +196,12 @@ public class Inventory
         return newItems.AsReadOnly();
     }
 
-    public void AddItem(ItemsCollection itemsCollection, Item newItem, bool tryStack = true, bool force = false)
+    public void AddItem(ItemsCollection itemsCollection, InventoryItem newItem, bool tryStack = true, bool force = false)
     {
         AddItem(itemsCollection, newItem.ItemId, newItem.Number, newItem.MetaData, tryStack, force);
     }
 
-    public void AddItems(ItemsCollection itemsCollection, IEnumerable<Item> newItems, bool force = false)
+    public void AddItems(ItemsCollection itemsCollection, IEnumerable<InventoryItem> newItems, bool force = false)
     {
         using var _ = _lock.BeginWrite();
 
@@ -226,17 +226,17 @@ public class Inventory
         }
     }
 
-    private void HandleItemMetadataChanged(Item item, string key)
+    private void HandleItemMetadataChanged(InventoryItem item, string key)
     {
         ItemChanged?.Invoke(this, item);
     }
     
-    private void HandleItemNumberChanged(Item item, uint from, uint to)
+    private void HandleItemNumberChanged(InventoryItem item, uint from, uint to)
     {
         ItemChanged?.Invoke(this, item);
     }
 
-    public bool RemoveItemStack(Item item) => RemoveItem(item, item.Number);
+    public bool RemoveItemStack(InventoryItem item) => RemoveItem(item, item.Number);
     public bool RemoveItemStack(uint id)
     {
         using var _ = _lock.BeginWrite();
@@ -245,13 +245,13 @@ public class Inventory
         return false;
     }
 
-    public bool RemoveItem(Item item, uint number = 1)
+    public bool RemoveItem(InventoryItem item, uint number = 1)
     {
         using var _ = _lock.BeginWrite();
         return RemoveItem(item, out var _, out var _, number);
     }
 
-    public bool RemoveItem(Item item, out uint removedNumber, out bool stackRemoved, uint number = 1)
+    public bool RemoveItem(InventoryItem item, out uint removedNumber, out bool stackRemoved, uint number = 1)
     {
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
@@ -300,12 +300,12 @@ public class Inventory
         return false;
     }
 
-    public List<Item> RemoveAndGetItemById(uint id, uint number = 1)
+    public List<InventoryItem> RemoveAndGetItemById(uint id, uint number = 1)
     {
         return RemoveAndGetItemByIdInternal(id, number).ToList();
     }
 
-    private IEnumerable<Item> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
+    private IEnumerable<InventoryItem> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
     {
         using var _ = _lock.BeginWrite();
 
@@ -314,7 +314,7 @@ public class Inventory
             var success = RemoveItem(item, out var removedNumber, out bool stackRemoved, number);
             if (item.Number > 0 && !stackRemoved)
             {
-                item = new Item(item)
+                item = new InventoryItem(item)
                 {
                     Number = removedNumber
                 };
@@ -332,7 +332,7 @@ public class Inventory
         }
     }
 
-    public bool TryUseItem(Item item, ItemAction flags)
+    public bool TryUseItem(InventoryItem item, ItemAction flags)
     {
         using var _ = _lock.BeginRead();
 
@@ -395,7 +395,7 @@ public class Inventory
     {
         var items = inventory.InventoryItems
             .Select(x =>
-                new Item(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings), x.Id)
+                new InventoryItem(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<ItemMetadata>(x.MetaData, _jsonSerializerSettings), x.Id)
             )
             .ToList();
         return new Inventory(element, inventory.Size, inventory.Id, items);
@@ -412,9 +412,9 @@ public class Inventory
         return data;
     }
 
-    private static List<InventoryItemData> MapItems(IReadOnlyList<Item> items)
+    private static List<InventoryItemData> MapItems(IReadOnlyList<InventoryItem> items)
     {
-        var itemsData = items.Select(item => Item.CreateData(item)).ToList();
+        var itemsData = items.Select(item => InventoryItem.CreateData(item)).ToList();
 
         return itemsData;
     }

@@ -21,7 +21,7 @@ public sealed class GiveItemCommand : IInGameCommand
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventory.AddItem(_itemsCollection, itemId, count, new Metadata
+            inventory.AddItem(_itemsCollection, itemId, count, new ItemMetadata
             {
                 ["foo"] = 10
             });

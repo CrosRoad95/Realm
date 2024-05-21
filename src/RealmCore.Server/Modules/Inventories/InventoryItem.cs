@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Inventories;
 
-public class Item : IEquatable<Item>, IEquatable<Metadata>
+public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 {
     private readonly object _lock = new();
     public string Id { get; internal set; }
@@ -35,13 +35,13 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
 
     public decimal Size { get; init; }
     public ItemAction AvailableActions { get; init; }
-    private readonly Metadata _metadata;
-    public Metadata MetaData
+    private readonly ItemMetadata _metadata;
+    public ItemMetadata MetaData
     {
         get
         {
             lock (_lock)
-                return new Metadata(_metadata);
+                return new ItemMetadata(_metadata);
         }
     }
 
@@ -54,20 +54,20 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         }
     }
 
-    public event Action<Item, uint, uint>? NumberChanged;
-    public event Action<Item, string>? MetadataChanged;
-    public event Action<Item, string>? MetadataRemoved;
+    public event Action<InventoryItem, uint, uint>? NumberChanged;
+    public event Action<InventoryItem, string>? MetadataChanged;
+    public event Action<InventoryItem, string>? MetadataRemoved;
 
-    public Item(Item item)
+    public InventoryItem(InventoryItem item)
     {
         ItemId = item.ItemId;
         Size = item.Size;
         _number = item.Number;
-        _metadata = new Metadata(item.MetaData);
+        _metadata = new ItemMetadata(item.MetaData);
         AvailableActions = item.AvailableActions;
     }
 
-    internal Item(ItemsCollection itemsCollection, uint itemId, uint number, Metadata? metaData = null, string? id = null)
+    internal InventoryItem(ItemsCollection itemsCollection, uint itemId, uint number, ItemMetadata? metaData = null, string? id = null)
     {
         var itemsCollectionItem = itemsCollection.Get(itemId);
         AvailableActions = itemsCollectionItem.AvailableActions;
@@ -188,7 +188,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
             return _metadata.ContainsKey(key);
     }
 
-    public bool Equals(Item? other)
+    public bool Equals(InventoryItem? other)
     {
         // TODO: Make sure it really works.
 
@@ -204,7 +204,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         return Equals(other._metadata);
     }
 
-    public bool Equals(Metadata? other)
+    public bool Equals(ItemMetadata? other)
     {
         if (other == null)
             return false;
@@ -225,7 +225,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         }
     }
 
-    public static InventoryItemData CreateData(Item item)
+    public static InventoryItemData CreateData(InventoryItem item)
     {
         return new InventoryItemData
         {
