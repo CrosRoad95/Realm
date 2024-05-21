@@ -98,14 +98,12 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         itemsCollection.Add(1, new ItemsCollectionItem
         {
-            Name = "test item id 1",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(2, new ItemsCollectionItem
         {
-            Name = "test item id 2",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use,

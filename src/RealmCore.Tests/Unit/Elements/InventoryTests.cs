@@ -7,42 +7,36 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         itemsCollection.Add(1, new ItemsCollectionItem
         {
-            Name = "test item id 1",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(2, new ItemsCollectionItem
         {
-            Name = "test item id 2",
             Size = 2,
             StackSize = 1,
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(3, new ItemsCollectionItem
         {
-            Name = "test item id 3",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
         });
         itemsCollection.Add(4, new ItemsCollectionItem
         {
-            Name = "test item id 4",
             Size = 100,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(5, new ItemsCollectionItem
         {
-            Name = "test item id 5",
             Size = 101,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(6, new ItemsCollectionItem
         {
-            Name = "test item id 6",
             Size = 1,
             StackSize = 1,
             AvailableActions = ItemAction.Use,

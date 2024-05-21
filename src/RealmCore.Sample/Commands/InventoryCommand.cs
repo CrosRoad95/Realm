@@ -20,7 +20,7 @@ public sealed class InventoryCommand : IInGameCommand
             _chatBox.OutputTo(player, $"Inventory, {inventory.Number}/{inventory.Size}");
             foreach (var item in inventory.Items)
             {
-                _chatBox.OutputTo(player, $"Item, {item.ItemId} = {item.Name}");
+                _chatBox.OutputTo(player, $"Item, {item.ItemId}");
             }
         }
 

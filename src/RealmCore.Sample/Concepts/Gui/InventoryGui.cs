@@ -10,7 +10,6 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
         {
             public string localId;
             public double id;
-            public string name;
             public double number;
             public double actions;
             public object metaData;
@@ -65,7 +64,6 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
         {
             localId = x.LocalId,
             id = x.ItemId,
-            name = x.Name,
             number = x.Number,
             actions = (double)x.AvailableActions,
             metaData = x.MetaData

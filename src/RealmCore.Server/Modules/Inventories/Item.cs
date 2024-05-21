@@ -32,7 +32,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
                 NumberChanged?.Invoke(this, old, value);
         }
     }
-    public string Name { get; init; }
+
     public decimal Size { get; init; }
     public ItemAction AvailableActions { get; init; }
     private readonly Metadata _metadata;
@@ -62,7 +62,6 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     {
         ItemId = item.ItemId;
         Size = item.Size;
-        Name = item.Name;
         _number = item.Number;
         _metadata = new Metadata(item.MetaData);
         AvailableActions = item.AvailableActions;
@@ -73,7 +72,6 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         var itemsCollectionItem = itemsCollection.Get(itemId);
         AvailableActions = itemsCollectionItem.AvailableActions;
         Size = itemsCollectionItem.Size;
-        Name = itemsCollectionItem.Name;
         ItemId = itemsCollectionItem.Id;
         Id = id ?? Guid.NewGuid().ToString();
         _number = number;
@@ -189,8 +187,6 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         lock (_lock)
             return _metadata.ContainsKey(key);
     }
-
-    public override string ToString() => Name;
 
     public bool Equals(Item? other)
     {

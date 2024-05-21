@@ -10,28 +10,24 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         {
             Size = 1,
             StackSize = 4,
-            Name = "Test item id 1",
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(2, new ItemsCollectionItem
         {
             Size = 2,
             StackSize = 4,
-            Name = "Foo item id 2",
             AvailableActions = ItemAction.Use,
         });
         itemsCollection.Add(3, new ItemsCollectionItem
         {
             Size = 1,
             StackSize = 1,
-            Name = "Sample weapon",
             AvailableActions = ItemAction.None,
         });
         itemsCollection.Add(4, new ItemsCollectionItem
         {
             Size = 0.05m,
             StackSize = 10,
-            Name = "item size 0.05",
             AvailableActions = ItemAction.None,
         });
 
@@ -114,7 +110,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
             case ItemAction.Use:
                 if (inventory.Owner is RealmPlayer player)
                 {
-                    _chatBox.OutputTo(player, $"Item used: {item.Name}");
+                    _chatBox.OutputTo(player, $"Item used: {item.ItemId}");
                     inventory.RemoveItem(item);
                 }
                 break;
