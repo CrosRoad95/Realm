@@ -1,4 +1,5 @@
-﻿using RealmCore.Resources.MapNames;
+﻿using Polly.RateLimit;
+using RealmCore.Resources.MapNames;
 using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Elements.Focusable;
@@ -1991,6 +1992,37 @@ internal sealed class CommandsHostedService : IHostedService
 
             var t = ((start - Stopwatch.GetTimestamp()) / Stopwatch.Frequency) * 1000;
             _chatBox.OutputTo(player, $"Saved {i} elements in {t} ms");
+        });
+
+        _commandService.AddAsyncCommandHandler("invoketest", async (player, args, token) =>
+        {
+            try
+            {
+                await player.Invoke(() =>
+                {
+                    _chatBox.OutputTo(player, "Ok");
+                    return Task.CompletedTask;
+                }, token);
+            }
+            catch(RateLimitRejectedException)
+            {
+                _chatBox.OutputTo(player, "Rate limited");
+            }
+        });
+        
+        _commandService.AddAsyncCommandHandler("invoketesttimeout", async (player, args, token) =>
+        {
+            try
+            {
+                await player.Invoke(async () =>
+                {
+                    await Task.Delay(15000);
+                }, token);
+            }
+            catch (Exception ex)
+            {
+                _chatBox.OutputTo(player, ex.ToString());
+            }
         });
 
         AddInventoryCommands();

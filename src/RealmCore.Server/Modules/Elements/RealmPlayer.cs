@@ -1,4 +1,6 @@
 ﻿using RealmCore.Server.Modules.Players.Settings;
+using System;
+using System.Threading;
 
 namespace RealmCore.Server.Modules.Elements;
 
@@ -33,6 +35,7 @@ public class RealmPlayer : Player, IDisposable
     private readonly AtomicBool _inToggleControlScopeFlag = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     public IServiceProvider ServiceProvider => _serviceProvider;
 
@@ -199,6 +202,7 @@ public class RealmPlayer : Player, IDisposable
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements = new();
 
+    private readonly AsyncRateLimitPolicy _invokePolicy;
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -239,6 +243,41 @@ public class RealmPlayer : Player, IDisposable
         IsNametagShowing = false;
         UpdateFight();
         Wasted += HandleWasted;
+
+        var maxCalls = 3;
+        var timeSpan = TimeSpan.FromSeconds(10);
+        _invokePolicy = Policy.RateLimitAsync(maxCalls, timeSpan, maxCalls);
+    }
+
+    public virtual async Task Invoke(Func<Task> task, CancellationToken cancellationToken = default)
+    {
+        if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
+            throw new TimeoutException();
+
+        if (User.HasClaim("invokeNoLimit"))
+        {
+            await task();
+            return;
+        }
+
+        await _invokePolicy.ExecuteAsync(async () =>
+        {
+            await task();
+        });
+    }
+
+    public virtual async Task<T> Invoke<T>(Func<Task<T>> task, CancellationToken cancellationToken = default)
+    {
+        if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
+            throw new TimeoutException();
+
+        if (User.HasClaim("invokeNoLimit"))
+            return await task();
+
+        return await _invokePolicy.ExecuteAsync(async () =>
+        {
+            return await task();
+        });
     }
 
     private void HandleWasted(Ped sender, PedWastedEventArgs e)
