@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace RealmCore.Persistence.Context;
+﻿namespace RealmCore.Persistence.Context;
 
 public interface ITransactionContext
 {

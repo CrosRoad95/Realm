@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public interface IRatingRepository
 {

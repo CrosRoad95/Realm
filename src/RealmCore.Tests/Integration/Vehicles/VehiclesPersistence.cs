@@ -1,6 +1,5 @@
 ﻿using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Pickups;
-using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 

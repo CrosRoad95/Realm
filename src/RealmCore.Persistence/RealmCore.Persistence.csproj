@@ -39,6 +39,7 @@
 		<Using Include="RealmCore.Persistence.Context" />
 		<Using Include="System.Diagnostics" />
 		<Using Include="RealmCore.Persistence.Data.Helpers" />
+		<Using Include="System.Data" />
 	</ItemGroup>
 
 </Project>

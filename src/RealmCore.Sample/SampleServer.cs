@@ -6,9 +6,7 @@ using RealmCore.Sample.Data.Validators;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
 using RealmCore.Module.Discord;
-using SlipeServer.Server.ServerBuilders;
 using RealmCore.Server.Modules.Chat;
-using SlipeServer.Net.Wrappers.Enums;
 
 [assembly: ExcludeFromCodeCoverage]
 
