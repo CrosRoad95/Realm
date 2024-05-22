@@ -4,7 +4,7 @@ public interface IUserNotificationRepository
 {
     Task<int> CountUnread(int userId, CancellationToken cancellationToken = default);
     Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default);
-    Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
     Task<UserNotificationData?> GetById(int notificationId, CancellationToken cancellationToken = default);
     Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default);
 }
@@ -18,7 +18,7 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
         _db = db;
     }
 
-    public async Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
 
@@ -35,7 +35,7 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
             .OrderByDescending(x => x.SentTime)
             .Take(limit);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
     
     public async Task<UserNotificationData?> GetById(int id, CancellationToken cancellationToken = default)

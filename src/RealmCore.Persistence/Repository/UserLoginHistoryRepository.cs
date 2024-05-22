@@ -3,7 +3,7 @@
 public interface IUserLoginHistoryRepository
 {
     Task Add(int userId, DateTime now, string ip, string serial, CancellationToken cancellationToken = default);
-    Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserLoginHistoryData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
 }
 
 internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
@@ -38,7 +38,7 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserLoginHistoryData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
 
@@ -55,7 +55,7 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
             .OrderByDescending(x => x.DateTime)
             .Take(limit);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UserLoginHistoryRepository", "1.0.0");

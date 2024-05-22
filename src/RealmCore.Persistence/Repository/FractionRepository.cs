@@ -4,8 +4,8 @@ public interface IFractionRepository
 {
     Task<bool> Create(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
     Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default);
-    Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default);
-    Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default);
+    Task<FractionData[]> GetAll(CancellationToken cancellationToken = default);
+    Task<FractionMemberData[]> GetAllMembers(int fractionId, CancellationToken cancellationToken = default);
     Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
     Task<FractionData?> CreateOrGet(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
 }
@@ -19,7 +19,7 @@ internal sealed class FractionRepository : IFractionRepository
         _db = db;
     }
 
-    public async Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default)
+    public async Task<FractionData[]> GetAll(CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAll));
 
@@ -28,10 +28,10 @@ internal sealed class FractionRepository : IFractionRepository
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<List<FractionMemberData>> GetAllMembers(int id, CancellationToken cancellationToken = default)
+    public async Task<FractionMemberData[]> GetAllMembers(int id, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllMembers));
 
@@ -44,7 +44,7 @@ internal sealed class FractionRepository : IFractionRepository
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default)

@@ -3,8 +3,8 @@
 public interface IUserEventRepository
 {
     Task AddEvent(int userId, int eventType, DateTime dateTime, string? metadata = null, CancellationToken cancellationToken = default);
-    Task<List<UserEventData>> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
-    Task<List<UserEventData>> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
+    Task<UserEventData[]> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
+    Task<UserEventData[]> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
 }
 
 internal sealed class UserEventRepository : IUserEventRepository
@@ -38,7 +38,7 @@ internal sealed class UserEventRepository : IUserEventRepository
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<UserEventData>> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
+    public async Task<UserEventData[]> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllEventsByUserId));
 
@@ -54,10 +54,10 @@ internal sealed class UserEventRepository : IUserEventRepository
             .Where(x => x.UserId == userId);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<List<UserEventData>> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
+    public async Task<UserEventData[]> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLastEventsByUserId));
 
@@ -76,7 +76,7 @@ internal sealed class UserEventRepository : IUserEventRepository
             .Take(limit);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UserEventRepository", "1.0.0");

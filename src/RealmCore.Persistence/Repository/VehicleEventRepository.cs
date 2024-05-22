@@ -3,8 +3,8 @@
 public interface IVehicleEventRepository
 {
     Task AddEvent(int vehicleId, int eventType, DateTime dateTime, string? metadata = null, CancellationToken cancellationToken = default);
-    Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
-    Task<List<VehicleEventData>> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
+    Task<VehicleEventData[]> GetAllEventsByVehicleId(int vehicleId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
+    Task<VehicleEventData[]> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
 }
 
 internal sealed class VehicleEventRepository : IVehicleEventRepository
@@ -38,7 +38,7 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
+    public async Task<VehicleEventData[]> GetAllEventsByVehicleId(int vehicleId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllEventsByVehicleId));
 
@@ -54,10 +54,10 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
             .Where(x => x.VehicleId == vehicleId);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<List<VehicleEventData>> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
+    public async Task<VehicleEventData[]> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLastEventsByVehicleId));
 
@@ -76,7 +76,7 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
             .Take(limit);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.VehicleEventRepository", "1.0.0");

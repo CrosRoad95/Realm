@@ -9,8 +9,8 @@ public interface IPlayersNotifications
     Task<int> CountUnread(int userId, CancellationToken cancellationToken = default);
     Task<UserNotificationDto> Create(RealmPlayer player, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default);
     Task<UserNotificationDto> Create(int userId, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default);
-    Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
-    Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserNotificationData[]> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
     Task<UserNotificationDto?> GetById(int notificationId, CancellationToken cancellationToken = default);
     Task<bool> TryMarkAsRead(int notificationId, CancellationToken cancellationToken = default);
 }
@@ -51,12 +51,12 @@ internal sealed class PlayersNotifications : IPlayersNotifications
         return userNotificationDto;
     }
 
-    public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationData[]> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
         return await _userNotificationRepository.Get(player.UserId, limit, cancellationToken);
     }
 
-    public async Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         return await _userNotificationRepository.Get(userId, limit, cancellationToken);
     }

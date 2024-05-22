@@ -2,7 +2,7 @@
 
 public interface IJobRepository
 {
-    Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserJobStatisticsDto[]> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
     Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default);
 }
 
@@ -15,7 +15,7 @@ internal sealed class JobRepository : IJobRepository
         _db = db;
     }
 
-    public async Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserJobStatisticsDto[]> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetJobStatistics));
 
@@ -40,7 +40,7 @@ internal sealed class JobRepository : IJobRepository
             .OrderBy(x => x.Points)
             .Take(limit);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)

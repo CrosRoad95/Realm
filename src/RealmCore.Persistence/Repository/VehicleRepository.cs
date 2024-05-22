@@ -4,14 +4,14 @@ public interface IVehicleRepository
 {
     Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
     Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default);
-    Task<List<int>> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default);
-    Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
+    Task<int[]> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default);
+    Task<VehicleUserAccessData[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
     Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default);
-    Task<List<LightInfoVehicleDto>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
-    Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default);
+    Task<LightInfoVehicleDto[]> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
+    Task<int[]> GetOwner(int vehicleId, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetReadOnlyById(int id, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetById(int id, CancellationToken cancellationToken = default);
-    Task<List<VehicleData>> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
+    Task<VehicleData[]> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
     Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default);
     Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default);
     Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default);
@@ -56,7 +56,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDto>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
+    public async Task<LightInfoVehicleDto[]> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLightVehiclesByUserId));
 
@@ -75,7 +75,7 @@ internal sealed class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
@@ -99,7 +99,7 @@ internal sealed class VehicleRepository : IVehicleRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    public async Task<List<VehicleData>> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
+    public async Task<VehicleData[]> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetVehiclesByUserId));
 
@@ -111,7 +111,7 @@ internal sealed class VehicleRepository : IVehicleRepository
 
         var query = BuildGetVehiclesByUserIdQuery(userId, accessTypes);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
@@ -145,7 +145,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<List<int>> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default)
+    public async Task<int[]> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllSpawnedVehiclesIds));
 
@@ -153,7 +153,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .IsSpawned()
             .Select(x => x.Id);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
     
     public async Task<VehicleData?> GetById(int id, CancellationToken cancellationToken = default)
@@ -246,7 +246,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         return result > 0;
     }
 
-    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int id, CancellationToken cancellationToken = default)
+    public async Task<VehicleUserAccessData[]> GetAllVehicleAccesses(int id, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllVehicleAccesses));
 
@@ -261,7 +261,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Include(x => x.User)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == id);
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default)
@@ -284,7 +284,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default)
+    public async Task<int[]> GetOwner(int vehicleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetOwner));
 
@@ -299,7 +299,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
             .Select(x => x.UserId);
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     private IQueryable<VehicleData> BuildGetVehiclesByUserIdQuery(int userId, IEnumerable<int>? accessTypes)

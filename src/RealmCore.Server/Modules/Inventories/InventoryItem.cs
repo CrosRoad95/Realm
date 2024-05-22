@@ -45,12 +45,12 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
         }
     }
 
-    public List<string> MetaDataKeys
+    public string[] MetadataKeys
     {
         get
         {
             lock (_lock)
-                return _metadata.Keys.ToList();
+                return [.. _metadata.Keys];
         }
     }
 

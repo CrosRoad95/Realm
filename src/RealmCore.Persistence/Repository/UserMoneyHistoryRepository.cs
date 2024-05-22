@@ -3,7 +3,7 @@
 public interface IUserMoneyHistoryRepository
 {
     Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, int? category = null, string? description = null, CancellationToken cancellationToken = default);
-    Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserMoneyHistoryData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
 }
 
 internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
@@ -43,7 +43,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
         return userMoneyHistoryData;
     }
 
-    public async Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserMoneyHistoryData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
 
@@ -60,7 +60,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
             .OrderByDescending(x => x.DateTime)
             .Take(limit);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UserMoneyHistoryRepository", "1.0.0");

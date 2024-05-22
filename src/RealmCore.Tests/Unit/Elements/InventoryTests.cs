@@ -553,10 +553,9 @@ public class InventoryTests : RealmUnitTestingBase
         var itemsCollection = server.GetRequiredService<ItemsCollection>();
         Seed(server);
 
-        var inventory = new Inventory(player, 10, 0, new List<InventoryItem>
-        {
-            new InventoryItem(itemsCollection, 1, 1)
-        });
+        var inventory = new Inventory(player, 10, 0, [
+            new(itemsCollection, 1, 1)
+        ]);
         inventory.Number.Should().Be(1);
     }
 
@@ -595,7 +594,7 @@ public class InventoryTests : RealmUnitTestingBase
 
         var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
 
-        item.MetaDataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
+        item.MetadataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
     }
 
     [Fact]

@@ -3,7 +3,7 @@
 public interface INewsRepository
 {
     Task Add(string title, string excerpt, string content, DateTime publishTime, string[] tags, int? createdByUserId = null, CancellationToken cancellationToken = default);
-    Task<List<NewsData>> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default);
+    Task<NewsData[]> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default);
 }
 
 internal sealed class NewsRepository : INewsRepository
@@ -55,7 +55,7 @@ internal sealed class NewsRepository : INewsRepository
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<NewsData>> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<NewsData[]> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
 
@@ -74,7 +74,7 @@ internal sealed class NewsRepository : INewsRepository
             .Include(x => x.NewsTags)
             .ThenInclude(x => x.Tag);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.NewsRepository", "1.0.0");

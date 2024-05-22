@@ -6,12 +6,12 @@ public interface IBanRepository
     Task<BanData> CreateForUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);
     Task<BanData> CreateForUserIdAndSerial(int userId, string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);
     Task<bool> Delete(int id, CancellationToken cancellationToken = default);
-    Task<List<int>> DeleteBySerial(string serial, int? type = 0, CancellationToken cancellationToken = default);
-    Task<List<int>> DeleteByUserId(int userId, int? type = 0, CancellationToken cancellationToken = default);
-    Task<List<int>> DeleteByUserIdOrSerial(int userId, string serial, int? type = 0, CancellationToken cancellationToken = default);
-    Task<List<BanData>> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
-    Task<List<BanData>> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default);
-    Task<List<BanData>> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
+    Task<int[]> DeleteBySerial(string serial, int? type = 0, CancellationToken cancellationToken = default);
+    Task<int[]> DeleteByUserId(int userId, int? type = 0, CancellationToken cancellationToken = default);
+    Task<int[]> DeleteByUserIdOrSerial(int userId, string serial, int? type = 0, CancellationToken cancellationToken = default);
+    Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
+    Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default);
+    Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
 }
 
 internal sealed class BanRepository : IBanRepository
@@ -112,7 +112,7 @@ internal sealed class BanRepository : IBanRepository
         return ban;
     }
 
-    public async Task<List<BanData>> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetBySerial));
         if (activity != null)
@@ -130,10 +130,10 @@ internal sealed class BanRepository : IBanRepository
         if (type != null)
             query = query.Where(x => x.Type == type);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
     
-    public async Task<List<BanData>> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByUserId));
         if (activity != null)
@@ -151,10 +151,10 @@ internal sealed class BanRepository : IBanRepository
         if(type != null)
             query = query.Where(x => x.Type == type);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<List<BanData>> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByUserIdOrSerial));
         if (activity != null)
@@ -173,7 +173,7 @@ internal sealed class BanRepository : IBanRepository
         if (type != null)
             query = query.Where(x => x.Type == type);
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
@@ -200,7 +200,7 @@ internal sealed class BanRepository : IBanRepository
         return true;
     }
 
-    public async Task<List<int>> DeleteByUserId(int userId, int? type = 0, CancellationToken cancellationToken = default)
+    public async Task<int[]> DeleteByUserId(int userId, int? type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(DeleteByUserId));
         if (activity != null)
@@ -229,10 +229,10 @@ internal sealed class BanRepository : IBanRepository
             deletedBansIds.Add(banData.Id);
         }
         await _db.SaveChangesAsync(cancellationToken);
-        return deletedBansIds;
+        return [.. deletedBansIds];
     }
 
-    public async Task<List<int>> DeleteBySerial(string serial, int? type = 0, CancellationToken cancellationToken = default)
+    public async Task<int[]> DeleteBySerial(string serial, int? type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(DeleteBySerial));
         if (activity != null)
@@ -261,10 +261,10 @@ internal sealed class BanRepository : IBanRepository
             deletedBansIds.Add(banData.Id);
         }
         await _db.SaveChangesAsync(cancellationToken);
-        return deletedBansIds;
+        return [.. deletedBansIds];
     }
 
-    public async Task<List<int>> DeleteByUserIdOrSerial(int userId, string serial, int? type = 0, CancellationToken cancellationToken = default)
+    public async Task<int[]> DeleteByUserIdOrSerial(int userId, string serial, int? type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(DeleteByUserIdOrSerial));
         if (activity != null)
@@ -294,7 +294,7 @@ internal sealed class BanRepository : IBanRepository
             deletedBansIds.Add(banData.Id);
         }
         await _db.SaveChangesAsync(cancellationToken);
-        return deletedBansIds;
+        return [.. deletedBansIds];
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.BanRepository", "1.0.0");
