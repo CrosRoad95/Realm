@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IOpinionRepository
 {
@@ -19,6 +22,14 @@ internal sealed class OpinionRepository : IOpinionRepository
     {
         using var activity = Activity.StartActivity(nameof(Add));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("OpinionId", opinionId);
+            activity.AddTag("Opinion", opinion);
+            activity.AddTag("DateTime", dateTime);
+        }
+
         _db.Opinions.Add(new OpinionData
         {
             UserId = userId,
@@ -33,6 +44,12 @@ internal sealed class OpinionRepository : IOpinionRepository
     public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLastOpinionDateTime));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("OpinionId", opinionId);
+        }
 
         var query = _db.Opinions
             .Where(x => x.UserId == userId && x.OpinionId == opinionId)

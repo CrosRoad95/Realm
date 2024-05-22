@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IJobRepository
 {
@@ -18,6 +21,12 @@ internal sealed class JobRepository : IJobRepository
     public async Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetJobStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("JobId", jobId);
+            activity.AddTag("Limit", limit);
+        }
 
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -40,6 +49,12 @@ internal sealed class JobRepository : IJobRepository
     public async Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetUserJobStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("JobId", jobId);
+            activity.AddTag("JobId", jobId);
+        }
 
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))

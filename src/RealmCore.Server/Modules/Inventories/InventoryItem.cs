@@ -60,7 +60,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 
     public InventoryItem(InventoryItem item)
     {
-        Id = id ?? Guid.NewGuid().ToString();
+        Id = Guid.NewGuid().ToString();
         ItemId = item.ItemId;
         Size = item.Size;
         _number = item.Number;

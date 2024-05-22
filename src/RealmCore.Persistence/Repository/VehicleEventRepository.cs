@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IVehicleEventRepository
 {
@@ -20,6 +22,14 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
     {
         using var activity = Activity.StartActivity(nameof(AddEvent));
 
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("EventType", eventType);
+            activity.AddTag("DateTime", dateTime);
+            activity.AddTag("Metadata", metadata);
+        }
+
         _db.VehicleEvents.Add(new VehicleEventData
         {
             VehicleId = vehicleId,
@@ -34,6 +44,12 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
     {
         using var activity = Activity.StartActivity(nameof(GetAllEventsByVehicleId));
 
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("Events", events);
+        }
+
         var query = _db.VehicleEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
@@ -46,6 +62,13 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
     public async Task<List<VehicleEventData>> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLastEventsByVehicleId));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("Limit", limit);
+            activity.AddTag("Events", events);
+        }
 
         var query = _db.VehicleEvents
             .AsNoTracking()

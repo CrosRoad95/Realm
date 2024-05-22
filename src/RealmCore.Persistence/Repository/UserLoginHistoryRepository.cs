@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IUserLoginHistoryRepository
 {
@@ -19,6 +22,14 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
     {
         using var activity = Activity.StartActivity(nameof(Add));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("now", now);
+            activity.AddTag("Ip", ip);
+            activity.AddTag("Serial", serial);
+        }
+
         var userLoginHistoryData = new UserLoginHistoryData
         {
             UserId = userId,
@@ -33,6 +44,12 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
     public async Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("limit", limit);
+        }
 
         var query = _db.UserLoginHistory
             .TagWithSource(nameof(UserMoneyHistoryRepository))

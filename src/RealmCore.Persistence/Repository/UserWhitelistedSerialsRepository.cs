@@ -20,6 +20,12 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
     {
         using var activity = Activity.StartActivity(nameof(IsSerialWhitelisted));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Serial", serial);
+        }
+
         var query = _db.UserWhitelistedSerials
             .AsNoTracking()
             .TagWith(nameof(UserWhitelistedSerialsRepository))
@@ -30,6 +36,12 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
     public async Task<bool> TryAddWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddWhitelistedSerial));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Serial", serial);
+        }
 
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));
@@ -58,6 +70,12 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
     public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryRemoveWhitelistedSerial));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Serial", serial);
+        }
 
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));

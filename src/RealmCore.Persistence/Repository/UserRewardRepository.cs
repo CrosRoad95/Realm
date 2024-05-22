@@ -19,6 +19,12 @@ internal sealed class UserRewardRepository : IUserRewardRepository
     {
         using var activity = Activity.StartActivity(nameof(TryAddReward));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("RewardId", rewardId);
+        }
+
         try
         {
             _db.UserRewards.Add(new UserRewardData

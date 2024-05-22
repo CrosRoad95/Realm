@@ -19,6 +19,16 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
     {
         using var activity = Activity.StartActivity(nameof(Add));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Now", now);
+            activity.AddTag("CurrentBalance", currentBalance);
+            activity.AddTag("Amount", amount);
+            activity.AddTag("Category", category);
+            activity.AddTag("Description", description);
+        }
+
         var userMoneyHistoryData = new UserMoneyHistoryData
         {
             UserId = userId,
@@ -36,6 +46,12 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
     public async Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Limit", limit);
+        }
 
         var query = _db.UserMoneyHistory
             .TagWithSource(nameof(UserMoneyHistoryRepository))

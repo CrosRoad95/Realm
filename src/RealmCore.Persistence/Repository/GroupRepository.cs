@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Xml.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IGroupRepository
 {
@@ -22,56 +24,83 @@ internal sealed class GroupRepository : IGroupRepository
         _db = db;
     }
 
-    public async Task<GroupData?> GetByName(string groupName, CancellationToken cancellationToken = default)
+    public async Task<GroupData?> GetByName(string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByName));
 
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+        }
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .Include(x => x.Members)
-            .Where(x => x.Name == groupName);
+            .Where(x => x.Name == name);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
+    public async Task<GroupData?> GetGroupByNameOrShortcut(string name, string shortcut, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupByNameOrShortcut));
 
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+            activity.AddTag("Shortcut", shortcut);
+        }
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .Include(x => x.Members)
-            .Where(x => x.Name == groupName || x.Shortcut == shortcut);
+            .Where(x => x.Name == name || x.Shortcut == shortcut);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByName(string groupName, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsByName(string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(ExistsByName));
+
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+        }
 
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Name == groupName);
+            .Where(x => x.Name == name);
 
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsByNameOrShortcut(string name, string shortcut, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(ExistsByNameOrShortcut));
+
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+            activity.AddTag("Shortcut", shortcut);
+        }
 
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Name == groupName || x.Shortcut == shortcut);
+            .Where(x => x.Name == name || x.Shortcut == shortcut);
         return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(ExistsByShortcut));
+
+        if (activity != null)
+        {
+            activity.AddTag("Shortcut", shortcut);
+        }
 
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
@@ -81,24 +110,36 @@ internal sealed class GroupRepository : IGroupRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<int> GetGroupIdByName(string groupName, CancellationToken cancellationToken = default)
+    public async Task<int> GetGroupIdByName(string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupIdByName));
 
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+        }
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Name == groupName)
+            .Where(x => x.Name == name)
             .Select(x => x.Id);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<GroupData> Create(string groupName, string shortcut, byte kind = 1, CancellationToken cancellationToken = default)
+    public async Task<GroupData> Create(string name, string shortcut, byte kind = 1, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
 
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+            activity.AddTag("Shortcut", shortcut);
+            activity.AddTag("Kind", kind);
+        }
+
         var group = new GroupData
         {
-            Name = groupName,
+            Name = name,
             Shortcut = shortcut,
             Kind = kind,
         };
@@ -110,6 +151,14 @@ internal sealed class GroupRepository : IGroupRepository
     public async Task<GroupMemberData?> TryAddMember(int groupId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddMember));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Rank", rank);
+            activity.AddTag("RankName", rankName);
+        }
 
         var groupMember = new GroupMemberData
         {
@@ -134,6 +183,12 @@ internal sealed class GroupRepository : IGroupRepository
     {
         using var activity = Activity.StartActivity(nameof(IsUserInGroup));
 
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
+
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
@@ -144,6 +199,12 @@ internal sealed class GroupRepository : IGroupRepository
     public async Task<bool> TryRemoveMember(int groupId, int userId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryRemoveMember));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
 
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))

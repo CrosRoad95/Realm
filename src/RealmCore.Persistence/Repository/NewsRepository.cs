@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 
 namespace RealmCore.Persistence.Repository;
 
@@ -20,6 +21,16 @@ internal sealed class NewsRepository : INewsRepository
     public async Task Add(string title, string excerpt, string content, DateTime publishTime, string[] tags, int? createdByUserId = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Add));
+
+        if (activity != null)
+        {
+            activity.AddTag("Title", title);
+            activity.AddTag("Excerpt", excerpt);
+            activity.AddTag("Content", content);
+            activity.AddTag("PublishTime", publishTime);
+            activity.AddTag("Tags", tags);
+            activity.AddTag("CreatedByUserId", createdByUserId);
+        }
 
         var newsTags = new List<NewsTagData>();
         foreach (var tagName in tags)
@@ -50,6 +61,12 @@ internal sealed class NewsRepository : INewsRepository
     public async Task<List<NewsData>> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
+
+        if (activity != null)
+        {
+            activity.AddTag("Now", now);
+            activity.AddTag("Limit", limit);
+        }
 
         var query = _db.News
             .TagWithSource(nameof(UserNotificationRepository))

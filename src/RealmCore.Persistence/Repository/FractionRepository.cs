@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Xml.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IFractionRepository
 {
@@ -35,6 +37,11 @@ internal sealed class FractionRepository : IFractionRepository
     {
         using var activity = Activity.StartActivity(nameof(GetAllMembers));
 
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+        }
+
         var query = _db.FractionMembers.Where(x => x.FractionId == id)
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
@@ -45,6 +52,13 @@ internal sealed class FractionRepository : IFractionRepository
     public async Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Exists));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+            activity.AddTag("Code", code);
+            activity.AddTag("Name", name);
+        }
 
         var query = _db.Fractions
             .TagWithSource(nameof(FractionRepository))
@@ -57,6 +71,13 @@ internal sealed class FractionRepository : IFractionRepository
     public async Task<bool> Create(int id, string name, string code, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+            activity.AddTag("Code", code);
+            activity.AddTag("Name", name);
+        }
 
         _db.Fractions.Add(new FractionData
         {
@@ -71,6 +92,13 @@ internal sealed class FractionRepository : IFractionRepository
     public async Task<FractionData> CreateOrGet(int id, string name, string code, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateOrGet));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+            activity.AddTag("Code", code);
+            activity.AddTag("Name", name);
+        }
 
         var query = _db.Fractions
             .TagWithSource(nameof(FractionRepository))
@@ -93,13 +121,21 @@ internal sealed class FractionRepository : IFractionRepository
         return fractionData;
     }
 
-    public async Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    public async Task<FractionMemberData?> TryAddMember(int id, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddMember));
 
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Rank", rank);
+            activity.AddTag("RankName", rankName);
+        }
+
         var fractionMember = new FractionMemberData
         {
-            FractionId = fractionId,
+            FractionId = id,
             UserId = userId,
             Rank = rank,
             RankName = rankName,

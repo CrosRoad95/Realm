@@ -46,9 +46,6 @@
 	  <EditorConfigFiles Remove="C:\Users\sebaj\source\repos\RealmCore\src\RealmCore.BlazorGui\.editorconfig" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="C:\Users\sebaj\source\repos\RealmCore\src\RealmCore.BlazorGui\.editorconfig" />
-	</ItemGroup>
-	<ItemGroup>
 	  <Using Include="RealmCore.BlazorGui" />
 	  <Using Include="RealmCore.Discord.Integration.Extensions" />
 	  <Using Include="RealmCore.Module.Discord" />

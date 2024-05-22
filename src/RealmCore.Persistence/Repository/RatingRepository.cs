@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System;
+
+namespace RealmCore.Persistence.Repository;
 
 public interface IRatingRepository
 {
@@ -20,6 +22,14 @@ internal sealed class RatingRepository : IRatingRepository
     {
         using var activity = Activity.StartActivity(nameof(Rate));
 
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("RatingId", ratingId);
+            activity.AddTag("rating", rating);
+            activity.AddTag("DateTime", dateTime);
+        }
+
         _db.Ratings.Add(new RatingData
         {
             UserId = userId,
@@ -34,6 +44,14 @@ internal sealed class RatingRepository : IRatingRepository
     public async Task ChangeLastRating(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(ChangeLastRating));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("RatingId", ratingId);
+            activity.AddTag("rating", rating);
+            activity.AddTag("DateTime", dateTime);
+        }
 
         var query = _db.Ratings
             .Where(x => x.UserId == userId && x.RatingId == ratingId)
@@ -61,6 +79,12 @@ internal sealed class RatingRepository : IRatingRepository
     public async Task<(int, DateTime)?> GetLastRating(int userId, int ratingId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetLastRating));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("RatingId", ratingId);
+        }
 
         var query = _db.Ratings
             .Where(x => x.UserId == userId && x.RatingId == ratingId)
