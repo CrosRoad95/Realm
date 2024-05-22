@@ -60,6 +60,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 
     public InventoryItem(InventoryItem item)
     {
+        Id = id ?? Guid.NewGuid().ToString();
         ItemId = item.ItemId;
         Size = item.Size;
         _number = item.Number;
@@ -87,43 +88,56 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 
     public bool SetMetadata(string key, object value)
     {
+        if (value is not (string or double or int))
+            return false;
+
         lock (_lock)
         {
-            if (value is string or double or int)
-            {
-                _metadata[key] = value;
-                MetadataChanged?.Invoke(this, key);
-                return true;
-            }
-            return false;
+            _metadata[key] = value;
         }
+
+        MetadataChanged?.Invoke(this, key);
+        return true;
     }
 
     public bool RemoveMetadata(string key)
     {
+        bool removed = false;
         lock (_lock)
         {
             if (_metadata.ContainsKey(key))
             {
                 _metadata.Remove(key);
-                MetadataRemoved?.Invoke(this, key);
-                return true;
+                removed = true;
             }
-            return false;
         }
+
+        if(removed)
+            MetadataRemoved?.Invoke(this, key);
+
+        return removed;
     }
 
     public void ChangeMetadata<T>(string key, Func<T, T> callback)
     {
+        bool changed = false;
         lock (_lock)
         {
-            if (_metadata.ContainsKey(key))
+            if (_metadata.TryGetValue(key, out object? metadataValue))
             {
-                var value = callback((T)_metadata[key]) ?? throw new NullReferenceException("Callback result can not be null");
-                _metadata[key] = value;
-                MetadataChanged?.Invoke(this, key);
+                var newValue = callback((T)metadataValue);
+                if (newValue == null)
+                {
+                    _metadata.Remove(key);
+                }
+                else
+                    _metadata[key] = newValue;
+                changed = true;
             }
         }
+
+        if(changed)
+            MetadataChanged?.Invoke(this, key);
     }
 
     public object? GetMetadata(string key)
