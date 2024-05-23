@@ -218,7 +218,7 @@ public class PlayersTests : RealmUnitTestingBase
         var settings = player.Settings;
         settings.Set(1, "foo");
         bool hasSetting = settings.TryGet(1, out var settingValue);
-        string gotSettingValue = settings.Get(1);
+        settings.TryGet(1, out var gotSettingValue);
         bool removedSetting = settings.TryRemove(1);
         bool exists = settings.Has(1);
         #endregion

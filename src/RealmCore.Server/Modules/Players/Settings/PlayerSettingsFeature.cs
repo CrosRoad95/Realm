@@ -11,9 +11,7 @@ public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettin
     /// </summary>
     int[] SettingsIds { get; }
     void Set(int settingId, string value);
-    void Remove(int settingId);
     bool TryGet(int settingId, out string? value);
-    string Get(int settingId);
     bool Has(int settingId);
     /// <summary>
     /// Removes all settings
@@ -50,8 +48,10 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
 
     public void LogIn(UserData userData)
     {
-        lock (_lock)
-            _settings = userData.Settings;
+        foreach (var item in userData.Settings)
+        {
+            Set(item.SettingId, item.Value);
+        }
     }
 
     public void LogOut()
@@ -63,7 +63,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
     {
         foreach (var settingId in SettingsIds)
         {
-            Remove(settingId);
+            TryRemove(settingId);
         }
     }
 
@@ -75,13 +75,14 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
 
     public void Set(int settingId, string value)
     {
+        bool added = false;
+        UserSettingData? setting;
         lock (_lock)
         {
-            var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
+            setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
             if (setting != null)
             {
                 setting.Value = value;
-                Changed?.Invoke(this, UserSettingDto.Map(setting));
             }
             else
             {
@@ -92,21 +93,18 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
                 };
 
                 _settings.Add(setting);
-                Added?.Invoke(this, UserSettingDto.Map(setting));
             }
         }
-        VersionIncreased?.Invoke();
-    }
 
-    public string Get(int settingId)
-    {
-        lock (_lock)
+        if (added)
         {
-            var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
-            if (setting == null)
-                throw new SettingNotFoundException(settingId);
-            return setting.Value;
+            Added?.Invoke(this, UserSettingDto.Map(setting));
         }
+        else
+        {
+            Changed?.Invoke(this, UserSettingDto.Map(setting));
+        }
+        VersionIncreased?.Invoke();
     }
 
     public bool TryGet(int settingId, out string? value)
@@ -119,39 +117,30 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
                 value = setting.Value;
                 return true;
             }
-            value = null;
-            return false;
         }
+        value = null;
+        return false;
     }
 
-    public void Remove(int settingId)
-    {
-        lock (_lock)
-        {
-            var setting = _settings.First(x => x.SettingId == settingId);
-            if(setting == null)
-                throw new SettingNotFoundException(settingId);
-
-            _settings.Remove(setting);
-            Removed?.Invoke(this, UserSettingDto.Map(setting));
-            VersionIncreased?.Invoke();
-        }
-    }
-    
     public bool TryRemove(int settingId)
     {
+        UserSettingData? setting;
         lock (_lock)
         {
-            var setting = _settings.First(x => x.SettingId == settingId);
+            setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
             if (setting != null)
             {
                 _settings.Remove(setting);
-                Removed?.Invoke(this, UserSettingDto.Map(setting));
-                VersionIncreased?.Invoke();
-                return true;
             }
-            return false;
         }
+
+        if (setting != null)
+        {
+            Removed?.Invoke(this, UserSettingDto.Map(setting));
+            VersionIncreased?.Invoke();
+            return true;
+        }
+        return false;
     }
 
     public IEnumerator<UserSettingDto> GetEnumerator()

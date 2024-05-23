@@ -469,13 +469,14 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.AddCommandHandler("removesetting", (player, args) =>
         {
-            player.Settings.Remove(1);
+            player.Settings.TryRemove(1);
             _chatBox.OutputTo(player, "remove");
         });
 
         _commandService.AddCommandHandler("getsetting", (player, args) =>
         {
-            _chatBox.OutputTo(player, $"Setting1: {player.Settings.Get(1)}");
+            player.Settings.TryGet(1, out var value);
+            _chatBox.OutputTo(player, $"Setting1: {value}");
         });
 
         _commandService.AddCommandHandler("spawncolshapeforme", (player, args) =>

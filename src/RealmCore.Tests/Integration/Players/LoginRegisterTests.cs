@@ -41,7 +41,8 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
             player.Money.Amount.Should().Be(12.345m);
             player.DailyVisits.VisitsInRow.Should().Be(2);
             player.DailyVisits.LastVisit.Date.Should().Be(server.DateTimeProvider.Now.Date);
-            player.Settings.Get(1).Should().Be("test");
+            player.Settings.TryGet(1, out var setting).Should().BeTrue();
+            setting.Should().Be("test");
             player.Bans.IsBanned(1).Should().BeTrue();
             player.Upgrades.Has(1).Should().BeTrue();
             player.Statistics.Should().BeEquivalentTo([new UserStatDto(1, 1), new UserStatDto(2, 2)]);
