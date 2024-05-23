@@ -41,7 +41,7 @@ end
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
 
-        var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToList();
+        var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToArray();
         foreach (var path in assets)
         {
             if(path.EndsWith(".otf") || path.EndsWith(".ttf"))

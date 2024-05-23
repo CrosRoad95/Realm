@@ -124,7 +124,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFeedbackService, PlayerFeedbackService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IPlayersNotifications, PlayersNotifications>();
-        services.AddScoped<INewsService, PlayerNewsService>();
+        services.AddScoped<IPlayerNewsService, PlayerNewsService>();
         services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
         services.AddScoped<IPlayerMapsService, PlayerMapsService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();

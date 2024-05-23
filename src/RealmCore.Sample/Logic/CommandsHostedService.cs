@@ -1691,7 +1691,7 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.AddAsyncCommandHandler("fetchmoreevents", async (player, args, token) =>
         {
             var fetched = await player.Events.FetchMore(10, token);
-            _chatBox.OutputTo(player, $"fetched {fetched.Count} more events");
+            _chatBox.OutputTo(player, $"fetched {fetched.Length} more events");
         });
 
         _commandService.AddAsyncCommandHandler("wait", async (player, args, token) =>

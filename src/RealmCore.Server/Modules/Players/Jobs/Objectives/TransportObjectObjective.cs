@@ -63,7 +63,7 @@ public class TransportObjectObjective : Objective
                     }
                 }
             }
-            foreach (var element in _scopedElementFactory.CreatedElements.ToList())
+            foreach (var element in _scopedElementFactory.CreatedElements.ToArray())
             {
                 if (element is RealmWorldObject worldObject)
                 {

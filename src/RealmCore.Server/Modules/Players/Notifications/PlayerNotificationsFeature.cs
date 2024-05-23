@@ -5,7 +5,7 @@ public interface IPlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserN
     event Action<IPlayerNotificationsFeature, UserNotificationDto>? Created;
     event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
 
-    Task<List<UserNotificationDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
+    Task<UserNotificationDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default);
     void RelayCreated(UserNotificationData userNotificationData);
     void RelayRead(UserNotificationData userNotificationData);
 }
@@ -83,7 +83,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         }
     }
 
-    public async Task<List<UserNotificationDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         await _lock.WaitAsync(cancellationToken);
         try
@@ -99,7 +99,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
 
             var results = await query.ToListAsync(cancellationToken);
 
-            return results.Select(UserNotificationDto.Map).ToList();
+            return results.Select(UserNotificationDto.Map).ToArray();
         }
         finally
         {

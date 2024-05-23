@@ -9,4 +9,4 @@ internal record struct BroadcastElementsDebugInfoMessageForPlayer(Player player,
 internal record struct BroadcastSpawnMarkersForPlayerMessage(Player Player, IEnumerable<LuaValue> SpawnMarkers) : IMessage;
 internal record struct ClearElementsForPlayerMessage(Player player) : IMessage;
 internal record struct ClearSpawnMarkersForPlayerMessage(Player Player) : IMessage;
-internal record struct SetAdminToolsMessage(Player Player, IReadOnlyList<AdminTool> AdminTools) : IMessage;
+internal record struct SetAdminToolsMessage(Player Player, AdminTool[] AdminTools) : IMessage;

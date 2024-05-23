@@ -2,7 +2,7 @@
 
 public interface IVehiclePartDamageFeature : IVehicleFeature
 {
-    IReadOnlyList<short> Parts { get; }
+    short[] Parts { get; }
 
     /// <summary>
     /// Triggered when part damage drop to zero.
@@ -24,13 +24,13 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUse
     public event Action<IVehiclePartDamageFeature, short>? PartDestroyed;
     public event Action? VersionIncreased;
 
-    public IReadOnlyList<short> Parts
+    public short[] Parts
     {
         get
         {
             lock (_lock)
             {
-                return _vehiclePartDamages.Select(x => x.PartId).ToList();
+                return [.. _vehiclePartDamages.Select(x => x.PartId)];
             }
         }
     }

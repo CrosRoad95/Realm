@@ -227,8 +227,8 @@ public sealed class RealmCommandService
 
     private readonly Dictionary<string, CommandInfo> _commands = [];
 
-    public List<CommandInfo> Commands => _commands.Select(x => x.Value).ToList();
-    public List<string> CommandNames => _commands.Keys.Concat(_commands.Keys).ToList();
+    public CommandInfo[] Commands => [.. _commands.Select(x => x.Value)];
+    public string[] CommandNames => [.. _commands.Keys.Concat(_commands.Keys)];
     public int Count => _commands.Count;
 
     public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands)

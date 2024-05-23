@@ -9,7 +9,7 @@ public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
         var now = server.DateTimeProvider.Now;
-        var newsService = server.GetRequiredService<INewsService>();
+        var newsService = server.GetRequiredService<IPlayerNewsService>();
         var context = server.GetRequiredService<IDb>();
 
         var tag1 = Guid.NewGuid().ToString();

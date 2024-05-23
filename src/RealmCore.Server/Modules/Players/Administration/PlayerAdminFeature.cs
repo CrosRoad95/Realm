@@ -2,7 +2,7 @@
 
 public interface IPlayerAdminFeature : IPlayerFeature
 {
-    IReadOnlyList<AdminTool> Tools { get; }
+    AdminTool[] Tools { get; }
     bool DevelopmentMode { get; set; }
     bool DebugView { get; set; }
     bool AdminMode { get; set; }
@@ -14,7 +14,7 @@ public interface IPlayerAdminFeature : IPlayerFeature
     event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
     event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
     event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
-    event Action<IPlayerAdminFeature, IReadOnlyList<AdminTool>>? ToolsChanged;
+    event Action<IPlayerAdminFeature, AdminTool[]>? ToolsChanged;
 
     bool HasTool(AdminTool adminTool);
     void SetTools(IEnumerable<AdminTool> adminTools);
@@ -32,19 +32,19 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
     private bool _interactionDebugRenderingEnabled = false;
     private List<AdminTool> _tools = [];
 
-    public event Action<IPlayerAdminFeature, IReadOnlyList<AdminTool>>? ToolsChanged;
+    public event Action<IPlayerAdminFeature, AdminTool[]>? ToolsChanged;
     public event Action<IPlayerAdminFeature, bool>? DebugViewStateChanged;
     public event Action<IPlayerAdminFeature, bool>? AdminModeChanged;
     public event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
     public event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
     public event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
 
-    public IReadOnlyList<AdminTool> Tools
+    public AdminTool[] Tools
     {
         get
         {
             lock (_lock)
-                return new List<AdminTool>(_tools);
+                return [.. _tools];
         }
     }
 
@@ -142,11 +142,12 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
 
     public void SetTools(IEnumerable<AdminTool> adminTools)
     {
+        var tools = _tools.ToArray();
         lock (_lock)
         {
-            _tools = new(adminTools);
-            ToolsChanged?.Invoke(this, _tools);
+            _tools = new(tools);
         }
+        ToolsChanged?.Invoke(this, tools);
     }
 
     public bool HasTool(AdminTool adminTool)

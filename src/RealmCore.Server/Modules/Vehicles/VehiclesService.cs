@@ -104,7 +104,7 @@ internal sealed class VehiclesService : IVehiclesService
 
         vehicle.Persistence.Load(vehicleData, true);
 
-        var occupants = vehicle.Occupants.ToList();
+        var occupants = vehicle.Occupants.ToArray();
         await vehicleService.Destroy(cancellationToken);
         var vehicleLoader = vehicle.GetRequiredService<IVehicleLoader>();
         var persistentVehicle = await vehicleLoader.LoadVehicleById(vehicleData.Id, cancellationToken);

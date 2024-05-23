@@ -22,8 +22,8 @@ public interface IPlayerUserFeature : IPlayerFeature
     event Action<IPlayerUserFeature, RealmPlayer>? LoggedIn;
     event Action<IPlayerUserFeature, RealmPlayer>? LoggedOut;
 
-    IReadOnlyList<string> GetClaims();
-    IReadOnlyList<string> GetRoles();
+    string[] GetClaims();
+    string[] GetRoles();
     string? GetClaimValue(string type);
     bool HasAuthorizedPolicies(string[] policies);
     bool HasAuthorizedPolicy(string policy);
@@ -268,21 +268,21 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         return false;
     }
 
-    public IReadOnlyList<string> GetClaims()
+    public string[] GetClaims()
     {
         if (_claimsPrincipal != null && _claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
-            return claimsIdentity.Claims.Select(x => x.Type).ToList();
+            return [.. claimsIdentity.Claims.Select(x => x.Type)];
         }
 
         return [];
     }
 
-    public IReadOnlyList<string> GetRoles()
+    public string[] GetRoles()
     {
         if (_claimsPrincipal != null && _claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
-            return claimsIdentity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
+            return [.. claimsIdentity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value)];
         }
 
         return [];

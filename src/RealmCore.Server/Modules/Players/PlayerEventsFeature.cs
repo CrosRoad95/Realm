@@ -5,8 +5,8 @@ public interface IPlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto
     event Action<IPlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
 
     void Add(int eventType, string? metadata = null);
-    Task<List<UserEventDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
-    IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10);
+    Task<UserEventDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default);
+    UserEventData[] Get(IEnumerable<int>? events = null, int limit = 10);
 }
 
 internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentData
@@ -52,7 +52,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         }
     }
 
-    public async Task<List<UserEventDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<UserEventDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         var last = _userEventData.LastOrDefault();
         if (last == null)
@@ -69,7 +69,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
 
             var results = await query.ToListAsync(cancellationToken);
 
-            return results.Select(UserEventDto.Map).ToList();
+            return results.Select(UserEventDto.Map).ToArray();
         }
         finally
         {
@@ -94,12 +94,12 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         Added?.Invoke(this, [UserEventDto.Map(userEvent)]);
     }
 
-    public IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10)
+    public UserEventData[] Get(IEnumerable<int>? events = null, int limit = 10)
     {
         lock (_lock)
         {
             var q = events != null ? _userEventData.Where(x => events.Contains(x.EventType)) : _userEventData;
-            return q.Take(limit).ToList().AsReadOnly();
+            return q.Take(limit).ToArray();
         }
     }
 

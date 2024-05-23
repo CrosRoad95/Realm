@@ -2,8 +2,8 @@
 
 public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>
 {
-    IReadOnlyList<int> StatsIds { get; }
-    IReadOnlyList<int> GtaSaStatsIds { get; }
+    int[] StatsIds { get; }
+    int[] GtaSaStatsIds { get; }
 
     event Action<IPlayerStatisticsFeature, int, float>? Decreased;
     event Action<IPlayerStatisticsFeature, int, float>? Increased;
@@ -26,21 +26,21 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
     public event Action<IPlayerStatisticsFeature, int, float>? Increased;
     public event Action? VersionIncreased;
 
-    public IReadOnlyList<int> StatsIds
+    public int[] StatsIds
     {
         get
         {
             lock (_lock)
-                return _stats.Select(x => x.StatId).ToList();
+                return _stats.Select(x => x.StatId).ToArray();
         }
     }
 
-    public IReadOnlyList<int> GtaSaStatsIds
+    public int[] GtaSaStatsIds
     {
         get
         {
             lock (_lock)
-                return _gtaSaStats.Select(x => x.StatId).ToList();
+                return _gtaSaStats.Select(x => x.StatId).ToArray();
         }
     }
 

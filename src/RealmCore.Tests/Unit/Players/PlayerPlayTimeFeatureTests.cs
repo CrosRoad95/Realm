@@ -42,7 +42,7 @@ public class PlayerPlayTimeFeatureTests : RealmUnitTestingBase
         playTime.Category = 2;
         server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
 
-        playTime.ToList().Should().BeEquivalentTo([
+        playTime.ToArray().Should().BeEquivalentTo([
             new PlayerPlayTimeDto(1, TimeSpan.FromSeconds(30)),
             new PlayerPlayTimeDto(2, TimeSpan.FromSeconds(30))
         ]);

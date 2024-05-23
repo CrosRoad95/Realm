@@ -2,7 +2,7 @@
 
 public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUserAccessDto>
 {
-    IReadOnlyList<VehicleUserAccessDto> Owners { get; }
+    VehicleUserAccessDto[] Owners { get; }
 
     VehicleUserAccessDto AddAccess(int userId, byte accessType, string? customValue = null);
     VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null);
@@ -33,12 +33,12 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
         Vehicle = vehicleContext.Vehicle;
     }
 
-    public IReadOnlyList<VehicleUserAccessDto> Owners
+    public VehicleUserAccessDto[] Owners
     {
         get
         {
             lock (_lock)
-                return new List<VehicleUserAccessDto>(_userAccesses.Where(x => x.AccessType == 0).Select(VehicleUserAccessDto.Map));
+                return [.. _userAccesses.Where(x => x.AccessType == 0).Select(VehicleUserAccessDto.Map)];
         }
     }
 

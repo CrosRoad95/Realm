@@ -221,8 +221,8 @@ public class CommandArguments
     public virtual IEnumerable<RealmPlayer> SearchPlayers(string? pattern = null, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         pattern ??= ReadArgument();
-        var players = _searchService.SearchPlayers(pattern).ToList();
-        if (players.Count == 0 && !searchOption.HasFlag(PlayerSearchOption.AllowEmpty))
+        var players = _searchService.SearchPlayers(pattern).ToArray();
+        if (players.Length == 0 && !searchOption.HasFlag(PlayerSearchOption.AllowEmpty))
             throw new CommandArgumentException(CurrentArgument, "Nie znaleziono żadnego gracza.", pattern);
         return players;
     }
@@ -230,8 +230,8 @@ public class CommandArguments
     public virtual IEnumerable<RealmVehicle> SearchVehicles(string? pattern = null, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         pattern ??= ReadArgument();
-        var vehicles = _searchService.SearchVehicles(pattern).ToList();
-        if (vehicles.Count == 0)
+        var vehicles = _searchService.SearchVehicles(pattern).ToArray();
+        if (vehicles.Length == 0)
             throw new CommandArgumentException(CurrentArgument, "Nie znaleziono żadnego pojazdu.", pattern);
         return vehicles;
     }

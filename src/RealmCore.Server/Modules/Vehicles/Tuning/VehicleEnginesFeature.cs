@@ -3,7 +3,7 @@
 public interface IVehicleEnginesFeature : IVehicleFeature
 {
     short ActiveEngineId { get; set; }
-    List<short> EnginesIds { get; }
+    short[] EnginesIds { get; }
 
     event Action<IVehicleEnginesFeature, short>? ActiveEngineChanged;
     event Action<IVehicleEnginesFeature, short>? EngineAdded;
@@ -44,13 +44,13 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature, IUsesVehic
         }
     }
 
-    public List<short> EnginesIds
+    public short[] EnginesIds
     {
         get
         {
             lock (_lock)
             {
-                return new List<short>(_vehicleEngine.Select(x => x.EngineId));
+                return [.. _vehicleEngine.Select(x => x.EngineId)];
             }
         }
     }

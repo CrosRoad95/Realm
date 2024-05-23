@@ -300,9 +300,9 @@ public class Inventory
         return false;
     }
 
-    public List<InventoryItem> RemoveAndGetItemById(uint id, uint number = 1)
+    public InventoryItem[] RemoveAndGetItemById(uint id, uint number = 1)
     {
-        return RemoveAndGetItemByIdInternal(id, number).ToList();
+        return RemoveAndGetItemByIdInternal(id, number).ToArray();
     }
 
     private IEnumerable<InventoryItem> RemoveAndGetItemByIdInternal(uint id, uint number = 1)

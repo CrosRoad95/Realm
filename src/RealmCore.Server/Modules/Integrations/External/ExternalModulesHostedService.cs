@@ -3,11 +3,11 @@ namespace RealmCore.Server.Modules.Integrations.External;
 
 public sealed class ExternalModulesHostedService : IHostedService
 {
-    private readonly List<IExternalModule> _modules;
+    private readonly IExternalModule[] _modules;
 
     public ExternalModulesHostedService(IEnumerable<IExternalModule> modules)
     {
-        _modules = modules.ToList();
+        _modules = [.. modules];
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

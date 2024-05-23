@@ -39,11 +39,11 @@ internal sealed class VehiclesTuningHostedService : IHostedService
         {
             var vehicleHandlingModifiers = upgrades.Select(x => _vehicleUpgradesCollection.Get(x))
                 .Select(x => x.VehicleUpgrade)
-                .ToList();
+                .ToArray();
 
             void Next(VehicleHandlingContext data, int index)
             {
-                if (index < vehicleHandlingModifiers.Count)
+                if (index < vehicleHandlingModifiers.Length)
                 {
                     vehicleHandlingModifiers[index].Apply(data, newData => Next(newData, index + 1));
                 }

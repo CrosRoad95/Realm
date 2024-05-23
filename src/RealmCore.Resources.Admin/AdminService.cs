@@ -40,7 +40,7 @@ internal sealed class AdminService : IAdminService
 
     public void SetAdminTools(Player player, IEnumerable<AdminTool> adminTools)
     {
-        MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools.ToList()));
+        MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools.ToArray()));
     }
 
     public void BroadcastElementDebugInfoUpdate(ElementDebugInfo elementDebugInfo)
