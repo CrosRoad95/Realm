@@ -100,6 +100,8 @@
 		<Using Include="RealmCore.Module.Discord.Services" />
 		<Using Include="RealmCore.Sample.Logic" />
 		<Using Include="Microsoft.Extensions.Hosting" />
+		<Using Include="SlipeServer.Server.ElementCollections" />
+		<Using Include="RealmCore.Module.Discord.Interfaces" />
 	</ItemGroup>
 
 </Project>

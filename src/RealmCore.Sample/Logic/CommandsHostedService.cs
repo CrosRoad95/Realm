@@ -6,7 +6,6 @@ using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;
-using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Events;
 using System.ComponentModel.DataAnnotations;
@@ -1813,7 +1812,7 @@ internal sealed class CommandsHostedService : IHostedService
             player.Scheduler.ScheduleJobOnce(() =>
             {
                 _chatBox.OutputTo(player, "Once");
-                Console.WriteLine("Player once");
+                System.Console.WriteLine("Player once");
                 return Task.CompletedTask;
             }, TimeSpan.FromSeconds(5));
         });
@@ -1823,7 +1822,7 @@ internal sealed class CommandsHostedService : IHostedService
             player.Scheduler.ScheduleJob(() =>
             {
                 _chatBox.OutputTo(player, "repeat");
-                Console.WriteLine("Player repeat");
+                System.Console.WriteLine("Player repeat");
                 return Task.CompletedTask;
             }, TimeSpan.FromSeconds(2));
         });

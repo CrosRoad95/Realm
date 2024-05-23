@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RealmCore.Console.Extra\RealmCore.Console.Extra.csproj" />
     <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.Sample\RealmCore.Sample.csproj" />

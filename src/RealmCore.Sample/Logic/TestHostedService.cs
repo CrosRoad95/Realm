@@ -42,7 +42,7 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
         var cts = new CancellationTokenSource();
         var scheduledJob = _schedulerService.ScheduleJob(() =>
         {
-            Console.WriteLine("Hello {0}", DateTime.Now);
+            System.Console.WriteLine("Hello {0}", DateTime.Now);
             return Task.CompletedTask;
         }, TimeSpan.FromSeconds(3), cts.Token);
 
@@ -51,26 +51,26 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
         var t3 = DateTime.Now.AddSeconds(20);
         var scheduledAt = _schedulerService.ScheduleJobAt(() =>
         {
-            Console.WriteLine("Time1 {0} = {1}", DateTime.Now, t3);
+            System.Console.WriteLine("Time1 {0} = {1}", DateTime.Now, t3);
             return Task.CompletedTask;
         }, t, CancellationToken.None);
         scheduledAt.Reschedule(t3);
 
         _schedulerService.ScheduleJobAt(() =>
         {
-            Console.WriteLine("Time2 {0} = {1}", DateTime.Now, t);
+            System.Console.WriteLine("Time2 {0} = {1}", DateTime.Now, t);
             return Task.CompletedTask;
         }, t2, cts.Token);
 
         _schedulerService.ScheduleJobAt(() =>
         {
-            Console.WriteLine("Cron every 2s {0}", DateTime.Now);
+            System.Console.WriteLine("Cron every 2s {0}", DateTime.Now);
             return Task.CompletedTask;
         }, "*/2 * * * * ? *", cts.Token);
 
         _schedulerService.ScheduleJobOnce(() =>
         {
-            Console.WriteLine("ONCE");
+            System.Console.WriteLine("ONCE");
             return Task.CompletedTask;
         }, TimeSpan.FromSeconds(15));
         Task.Run(async () =>

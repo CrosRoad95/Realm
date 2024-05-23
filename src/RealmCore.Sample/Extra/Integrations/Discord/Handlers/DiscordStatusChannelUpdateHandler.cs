@@ -1,7 +1,4 @@
-﻿using RealmCore.Module.Discord.Interfaces;
-using RealmCore.Server.Modules.Server;
-
-namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
 public class DiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
 {

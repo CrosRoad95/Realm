@@ -1,7 +1,4 @@
-﻿using RealmCore.Module.Discord.Interfaces;
-using RealmCore.Module.Discord.Services;
-
-namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
 public class TextBasedCommandHandler : IDiscordTextBasedCommandHandler
 {

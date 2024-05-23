@@ -1,8 +1,4 @@
-﻿using RealmCore.Module.Discord.Services;
-using RealmCore.Server.Modules.Commands;
-using RealmCore.Server.Modules.Elements;
-
-namespace RealmCore.Console.Extra;
+﻿namespace RealmCore.Console.Extra;
 
 internal class ExtraCommandsLogic
 {
