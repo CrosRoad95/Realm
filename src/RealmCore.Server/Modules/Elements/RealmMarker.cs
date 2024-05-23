@@ -2,8 +2,6 @@
 
 public class RealmMarker : Marker, IElementName
 {
-    public event Action<Element>? ElementEntered;
-    public event Action<Element>? ElementLeft;
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public CollisionSphere CollisionShape { get; init; }
     public string? ElementName { get; set; }

@@ -827,28 +827,4 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             _semaphoreSlim.Release();
         }
     }
-
-    public override ValueTask DisposeAsync()
-    {
-        return base.DisposeAsync();
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
-    //public override int SaveChanges()
-    //{
-    //    return base.SaveChanges();
-    //}
-
-    //public override int SaveChanges(bool acceptAllChangesOnSuccess)
-    //{
-    //    return base.SaveChanges(acceptAllChangesOnSuccess);
-    //}
-
-    //public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-    //{
-    //    return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-    //}
 }

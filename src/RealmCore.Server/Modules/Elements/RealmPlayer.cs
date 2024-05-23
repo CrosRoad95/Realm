@@ -1,10 +1,8 @@
 ﻿using RealmCore.Server.Modules.Players.Settings;
-using System;
-using System.Threading;
 
 namespace RealmCore.Server.Modules.Elements;
 
-internal struct FadeCameraScope : IAsyncDisposable
+internal readonly struct FadeCameraScope : IAsyncDisposable
 {
     private readonly RealmPlayer _player;
     private readonly CameraFade _cameraFade;
@@ -37,8 +35,6 @@ public class RealmPlayer : Player, IDisposable
     private readonly IServiceScope _serviceScope;
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
-    public IServiceProvider ServiceProvider => _serviceProvider;
-
     private Element? _focusedElement;
     private string? _focusedVehiclePart;
     private Element? _lastClickedElement;
@@ -59,6 +55,8 @@ public class RealmPlayer : Player, IDisposable
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = [];
     private readonly ConcurrentDictionary<int, bool> _enableFightFlags = new();
     private readonly List<AttachedBoneWorldObject> _attachedBoneElements = [];
+    private readonly ElementBag _selectedElements = new();
+    private readonly AsyncRateLimitPolicy _invokePolicy;
 
     public event Action<RealmPlayer, Element?, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, string?, string?>? FocusedVehiclePartChanged;
@@ -74,7 +72,10 @@ public class RealmPlayer : Player, IDisposable
     public int AttachedBoneElementsCount => _attachedBoneElements.Count;
     public bool IsSpawned { get; private set; }
 
+    public IServiceProvider ServiceProvider => _serviceProvider;
+
     public new RealmVehicle? Vehicle => (RealmVehicle?)base.Vehicle;
+
     public Element? FocusedElement
     {
         get => _focusedElement;
@@ -200,9 +201,8 @@ public class RealmPlayer : Player, IDisposable
     public IPlayerNotificationsFeature Notifications { get; init; }
     public IPlayerSchedulerFeature Scheduler { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
-    public ElementBag SelectedElements = new();
+    public ElementBag SelectedElements => _selectedElements;
 
-    private readonly AsyncRateLimitPolicy _invokePolicy;
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -588,7 +588,7 @@ public class RealmPlayer : Player, IDisposable
         switch (animation)
         {
             case Animation.StartCarry:
-                timeSpan ??= TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(0.1f);
                 SetAnimation("CARRY", "crry_prtial", timeSpan, true, false);
                 break;
             case Animation.CrouchAndTakeALook:
