@@ -9,7 +9,7 @@ namespace RealmCore.WebHosting;
 
 public static class HostApplicationBuilderExtensions
 {
-    public static IHostApplicationBuilder AddRealmServer<TPlayer>(this IHostApplicationBuilder builder, IConfiguration configuration, Action<ServerBuilder>? serverBuilder = null) where TPlayer : RealmPlayer
+    public static IHostApplicationBuilder AddRealmServer<TPlayer>(this IHostApplicationBuilder builder, Action<ServerBuilder>? serverBuilder = null) where TPlayer : RealmPlayer
     {
         builder.ConfigureMtaServers(configure =>
         {
@@ -21,7 +21,7 @@ public static class HostApplicationBuilderExtensions
             configure.AddDefaultBehaviours(exceptBehaviours);
         });
 
-        builder.Services.AddRealmServer<TPlayer>(configuration, serverBuilder);
+        builder.Services.AddRealmServer<TPlayer>(builder.Configuration, serverBuilder);
         return builder;
     }
 }

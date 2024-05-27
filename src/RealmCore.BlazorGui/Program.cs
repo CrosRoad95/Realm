@@ -11,7 +11,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 
-builder.AddRealmServer<RealmPlayer>(builder.Configuration);
+builder.AddRealmServer<RealmPlayer>();
 
 builder.AddRealmBlazorGuiSupport();
 builder.AddRealmServerDiscordBotIntegration();
