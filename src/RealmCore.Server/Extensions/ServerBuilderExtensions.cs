@@ -1,7 +1,4 @@
-﻿using RealmCore.Resources.Addons.GuiSystem.DGS;
-using SlipeServer.Resources.DGS;
-
-[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

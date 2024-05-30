@@ -1,13 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using RealmCore.WebHosting;
-using SlipeServer.Hosting;
-using SlipeServer.Server;
-using SlipeServer.Server.Elements;
-using SlipeServer.Server.Mappers;
-using SlipeServer.Server.Resources.Serving;
-using SlipeServer.Server.ServerBuilders;
-using System.Numerics;
+using System.Security.Cryptography;
 
 namespace RealmCore.TestingTools;
 
@@ -15,19 +7,26 @@ public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer
 {
     public RealmTestingServer2(IServiceProvider serviceProvider, Configuration? configuration = null) : base(serviceProvider, configuration)
     {
+        this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
+            .Returns(new Tuple<string, string, string>("7815696ECBF1C96E6894B779456D330E", "", ""));
     }
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
         var player = Instantiate<TPlayer>();
         player.Name = "foo"; // TODO:
-        player.Client = new TestingClient(binaryAddress, netWrapper, player);
-        return player.Client;
+        var client = new TestingClient(binaryAddress, netWrapper, player);
+        client.FetchSerial();
+        player.Client = client;
+        return client;
     }
+
 }
 
 public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer>
 {
+    private TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
+
     public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer2<RealmTestingPlayer>(services, new()), hostBuilder =>
     {
         hostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -58,6 +57,8 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         hostBuilder.Services.AddRealmServerCore(hostBuilder.Configuration);
         outerApplicationBuilder?.Invoke(hostBuilder);
 
+        hostBuilder.Services.AddSingleton<TestDateTimeProvider>();
+        hostBuilder.Services.AddSingleton<IDateTimeProvider>(x => x.GetRequiredService<TestDateTimeProvider>());
         hostBuilder.Services.AddSingleton<TestRealmResourceServer>();
         hostBuilder.Services.AddSingleton<IResourceServer>(x => x.GetRequiredService<TestRealmResourceServer>());
     }, serverBuilder =>
@@ -74,15 +75,42 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
             waitHandle.Set();
         });
 
-        lifecycle.ApplicationStopping.Register(() =>
-        {
-            ;
-        });
-
         waitHandle.WaitOne(TimeSpan.FromSeconds(30.0));
     }
 
-    public RealmTestingPlayer CreatePlayer()
+    public async Task<RealmPlayer> LoginPlayer(RealmPlayer player)
+    {
+        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
+
+        if (user == null)
+        {
+            await Host.Services.GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
+
+            user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
+        }
+
+        if (user == null)
+            throw new InvalidOperationException();
+
+        var success = await player.GetRequiredService<IUsersService>().LogIn(player, user);
+        success.Switch(loggedIn =>
+        {
+            // Ok
+        }, userDisabled =>
+        {
+            throw new XunitException("User should not be disabled");
+        }, playerAlreadyLoggedIn =>
+        {
+            throw new XunitException("Player should not be already logged in");
+        }, userAlreadyInUse =>
+        {
+            throw new XunitException("Player should not be already in use");
+        });
+
+        return player;
+    }
+
+    public async Task<RealmTestingPlayer> CreatePlayer(bool notLoggedIn = false)
     {
         var player = Server.AddFakePlayer();
 
@@ -91,6 +119,11 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         foreach (var resource in testRealmResourceServer.Resources)
         {
             player.TriggerResourceStarted(resource.NetId);
+        }
+
+        if (!notLoggedIn)
+        {
+            await LoginPlayer(player);
         }
 
         return player;

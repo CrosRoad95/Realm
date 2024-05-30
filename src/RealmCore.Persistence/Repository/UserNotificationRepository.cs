@@ -4,8 +4,9 @@ public interface IUserNotificationRepository
 {
     Task<int> CountUnread(int userId, CancellationToken cancellationToken = default);
     Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default);
+    Task<UserNotificationData[]> FetchMore(int userId, int lastId, int number, CancellationToken cancellationToken = default);
     Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
-    Task<UserNotificationData?> GetById(int notificationId, CancellationToken cancellationToken = default);
+    Task<UserNotificationData?> GetById(int id, CancellationToken cancellationToken = default);
     Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default);
 }
 
@@ -54,7 +55,7 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
@@ -108,16 +109,31 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
             activity.AddTag("Now", now);
         }
 
-        var notification = await _db.UserNotifications
+        var query = _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
-            .Where(x => x.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(x => x.Id == id && x.ReadTime == null);
 
-        if (notification == null || notification.ReadTime != null)
-            return false;
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.ReadTime, now), cancellationToken) == 1;
+    }
 
-        notification.ReadTime = now;
-        return await _db.SaveChangesAsync(cancellationToken) == 1;
+    public async Task<UserNotificationData[]> FetchMore(int userId, int lastId, int number, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(MarkAsRead));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("LastId", lastId);
+            activity.AddTag("Number", number);
+        }
+
+        var query = _db.UserNotifications
+            .TagWithSource(nameof(UserNotificationRepository))
+            .Where(x => x.UserId == userId && x.Id < lastId)
+                .OrderByDescending(x => x.Id)
+                .Take(number);
+
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UserNotificationRepository", "1.0.0");

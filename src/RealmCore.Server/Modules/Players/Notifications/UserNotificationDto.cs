@@ -10,6 +10,8 @@ public sealed class UserNotificationDto : IEquatable<UserNotificationDto>
     public required string Excerpt { get; set; }
     public required string Content { get; set; }
 
+    public bool IsRead => ReadTime != null;
+
     [return: NotNullIfNotNull(nameof(userNotificationData))]
     public static UserNotificationDto? Map(UserNotificationData? userNotificationData)
     {

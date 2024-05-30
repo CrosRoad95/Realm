@@ -1,7 +1,5 @@
 ﻿using RealmCore.Server.Modules.Friends;
 using RealmCore.Server.Modules.Players.Settings;
-using SlipeServer.Server.Resources.Serving;
-using SlipeServer.Server;
 using SlipeServer.Hosting;
 
 namespace RealmCore.Server.Extensions;
@@ -127,7 +125,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IRewardsService, RewardsService>();
         services.AddScoped<IFeedbackService, PlayerFeedbackService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddScoped<IPlayersNotifications, PlayersNotifications>();
         services.AddScoped<IPlayerNewsService, PlayerNewsService>();
         services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
         services.AddScoped<IPlayerMapsService, PlayerMapsService>();
@@ -142,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ScopedCollisionShapeBehaviour>();
         services.AddSingleton<FriendsService>();
         services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>()));
+        services.AddSingleton<IPlayersNotifications, PlayersNotifications>();
         #endregion
 
         #region Player features

@@ -122,5 +122,11 @@
 		<Using Include="SlipeServer.Server.Resources.Interpreters" />
 		<Using Include="SlipeServer.Server.Resources.Providers" />
 		<Using Include="RealmCore.TestingTools" />
+		<Using Include="Xunit.Sdk" />
+		<Using Include="SlipeServer.Server.Mappers" />
+		<Using Include="Microsoft.Extensions.Hosting" />
+		<Using Include="RealmCore.WebHosting" />
+		<Using Include="SlipeServer.Server" />
+		<Using Include="SlipeServer.Server.Resources.Serving" />
 	</ItemGroup>
 </Project>

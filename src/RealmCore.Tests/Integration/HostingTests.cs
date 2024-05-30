@@ -3,7 +3,7 @@
 public class HostingTests
 {
     [Fact]
-    public void HostingShouldWork()
+    public async Task HostingShouldWork()
     {
         var sampleService = new SampleHostedService();
 
@@ -14,7 +14,7 @@ public class HostingTests
                 hostBuilder.Services.AddHostedService(x => sampleService);
             }, null);
 
-            player = hosting.CreatePlayer();
+            player = await hosting.CreatePlayer();
 
             player.Client.IsConnected.Should().BeTrue();
         }

@@ -6,16 +6,16 @@ public interface IPlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserN
     event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
 
     Task<UserNotificationDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default);
-    void RelayCreated(UserNotificationData userNotificationData);
-    void RelayRead(UserNotificationData userNotificationData);
+    internal void Create(UserNotificationData userNotificationData);
+    internal void Update(UserNotificationData userNotificationData);
 }
 
 internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IDb _db;
-
-    private ICollection<UserNotificationData> _userNotificationDataList = [];
+    private readonly IUserNotificationRepository _userNotificationRepository;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private ICollection<UserNotificationData> _userNotificationDataCollection = [];
 
     public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Created;
     public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
@@ -23,10 +23,11 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
 
     public RealmPlayer Player { get; }
 
-    public PlayerNotificationsFeature(PlayerContext playerContext, IDb db)
+    public PlayerNotificationsFeature(PlayerContext playerContext, IUserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider, IPlayersNotifications playersNotifications)
     {
         Player = playerContext.Player;
-        _db = db;
+        _userNotificationRepository = userNotificationRepository;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public void LogIn(UserData userData)
@@ -34,7 +35,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _lock.Wait();
         try
         {
-            _userNotificationDataList = userData.Notifications;
+            _userNotificationDataCollection = userData.Notifications;
         }
         finally
         {
@@ -47,7 +48,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _lock.Wait();
         try
         {
-            _userNotificationDataList = [];
+            _userNotificationDataCollection = [];
         }
         finally
         {
@@ -55,49 +56,43 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         }
     }
 
-
-    public void RelayCreated(UserNotificationData userNotificationData)
+    public void Create(UserNotificationData data)
     {
-        _lock.Wait();
-        try
-        {
-            _userNotificationDataList.Add(userNotificationData);
-            Created?.Invoke(this, UserNotificationDto.Map(userNotificationData));
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
+        _userNotificationDataCollection.Add(data);
 
-    public void RelayRead(UserNotificationData userNotificationData)
+        var userNotificationDto = UserNotificationDto.Map(data);
+        Created?.Invoke(this, userNotificationDto);
+    }
+    
+    public void Update(UserNotificationData data)
     {
-        _lock.Wait();
-        try
+        var notification = _userNotificationDataCollection.Where(x => x.Id == data.Id).FirstOrDefault();
+        if(notification != null)
         {
-            Read?.Invoke(this, UserNotificationDto.Map(userNotificationData));
-        }
-        finally
-        {
-            _lock.Release();
+            if(notification.ReadTime == null && data.ReadTime != null)
+            {
+                notification.ReadTime = data.ReadTime;
+                Read?.Invoke(this, UserNotificationDto.Map(data));
+            }
         }
     }
 
-    public async Task<UserNotificationDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationDto?> GetById(int notificationId, CancellationToken cancellationToken = default)
+    {
+        var notificationData = await _userNotificationRepository.GetById(notificationId, cancellationToken);
+        return UserNotificationDto.Map(notificationData);
+    }
+
+    public async Task<UserNotificationDto[]> FetchMore(int number = 10, CancellationToken cancellationToken = default)
     {
         await _lock.WaitAsync(cancellationToken);
         try
         {
-            var last = _userNotificationDataList.LastOrDefault();
+            var last = _userNotificationDataCollection.LastOrDefault();
             if (last == null)
                 return [];
 
-            var query = _db.UserNotifications
-                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
-                .OrderByDescending(x => x.Id)
-                .Take(count);
-
-            var results = await query.ToListAsync(cancellationToken);
+            var results = await _userNotificationRepository.FetchMore(Player.UserId, last.Id, number, cancellationToken);
 
             return results.Select(UserNotificationDto.Map).ToArray();
         }
@@ -113,7 +108,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _lock.Wait();
         try
         {
-            view = [.. _userNotificationDataList];
+            view = [.. _userNotificationDataCollection];
         }
         finally
         {
