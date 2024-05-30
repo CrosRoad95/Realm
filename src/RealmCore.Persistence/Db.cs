@@ -47,6 +47,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<TagData> Tags => Set<TagData>();
     public DbSet<NewsTagData> NewsTags => Set<NewsTagData>();
     public DbSet<UserPlayTimeData> UsersPlayTimes => Set<UserPlayTimeData>();
+    public DbSet<FriendData> Friends => Set<FriendData>();
+    public DbSet<PendingFriendRequestData> PendingFriendsRequests => Set<PendingFriendRequestData>();
+    public DbSet<BlockedUserData> BlockedUsers => Set<BlockedUserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -236,6 +239,36 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.UserInventories)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany<FriendData>()
+                .WithOne(x => x.User1)
+                .HasForeignKey(x => x.UserId1);
+
+            entityBuilder
+                .HasMany<FriendData>()
+                .WithOne(x => x.User2)
+                .HasForeignKey(x => x.UserId2);
+
+            entityBuilder
+                .HasMany<PendingFriendRequestData>()
+                .WithOne(x => x.User1)
+                .HasForeignKey(x => x.UserId1);
+
+            entityBuilder
+                .HasMany<PendingFriendRequestData>()
+                .WithOne(x => x.User2)
+                .HasForeignKey(x => x.UserId2);
+
+            entityBuilder
+                .HasMany(x => x.BlockedUsers)
+                .WithOne(x => x.User1)
+                .HasForeignKey(x => x.UserId1);
+
+            entityBuilder
+                .HasMany<BlockedUserData>()
+                .WithOne(x => x.User2)
+                .HasForeignKey(x => x.UserId2);
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -813,6 +846,18 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .ToTable(nameof(UsersPlayTimes))
                 .HasKey(x => new { x.UserId, x.Category });
         });
+
+        modelBuilder.Entity<FriendData>()
+            .ToTable(nameof(Friends))
+            .HasKey(x => new { x.UserId1, x.UserId2 });
+
+        modelBuilder.Entity<PendingFriendRequestData>()
+            .ToTable(nameof(PendingFriendsRequests))
+            .HasKey(x => new { x.UserId1, x.UserId2 });
+
+        modelBuilder.Entity<BlockedUserData>()
+            .ToTable(nameof(BlockedUsers))
+            .HasKey(x => new { x.UserId1, x.UserId2 });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

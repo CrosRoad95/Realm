@@ -28,14 +28,28 @@ public static class HostApplicationBuilderExtensions
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRealmServer<TPlayer>(this IServiceCollection services, IConfiguration configuration, Action<ServerBuilder>? builder = null) where TPlayer : RealmPlayer
+    public static IServiceCollection AddRealmServerCore(this IServiceCollection services, IConfiguration configuration)
     {
         var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
         services.AddDefaultMtaServerServices();
         services.AddSingleton<BasicHttpServer>();
         services.TryAddSingleton<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
 
-        services.AddMtaServer<TPlayer>(realmConfiguration, serverBuilder =>
+        services.ConfigureRealmServices(configuration);
+        //services.AddSingleton<MtaServer>(x => x.GetRequiredService<T>());
+        //services.AddSingleton(factory);
+        //services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
+        //services.AddHostedService<RealmServerHostedService>();
+        //services.AddHostedService<ExternalModulesHostedService>();
+        return services;
+    }
+
+    public static IServiceCollection AddRealmServer<TPlayer>(this IServiceCollection services, IConfiguration configuration,  Action<ServerBuilder>? builder = null) where TPlayer : RealmPlayer
+    {
+        var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
+
+        services.AddRealmServerCore(configuration);
+        services.AddMtaServer(realmConfiguration, services => new MtaDiPlayerServer<TPlayer>(services, realmConfiguration), serverBuilder =>
         {
             serverBuilder.UseConfiguration(realmConfiguration);
             serverBuilder.AddDefaultServices();
@@ -45,12 +59,6 @@ public static class ServiceCollectionExtensions
             builder?.Invoke(serverBuilder);
         });
 
-        services.ConfigureRealmServices(configuration);
-        //services.AddSingleton<MtaServer>(x => x.GetRequiredService<T>());
-        //services.AddSingleton(factory);
-        //services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
-        //services.AddHostedService<RealmServerHostedService>();
-        //services.AddHostedService<ExternalModulesHostedService>();
         return services;
     }
 }

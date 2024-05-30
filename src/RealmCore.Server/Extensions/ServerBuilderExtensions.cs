@@ -37,17 +37,17 @@ public static class ServerBuilderExtensions
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddScoreboard();
-        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
-            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
-        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.DGS))
-        {
-            serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
-            serverBuilder.AddGuiSystemResource(builder =>
-            {
-                builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-                builder.SetGuiProvider(DGSGuiProvider.Name);
-            }, new());
-        }
+        //if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
+        //    serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
+        //if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.DGS))
+        //{
+        //    serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
+        //    serverBuilder.AddGuiSystemResource(builder =>
+        //    {
+        //        builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+        //        builder.SetGuiProvider(DGSGuiProvider.Name);
+        //    }, new());
+        //}
         return serverBuilder;
     }
     

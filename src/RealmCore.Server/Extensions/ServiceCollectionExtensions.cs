@@ -1,4 +1,8 @@
-﻿using RealmCore.Server.Modules.Players.Settings;
+﻿using RealmCore.Server.Modules.Friends;
+using RealmCore.Server.Modules.Players.Settings;
+using SlipeServer.Server.Resources.Serving;
+using SlipeServer.Server;
+using SlipeServer.Hosting;
 
 namespace RealmCore.Server.Extensions;
 
@@ -136,6 +140,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IVehiclesService, VehiclesService>();
         services.AddSingleton<CollisionShapeBehaviour>();
         services.AddSingleton<ScopedCollisionShapeBehaviour>();
+        services.AddSingleton<FriendsService>();
+        services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>()));
         #endregion
 
         #region Player features
@@ -165,6 +171,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerInventoryFeature, PlayerInventoryFeature>();
         services.AddPlayerScopedFeature<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
         services.AddPlayerScopedFeature<IPlayerSchedulerFeature, PlayerSchedulerFeature>();
+        services.AddPlayerScopedFeature<IPlayerFriendsFeature, PlayerFriendsFeature>();
         #endregion
 
         #region Vehicle features
@@ -235,7 +242,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<PlayerDailyVisitsHostedService>();
         services.AddHostedService<PlayerJoinedPipelineHostedService>();
         services.AddHostedService<ServerLifecycle>();
-
+        services.AddHostedService<FriendsHostedService>();
+        services.AddHostedService<DefaultStartAllMtaServersHostedService>();
         return services;
     }
 }
@@ -250,7 +258,7 @@ internal sealed class ServerLifecycle : IHostedService
     private readonly MtaServer _mtaServer;
     private readonly ScopedCollisionShapeBehaviour _scopedCollisionShapeBehaviour;
 
-    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, BasicHttpServer basicHttpServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour)
+    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour, IResourceServer resourceServer)
     {
         _logger = logger;
         _gameplayOptions = gameplayOptions;
@@ -259,7 +267,7 @@ internal sealed class ServerLifecycle : IHostedService
         _serviceProvider = serviceProvider;
         _mtaServer = mtaServer;
         _scopedCollisionShapeBehaviour = scopedCollisionShapeBehaviour;
-        _mtaServer.AddResourceServer(new RealmResourceServer(basicHttpServer));
+        _mtaServer.AddResourceServer(resourceServer);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -270,7 +278,6 @@ internal sealed class ServerLifecycle : IHostedService
         var serverLoaders = scope.ServiceProvider.GetRequiredService<IEnumerable<IServerLoader>>();
         {
             using var serverLoadersActivity = Activity.StartActivity("Loading server");
-            bool anyFailed = false;
             foreach (var item in serverLoaders)
             {
                 using var serverLoaderActivity = Activity.StartActivity($"Loading {item}");
@@ -280,21 +287,15 @@ internal sealed class ServerLifecycle : IHostedService
                 }
                 catch (Exception ex)
                 {
-                    anyFailed = true;
                     serverLoaderActivity?.SetStatus(ActivityStatusCode.Error);
                     _logger.LogError(ex, "Failed to load server loader.");
+                    throw;
                 }
-            }
-            if (anyFailed)
-            {
-                throw new Exception("Server failed to load.");
             }
         }
 
         CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
         CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
-
-        _mtaServer.Start();
 
         _logger.LogInformation("Server started.");
         _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
@@ -324,10 +325,6 @@ internal sealed class ServerLifecycle : IHostedService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to save element.");
-            }
-            finally
-            {
-                element.Destroy();
             }
         }
 

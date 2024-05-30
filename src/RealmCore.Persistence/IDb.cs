@@ -48,6 +48,9 @@ public interface IDb : IDisposable
     DbSet<NewsData> News { get; }
     DbSet<TagData> Tags { get; }
     DbSet<NewsTagData> NewsTags { get; }
+    DbSet<FriendData> Friends { get; }
+    DbSet<PendingFriendRequestData> PendingFriendsRequests { get; }
+    DbSet<BlockedUserData> BlockedUsers { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

@@ -496,14 +496,4 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         });
         money.Amount.Should().Be(980);
     }
-
-    [Fact]
-    public async Task asdasd()
-    {
-        using var _ = new AssertionScope();
-
-        var asd = new NewRealmTestingServer();
-
-        ;
-    }
 }

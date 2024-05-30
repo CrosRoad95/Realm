@@ -39,6 +39,7 @@ public static class QueryableExtensions
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
             .Include(x => x.PlayTimes)
+            .Include(x => x.BlockedUsers)
             .AsSplitQuery();
     }
 

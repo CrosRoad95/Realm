@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Settings;
+﻿using RealmCore.Server.Modules.Friends;
+using RealmCore.Server.Modules.Players.Settings;
 
 namespace RealmCore.Server.Modules.Elements;
 
@@ -200,6 +201,7 @@ public class RealmPlayer : Player, IDisposable
     public IPlayerInventoryFeature Inventory { get; init; }
     public IPlayerNotificationsFeature Notifications { get; init; }
     public IPlayerSchedulerFeature Scheduler { get; init; }
+    public IPlayerFriendsFeature Friends { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -237,6 +239,7 @@ public class RealmPlayer : Player, IDisposable
         Inventory = GetRequiredService<IPlayerInventoryFeature>();
         Notifications = GetRequiredService<IPlayerNotificationsFeature>();
         Scheduler = GetRequiredService<IPlayerSchedulerFeature>();
+        Friends = GetRequiredService<IPlayerFriendsFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

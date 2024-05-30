@@ -154,6 +154,72 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         return false;
     }
 
+    public int[] BlockedUsers()
+    {
+        lock (_lock)
+        {
+            if (_user == null)
+                throw new InvalidOperationException();
+
+            return _user.BlockedUsers.Select(x => x.UserId2).ToArray();
+        }
+    }
+
+    private bool IsBlockedCore(int userId)
+    {
+        if (_user == null)
+            throw new InvalidOperationException();
+
+        return _user.BlockedUsers.Where(x => x.UserId2 == userId).Any();
+    }
+    
+    public bool IsBlocked(int userId)
+    {
+        lock (_lock)
+        {
+            return IsBlockedCore(userId);
+        }
+    }
+
+    public bool BlockUser(int userId)
+    {
+        lock (_lock)
+        {
+            if (IsBlockedCore(userId))
+                return false;
+
+            if (_user == null)
+                throw new InvalidOperationException();
+
+            _user.BlockedUsers.Add(new BlockedUserData
+            {
+                UserId1 = _user.Id,
+                UserId2 = userId,
+                CreatedAt = _dateTimeProvider.Now
+            });
+        }
+
+        IncreaseVersion();
+        return true;
+    }
+
+    public bool UnblockUser(int userId)
+    {
+        lock (_lock)
+        {
+            if (_user == null)
+                throw new InvalidOperationException();
+
+            var blockedUser = _user.BlockedUsers.FirstOrDefault(x => x.UserId2 == userId);
+            if (blockedUser == null)
+                return false;
+
+            _user.BlockedUsers.Remove(blockedUser);
+        }
+        IncreaseVersion();
+        return true;
+    }
+
     public void SetAuthorizedPolicyState(string policy, bool authorized)
     {
         lock (_lock)

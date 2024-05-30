@@ -86,6 +86,12 @@ public class NullDb : IDb
 
     public DbSet<UserGtaStatData> UserGtaStats => throw new NotImplementedException();
 
+    public DbSet<FriendData> Friends => throw new NotImplementedException();
+
+    public DbSet<PendingFriendRequestData> PendingFriendsRequests => throw new NotImplementedException();
+
+    public DbSet<BlockedUserData> BlockedUsers => throw new NotImplementedException();
+
     public event EventHandler<SavedChangesEventArgs>? SavedChanges;
 
     public EntityEntry Attach(object entity)

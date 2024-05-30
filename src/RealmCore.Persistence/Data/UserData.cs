@@ -46,4 +46,5 @@ public class UserData : IdentityUser<int>
     public ICollection<BanData> Bans { get; set; } = new List<BanData>();
     public ICollection<BanData> ResponsibleBans { get; set; } = new List<BanData>();
     public ICollection<UserPlayTimeData> PlayTimes { get; set; } = new List<UserPlayTimeData>();
+    public ICollection<BlockedUserData> BlockedUsers { get; set; } = new List<BlockedUserData>();
 }

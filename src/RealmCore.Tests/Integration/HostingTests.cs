@@ -1,6 +1,4 @@
-﻿using RealmCore.WebHosting;
-
-namespace RealmCore.Tests.Integration;
+﻿namespace RealmCore.Tests.Integration;
 
 public class HostingTests
 {
@@ -9,15 +7,15 @@ public class HostingTests
     {
         var sampleService = new SampleHostedService();
 
-        TestingPlayer player;
+        RealmTestingPlayer player;
         {
             using var hosting = new RealmTestingServerHosting(hostBuilder =>
             {
-                hostBuilder.AddRealmServer<RealmTestingPlayer>();
                 hostBuilder.Services.AddHostedService(x => sampleService);
             }, null);
 
-            player = hosting.Server.AddFakePlayer();
+            player = hosting.CreatePlayer();
+
             player.Client.IsConnected.Should().BeTrue();
         }
 
@@ -27,20 +25,20 @@ public class HostingTests
     }
 }
 
-
 public class SampleHostedService : IHostedService
 {
     public bool Started { get; private set; }
     public bool Stopped { get; private set; }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        this.Started = true;
+        Started = true;
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        this.Stopped = true;
+        Stopped = true;
         return Task.CompletedTask;
     }
 }

@@ -5,7 +5,7 @@ public interface IUsersInUse
     IEnumerable<int> ActiveUsersIds { get; }
 
     bool IsActive(int userId);
-    bool TryGetPlayerByUserId(int userId, out RealmPlayer? player);
+    bool TryGetPlayerByUserId(int userId, out RealmPlayer player);
     bool TrySetActive(int userId, RealmPlayer player);
     bool TrySetInactive(int userId);
 }
@@ -49,5 +49,14 @@ internal sealed class UsersInUse : IUsersInUse
         return false;
     }
 
-    public bool TryGetPlayerByUserId(int userId, out RealmPlayer? player) => _activeUsers.TryGetValue(userId, out player);
+    public bool TryGetPlayerByUserId(int userId, out RealmPlayer player)
+    {
+        if (_activeUsers.TryGetValue(userId, out var tempPlayer) && tempPlayer != null)
+        {
+            player = tempPlayer;
+            return true;
+        }
+        player = default!;
+        return false;
+    }
 }
