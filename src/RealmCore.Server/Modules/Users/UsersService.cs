@@ -186,7 +186,7 @@ internal sealed class UsersService : IUsersService
             user.LastSerial = client.Serial;
             user.RegisterSerial ??= client.Serial;
             user.RegisterIp ??= user.LastIp;
-            user.RegisteredDateTime ??= _dateTimeProvider.Now; ;
+            user.RegisteredDateTime ??= _dateTimeProvider.Now;
             user.Nick = player.Name;
         }
     }

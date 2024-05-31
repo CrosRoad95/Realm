@@ -3,7 +3,6 @@ using RealmCore.Server.Modules.Pickups;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 
-[Collection("IntegrationTests")]
 public class VehiclesPersistence
 {
     [Fact]

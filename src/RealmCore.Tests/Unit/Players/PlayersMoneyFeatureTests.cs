@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Money;
-
-namespace RealmCore.Tests.Unit.Players;
+﻿namespace RealmCore.Tests.Unit.Players;
 
 public class PlayersMoneyFeatureTests
 {

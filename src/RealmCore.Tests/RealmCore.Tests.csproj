@@ -128,6 +128,8 @@
 		<Using Include="RealmCore.Server.Modules.Players.PlayTime" />
 		<Using Include="RealmCore.Persistence.Context" />
 		<Using Include="Microsoft.Extensions.Hosting" />
+		<Using Include="SlipeServer.Packets.Lua.Camera" />
+		<Using Include="RealmCore.Server.Modules.Search" />
 	</ItemGroup>
 
 </Project>

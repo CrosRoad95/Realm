@@ -52,6 +52,8 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
         {
             Set(item.SettingId, item.Value);
         }
+        lock (_lock)
+            _settings = userData.Settings;
     }
 
     public void LogOut()

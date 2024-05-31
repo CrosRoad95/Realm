@@ -13,15 +13,15 @@ public enum ExcludeResources
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder AddResources(this ServerBuilder serverBuilder, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
+    public static ServerBuilder AddResources(this ServerBuilder serverBuilder, ExcludeResources? excludeResources = null)
     {
         var commonOptions = new CommonResourceOptions();
 
         serverBuilder.AddBrowserResource();
-        //serverBuilder.AddNoClipResource(new NoClipOptions
-        //{
-        //    Bind = null
-        //});
+        serverBuilder.AddNoClipResource(new NoClipOptions
+        {
+            Bind = null
+        });
         serverBuilder.AddClientInterfaceResource(commonOptions);
         serverBuilder.AddElementOutlineResource();
         serverBuilder.AddAdminResource();
@@ -34,8 +34,8 @@ public static class ServerBuilderExtensions
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddScoreboard();
-        //if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
-        //    serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
+        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
+            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
         //if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.DGS))
         //{
         //    serverBuilder.AddDGSResource(DGSVersion.Release_3_520);

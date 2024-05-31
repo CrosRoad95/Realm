@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-[Collection("IntegrationTests")]
 public class GroupServiceTests
 {
     [Fact]

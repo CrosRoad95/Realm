@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration;
 
-[Collection("IntegrationTests")]
 public class TransactionContextTests
 {
     [InlineData(true)]

@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-[Collection("IntegrationTests")]
 public class LoginRegisterTests
 {
     [Fact]
@@ -63,33 +62,33 @@ public class LoginRegisterTests
     }
 
     //[Fact]
-    public async Task Test1()
-    {
-        var server = new RealmTestingServer();
+    //public async Task Test1()
+    //{
+    //    var server = new RealmTestingServer();
 
-        {
-            var player = server.CreatePlayer();
-            await server.LoginPlayer(player);
+    //    {
+    //        var player = server.CreatePlayer();
+    //        await server.LoginPlayer(player);
 
-            for (int i = 0; i < 25; i++)
-            {
-                player.Events.Add(i % 5, $"test{i}");
-            }
+    //        for (int i = 0; i < 25; i++)
+    //        {
+    //            player.Events.Add(i % 5, $"test{i}");
+    //        }
 
-            //await hosting.DisconnectPlayer(player);
-        }
+    //        //await hosting.DisconnectPlayer(player);
+    //    }
 
-        {
-            var player = server.CreatePlayer();
-            await server.LoginPlayer(player);
-            var events = player.Events;
-            var initialCount1 = events.Count();
-            var fetched1 = await events.FetchMore();
-            var fetched2 = await events.FetchMore();
-            var initialCount2 = events.Count();
-            ;
-        }
-    }
+    //    {
+    //        var player = server.CreatePlayer();
+    //        await server.LoginPlayer(player);
+    //        var events = player.Events;
+    //        var initialCount1 = events.Count();
+    //        var fetched1 = await events.FetchMore();
+    //        var fetched2 = await events.FetchMore();
+    //        var initialCount2 = events.Count();
+    //        ;
+    //    }
+    //}
 
     [Fact]
     public async Task RemovingItemShouldRemoveItFromDatabase()

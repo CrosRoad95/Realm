@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Server;
 
-[Collection("IntegrationTests")]
 public class NewsServiceTests
 {
     [Fact]

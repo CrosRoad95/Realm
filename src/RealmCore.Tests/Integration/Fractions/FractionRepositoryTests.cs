@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Fractions;
 
-[Collection("IntegrationTests")]
 public class FractionRepositoryTests
 {
     [Fact]

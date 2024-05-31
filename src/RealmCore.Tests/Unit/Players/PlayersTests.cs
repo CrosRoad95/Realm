@@ -1,8 +1,4 @@
-﻿using RealmCore.Server.Modules.Search;
-using SlipeServer.Packets.Lua.Camera;
-using SlipeServer.Resources.BoneAttach;
-
-namespace RealmCore.Tests.Unit.Players;
+﻿namespace RealmCore.Tests.Unit.Players;
 
 public class PlayersTests
 {

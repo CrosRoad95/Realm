@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.Extensions.DependencyInjection;
-using System.Security.Cryptography;
-
-namespace RealmCore.TestingTools;
+﻿namespace RealmCore.TestingTools;
 
 public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer : Player
 {
@@ -44,6 +40,7 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
             ["Discord:Token"] = "true",
             ["Discord:Guild"] = "997787973775011850",
             ["Discord:StatusChannel:ChannelId"] = "1025774028255932497",
+            ["Identity:Policies:SampleRole:RequireRoles:0"] = "SampleRole",
             ["Identity:Policies:Admin:RequireRoles:0"] = "Admin",
             //["Identity:Policies:Admin:RequireClaims:Test"] = "true",
             ["Gameplay:MoneyLimit"] = "1000000",
@@ -66,6 +63,7 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         hostBuilder.Services.AddSingleton<IResourceServer>(x => x.GetRequiredService<TestRealmResourceServer>());
         hostBuilder.Services.AddSingleton<TestDebounceFactory>();
         hostBuilder.Services.AddSingleton<IDebounceFactory>(x => x.GetRequiredService<TestDebounceFactory>());
+        hostBuilder.Services.AddHttpClient();
     }, serverBuilder =>
     {
         serverBuilder.AddDefaultLuaMappings();

@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Elements;
 
-[Collection("IntegrationTests")]
 public class InventoryRepositoryTests
 {
     [Fact]

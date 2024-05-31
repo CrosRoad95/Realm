@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Tests.Integration.Vehicles;
 
-[Collection("IntegrationTests")]
 public class VehicleEventRepositoryTests
 {
     [Fact]
