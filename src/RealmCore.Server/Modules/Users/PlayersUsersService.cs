@@ -2,7 +2,7 @@
 
 public interface IPlayerUserService
 {
-    Task<UserData?> GetUserByUserName(string userName, DateTime now, CancellationToken cancellationToken = default);
+    Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default);
     Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default);
 }
 
@@ -17,7 +17,7 @@ internal sealed class PlayersUsersService : IPlayerUserService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<UserData?> GetUserByUserName(string userName, DateTime now, CancellationToken cancellationToken = default)
+    public async Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .TagWithSource(nameof(PlayersUsersService))

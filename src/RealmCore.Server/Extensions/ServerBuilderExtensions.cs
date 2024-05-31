@@ -36,15 +36,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScoreboard();
         if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
             serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
-        //if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.DGS))
-        //{
-        //    serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
-        //    serverBuilder.AddGuiSystemResource(builder =>
-        //    {
-        //        builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-        //        builder.SetGuiProvider(DGSGuiProvider.Name);
-        //    }, new());
-        //}
         return serverBuilder;
     }
     
@@ -68,12 +59,4 @@ public static class ServerBuilderExtensions
             services.AddBoneAttachServices();
         return services;
     }
-
-    public static IServiceCollection WithGuiSystem(this IServiceCollection services)
-    {
-        services.AddHostedService<DxGuiSystemHostedService>();
-        services.AddHostedService<ReactiveDxGuiHostedService>();
-        return services;
-    }
-
 }

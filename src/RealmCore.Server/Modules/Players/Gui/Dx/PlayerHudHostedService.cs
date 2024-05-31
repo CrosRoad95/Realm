@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Modules.Players.Gui.Dx;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
 internal sealed class PlayerHudHostedService : PlayerLifecycle, IHostedService
 {

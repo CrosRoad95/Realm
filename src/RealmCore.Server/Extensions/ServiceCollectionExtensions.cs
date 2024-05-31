@@ -234,7 +234,6 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<VehiclesInUseHostedService>();
         services.AddHostedService<InventoryHostedService>();
         services.AddHostedService<PlayersHostedService>();
-        services.AddHostedService<GuiHostedService>();
         services.AddHostedService<ServerListHostedService>();
         services.AddHostedService<VehicleAccessControllerLogic>();
         services.AddHostedService<MapsHostedService>();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Resources.AFK;
@@ -10,8 +11,8 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new AFKResource(server);
-
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
         });
 
         builder.ConfigureServices(services =>

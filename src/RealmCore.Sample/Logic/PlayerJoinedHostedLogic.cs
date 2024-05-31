@@ -1,6 +1,4 @@
-﻿using SlipeServer.Resources.Scoreboard;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedHostedLogic : IHostedService
 {
@@ -11,9 +9,8 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     private readonly PlayersEventManager _playersEventManager;
     private readonly IUsersService _usersService;
     private readonly ScoreboardService _scoreboardService;
-    private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService, ScoreboardService scoreboardService)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -22,7 +19,6 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         _playersEventManager = playersEventManager;
         _usersService = usersService;
         _scoreboardService = scoreboardService;
-        _guiSystemService = guiSystemService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -61,10 +57,9 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     private async Task HandleSignedInCore(RealmPlayer player)
     {
         await player.FadeCameraAsync(CameraFade.Out);
-        if (_guiSystemService != null)
-            _guiSystemService.SetDebugToolsEnabled(player, true);
         _chatBox.SetVisibleFor(player, true);
         _chatBox.ClearFor(player);
+        player.Gui.TryClose();
         player.Camera.Target = player;
         if (!player.TrySpawnAtLastPosition())
         {

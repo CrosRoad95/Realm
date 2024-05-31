@@ -11,9 +11,9 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new NametagsResource(server);
-
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
             resource.AddLuaEventHub<INametagsEventHub>();
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
         builder.ConfigureServices(services =>

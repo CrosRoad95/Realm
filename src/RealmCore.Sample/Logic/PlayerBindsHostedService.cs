@@ -1,5 +1,4 @@
-﻿using RealmCore.Sample.Concepts.Gui;
-using SlipeServer.Server.Elements.Enums;
+﻿using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
 
@@ -106,24 +105,6 @@ internal sealed class PlayerBindsHostedService : IHostedService
 
         GuiHelpers.BindGuiPage<HomePageGui>(player, "F6");
         GuiHelpers.BindGuiPage<CounterPageGui>(player, "F7");
-
-        GuiHelpers.BindGuiPage(player, "F1", async cancellationToken =>
-        {
-            DashboardGui.DashboardState state = new();
-            state.Money = (double)player.Money.Amount;
-
-            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
-            var vehiclesWithModelAndPositionDTos = await vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
-            state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDto
-            {
-                Id = x.Id,
-                Model = x.Model,
-                Position = x.Position,
-            }).ToList();
-            state.Counter = 3;
-            return new DashboardGui(player, state);
-        });
-        GuiHelpers.BindGui<InventoryGui>(player, "i");
     }
 
     private void HandleSignedOut(RealmPlayer player)

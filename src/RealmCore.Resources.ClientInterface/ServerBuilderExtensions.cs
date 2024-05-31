@@ -15,8 +15,9 @@ public static class ServerBuilderExtensions
             if (commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
 
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
             resource.AddLuaEventHub<IClientInterfaceEventHub>();
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
         builder.ConfigureServices(services =>

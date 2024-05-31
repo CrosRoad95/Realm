@@ -146,7 +146,7 @@ internal sealed class SeederServerBuilder : IDisposable
         foreach (var pair in users)
         {
             var userSeedData = pair.Value;
-            var user = await playerUserService.GetUserByUserName(pair.Key, _dateTimeProvider.Now);
+            var user = await playerUserService.GetUserByUserName(pair.Key);
 
             if (user == null)
             {

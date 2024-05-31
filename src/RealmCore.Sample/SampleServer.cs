@@ -42,9 +42,6 @@ public static class SampleServerExtensions
         services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
 
         services.AddDiscordSupport();
-        services.AddGuiSystemServices();
-
-        services.WithGuiSystem();
 
         services.AddHostedService<PlayerJoinedHostedLogic>();
         services.AddHostedService<SamplePickupsHostedService>();

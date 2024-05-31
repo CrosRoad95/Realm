@@ -85,13 +85,13 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
 
     public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
-        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
+        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name);
 
         if (user == null)
         {
             await Host.Services.GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
 
-            user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
+            user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name);
         }
 
         if (user == null)

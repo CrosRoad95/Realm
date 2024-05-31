@@ -14,10 +14,10 @@ public static class ServerBuilderExtensions
         {
             var resource = new OverlayResource(server);
             resource.AddLuaEventHub<IHudEventHub>();
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
 
             resource.InjectAssetsExportedFunctions();
-
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
         builder.ConfigureServices(services =>

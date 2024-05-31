@@ -100,7 +100,6 @@
 		<Using Include="RealmCore.Resources.Admin.Data" />
 		<Using Include="RealmCore.Resources.Admin.Enums" />
 		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
-		<Using Include="RealmCore.Resources.GuiSystem" />
 		<Using Include="RealmCore.Server.Modules.Integrations" />
 		<Using Include="RealmCore.Persistence.DTOs" />
 		<Using Include="RealmCore.Persistence.Extensions" />

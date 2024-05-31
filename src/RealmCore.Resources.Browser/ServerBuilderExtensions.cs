@@ -8,12 +8,13 @@ namespace RealmCore.Resources.Browser;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddBrowserResource(this ServerBuilder builder, string? filesLocation = null)
+    public static void AddBrowserResource(this ServerBuilder builder)
     {
         builder.AddBuildStep(server =>
         {
-            var resource = new BrowserResource(server, filesLocation);
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
+            var resource = new BrowserResource(server);
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
             resource.AddLuaEventHub<IBrowserEventHub>();
         });
 

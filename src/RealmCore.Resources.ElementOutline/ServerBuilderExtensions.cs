@@ -12,9 +12,10 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new ElementOutlineResource(server);
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
 
             resource.AddLuaEventHub<IElementOutlineEventHub>();
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
         builder.ConfigureServices(services =>

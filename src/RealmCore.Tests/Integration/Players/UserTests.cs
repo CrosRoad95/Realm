@@ -17,14 +17,14 @@ public class UserTests
 
         #region Act
         var registerResult = await usersService.Register(login, password);
-        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login, hosting.DateTimeProvider.Now) ?? throw new Exception("User not found");
+        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
-        var signIn = async () => await usersService.LogIn(player, user);
+        var logIn = async () => await usersService.LogIn(player, user);
 
-        (await signIn()).Value.Should().BeOfType<UsersResults.LoggedIn>();
+        (await logIn()).Value.Should().BeOfType<UsersResults.LoggedIn>();
         player.User.IsLoggedIn.Should().BeTrue();
-        (await signIn()).Value.Should().BeOfType<UsersResults.PlayerAlreadyLoggedIn>();
+        (await logIn()).Value.Should().BeOfType<UsersResults.PlayerAlreadyLoggedIn>();
 
         var userId = registerResult.Match(registered =>
         {

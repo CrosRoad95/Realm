@@ -1,5 +1,4 @@
-﻿using RealmCore.Sample.Concepts.Gui;
-using RealmCore.Sample.Elements;
+﻿using RealmCore.Sample.Elements;
 using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
@@ -138,18 +137,18 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
                 var vehicleName = ((RealmVehicle)element).Name;
                 var buyVehicleGui = new BuyVehicleGui(player, vehicleName, realmVehicleForSale.Price)
                 {
-                    Bought = async () =>
-                    {
-                        player.Gui.TryClose<BuyVehicleGui>();
-                        if (realmVehicleForSale.TrySell())
-                        {
-                            vehicle = await _vehiclesService.ConvertToPersistantVehicle(vehicle);
-                            if (vehicle == null)
-                                throw new NullReferenceException();
-                            vehicle.Access.AddAsOwner(player);
-                            vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-                        }
-                    }
+                    //Bought = async () =>
+                    //{
+                    //    player.Gui.TryClose<BuyVehicleGui>();
+                    //    if (realmVehicleForSale.TrySell())
+                    //    {
+                    //        vehicle = await _vehiclesService.ConvertToPersistantVehicle(vehicle);
+                    //        if (vehicle == null)
+                    //            throw new NullReferenceException();
+                    //        vehicle.Access.AddAsOwner(player);
+                    //        vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
+                    //    }
+                    //}
                 };
                 player.Gui.Current = buyVehicleGui;
             }

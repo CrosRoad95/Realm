@@ -1,0 +1,17 @@
+﻿@page "/realmUi/login"
+@layout RealmGuiBaseLayout<LoginGui>
+<PageTitle>login</PageTitle>
+
+<button @onclick="HandleLogin">login</button>
+
+@code{
+
+    [CascadingParameter]
+    private LoginGui Gui { get; set; }
+
+
+    private async Task HandleLogin()
+    {
+        await Gui.Login();
+    }
+}
