@@ -1,7 +1,4 @@
-﻿using RealmCore.Interfaces.Extend;
-using RealmCore.Module.Discord.Stubs;
-
-namespace RealmCore.Module.Discord;
+﻿namespace RealmCore.Module.Discord;
 
 public static class ServiceCollectionExtensions
 {

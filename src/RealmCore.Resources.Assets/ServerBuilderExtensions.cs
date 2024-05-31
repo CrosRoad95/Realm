@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Resources.Assets.Interfaces;
 using SlipeServer.Server.ServerBuilders;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]

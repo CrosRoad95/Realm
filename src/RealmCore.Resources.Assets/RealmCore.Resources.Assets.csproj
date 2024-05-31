@@ -20,6 +20,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Using Include="RealmCore.Resources.Assets.Interfaces" />
+	  <Using Include="SlipeServer.Server" />
+	  <Using Include="SlipeServer.Server.Resources" />
 	  <Using Include="System.Runtime.CompilerServices" />
+	  <Using Include="System.Text" />
 	</ItemGroup>
 </Project>

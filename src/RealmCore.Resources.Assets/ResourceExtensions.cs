@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-using System.Text;
-
-namespace RealmCore.Resources.Assets;
+﻿namespace RealmCore.Resources.Assets;
 
 public static class ResourceExtensions
 {

@@ -9,9 +9,9 @@ public interface IVehicleEnginesFeature : IVehicleFeature
     event Action<IVehicleEnginesFeature, short>? EngineAdded;
     event Action<IVehicleEnginesFeature, short>? EngineRemoved;
 
-    void Add(short engineId);
+    bool TryAdd(short engineId);
     bool Has(short engineId);
-    void Remove(short engineId);
+    bool TryRemove(short engineId);
 }
 
 internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature, IUsesVehiclePersistentData
@@ -73,30 +73,35 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature, IUsesVehic
             return InternalHasEngine(engineId);
     }
 
-    public void Add(short engineId)
+    public bool TryAdd(short engineId)
     {
         lock (_lock)
         {
             if (InternalHasEngine(engineId))
-                throw new Exception($"Vehicle engine id '{engineId}' already added");
+                return false;
+
             _vehicleEngine.Add(new VehicleEngineData
             {
                 EngineId = engineId
             });
         }
         EngineAdded?.Invoke(this, engineId);
+        VersionIncreased?.Invoke();
+        return true;
     }
 
-    public void Remove(short engineId)
+    public bool TryRemove(short engineId)
     {
         lock (_lock)
         {
             if (!InternalHasEngine(engineId))
-                throw new Exception($"Vehicle engine id '{engineId}' doesn't exists");
+                return false;
             var engine = _vehicleEngine.First(x => x.EngineId == engineId);
             _vehicleEngine.Remove(engine);
         }
         EngineRemoved?.Invoke(this, engineId);
+        VersionIncreased?.Invoke();
+        return true;
     }
 
     public void Loaded(VehicleData vehicleData)

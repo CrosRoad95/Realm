@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server;
 using SlipeServer.Server.Services;
 using SlipeServer.Server.Events;
 using SlipeServer.Packets.Definitions.Lua;

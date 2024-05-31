@@ -1,6 +1,5 @@
 ﻿using SlipeServer.Server.Elements;
 using SlipeServer.Server;
-using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Resources.Base;
 

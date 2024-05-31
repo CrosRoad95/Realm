@@ -1,11 +1,4 @@
-﻿using Discord;
-using Microsoft.AspNetCore.Identity;
-using RealmCore.Server.Modules.Users;
-using Serilog;
-using SlipeServer.Server.Elements;
-using System.Numerics;
-
-namespace RealmCore.Sample.Concepts.Gui.Blazor;
+﻿namespace RealmCore.Sample.Concepts.Gui.Blazor;
 
 public class LoginGui : BrowserGui
 {

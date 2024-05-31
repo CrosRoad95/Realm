@@ -62,6 +62,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
 
         var userNotificationDto = UserNotificationDto.Map(data);
         Created?.Invoke(this, userNotificationDto);
+        VersionIncreased?.Invoke();
     }
     
     public void Update(UserNotificationData data)

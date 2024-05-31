@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay.ConstructionInfos;
-
-namespace RealmCore.Resources.Overlay;
+﻿namespace RealmCore.Resources.Overlay;
 
 internal class TextAndHudBuilder<TState> : ITextAndHudBuilder<TState>
 {

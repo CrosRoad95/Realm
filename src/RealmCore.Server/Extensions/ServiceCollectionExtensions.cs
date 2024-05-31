@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Friends;
-using RealmCore.Server.Modules.Players.Settings;
-using SlipeServer.Hosting;
+﻿using SlipeServer.Hosting;
 
 namespace RealmCore.Server.Extensions;
 

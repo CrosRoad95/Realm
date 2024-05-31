@@ -1,10 +1,4 @@
-﻿using RealmCore.Resources.Base.Extensions;
-using RealmCore.Resources.Overlay.Builders;
-using RealmCore.Resources.Overlay.ConstructionInfos;
-using RealmCore.Resources.Overlay.Interfaces;
-using SlipeServer.Packets.Definitions.Lua;
-
-namespace RealmCore.Resources.Overlay;
+﻿namespace RealmCore.Resources.Overlay;
 
 internal enum AddElementLocation
 {

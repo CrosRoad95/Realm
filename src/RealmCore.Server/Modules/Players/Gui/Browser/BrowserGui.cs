@@ -7,7 +7,6 @@ public abstract class BrowserGui : IPlayerGui
     public IReadOnlyDictionary<string, string?>? QueryParameters { get; }
 
     public event Action<BrowserGui>? Changed;
-    internal event Action<BrowserGui, BrowserGui>? NavigationRequested;
 
     public BrowserGui(RealmPlayer player, string path, Dictionary<string, string?>? queryParameters = null)
     {

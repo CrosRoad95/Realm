@@ -1,6 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-
-namespace RealmCore.Resources.Overlay;
+﻿namespace RealmCore.Resources.Overlay;
 
 internal interface IHudEventHub
 {

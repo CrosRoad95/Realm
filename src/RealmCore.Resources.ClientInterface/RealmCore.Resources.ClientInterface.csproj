@@ -23,8 +23,15 @@
 
 	<ItemGroup>
 	  <Using Include="Microsoft.Extensions.DependencyInjection" />
+	  <Using Include="Microsoft.Extensions.Logging" />
 	  <Using Include="RealmCore.Resources.Base" />
+	  <Using Include="SlipeServer.Resources.Base" />
+	  <Using Include="SlipeServer.Server" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	  <Using Include="SlipeServer.Server.Events" />
+	  <Using Include="SlipeServer.Server.Mappers" />
 	  <Using Include="SlipeServer.Server.ServerBuilders" />
+	  <Using Include="SlipeServer.Server.Services" />
 	  <Using Include="System.Runtime.CompilerServices" />
 	</ItemGroup>
 

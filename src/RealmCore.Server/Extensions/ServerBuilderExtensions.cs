@@ -4,16 +4,9 @@
 
 namespace RealmCore.Server.Extensions;
 
-[Flags]
-public enum ExcludeResources
-{
-    BoneAttach = 0x1,
-    DGS = 0x2,
-}
-
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder AddResources(this ServerBuilder serverBuilder, ExcludeResources? excludeResources = null)
+    public static ServerBuilder AddResources(this ServerBuilder serverBuilder)
     {
         var commonOptions = new CommonResourceOptions();
 
@@ -34,12 +27,11 @@ public static class ServerBuilderExtensions
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddScoreboard();
-        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
-            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
         return serverBuilder;
     }
     
-    public static IServiceCollection AddResources(this IServiceCollection services, ExcludeResources? excludeResources = null)
+    public static IServiceCollection AddResources(this IServiceCollection services)
     {
         services.AddBrowserServices();
         services.AddNoClipServices();
@@ -55,8 +47,7 @@ public static class ServerBuilderExtensions
         services.AddNametagsServices();
         services.AddWatermarkServices();
         services.AddScoreboardServices();
-        if (excludeResources == null || !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach))
-            services.AddBoneAttachServices();
+        services.AddBoneAttachServices();
         return services;
     }
 }

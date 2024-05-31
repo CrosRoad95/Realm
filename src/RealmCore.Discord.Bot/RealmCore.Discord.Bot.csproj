@@ -25,4 +25,18 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Discord" />
+    <Using Include="Discord.WebSocket" />
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Extensions.Hosting" />
+    <Using Include="RealmCore.Discord.Integration.Channels" />
+    <Using Include="RealmCore.Discord.Integration.Extensions" />
+    <Using Include="RealmCore.Logging" />
+    <Using Include="Serilog" />
+    <Using Include="Serilog.Events" />
+    <Using Include="System.Reflection" />
+  </ItemGroup>
+
 </Project>

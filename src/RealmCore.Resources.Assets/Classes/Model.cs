@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Assets.Interfaces;
-
-namespace RealmCore.Resources.Assets.Classes;
+﻿namespace RealmCore.Resources.Assets.Classes;
 
 internal class Model : IModel
 {

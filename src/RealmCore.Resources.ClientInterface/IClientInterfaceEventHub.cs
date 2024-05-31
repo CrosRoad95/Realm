@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Resources.ClientInterface;
+﻿namespace RealmCore.Resources.ClientInterface;
 
 public interface IClientInterfaceEventHub
 {

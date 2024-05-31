@@ -1,6 +1,4 @@
-﻿using RealmCore.Interfaces.Extend;
-
-namespace RealmCore.Module.Discord;
+﻿namespace RealmCore.Module.Discord;
 
 public interface IDiscordHandler
 {

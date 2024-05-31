@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Server.Resources;
-using SlipeServer.Server;
 
 namespace RealmCore.Resources.ClientInterface;
 

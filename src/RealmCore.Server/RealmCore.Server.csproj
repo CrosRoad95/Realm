@@ -222,6 +222,8 @@
 		<Using Include="SlipeServer.Server.PacketHandling.Handlers.Middleware" />
 		<Using Include="SlipeServer.Packets.Definitions.Explosions" />
 		<Using Include="RealmCore.Server.PacketHandling" />
+		<Using Include="RealmCore.Server.Modules.Friends" />
+		<Using Include="RealmCore.Server.Modules.Players.Settings" />
 	</ItemGroup>
 
 </Project>

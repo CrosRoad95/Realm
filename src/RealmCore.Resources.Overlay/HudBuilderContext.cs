@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay.Interfaces;
-
-namespace RealmCore.Resources.Overlay;
+﻿namespace RealmCore.Resources.Overlay;
 
 internal sealed class HudBuilderContext : IHudBuilderContext
 {

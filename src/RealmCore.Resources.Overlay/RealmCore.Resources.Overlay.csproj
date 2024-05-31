@@ -28,8 +28,13 @@
 
 	<ItemGroup>
 		<Using Include="RealmCore.Resources.Assets.Interfaces" />
+		<Using Include="RealmCore.Resources.Base.Extensions" />
+		<Using Include="RealmCore.Resources.Overlay.Builders" />
 		<Using Include="RealmCore.Resources.Overlay.Builders.Interfaces" />
+		<Using Include="RealmCore.Resources.Overlay.ConstructionInfos" />
 		<Using Include="RealmCore.Resources.Overlay.Enums" />
+		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
+		<Using Include="SlipeServer.Packets.Definitions.Lua" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq.Expressions" />

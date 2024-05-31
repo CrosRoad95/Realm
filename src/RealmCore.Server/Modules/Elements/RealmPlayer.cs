@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Modules.Friends;
-using RealmCore.Server.Modules.Players.Settings;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 internal readonly struct FadeCameraScope : IAsyncDisposable
 {
@@ -415,14 +412,13 @@ public class RealmPlayer : Player, IDisposable
             }
             RemoveBind(key, KeyState.Both);
             _binds.Remove(key);
-            return true;
         }
         finally
         {
             _bindsLock.Release();
         }
 
-        return false;
+        return true;
     }
 
     public void RemoveAllBinds()

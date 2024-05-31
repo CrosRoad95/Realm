@@ -1,12 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SlipeServer.Resources.Base;
-using SlipeServer.Server;
-using SlipeServer.Server.Elements;
-using SlipeServer.Server.Events;
-using SlipeServer.Server.Mappers;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Resources.ClientInterface;
+﻿namespace RealmCore.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {

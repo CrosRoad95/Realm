@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay.ConstructionInfos;
-
-namespace RealmCore.Resources.Overlay.Builders.Interfaces;
+﻿namespace RealmCore.Resources.Overlay.Builders.Interfaces;
 
 public interface ITextHudBuilder<TState>
 {

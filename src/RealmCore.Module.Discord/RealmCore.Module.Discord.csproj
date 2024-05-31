@@ -18,11 +18,13 @@
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Discord" />
 		<Using Include="Microsoft.Extensions.Logging" />
+		<Using Include="RealmCore.Interfaces.Extend" />
 		<Using Include="RealmCore.Module.Discord.Interfaces" />
 		<Using Include="Grpc.Core" />
 		<Using Include="Google.Protobuf" />
 		<Using Include="Grpc.Net.Client" />
 		<Using Include="RealmCore.Module.Discord.Services" />
+		<Using Include="RealmCore.Module.Discord.Stubs" />
 	</ItemGroup>
 
 </Project>

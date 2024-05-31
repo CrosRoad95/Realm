@@ -1,9 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-using SlipeServer.Server;
-using System.Text;
-using RealmCore.Resources.Assets.Interfaces;
-
-namespace RealmCore.Resources.Assets;
+﻿namespace RealmCore.Resources.Assets;
 
 internal class AssetsResource : Resource
 {

@@ -1,16 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Logging;
-using Serilog;
-using Serilog.Events;
-using RealmCore.Discord.Integration.Channels;
-using RealmCore.Discord.Integration.Extensions;
-using Discord.WebSocket;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using Discord;
-using System.Reflection;
-
-var app = Host.CreateDefaultBuilder(args)
+﻿var app = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((hostingContext, builder) =>
     {
         var configuration = new ConfigurationBuilder()
