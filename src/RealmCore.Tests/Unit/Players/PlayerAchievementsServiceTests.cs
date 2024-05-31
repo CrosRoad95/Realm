@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerAchievementsServiceTests : RealmUnitTestingBase
+public class PlayerAchievementsServiceTests
 {
     [Fact]
-    public void TestIfAchievementProgressCountsCorrectly()
+    public async Task TestIfAchievementProgressCountsCorrectly()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var achievements = player.Achievements;
         var progressedTimes = 0;
@@ -27,10 +27,10 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TestIfCanReceiveReward()
+    public async Task TestIfCanReceiveReward()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var achievements = player.Achievements;
 
@@ -40,7 +40,7 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
             unlockedAchievement = achievementId;
         };
 
-        var now = server.DateTimeProvider.Now;
+        var now = hosting.DateTimeProvider.Now;
         achievements.TryReceiveReward(2, 100, now).Should().BeFalse();
 
         achievements.UpdateProgress(2, 100, 100);

@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerLevelFeatureTests : RealmUnitTestingBase
+public class PlayerLevelFeatureTests
 {
-    private uint Seed(RealmTestingServer server, int step = 10)
+    private uint Seed(RealmTestingServerHosting hosting, int step = 10)
     {
-        var levelsCollection = server.GetRequiredService<LevelsCollection>();
+        var levelsCollection = hosting.GetRequiredService<LevelsCollection>();
         uint totalRequiredExperience = 0;
         for (int i = 0; i < 10; i++)
         {
@@ -16,12 +16,12 @@ public class PlayerLevelFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TestIfLevelsAreCountingCorrectly()
+    public async Task TestIfLevelsAreCountingCorrectly()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var totalRequiredExperience = Seed(server);
+        var totalRequiredExperience = Seed(hosting);
         var level = player.Level;
 
         int addedLevels = 0;
@@ -56,10 +56,10 @@ public class PlayerLevelFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task GivingExperienceShouldBeThreadSafe()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var totalRequiredExperience = Seed(server, 10000);
+        var totalRequiredExperience = Seed(hosting, 10000);
         var level = player.Level;
 
         await ParallelHelpers.Run(() =>

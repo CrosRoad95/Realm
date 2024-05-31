@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Tests.Unit.Elements;
 
-public class FocusableElementsTests : RealmUnitTestingBase
+public class FocusableElementsTests
 {
     [Fact]
-    public void FocusableShouldWork()
+    public async Task FocusableShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var obj = server.CreateFocusableObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
         obj.AddFocusedPlayer(player);
 
         obj.FocusedPlayerCount.Should().Be(1);
@@ -15,11 +15,11 @@ public class FocusableElementsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void FocusedElementShouldBeRemovedWhenItDisposes()
+    public async Task FocusedElementShouldBeRemovedWhenItDisposes()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var obj = server.CreateFocusableObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
 
         obj.AddFocusedPlayer(player);
         player.Destroy();
@@ -28,11 +28,11 @@ public class FocusableElementsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouCanNotFocusOneElementTwoTimes()
+    public async Task YouCanNotFocusOneElementTwoTimes()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var obj = server.CreateFocusableObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
         var act = () => obj.AddFocusedPlayer(player);
 
         act().Should().BeTrue();
@@ -41,11 +41,11 @@ public class FocusableElementsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldBeAbleToRemoveFocusedPlayer()
+    public async Task YouShouldBeAbleToRemoveFocusedPlayer()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var obj = server.CreateFocusableObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
 
         obj.AddFocusedPlayer(player).Should().BeTrue();
         obj.RemoveFocusedPlayer(player).Should().BeTrue();
@@ -54,11 +54,11 @@ public class FocusableElementsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void RemovedFocusedElementShouldWork()
+    public async Task RemovedFocusedElementShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var obj = server.CreateFocusableObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
 
         bool lostFocus = false;
         obj.PlayerLostFocus += (s, plr) =>

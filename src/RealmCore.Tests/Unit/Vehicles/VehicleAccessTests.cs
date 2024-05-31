@@ -1,29 +1,29 @@
 ﻿namespace RealmCore.Tests.Unit.Vehicles;
 
-public class VehicleAccessTests : RealmUnitTestingBase
+public class VehicleAccessTests
 {
     [Fact]
-    public void PlayerShouldBeAbleToEnterVehicleIfNoAccessGetsConfigured()
+    public async Task PlayerShouldBeAbleToEnterVehicleIfNoAccessGetsConfigured()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var vehicle = hosting.CreateVehicle();
 
-        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0);
         canEnter.Should().BeTrue();
     }
 
     [Fact]
-    public void VehicleExclusiveAccessControllerShouldWork()
+    public async Task VehicleExclusiveAccessControllerShouldWork()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = new VehicleExclusiveAccessController(player1);
-        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
 
         var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, vehicle.AccessController);
         var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, vehicle.AccessController);
@@ -32,43 +32,43 @@ public class VehicleAccessTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void VehicleNoAccessControllerShouldWork()
+    public async Task VehicleNoAccessControllerShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeFalse();
     }
 
     [Fact]
-    public void DefaultAccessControllerShouldWork()
+    public async Task DefaultAccessControllerShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleDefaultAccessController.Instance;
-        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeTrue();
     }
 
     [Fact]
-    public void VehicleAccessServiceCanEnterMethod()
+    public async Task VehicleAccessServiceCanEnterMethod()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
 
         vehicleAccessService.CanEnter += (ped, vehicle, seat) => ped == player1;
 

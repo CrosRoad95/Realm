@@ -2,17 +2,17 @@
 
 namespace RealmCore.Tests.Unit.Players;
 
-public class PlayersMoneyFeatureTests : RealmUnitTestingBase
+public class PlayersMoneyFeatureTests
 {
     [InlineData(0, 0, 1)]
     [InlineData(1, 1, 1)]
     [InlineData(1.234567890, 1.2345, 1)]
     [InlineData(1.234, 123.4, 100)]
     [Theory]
-    public void GiveAndTakeMoneyShouldGiveExpectedAmountOfMoney(decimal moneyGiven, decimal expectedAmount, int times)
+    public async Task GiveAndTakeMoneyShouldGiveExpectedAmountOfMoney(decimal moneyGiven, decimal expectedAmount, int times)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         decimal moneyAdded = 0;
         decimal moneyTaken = 0;
@@ -42,9 +42,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [InlineData(1.234567890, 1.2345)]
     [InlineData(1.234, 1.234)]
     [Theory]
-    public void SettingAndGettingMoneyShouldWork(decimal moneySet, decimal expectedMoney)
+    public async Task SettingAndGettingMoneyShouldWork(decimal moneySet, decimal expectedMoney)
     {
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var money = player.Money;
         money.SetInternal(1000000);
@@ -54,10 +55,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void GiveAndTakeMoneyShouldNotAllowNegativeValues()
+    public async Task GiveAndTakeMoneyShouldNotAllowNegativeValues()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         Action actGiveMoney = () => { player.Money.Give(-1); };
@@ -72,10 +73,12 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [InlineData(10000000)]
     [InlineData(-10000000)]
     [Theory]
-    public void YouCanNotGiveTakeOrSetMoneyBeyondLimit(decimal amount)
+    public async Task YouCanNotGiveTakeOrSetMoneyBeyondLimit(decimal amount)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var _ = new AssertionScope();
+
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         Action actGiveMoney = () => { player.Money.Give(amount); };
         Action actTakeMoney = () => { player.Money.Take(amount); };
@@ -89,14 +92,14 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
                 .WithMessage("Unable to take money beyond limit.");
         }
         actSetMoney.Should().Throw<GameplayException>()
-            .WithMessage("Unable to set money beyond limit.");
+            .WithMessage("Unable to set money beyond limit (1000000).");
     }
 
     [Fact]
     public async Task TestIfPlayerIsThreadSafe()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         await ParallelHelpers.Run(() =>
         {
@@ -114,10 +117,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldNotBeAbleToTakeMoneyIfThereIsNotEnoughOfThem()
+    public async Task YouShouldNotBeAbleToTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 15;
@@ -130,10 +133,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
+    public async Task YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 15;
@@ -145,11 +148,11 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldBeAbleToTransferMoneyBetweenPlayers()
+    public async Task YouShouldBeAbleToTransferMoneyBetweenPlayers()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
 
         player1.Money.Amount = 15;
         player1.Money.Transfer(player2.Money, 10);
@@ -159,11 +162,12 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouCannotTransferMoreMoneyThanYouHave()
+    public async Task YouCannotTransferMoreMoneyThanYouHave()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+
         player1.Money.SetInternal(1000000);
         player2.Money.SetInternal(1000000);
 
@@ -176,9 +180,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TransferMoneyShouldBeThreadSafety()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+
         player1.Money.SetInternal(1000000);
 
         player1.Money.Amount = 800;
@@ -197,10 +202,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [InlineData(10, 15, false, false)]
     [InlineData(10, 15, true, true)]
     [Theory]
-    public void HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
+    public async Task HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = amount;
@@ -210,10 +215,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [InlineData(6, 4)]
     [InlineData(20, 10)]
     [Theory]
-    public void TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
+    public async Task TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -222,10 +227,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TryTakeMoneyWithCallbackShouldSucceed()
+    public async Task TryTakeMoneyWithCallbackShouldSucceed()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -237,10 +242,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TryTakeMoneyWithCallbackShouldFail()
+    public async Task TryTakeMoneyWithCallbackShouldFail()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -252,11 +257,11 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TryTakeMoneyWithCallbackShouldFailOnException()
+    public async Task TryTakeMoneyWithCallbackShouldFailOnException()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        server.GetRequiredService<PlayerMoneyHostedService>().StartAsync(CancellationToken.None).Wait();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -275,8 +280,8 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailOnException()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
@@ -295,8 +300,8 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotFail()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
@@ -318,10 +323,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
+    public async Task TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
@@ -337,8 +342,9 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailIfHasNotEnoughMoney()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
@@ -352,10 +358,11 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
+    public async Task TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
@@ -371,8 +378,9 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
@@ -386,12 +394,13 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void SettingMoneyInsideEventsShouldWork()
+    public async Task SettingMoneyInsideEventsShouldWork()
     {
         using var _ = new AssertionScope();
 
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Money.SetInternal(1000000);
 
         var act = () =>
@@ -408,13 +417,14 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void UsingMoneyComponentShouldIncreaseVersions()
+    public async Task UsingMoneyComponentShouldIncreaseVersions()
     {
         using var _ = new AssertionScope();
 
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+
         var money = player1.Money;
         var user1 = player1.User;
         var expectedVersion = 0;
@@ -441,23 +451,24 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         money.TryTake(5, () => false);
         user1.GetVersion().Should().Be(expectedVersion, "TryTake(5, () => false)");
 
-        money.TryTakeAsync(5, () => Task.FromResult(true)).Wait();
+        await money.TryTakeAsync(5, () => Task.FromResult(true));
         user1.GetVersion().Should().Be(++expectedVersion, "TryTakeAsync(5, () => Task.FromResult(true)).Wait()");
 
-        money.TryTakeAsync(5, () => Task.FromResult(false)).Wait();
+        await money.TryTakeAsync(5, () => Task.FromResult(false));
         user1.GetVersion().Should().Be(expectedVersion, "TryTakeAsync(5, () => Task.FromResult(false)).Wait()");
     }
 
     [Fact]
-    public void GivingAndTakingZeroMoneyShouldNotRaiseAnyEvent()
+    public async Task GivingAndTakingZeroMoneyShouldNotRaiseAnyEvent()
     {
         using var _ = new AssertionScope();
 
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         var money = player.Money;
 
-        using var monitor1 = money.Monitor();
+        using var monitor = money.Monitor();
 
         money.Give(0);
         money.Take(0);
@@ -466,11 +477,11 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         money.TryTake(0, true);
         money.TryTake(0, () => true);
         money.TryTake(0, () => false);
-        money.TryTakeAsync(0, () => Task.FromResult(true)).Wait();
-        money.TryTakeAsync(0, () => Task.FromResult(false)).Wait();
+        await money.TryTakeAsync(0, () => Task.FromResult(true));
+        await money.TryTakeAsync(0, () => Task.FromResult(false));
 
+        monitor.OccurredEvents.Should().BeEmpty();
         player.User.GetVersion().Should().Be(0);
-        monitor1.OccurredEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -478,8 +489,8 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         using var _ = new AssertionScope();
 
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         var money = player.Money;
         money.Amount = 1000;
 

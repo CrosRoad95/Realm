@@ -40,11 +40,11 @@ public class VehicleUpgrade3 : IVehicleHandlingModifier
     }
 }
 
-public class VehicleUpgradesTests : RealmUnitTestingBase
+public class VehicleUpgradesTests
 {
-    private void Seed(RealmTestingServer server)
+    private void Seed(RealmTestingServerHosting hosting)
     {
-        var vehicleUpgradesCollection = server.GetRequiredService<VehicleUpgradesCollection>();
+        var vehicleUpgradesCollection = hosting.GetRequiredService<VehicleUpgradesCollection>();
 
         vehicleUpgradesCollection.Add(1000000, new VehicleUpgradesCollectionItem(new VehicleUpgrade1()));
         vehicleUpgradesCollection.Add(1000001, new VehicleUpgradesCollectionItem(new VehicleUpgrade2()));
@@ -62,9 +62,10 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
         #region Arrange
-        var server = CreateServer();
-        Seed(server);
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+
+        Seed(hosting);
+        var vehicle = hosting.CreateVehicle();
         #endregion
 
         #region Act
@@ -82,9 +83,10 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
         #region Act
-        var server = CreateServer();
-        Seed(server);
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+
+        Seed(hosting);
+        var vehicle = hosting.CreateVehicle();
         var resultA = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         var resultB = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         #endregion
@@ -100,9 +102,10 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void UpgradesCanBeRemoved()
     {
         #region Act
-        var server = CreateServer();
-        Seed(server);
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+
+        Seed(hosting);
+        var vehicle = hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrade(1000000);
         vehicle.Upgrades.RemoveUpgrade(1000000);
         #endregion
@@ -116,9 +119,10 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void MultipleUpgradesOfSameTypeCanBeAdded()
     {
         #region Act
-        var server = CreateServer();
-        Seed(server);
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+
+        Seed(hosting);
+        var vehicle = hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion
 
@@ -137,9 +141,10 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void UpgradesMiddlewareShouldBeOrderIndependent(int[] upgrades)
     {
         #region Act
-        var server = CreateServer();
-        Seed(server);
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+
+        Seed(hosting);
+        var vehicle = hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(upgrades);
         #endregion
 

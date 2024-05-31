@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
+public class UserTests
 {
     [Fact]
     public async Task TestLogInFlow()
     {
         #region Arrange
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync(false);
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer(true);
 
         var usersService = player.GetRequiredService<IUsersService>();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
@@ -18,14 +18,14 @@ public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
 
         #region Act
         var registerResult = await usersService.Register(login, password);
-        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login, server.DateTimeProvider.Now) ?? throw new Exception("User not found");
+        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login, hosting.DateTimeProvider.Now) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
         var signIn = async () => await usersService.LogIn(player, user);
 
-        await signIn.Should().NotThrowAsync();
+        (await signIn()).Value.Should().BeOfType<UsersResults.LoggedIn>();
         player.User.IsLoggedIn.Should().BeTrue();
-        await signIn.Should().ThrowAsync<UserAlreadySignedInException>();
+        (await signIn()).Value.Should().BeOfType<UsersResults.PlayerAlreadyLoggedIn>();
 
         var userId = registerResult.Match(registered =>
         {

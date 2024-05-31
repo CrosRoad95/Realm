@@ -1,18 +1,18 @@
 ﻿namespace RealmCore.Tests.Integration;
 
 [Collection("IntegrationTests")]
-public class TransactionContextTests : RealmRemoteDatabaseIntegrationTestingBase
+public class TransactionContextTests
 {
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
     public async Task TransactionContextShouldWork(bool shouldThrow)
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer(name: Guid.NewGuid().ToString());
 
-        var repository = server.GetRequiredService<IInventoryRepository>();
-        var transactionContext = server.GetRequiredService<ITransactionContext>();
+        var repository = hosting.GetRequiredService<IInventoryRepository>();
+        var transactionContext = hosting.GetRequiredService<ITransactionContext>();
         var id = player.User.Id;
 
         var act = async () =>

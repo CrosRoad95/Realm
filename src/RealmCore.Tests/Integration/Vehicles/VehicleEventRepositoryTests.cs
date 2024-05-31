@@ -1,20 +1,21 @@
 ﻿namespace RealmCore.Tests.Integration.Vehicles;
 
 [Collection("IntegrationTests")]
-public class VehicleEventRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
+public class VehicleEventRepositoryTests
 {
     [Fact]
     public async Task VehicleEventRepositoryShouldWork()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
-        var vehicle1 = await CreateVehicleAsync();
-        var vehicle2 = await CreateVehicleAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var vehicle1 = await hosting.CreatePersistentVehicle();
+        var vehicle2 = await hosting.CreatePersistentVehicle();
+
         var vehicleId1 = vehicle1.VehicleId;
         var vehicleId2 = vehicle2.VehicleId;
 
-        var dateTimeProvider = server.GetRequiredService<IDateTimeProvider>();
-        var vehicleEventRepository = server.GetRequiredService<IVehicleEventRepository>();
+        var dateTimeProvider = hosting.GetRequiredService<IDateTimeProvider>();
+        var vehicleEventRepository = hosting.GetRequiredService<IVehicleEventRepository>();
 
         await vehicleEventRepository.AddEvent(vehicleId1, 1, dateTimeProvider.Now, "a");
         await vehicleEventRepository.AddEvent(vehicleId1, 1, dateTimeProvider.Now.AddMinutes(1), "b");

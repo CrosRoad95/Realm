@@ -1,14 +1,15 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
+public class GroupServiceTests
 {
     [Fact]
     public async Task GroupShouldBePossibleToCreate()
     {
-        var server = await CreateServerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var groupService = server.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<IGroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
 
@@ -22,10 +23,10 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
     //[Fact]
     public async Task YouCanNotCreateTwoGroupsWithTheSameName()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var groupService = server.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<IGroupsService>();
 
         var createGroup = async () => await groupService.CreateGroup("foo", "TG2", GroupKind.Regular);
 
@@ -37,10 +38,10 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
     [Fact]
     public async Task YouCanAddMemberToGroup()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var groupService = server.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<IGroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
         var group = await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
@@ -59,10 +60,10 @@ public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
     //[Fact]
     public async Task YouCanAddMemberToGroupAndThenRemoveIt()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var groupService = server.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<IGroupsService>();
         var group = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
 
         await groupService.TryAddMember(player, group.id, 100, "Leader");

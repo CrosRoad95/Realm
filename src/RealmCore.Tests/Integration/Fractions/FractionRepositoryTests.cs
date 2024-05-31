@@ -1,13 +1,15 @@
 ﻿namespace RealmCore.Tests.Integration.Fractions;
 
 [Collection("IntegrationTests")]
-public class FractionRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
+public class FractionRepositoryTests
 {
     [Fact]
     public async Task FractionRepositoryShouldWork()
     {
-        var server = await CreateServerAsync();
-        var fractionRepository = server.GetRequiredService<IFractionRepository>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        var fractionRepository = hosting.GetRequiredService<IFractionRepository>();
 
         var fraction1 = await fractionRepository.CreateOrGet(1, "foo", "bar");
         var fraction2 = await fractionRepository.CreateOrGet(1, "foo", "bar");

@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
+public class LoginRegisterTests
 {
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
@@ -9,12 +9,12 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
         using var _ = new AssertionScope();
         var name = $"foo{Guid.NewGuid()}";
 
-        var server = await CreateServerAsync();
-        var now = server.DateTimeProvider.Now;
+        using var hosting = new RealmTestingServerHosting();
+
+        var now = hosting.DateTimeProvider.Now;
         {
-            var player = await CreatePlayerAsync(false);
+            var player = await hosting.CreatePlayer(name: name, dontLoadData: false);
             player.Name = name;
-            await server.LoginPlayer(player);
             player.Spawn(new Vector3(1, 2, 3));
 
             player.PlayTime.InternalSetTotalPlayTime(1337);
@@ -27,14 +27,14 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
             player.Statistics.Increase(2, 2);
 
             await player.GetRequiredService<IUsersService>().LogOut(player);
-            player.TriggerDisconnected(QuitReason.Quit);
+            await hosting.DisconnectPlayer(player);
 
             player.Money.Amount.Should().Be(0);
         }
 
-        server.DateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        hosting.DateTimeProvider.AddOffset(TimeSpan.FromDays(1));
 
-        void assert(RealmTestingServer server, RealmPlayer player)
+        void assert(RealmTestingServerHosting server, RealmPlayer player)
         {
             player.Position.Should().Be(new Vector3(1, 2, 3));
             player.PlayTime.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1337));
@@ -50,15 +50,15 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
 
         for (int i = 0; i < 2; i++)
         {
-            var player = await CreatePlayerAsync(false);
+            var player = await hosting.CreatePlayer(name: name, dontLoadData: false);
             player.Name = name;
-            await server.LoginPlayer(player);
             player.TrySpawnAtLastPosition().Should().BeTrue();
 
-            assert(server, player);
+            assert(hosting, player);
 
             await player.GetRequiredService<IUsersService>().LogOut(player);
-            player.TriggerDisconnected(QuitReason.Quit);
+
+            await hosting.DisconnectPlayer(player);
         }
     }
 
@@ -75,7 +75,8 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
             {
                 player.Events.Add(i % 5, $"test{i}");
             }
-            player.TriggerDisconnected(QuitReason.Quit);
+
+            //await hosting.DisconnectPlayer(player);
         }
 
         {
@@ -95,8 +96,9 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
     {
         using var _ = new AssertionScope();
 
-        var server = await CreateServerAsync();
-        var itemsCollection = server.GetRequiredService<ItemsCollection>();
+        using var hosting = new RealmTestingServerHosting();
+
+        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
         itemsCollection.Add(1, new ItemsCollectionItem
         {
             Size = 1,
@@ -111,8 +113,7 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
         });
 
         var playerName = $"FakeInvPlayer{Guid.NewGuid()}";
-        var player1 = server.CreatePlayer(playerName);
-        await server.LoginPlayer(player1);
+        var player1 = await hosting.CreatePlayer(name: playerName);
 
         if (!player1.Inventory.TryGetPrimary(out var inventory1))
         {
@@ -124,17 +125,15 @@ public class LoginRegisterTests : RealmRemoteDatabaseIntegrationTestingBase
         inventory1.AddItem(itemsCollection, 1);
         inventory1.Number.Should().Be(3);
 
-        await DisconnectPlayer(player1);
+        await hosting.DisconnectPlayer(player1);
 
-        var player2 = server.CreatePlayer(playerName);
-        await server.LoginPlayer(player2);
+        var player2 = await hosting.CreatePlayer(name: playerName, dontLoadData: false);
         var inventory2 = player2.Inventory.Primary!;
         inventory2.RemoveItem(1, 1);
         player2.Inventory.Primary!.Number.Should().Be(2);
-        await DisconnectPlayer(player2);
+        await hosting.DisconnectPlayer(player2);
 
-        var player3 = server.CreatePlayer(playerName);
-        await server.LoginPlayer(player3);
+        var player3 = await hosting.CreatePlayer();
         var inventory3 = player2.Inventory.Primary!;
         player2.Inventory.Primary!.Number.Should().Be(2);
     }

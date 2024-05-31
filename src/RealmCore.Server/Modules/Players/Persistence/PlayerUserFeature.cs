@@ -29,7 +29,7 @@ public interface IPlayerUserFeature : IPlayerFeature
     bool HasAuthorizedPolicy(string policy);
     bool HasClaim(string type, string? value = null);
     bool IsInRole(string role);
-    void Login(UserData user, ClaimsPrincipal claimsPrincipal);
+    void Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false);
     void LogOut();
     bool TryRemoveClaim(string type, string? value = null);
     bool TryRemoveRole(string role);
@@ -84,7 +84,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         _userEventRepository = userEventRepository;
     }
 
-    public void Login(UserData user, ClaimsPrincipal claimsPrincipal)
+    public void Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
     {
         if (user == null)
             throw new InvalidOperationException();
@@ -98,7 +98,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                 if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                 {
                     usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
-                    usesPlayerPersistentData.LogIn(user);
+                    if(!dontLoadData)
+                        usesPlayerPersistentData.LogIn(user);
                 }
             }
             LoggedIn?.Invoke(this, Player);

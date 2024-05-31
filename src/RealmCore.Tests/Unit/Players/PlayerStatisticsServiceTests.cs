@@ -1,12 +1,14 @@
-﻿namespace RealmCore.Tests.Unit.Players;
+﻿using System.Formats.Asn1;
 
-public class PlayerStatisticsServiceTests : RealmUnitTestingBase
+namespace RealmCore.Tests.Unit.Players;
+
+public class PlayerStatisticsServiceTests
 {
     [Fact]
-    public void IncreaseStatAndGetStatShouldWork()
+    public async Task IncreaseStatAndGetStatShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         var statistics = player.Statistics;
 
         using var statisticsCounterMonitor = statistics.Monitor();
@@ -24,10 +26,10 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void DecreaseAndSetStatShouldWork()
+    public async Task DecreaseAndSetStatShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         var statistics = player.Statistics;
         statistics.Set(1, 10);
         statistics.Set(2, 10);

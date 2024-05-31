@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Tests.Unit.World;
 
-public class CollisionDetectionTests : RealmUnitTestingBase
+public class CollisionDetectionTests
 {
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public void CollisionSphereDetection(bool usePlayerElementFactory)
+    public async Task CollisionSphereDetection(bool usePlayerElementFactory)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
@@ -17,7 +17,7 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         }
         else
         {
-            elementFactory = server.GetRequiredService<IElementFactory>();
+            elementFactory = hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);
@@ -55,10 +55,10 @@ public class CollisionDetectionTests : RealmUnitTestingBase
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public void MarkerDetection(bool usePlayerElementFactory)
+    public async Task MarkerDetection(bool usePlayerElementFactory)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
@@ -67,7 +67,7 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         }
         else
         {
-            elementFactory = server.GetRequiredService<IElementFactory>();
+            elementFactory = hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);
@@ -106,10 +106,10 @@ public class CollisionDetectionTests : RealmUnitTestingBase
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public void PickupDetection(bool usePlayerElementFactory)
+    public async Task PickupDetection(bool usePlayerElementFactory)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
@@ -118,7 +118,7 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         }
         else
         {
-            elementFactory = server.GetRequiredService<IElementFactory>();
+            elementFactory = hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);

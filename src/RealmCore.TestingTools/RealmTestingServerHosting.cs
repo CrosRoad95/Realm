@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Cryptography;
 
 namespace RealmCore.TestingTools;
 
 public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer : Player
 {
+    private int _playerCounter = 0;
     public RealmTestingServer2(IServiceProvider serviceProvider, Configuration? configuration = null) : base(serviceProvider, configuration)
     {
         this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
@@ -14,7 +16,7 @@ public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
         var player = Instantiate<TPlayer>();
-        player.Name = "foo"; // TODO:
+        player.Name = $"TestPlayer{++_playerCounter}"; // TODO:
         var client = new TestingClient(binaryAddress, netWrapper, player);
         client.FetchSerial();
         player.Client = client;
@@ -25,7 +27,8 @@ public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer
 
 public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer>
 {
-    private TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
+    public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
+    public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
     public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer2<RealmTestingPlayer>(services, new()), hostBuilder =>
     {
@@ -61,6 +64,8 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         hostBuilder.Services.AddSingleton<IDateTimeProvider>(x => x.GetRequiredService<TestDateTimeProvider>());
         hostBuilder.Services.AddSingleton<TestRealmResourceServer>();
         hostBuilder.Services.AddSingleton<IResourceServer>(x => x.GetRequiredService<TestRealmResourceServer>());
+        hostBuilder.Services.AddSingleton<TestDebounceFactory>();
+        hostBuilder.Services.AddSingleton<IDebounceFactory>(x => x.GetRequiredService<TestDebounceFactory>());
     }, serverBuilder =>
     {
         serverBuilder.AddDefaultLuaMappings();
@@ -78,7 +83,9 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         waitHandle.WaitOne(TimeSpan.FromSeconds(30.0));
     }
 
-    public async Task<RealmPlayer> LoginPlayer(RealmPlayer player)
+    public T GetRequiredService<T>() where T: class => Host.Services.GetRequiredService<T>();
+
+    public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
         var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
 
@@ -92,7 +99,7 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         if (user == null)
             throw new InvalidOperationException();
 
-        var success = await player.GetRequiredService<IUsersService>().LogIn(player, user);
+        var success = await player.GetRequiredService<IUsersService>().LogIn(player, user, dontLoadData);
         success.Switch(loggedIn =>
         {
             // Ok
@@ -110,9 +117,11 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
         return player;
     }
 
-    public async Task<RealmTestingPlayer> CreatePlayer(bool notLoggedIn = false)
+    public async Task<RealmTestingPlayer> CreatePlayer(bool notLoggedIn = false, string? name = null, bool dontLoadData = true)
     {
         var player = Server.AddFakePlayer();
+        if (name != null)
+            player.Name = name;
 
         var testRealmResourceServer = Server.GetRequiredService<TestRealmResourceServer>();
 
@@ -123,10 +132,56 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
 
         if (!notLoggedIn)
         {
-            await LoginPlayer(player);
+            await LoginPlayer(player, dontLoadData);
         }
 
         return player;
+    }
+
+    public RealmVehicle CreateVehicle()
+    {
+        return GetRequiredService<IElementFactory>().CreateVehicle(Location.Zero, (VehicleModel)404);
+    }
+
+    public RealmWorldObject CreateObject()
+    {
+        return GetRequiredService<IElementFactory>().CreateObject(Location.Zero, ObjectModel.Bin1);
+    }
+
+    public FocusableRealmWorldObject CreateFocusableObject()
+    {
+        return GetRequiredService<IElementFactory>().CreateFocusableObject(Location.Zero, ObjectModel.Bin1);
+    }
+
+    public async Task<RealmVehicle> CreatePersistentVehicle()
+    {
+        var vehiclesService = GetRequiredService<IVehiclesService>();
+        var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
+        if (vehicle == null)
+            throw new NullReferenceException("Vehicle is null");
+
+        vehicle.Persistence.Id.Should().NotBe(0);
+        return vehicle;
+    }
+
+    public async Task DisconnectPlayer(RealmPlayer player)
+    {
+        var tcs = new TaskCompletionSource();
+        void handlePlayerDisposed(Element element)
+        {
+            tcs.SetResult();
+        }
+
+        player.Disposed += handlePlayerDisposed;
+        player.TriggerDisconnected(QuitReason.Quit);
+
+        await tcs.Task;
+    }
+
+
+    public async Task LogOutPlayer(RealmPlayer player)
+    {
+        await player.GetRequiredService<IUsersService>().LogOut(player);
     }
 }
 

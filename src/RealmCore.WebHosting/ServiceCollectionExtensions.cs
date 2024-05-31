@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<BasicHttpServer>();
         services.TryAddSingleton<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
 
-        services.ConfigureRealmServices(configuration);
+        services.ConfigureRealmServicesCore(configuration);
         //services.AddSingleton<MtaServer>(x => x.GetRequiredService<T>());
         //services.AddSingleton(factory);
         //services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
@@ -43,12 +43,13 @@ public static class ServiceCollectionExtensions
         //services.AddHostedService<ExternalModulesHostedService>();
         return services;
     }
-
+    
     public static IServiceCollection AddRealmServer<TPlayer>(this IServiceCollection services, IConfiguration configuration,  Action<ServerBuilder>? builder = null) where TPlayer : RealmPlayer
     {
         var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
 
         services.AddRealmServerCore(configuration);
+        services.ConfigureRealmServices();
         services.AddMtaServer(realmConfiguration, services => new MtaDiPlayerServer<TPlayer>(services, realmConfiguration), serverBuilder =>
         {
             serverBuilder.UseConfiguration(realmConfiguration);

@@ -1,14 +1,15 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerAFKServiceTests : RealmUnitTestingBase
+public class PlayerAFKServiceTests
 {
     [Fact]
     public async Task ServiceShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         var afkService = player.AFK;
-        var dateTimeProvider = server.DateTimeProvider;
+        var dateTimeProvider = hosting.DateTimeProvider;
 
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;
@@ -21,7 +22,7 @@ public class PlayerAFKServiceTests : RealmUnitTestingBase
 
         afkService.IsAFK.Should().BeFalse();
 
-        var debounce = server.TestDebounceFactory.LastDebounce;
+        var debounce = hosting.TestDebounceFactory.LastDebounce;
         afkService.HandleAFKStarted();
         await debounce.Release();
         _elapsed.Should().Be(TimeSpan.Zero);

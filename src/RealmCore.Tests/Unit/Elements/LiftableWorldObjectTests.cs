@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Tests.Unit.Elements;
 
-public class LiftableWorldObjectTests : RealmUnitTestingBase
+public class LiftableWorldObjectTests
 {
     [Fact]
-    public void YouShouldBeAbleToLiftElementAndDropElement()
+    public async Task YouShouldBeAbleToLiftElementAndDropElement()
     {
-        #region Act
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
+
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -16,42 +16,36 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
         var result1 = interaction.TryLift(player);
         var wasOwner = interaction.Owner;
         var result2 = interaction.TryDrop();
-        #endregion
 
-        #region Assert
         result1.Should().BeTrue();
         result2.Should().BeTrue();
         wasOwner.Should().Be(player);
         monitored.Should().Raise(nameof(LiftableInteraction.Lifted));
         monitored.Should().Raise(nameof(LiftableInteraction.Dropped));
-        #endregion
     }
 
     [Fact]
-    public void ElementCanBeLiftedOnce()
+    public async Task ElementCanBeLiftedOnce()
     {
-        #region Act
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
+
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
         interaction.TryLift(player);
         var result = interaction.TryLift(player);
-        #endregion
 
-        #region Assert
         result.Should().BeFalse();
-        #endregion
     }
 
     [Fact]
-    public void ElementCanBeDroppedOnce()
+    public async Task ElementCanBeDroppedOnce()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -67,11 +61,11 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void ElementShouldBeDroppedUponDispose()
+    public async Task ElementShouldBeDroppedUponDispose()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -92,11 +86,11 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void ElementShouldBeDroppedUponDispose2()
+    public async Task ElementShouldBeDroppedUponDispose2()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -117,12 +111,13 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherElement()
+    public async Task OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherElement()
     {
         #region Arrange
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
 
         var interaction1 = new LiftableInteraction();
         var interaction2 = new LiftableInteraction(player1);

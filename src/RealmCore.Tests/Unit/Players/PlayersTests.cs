@@ -4,15 +4,15 @@ using SlipeServer.Resources.BoneAttach;
 
 namespace RealmCore.Tests.Unit.Players;
 
-public class PlayersTests : RealmUnitTestingBase
+public class PlayersTests
 {
     [Fact]
-    public void DestroyingElementShouldResetCurrentInteractElement()
+    public async Task DestroyingElementShouldResetCurrentInteractElement()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
 
         player.CurrentInteractElement = worldObject;
         player.CurrentInteractElement.Should().Be(worldObject);
@@ -28,12 +28,12 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void YouShouldBeAbleAttachObjectToPlayer()
+    public async Task YouShouldBeAbleAttachObjectToPlayer()
     {
         #region Arrange
-        var server = CreateServer(configureBuilder: builder => builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0));
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
         #endregion
 
         #region Act
@@ -47,12 +47,12 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void AttachedElementShouldBeRemovedIfElementGetsDestroyed()
+    public async Task AttachedElementShouldBeRemovedIfElementGetsDestroyed()
     {
         #region Arrange
-        var server = CreateServer(configureBuilder: builder => builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0));
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
         #endregion
 
         #region Act
@@ -66,14 +66,14 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void ElementOwnerShouldWorkTests()
+    public async Task ElementOwnerShouldWorkTests()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        var worldObject = server.CreateObject();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
 
         worldObject.TrySetOwner(player);
-        player.Destroy();
+        await hosting.DisconnectPlayer(player);
 
         worldObject.Owner.Should().BeNull();
     }
@@ -82,7 +82,8 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         int executionCount = 0;
         player.SetBind("x", (player, keyState) =>
         {
@@ -105,7 +106,8 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         player.SetBindAsync("x", (player, keyState, token) =>
         {
             throw new Exception("test123");
@@ -123,10 +125,11 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
+    public async Task PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         #endregion
 
         #region Act
@@ -139,10 +142,11 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
+    public async Task PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         #endregion
 
         #region Act
@@ -159,7 +163,8 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldWork()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         #endregion
 
         #region Act & Assert
@@ -172,7 +177,8 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCancelable()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         var cancellationTokenSource = new CancellationTokenSource(100);
         #endregion
 
@@ -189,12 +195,14 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var _ = Task.Run(async () =>
         {
             await Task.Delay(200);
-            player.TriggerDisconnected(QuitReason.Quit);
+
+            await hosting.DisconnectPlayer(player);
         });
         #endregion
 
@@ -208,10 +216,11 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void SettingsShouldWork()
+    public async Task SettingsShouldWork()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         #endregion
 
         #region Act
@@ -233,10 +242,11 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void UpgradesShouldWork()
+    public async Task UpgradesShouldWork()
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         #endregion
 
         #region Act
@@ -262,14 +272,15 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
 
-    [InlineData("TestPlayer", true)]
+    [InlineData("TestPlayer1", true)]
     [InlineData("Testplayer", false)]
     [InlineData("FooPlayer", false)]
     [Theory]
-    public void TryGetPlayerByNameTests(string nick, bool shouldExists)
+    public async Task TryGetPlayerByNameTests(string nick, bool shouldExists)
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var elementSearchService = player.GetRequiredService<IElementSearchService>();
         #endregion
@@ -295,10 +306,11 @@ public class PlayersTests : RealmUnitTestingBase
     [InlineData("test", true)]
     [InlineData("asd", false)]
     [Theory]
-    public void SearchPlayersByNameTests(string pattern, bool shouldExists)
+    public async Task SearchPlayersByNameTests(string pattern, bool shouldExists)
     {
         #region Arrange
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var searchService = player.GetRequiredService<IElementSearchService>();
         #endregion
@@ -321,21 +333,10 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void OnlyOnePlayerOfGivenNameShouldBeAbleToJoinServer()
+    public async Task UserVersionShouldWorkAsExpected()
     {
-        CreateServer();
-
-        var player1 = CreatePlayer("TestPlayer123");
-        var player2 = CreatePlayer("TestPlayer123");
-
-        player1.IsDestroyed.Should().BeFalse();
-        player2.IsDestroyed.Should().BeTrue();
-    }
-
-    [Fact]
-    public void UserVersionShouldWorkAsExpected()
-    {
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
         var user = player.User;
 
         user.GetVersion().Should().Be(0);

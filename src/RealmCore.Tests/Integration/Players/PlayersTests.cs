@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class PlayersTests : RealmRemoteDatabaseIntegrationTestingBase
+public class PlayersTests
 {
     [InlineData(new string[] { }, false)]
     [InlineData(new string[] { "Admin" }, true)]
@@ -9,8 +9,8 @@ public class PlayersTests : RealmRemoteDatabaseIntegrationTestingBase
     public async Task UserShouldAuthorize(string[] roles, bool expectedAuthorized)
     {
         #region Arrange
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var usersService = player.GetRequiredService<IUsersService>();
         foreach (var roleName in roles)

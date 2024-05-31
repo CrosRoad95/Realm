@@ -4,19 +4,19 @@ using RealmCore.Server.Modules.Pickups;
 namespace RealmCore.Tests.Integration.Vehicles;
 
 [Collection("IntegrationTests")]
-public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
+public class VehiclesPersistence
 {
     [Fact]
     public async Task Test1()
     {
-        var server = await CreateServerAsync(configureServices: x =>
+        using var hosting = new RealmTestingServerHosting(hostBuilder =>
         {
-            x.AddScoped<IElementFactory, TestElementFactory>();
+            hostBuilder.Services.AddScoped<IElementFactory, TestElementFactory>();
         });
 
-        var factory = server.GetRequiredService<IElementFactory>();
-        var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<IVehicleLoader>();
+        var factory = hosting.GetRequiredService<IElementFactory>();
+        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
+        var loadService = hosting.GetRequiredService<IVehicleLoader>();
 
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         if (vehicle == null)
@@ -35,13 +35,15 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
     [Fact]
     public async Task SpawningTwoPersistentVehiclesShouldNotBeAllowed()
     {
-        var server = await CreateServerAsync();
-        var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<IVehicleLoader>();
-        var activeVehicles = server.GetRequiredService<IVehiclesInUse>();
+        using var hosting = new RealmTestingServerHosting();
+
+        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
+        var loadService = hosting.GetRequiredService<IVehicleLoader>();
+        var activeVehicles = hosting.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         if (vehicle == null)
             throw new NullReferenceException();
+
         var id = vehicle.VehicleId;
         activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
         activeVehicles.IsActive(id).Should().BeTrue();
@@ -57,12 +59,13 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
     [Fact]
     public async Task SpawnedVehicleShouldBeExactlyTheSameAsSavedOne()
     {
-        var server = await CreateServerAsync();
-        server.GetRequiredService<VehicleUpgradesCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
-        var player = server.CreatePlayer("SpawnedVehicleShouldBeExactlyTheSameAsSavedOne");
-        await server.LoginPlayer(player);
-        var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<IVehicleLoader>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        hosting.GetRequiredService<VehicleUpgradesCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
+
+        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
+        var loadService = hosting.GetRequiredService<IVehicleLoader>();
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         if (vehicle1 == null)
             throw new NullReferenceException();

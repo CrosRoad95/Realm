@@ -790,11 +790,14 @@ public class RealmPlayer : Player, IDisposable
         return true;
     }
 
+    public event Action<RealmPlayer>? Disposed;
+
     public void Dispose()
     {
         IsSpawned = false;
         Wasted -= HandleWasted;
         RemoveBlip();
         _serviceScope.Dispose();
+        Disposed?.Invoke(this);
     }
 }

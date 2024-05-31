@@ -1,15 +1,18 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerCommandsTests : RealmUnitTestingBase
+public class PlayerCommandsTests
 {
     [InlineData("foo", "FOO", true)]
     [InlineData("foo", "foo", true)]
     [InlineData("foo", "bar", false)]
     [Theory]
-    public void YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
+    public async Task YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
     {
-        var server = CreateServer();
-        var _sut = server.GetRequiredService<RealmCommandService>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var worldObject = hosting.CreateObject();
+
+        var _sut = hosting.GetRequiredService<RealmCommandService>();
 
         var act = () =>
         {
@@ -31,10 +34,11 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     [InlineData("foo", "foo", true)]
     [InlineData("foo", "bar", false)]
     [Theory]
-    public void YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
+    public async Task YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
     {
-        var server = CreateServer();
-        var _sut = server.GetRequiredService<RealmCommandService>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var _sut = hosting.GetRequiredService<RealmCommandService>();
 
         var act = () =>
         {
@@ -56,10 +60,11 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     [InlineData("foo", "foo", true)]
     [InlineData("foo", "bar", false)]
     [Theory]
-    public void YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
+    public async Task YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
     {
-        var server = CreateServer();
-        var _sut = server.GetRequiredService<RealmCommandService>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var _sut = hosting.GetRequiredService<RealmCommandService>();
 
         var act = () =>
         {
@@ -82,9 +87,9 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     [Theory]
     public async Task AddCommandHandlerShouldWork(bool useAsyncHandler)
     {
-        var server = CreateServer();
-        var sut = server.GetRequiredService<RealmCommandService>();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var sut = hosting.GetRequiredService<RealmCommandService>();
 
         var waitTask = new TaskCompletionSource();
         bool wasExecuted = false;
@@ -110,11 +115,11 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void RateLimitShouldWork()
+    public async Task RateLimitShouldWork()
     {
-        var server = CreateServer();
-        var sut = server.GetRequiredService<RealmCommandService>();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var sut = hosting.GetRequiredService<RealmCommandService>();
 
         int executionCount = 0;
         sut.AddCommandHandler("foo", (e, args) => {
@@ -127,12 +132,12 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void CommandArgumentsShouldWork1()
+    public async Task CommandArgumentsShouldWork1()
     {
-        var server = CreateServer();
-        var sut = server.GetRequiredService<RealmCommandService>();
-        var player1 = CreatePlayer("TestPlayer1");
-        var player2 = CreatePlayer("TestPlayer2");
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+        var sut = hosting.GetRequiredService<RealmCommandService>();
 
         bool commandExecutedSuccessfully = false;
         sut.AddCommandHandler("foo", (e, args) => {
@@ -148,11 +153,11 @@ public class PlayerCommandsTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void CommandArgumentsShouldWork2()
+    public async Task CommandArgumentsShouldWork2()
     {
-        var server = CreateServer();
-        var sut = server.GetRequiredService<RealmCommandService>();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var sut = hosting.GetRequiredService<RealmCommandService>();
 
         bool tooManyArguments = false;
         sut.AddCommandHandler("foo", (e, args) => {

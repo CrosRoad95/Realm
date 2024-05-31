@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Integration.Vehicles;
 
-public class VehiclePartDamageServiceTests : RealmUnitTestingBase
+public class VehiclePartDamageServiceTests
 {
     [Fact]
     public void AddPartShouldThrowOnDuplicatedParts()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         var addPart = () => vehicle.PartDamage.AddPart(1, 100);
 
@@ -24,8 +24,8 @@ public class VehiclePartDamageServiceTests : RealmUnitTestingBase
     [Fact]
     public void AddPartShouldThrowOnNegativeState()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         var addPart = () => vehicle.PartDamage.AddPart(1, -100);
 
@@ -35,8 +35,8 @@ public class VehiclePartDamageServiceTests : RealmUnitTestingBase
     [Fact]
     public void AddingPartWithZeroStateShouldTriggerDestroyedEvent()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         bool destroyed = false;
         void handlePartDestroyed(IVehiclePartDamageFeature arg1, short partId)
@@ -52,8 +52,8 @@ public class VehiclePartDamageServiceTests : RealmUnitTestingBase
     [Fact]
     public void RemovePartShouldRemovePart()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.PartDamage.AddPart(1, 100);
         vehicle.PartDamage.RemovePart(1);
@@ -66,8 +66,8 @@ public class VehiclePartDamageServiceTests : RealmUnitTestingBase
     [Theory]
     public void RemovePartShouldBeRemovedWhenStateFallBelowZero(float difference, bool shouldBeDestroyed)
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         bool destroyed = false;
         void handlePartDestroyed(IVehiclePartDamageFeature arg1, short partId)

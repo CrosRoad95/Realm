@@ -1,14 +1,15 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerPlayTimeFeatureTests : RealmUnitTestingBase
+public class PlayerPlayTimeFeatureTests
 {
     [Fact]
-    public void TestIfCounterWorksCorrectly()
+    public async Task TestIfCounterWorksCorrectly()
     {
-        var server = CreateServer();
-        var player1 = CreatePlayer();
-        var player2 = CreatePlayer();
-        var dateTimeProvider = server.DateTimeProvider;
+        using var hosting = new RealmTestingServerHosting();
+        var player1 = await hosting.CreatePlayer();
+        var player2 = await hosting.CreatePlayer();
+
+        var dateTimeProvider = hosting.DateTimeProvider;
 
         var playTime1 = player1.PlayTime;
         var playTime2 = player2.PlayTime;
@@ -30,17 +31,17 @@ public class PlayerPlayTimeFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void CategoryPlayTimeShouldWork1()
+    public async Task CategoryPlayTimeShouldWork1()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var playTime = player.PlayTime;
 
         playTime.Category = 1;
-        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
         playTime.Category = 2;
-        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
 
         playTime.ToArray().Should().BeEquivalentTo([
             new PlayerPlayTimeDto(1, TimeSpan.FromSeconds(30)),
@@ -49,16 +50,16 @@ public class PlayerPlayTimeFeatureTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void CategoryPlayTimeShouldWork2()
+    public async Task CategoryPlayTimeShouldWork2()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var playTime = player.PlayTime;
 
         playTime.Category = 1;
-        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
-        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
 
         playTime.GetByCategory(1).Should().Be(TimeSpan.FromMinutes(1));
     }

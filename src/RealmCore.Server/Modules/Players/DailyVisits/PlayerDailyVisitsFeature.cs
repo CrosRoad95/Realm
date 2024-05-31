@@ -19,31 +19,28 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
 
     public DateTime LastVisit
     {
-        get => _dailyVisitsData?.LastVisit ?? throw new UserNotSignedInException(); set
+        get => _dailyVisitsData?.LastVisit ?? DateTime.MinValue; set
         {
-            if (_dailyVisitsData == null)
-                throw new UserNotSignedInException();
-            _dailyVisitsData.LastVisit = value;
+            if (_dailyVisitsData != null)
+                _dailyVisitsData.LastVisit = value;
         }
     }
 
     public int VisitsInRow
     {
-        get => _dailyVisitsData?.VisitsInRow ?? throw new UserNotSignedInException(); set
+        get => _dailyVisitsData?.VisitsInRow ?? 0; set
         {
-            if (_dailyVisitsData == null)
-                throw new UserNotSignedInException();
-            _dailyVisitsData.VisitsInRow = value;
+            if (_dailyVisitsData != null)
+                _dailyVisitsData.VisitsInRow = value;
         }
     }
 
     public int VisitsInRowRecord
     {
-        get => _dailyVisitsData?.VisitsInRowRecord ?? throw new UserNotSignedInException(); set
+        get => _dailyVisitsData?.VisitsInRowRecord ?? 0; set
         {
-            if (_dailyVisitsData == null)
-                throw new UserNotSignedInException();
-            _dailyVisitsData.VisitsInRowRecord = value;
+            if (_dailyVisitsData != null)
+                _dailyVisitsData.VisitsInRowRecord = value;
         }
     }
 
@@ -87,6 +84,12 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
     public void Update(DateTime now)
     {
         var nowDate = now.Date;
+
+        if(_dailyVisitsData == null)
+        {
+            LastVisit = nowDate;
+            return;
+        }
 
         if (LastVisit.Date == nowDate)
             return;

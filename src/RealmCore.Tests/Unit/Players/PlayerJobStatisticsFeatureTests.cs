@@ -1,12 +1,13 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerJobStatisticsFeatureTests : RealmUnitTestingBase
+public class PlayerJobStatisticsFeatureTests
 {
     [Fact]
-    public void AddPointsTimePlayedShouldWork()
+    public async Task AddPointsTimePlayedShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var obj = hosting.CreateFocusableObject();
         var statistics = player.JobStatistics;
 
         #region Act

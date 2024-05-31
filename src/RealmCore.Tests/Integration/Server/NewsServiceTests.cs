@@ -1,16 +1,16 @@
 ﻿namespace RealmCore.Tests.Integration.Server;
 
 [Collection("IntegrationTests")]
-public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
+public class NewsServiceTests
 {
     [Fact]
     public async Task AddingAndListingNewsShouldWork()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
-        var now = server.DateTimeProvider.Now;
-        var newsService = server.GetRequiredService<IPlayerNewsService>();
-        var context = server.GetRequiredService<IDb>();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+        var now = hosting.DateTimeProvider.Now;
+        var newsService = hosting.GetRequiredService<IPlayerNewsService>();
+        var context = hosting.GetRequiredService<IDb>();
 
         var tag1 = Guid.NewGuid().ToString();
         var tag2 = Guid.NewGuid().ToString();

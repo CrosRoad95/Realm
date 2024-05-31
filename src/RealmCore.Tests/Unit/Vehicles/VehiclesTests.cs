@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Unit.Vehicles;
 
-public class VehiclesTests : RealmUnitTestingBase
+public class VehiclesTests
 {
     [Fact]
-    public void IsInMovePropertyShouldWork()
+    public async Task IsInMovePropertyShouldWork()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.IsInMove.Should().BeFalse();
         vehicle.Velocity = new Vector3(0.1f, 0.1f, 0.1f);
@@ -16,8 +16,8 @@ public class VehiclesTests : RealmUnitTestingBase
     [Fact]
     public void VehicleContextShouldWork()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         vehicle.GetRequiredService<VehicleContext>().Vehicle.Should().Be(vehicle);
     }
@@ -25,8 +25,8 @@ public class VehiclesTests : RealmUnitTestingBase
     [Fact]
     public void VehicleFuelShouldWork()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 50, 50, 1, 1, true);
         fuelContainer.Update(true);
@@ -42,8 +42,8 @@ public class VehiclesTests : RealmUnitTestingBase
     [Fact]
     public void VehicleFuelShouldNotBeConsumedWhenVehicleMovedOverLargeDistance()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 50, 50, 1, 1, true);
         fuelContainer.Update(true);
@@ -56,8 +56,8 @@ public class VehiclesTests : RealmUnitTestingBase
     [Fact]
     public void VehicleEngineShouldBeTurnedOffWhenFuelRanOut()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
         vehicle.IsEngineOn = true;
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 100, 100, 100, 1, true);
@@ -77,8 +77,8 @@ public class VehiclesTests : RealmUnitTestingBase
     [Fact]
     public void FuelShouldNotBeConsumedWhenFuelContainerIsNotActive()
     {
-        var server = CreateServer();
-        var vehicle = server.CreateVehicle();
+        using var hosting = new RealmTestingServerHosting();
+        var vehicle = hosting.CreateVehicle();
         vehicle.IsEngineOn = true;
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 100, 100, 100, 1, true);

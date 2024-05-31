@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class ToggleControlsScopeTests : RealmUnitTestingBase
+public class ToggleControlsScopeTests
 {
     [Fact]
-    public void ItShouldWork()
+    public async Task ItShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var scope = new ToggleControlsScope(player);
         player.Controls.JumpEnabled = false;
@@ -17,9 +17,10 @@ public class ToggleControlsScopeTests : RealmUnitTestingBase
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public void OnlyOneScopePerPlayerIsAllowed1(bool dispose)
+    public async Task OnlyOneScopePerPlayerIsAllowed1(bool dispose)
     {
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         ToggleControlsScope? createdScope = null;
 

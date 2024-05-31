@@ -85,9 +85,9 @@ internal sealed class FriendRepository : IFriendRepository
             .TagWithSource(nameof(FriendRepository))
             .AsNoTracking()
             .Where(x => x.UserId1 == userId || x.UserId2 == userId)
-            .SelectMany(x => new int[] { x.UserId1, x.UserId2 });
+            .Select(x => new { x.UserId1, x.UserId2 });
 
-        return (await query.ToArrayAsync()).Distinct().Where(x => x != userId).ToArray();
+        return (await query.ToArrayAsync()).SelectMany(x => new int[] { x.UserId1, x.UserId2 }).Distinct().Where(x => x != userId).ToArray();
     }
 
     public async Task<int[]> GetPendingIncomingFriendsRequests(int userId)

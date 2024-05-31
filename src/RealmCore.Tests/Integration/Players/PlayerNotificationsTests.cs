@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class PlayerNotificationsTests : RealmRemoteDatabaseIntegrationTestingBase
+public class PlayerNotificationsTests
 {
     [Fact]
     public async Task ItShouldBePossibleToReadNotification()

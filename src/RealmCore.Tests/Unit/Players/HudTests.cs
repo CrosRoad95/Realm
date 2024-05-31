@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class HudTests : RealmUnitTestingBase
+public class HudTests
 {
     private class SampleLayer : HudLayer
     {
@@ -16,10 +16,10 @@ public class HudTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void RemovingLayerShouldWork()
+    public async Task RemovingLayerShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var layer = new SampleLayer();
 
@@ -33,16 +33,16 @@ public class HudTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void DisconnectingPlayerShouldRemoveAllHudLayers()
+    public async Task DisconnectingPlayerShouldRemoveAllHudLayers()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var layer = new SampleLayer();
 
         using var monitor = player.Hud.Monitor();
         player.Hud.AddLayer(layer);
-        player.TriggerDisconnected(QuitReason.Quit);
+        await hosting.DisconnectPlayer(player);
 
         layer.Disposed.Should().BeTrue();
         player.Hud.Should().HaveCount(0);

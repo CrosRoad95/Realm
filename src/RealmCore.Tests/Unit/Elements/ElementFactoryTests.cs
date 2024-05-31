@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Unit.Elements;
 
-public class ElementFactoryTests : RealmUnitTestingBase
+public class ElementFactoryTests
 {
     [Fact]
-    public void ScopedElementFactoryShouldWork()
+    public async Task ScopedElementFactoryShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         bool wasDestroyed = false;
         void handleDestroyed(Element element)
@@ -19,16 +19,16 @@ public class ElementFactoryTests : RealmUnitTestingBase
         obj.Destroyed += handleDestroyed;
         obj.Id.Value.Should().Be(30001);
 
-        player.TriggerDisconnected(QuitReason.Quit);
+        await hosting.DisconnectPlayer(player);
 
         wasDestroyed.Should().BeTrue();
     }
 
     [Fact]
-    public void InnerScopesForScopedElementFactoryShouldWork()
+    public async Task InnerScopesForScopedElementFactoryShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         bool wasDestroyed = false;
         void handleDestroyed(Element element)
@@ -46,10 +46,10 @@ public class ElementFactoryTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void RootAndInnerScopesForScopedElementFactoryShouldWork()
+    public async Task RootAndInnerScopesForScopedElementFactoryShouldWork()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
@@ -59,16 +59,16 @@ public class ElementFactoryTests : RealmUnitTestingBase
         scope.CreatedElements.Should().BeEquivalentTo([obj2]);
         rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1, obj2]);
 
-        player.TriggerDisconnected(QuitReason.Quit);
+        await hosting.DisconnectPlayer(player);
 
         rootElementFactory.CreatedElements.Should().BeEmpty();
     }
 
     [Fact]
-    public void RootAndInnerScopesForScopedElementFactoryShouldWork2()
+    public async Task RootAndInnerScopesForScopedElementFactoryShouldWork2()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
@@ -81,16 +81,17 @@ public class ElementFactoryTests : RealmUnitTestingBase
         }
         rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1]);
 
-        player.TriggerDisconnected(QuitReason.Quit);
+        await hosting.DisconnectPlayer(player);
 
         rootElementFactory.CreatedElements.Should().BeEmpty();
     }
 
     [Fact]
-    public void ElementsShouldBeCreatedInTheSameDimensionAndInterior()
+    public async Task ElementsShouldBeCreatedInTheSameDimensionAndInterior()
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
         player.Interior = 13;
         player.Dimension = 56;
         var rootElementFactory = player.ElementFactory;

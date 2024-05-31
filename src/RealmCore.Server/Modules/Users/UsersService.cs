@@ -9,9 +9,9 @@ public interface IUsersService
 
     Task<bool> AddToRole(RealmPlayer player, string role);
     ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
-    Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user);
+    Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user, bool dontLoadData = false);
     Task<OneOf<LoggedOut, PlayerNotLoggedIn>> LogOut(RealmPlayer player, CancellationToken cancellationToken = default);
-    Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player);
+    Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player, bool dontLoadData = false);
     Task<OneOf<Registered, FailedToRegister>> Register(string username, string password);
 }
 
@@ -57,7 +57,7 @@ internal sealed class UsersService : IUsersService
         return new FailedToRegister();
     }
 
-    public async Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player)
+    public async Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player, bool dontLoadData = false)
     {
         var serial = player.Client.GetSerial();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
@@ -66,7 +66,7 @@ internal sealed class UsersService : IUsersService
         if (!userData.QuickLogin)
             return new QuickLoginDisabled();
 
-        var result = await LogIn(player, userData);
+        var result = await LogIn(player, userData, dontLoadData);
 
         return result.Match<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>>(loggedIn => loggedIn,
             userDisabled => userDisabled,
@@ -88,7 +88,7 @@ internal sealed class UsersService : IUsersService
         return false;
     }
 
-    public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user)
+    public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user, bool dontLoadData = false)
     {
         using var _ = _logger.BeginElement(player);
 
@@ -119,7 +119,7 @@ internal sealed class UsersService : IUsersService
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-            player.User.Login(user, claimsPrincipal);
+            player.User.Login(user, claimsPrincipal, dontLoadData);
 
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);

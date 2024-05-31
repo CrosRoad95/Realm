@@ -1,15 +1,15 @@
 ﻿namespace RealmCore.Tests.Integration.Elements;
 
 [Collection("IntegrationTests")]
-public class InventoryRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
+public class InventoryRepositoryTests
 {
     [Fact]
     public async Task InventoryRepositoryShouldWork()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var repository = server.GetRequiredService<IInventoryRepository>();
+        var repository = hosting.GetRequiredService<IInventoryRepository>();
         var id = player.User.Id;
 
         var inventoryId = await repository.CreateInventoryForUserId(id, 22);
@@ -24,15 +24,15 @@ public class InventoryRepositoryTests : RealmRemoteDatabaseIntegrationTestingBas
     [Fact]
     public async Task AddingInventoryViaRepositoryShouldWork()
     {
-        var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer(name: Guid.NewGuid().ToString());
 
-        var repository = server.GetRequiredService<IInventoryRepository>();
+        var repository = hosting.GetRequiredService<IInventoryRepository>();
         var id = player.User.Id;
 
-        await server.SignOutPlayer(player);
+        await hosting.LogOutPlayer(player);
         await repository.CreateInventoryForUserId(id, 24);
-        await server.LoginPlayer(player);
+        await hosting.LoginPlayer(player, false);
 
         player.Inventory.Primary!.Size.Should().Be(24);
     }

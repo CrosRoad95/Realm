@@ -1,16 +1,16 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerDailyVisitsServiceTests : RealmUnitTestingBase
+public class PlayerDailyVisitsServiceTests
 {
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public void VisitCounterShouldUpdateAppropriately(bool useNowDateTime)
+    public async Task VisitCounterShouldUpdateAppropriately(bool useNowDateTime)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer(name: Guid.NewGuid().ToString(), dontLoadData: false);
 
-        var testDateTimeProvider = server.DateTimeProvider;
+        var testDateTimeProvider = hosting.DateTimeProvider;
         var dailyVisits = player.DailyVisits;
 
         dailyVisits.LastVisit = useNowDateTime ? DateTime.Now : DateTime.MinValue;

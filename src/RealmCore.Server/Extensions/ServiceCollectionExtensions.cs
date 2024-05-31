@@ -62,7 +62,15 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection ConfigureRealmServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureRealmServices(this IServiceCollection services)
+    {
+        services.AddServerLoader<SeederServerLoader>();
+        services.AddServerLoader<VehicleServerLoader>();
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureRealmServicesCore(this IServiceCollection services, IConfiguration configuration)
     {
         // Options
         services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
@@ -210,8 +218,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
         services.AddServerLoader<MigrateDatabaseServerLoader>();
         services.AddServerLoader<LoadFractionsServerLoader>();
-        services.AddServerLoader<SeederServerLoader>();
-        services.AddServerLoader<VehicleServerLoader>();
 
         services.AddHostedService<BrowserGuiHostedService>();
         services.AddHostedService<AdminResourceHostedService>();

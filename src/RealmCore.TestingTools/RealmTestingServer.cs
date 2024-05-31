@@ -74,7 +74,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         serverBuilder.ConfigureServices(services =>
         {
             services.AddSingleton(httpClient);
-            services.ConfigureRealmServices(testConfigurationProvider ?? new(""));
+            services.ConfigureRealmServicesCore(testConfigurationProvider ?? new(""));
             services.Configure<AssetsOptions>(options =>
             {
                 options.Base64Key = "ehFQcEzbNPfHt+CKpDJ41Q==";

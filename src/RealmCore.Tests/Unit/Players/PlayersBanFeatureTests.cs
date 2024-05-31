@@ -1,16 +1,17 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayersBanFeatureTests : RealmUnitTestingBase
+public class PlayersBanFeatureTests
 {
     [Fact]
-    public void BansShouldWork()
+    public async Task BansShouldWork()
     {
-        var player = CreateServerWithOnePlayer();
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
 
-        var bans = player.Bans;
+        var sut = player.Bans;
 
-        bans.Add(type: 0, reason: "sample reason");
-        var isBanned = bans.IsBanned(0);
+        sut.Add(type: 0, reason: "sample reason");
+        var isBanned = sut.IsBanned(0);
         isBanned.Should().BeTrue();
     }
 }

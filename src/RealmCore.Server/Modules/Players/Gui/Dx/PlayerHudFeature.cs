@@ -143,7 +143,11 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
     {
         lock (_lock)
         {
-            foreach (var layer in _hudLayers)
+            IHudLayer[] view;
+            lock (_lock)
+                view = [.. _hudLayers];
+
+            foreach (var layer in view)
             {
                 RemoveLayer(layer);
             }
