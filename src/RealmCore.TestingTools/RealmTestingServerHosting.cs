@@ -1,6 +1,76 @@
 ﻿namespace RealmCore.TestingTools;
 
-public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer>
+public class TestingServerHosting2<T> : IDisposable where T : Player
+{
+    private readonly IHost host;
+
+    public TestingServer<T> Server { get; }
+    public IHost Host => this.host;
+
+    public TestingServerHosting2(Configuration configuration, Func<IServiceProvider, TestingServer<T>> serverFactory, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null)
+    {
+        var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
+
+        builder.Services.AddMtaServer<TestingServer<T>>(configuration, serverFactory, builder =>
+        {
+            builder.AddDefaultServices();
+            serverBuilder?.Invoke(builder);
+        });
+
+        applicationBuilder?.Invoke(builder);
+        this.host = builder.Build();
+
+        var tcs = new TaskCompletionSource();
+        var lifecycle = Host.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifecycle.ApplicationStarted.Register(() =>
+        {
+           tcs.SetResult();
+        });
+
+        var _ = Task.Run(async () =>
+        {
+            try
+            {
+                await this.host.RunAsync();
+            }
+            catch(Exception ex)
+            {
+                tcs.SetException(ex);
+            }
+        });
+
+        if (!tcs.WaitWithTimeout(TimeSpan.FromSeconds(60)).Result)
+        {
+            throw new XunitException("Testing hosting failed to start.");
+        }
+
+        tcs.Task.Wait();
+
+        this.Server = this.host.Services.GetRequiredService<TestingServer<T>>();
+    }
+
+    public void Dispose()
+    {
+        var waitHandle = new AutoResetEvent(false);
+        this.Server.Stopped += () =>
+        {
+            waitHandle.Set();
+        };
+        this.host.StopAsync().Wait();
+        waitHandle.WaitOne(TimeSpan.FromSeconds(30));
+    }
+}
+
+public class TestingServerHosting2 : TestingServerHosting2<TestingPlayer>
+{
+    public TestingServerHosting2(Configuration configuration, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null) : base(configuration, services => new TestingServer<TestingPlayer>(services, configuration), applicationBuilder, serverBuilder)
+    {
+
+    }
+}
+
+
+public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlayer>
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();

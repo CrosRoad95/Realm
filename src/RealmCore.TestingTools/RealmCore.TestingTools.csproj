@@ -127,5 +127,6 @@
 		<Using Include="RealmCore.WebHosting" />
 		<Using Include="SlipeServer.Server" />
 		<Using Include="SlipeServer.Server.Resources.Serving" />
+		<Using Include="SlipeServer.Hosting" />
 	</ItemGroup>
 </Project>

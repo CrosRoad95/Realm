@@ -80,7 +80,10 @@ public static class ServiceCollectionExtensions
         var connectionString = configuration.GetValue<string>("Database:ConnectionString");
         if (!string.IsNullOrEmpty(connectionString))
         {
-            services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+            services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+            {
+                options.EnableRetryOnFailure(10);
+            }));
             var identityConfiguration = configuration.GetSection("Identity").Get<IdentityConfiguration>();
             if (identityConfiguration == null)
                 throw new Exception("Identity configuration is null");
