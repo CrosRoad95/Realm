@@ -88,3 +88,23 @@ internal class TestResourceProvider : IResourceProvider
         return 420;
     }
 }
+
+public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer : Player
+{
+    protected int _playerCounter = 0;
+    public RealmTestingServer(IServiceProvider serviceProvider, Configuration? configuration = null) : base(serviceProvider, configuration)
+    {
+        this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
+            .Returns(new Tuple<string, string, string>("7815696ECBF1C96E6894B779456D330E", "", ""));
+    }
+
+    protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
+    {
+        var player = Instantiate<TPlayer>();
+        player.Name = $"TestPlayer{++_playerCounter}"; // TODO:
+        var client = new TestingClient(binaryAddress, netWrapper, player);
+        client.FetchSerial();
+        player.Client = client;
+        return client;
+    }
+}

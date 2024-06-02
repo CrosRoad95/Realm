@@ -1,32 +1,11 @@
 ﻿namespace RealmCore.TestingTools;
 
-public class RealmTestingServer2<TPlayer> : TestingServer<TPlayer> where TPlayer : Player
-{
-    private int _playerCounter = 0;
-    public RealmTestingServer2(IServiceProvider serviceProvider, Configuration? configuration = null) : base(serviceProvider, configuration)
-    {
-        this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
-            .Returns(new Tuple<string, string, string>("7815696ECBF1C96E6894B779456D330E", "", ""));
-    }
-
-    protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
-    {
-        var player = Instantiate<TPlayer>();
-        player.Name = $"TestPlayer{++_playerCounter}"; // TODO:
-        var client = new TestingClient(binaryAddress, netWrapper, player);
-        client.FetchSerial();
-        player.Client = client;
-        return client;
-    }
-
-}
-
 public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer>
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
-    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer2<RealmTestingPlayer>(services, new()), hostBuilder =>
+    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<RealmTestingPlayer>(services, new()), hostBuilder =>
     {
         hostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -181,23 +160,4 @@ public class RealmTestingServerHosting : TestingServerHosting<RealmTestingPlayer
     {
         await player.GetRequiredService<IUsersService>().LogOut(player);
     }
-}
-
-public sealed class TestRealmResourceServer : IResourceServer
-{
-    public List<Resource> Resources = [];
-    public void AddAdditionalResource(Resource resource, Dictionary<string, byte[]> files)
-    {
-        RealmResourceServer._resourceCounter++;
-        Resources.Add(resource);
-    }
-
-    public void RemoveAdditionalResource(Resource resource)
-    {
-        RealmResourceServer._resourceCounter--;
-    }
-
-    public void Start() { }
-
-    public void Stop() { }
 }
