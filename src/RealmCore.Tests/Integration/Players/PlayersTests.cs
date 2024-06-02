@@ -35,4 +35,44 @@ public class PlayersTests
             player.User.AuthorizedPolicies.Should().BeEquivalentTo([]);
         #endregion
     }
+
+    [Fact]
+    public async Task PlayerInvokeShouldWork()
+    {
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        int invokedTimes = 0;
+
+        async Task act() => await player.Invoke(() =>
+        {
+            invokedTimes++;
+            return Task.CompletedTask;
+        });
+
+        await act();
+        await act();
+
+        invokedTimes.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task PlayerInvokeShouldWorkWhenExceptionThrown()
+    {
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        int invokedTimes = 0;
+
+        var act = async () => await player.Invoke(() =>
+        {
+            invokedTimes++;
+            throw new Exception();
+        });
+
+        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<Exception>();
+
+        invokedTimes.Should().Be(2);
+    }
 }

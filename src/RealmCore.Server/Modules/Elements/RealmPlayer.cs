@@ -254,16 +254,23 @@ public class RealmPlayer : Player, IDisposable
         if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
             throw new TimeoutException();
 
-        if (User.HasClaim("invokeNoLimit"))
+        try
         {
-            await task();
-            return;
-        }
+            if (User.HasClaim("invokeNoLimit"))
+            {
+                await task();
+                return;
+            }
 
-        await _invokePolicy.ExecuteAsync(async () =>
+            await _invokePolicy.ExecuteAsync(async () =>
+            {
+                await task();
+            });
+        }
+        finally
         {
-            await task();
-        });
+            _semaphoreSlim.Release();
+        }
     }
 
     public virtual async Task<T> Invoke<T>(Func<Task<T>> task, CancellationToken cancellationToken = default)
@@ -271,13 +278,20 @@ public class RealmPlayer : Player, IDisposable
         if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
             throw new TimeoutException();
 
-        if (User.HasClaim("invokeNoLimit"))
-            return await task();
-
-        return await _invokePolicy.ExecuteAsync(async () =>
+        try
         {
-            return await task();
-        });
+            if (User.HasClaim("invokeNoLimit"))
+                return await task();
+
+            return await _invokePolicy.ExecuteAsync(async () =>
+            {
+                return await task();
+            });
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     private void HandleWasted(Ped sender, PedWastedEventArgs e)
