@@ -244,8 +244,8 @@ public class RealmPlayer : Player, IDisposable
         UpdateFight();
         Wasted += HandleWasted;
 
-        var maxCalls = 3;
-        var timeSpan = TimeSpan.FromSeconds(10);
+        var maxCalls = 10;
+        var timeSpan = TimeSpan.FromSeconds(5);
         _invokePolicy = Policy.RateLimitAsync(maxCalls, timeSpan, maxCalls);
     }
 

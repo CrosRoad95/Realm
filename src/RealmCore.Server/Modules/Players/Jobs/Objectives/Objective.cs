@@ -10,7 +10,7 @@ public abstract class Objective : IDisposable
     public bool IsFulfilled => _isFulfilled;
 
     public event Action<Objective, object?>? Completed;
-    public event Action<Objective>? InCompleted;
+    public event Action<Objective>? Incompleted;
     public event Action<Objective>? Disposed;
 
     public RealmPlayer Player { get => _player ?? throw new InvalidOperationException(); internal set => _player = value; }
@@ -49,7 +49,7 @@ public abstract class Objective : IDisposable
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
-        InCompleted?.Invoke(objective);
+        Incompleted?.Invoke(objective);
         _isFulfilled = true;
     }
 

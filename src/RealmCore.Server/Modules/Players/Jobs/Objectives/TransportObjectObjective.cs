@@ -95,6 +95,8 @@ public class TransportObjectObjective : Objective
         }
     }
 
+    public override string ToString() => "Przetransportuj obiekt";
+
     public override void Dispose()
     {
         if (_element != null)

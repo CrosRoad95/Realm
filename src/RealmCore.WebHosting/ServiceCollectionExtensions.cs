@@ -18,7 +18,7 @@ public static class HostApplicationBuilderExtensions
 
             var except = ServerBuilderDefaultPacketHandlers.ExplosionPacketHandler;
             configure.AddDefaultPacketHandlers(except);
-            configure.AddDefaultBehaviours(exceptBehaviours);
+            configure.AddDefaultBehaviours(exceptBehaviours | ServerBuilderDefaultBehaviours.DefaultChatBehaviour);
         });
 
         builder.Services.AddRealmServer<TPlayer>(builder.Configuration, serverBuilder);

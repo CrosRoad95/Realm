@@ -403,30 +403,38 @@ public sealed class RealmCommandService
 
             if (commandInfo is SyncCommandInfo syncCommandInfo)
             {
-                if (player.User.HasClaim("commandsNoLimit"))
-                    syncCommandInfo.Callback(player, commandArguments);
-                else
+                await player.Invoke(() =>
                 {
-                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
-                    commandThrottlingPolicy.Execute(() =>
-                    {
+                    if (player.User.HasClaim("commandsNoLimit"))
                         syncCommandInfo.Callback(player, commandArguments);
-                    });
-                }
+                    else
+                    {
+                        var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
+                        commandThrottlingPolicy.Execute(() =>
+                        {
+                            syncCommandInfo.Callback(player, commandArguments);
+                        });
+                    }
+                    return Task.CompletedTask;
+                });
             }
             else if (commandInfo is AsyncCommandInfo asyncCommandInfo)
             {
                 var token = player.CreateCancellationToken();
-                if (player.User.HasClaim("commandsNoLimit"))
-                    await asyncCommandInfo.Callback(player, commandArguments, token);
-                else
+
+                await player.Invoke(async () =>
                 {
-                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
-                    await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
+                    if (player.User.HasClaim("commandsNoLimit"))
+                        await asyncCommandInfo.Callback(player, commandArguments, token);
+                    else
                     {
-                        await asyncCommandInfo.Callback(player, commandArguments, cancellationToken);
-                    }, token);
-                }
+                        var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
+                        await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
+                        {
+                            await asyncCommandInfo.Callback(player, commandArguments, cancellationToken);
+                        }, token);
+                    }
+                }, token);
             }
             else if (commandInfo is DelegateAsyncCommandInfo delegateAsyncCommandInfo)
             {

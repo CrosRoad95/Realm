@@ -14,7 +14,7 @@ public abstract class JobSession : Session
     public event Action<JobSession>? CompletedAllObjectives;
     public event Action<JobSession, Objective>? ObjectiveAdded;
     public event Action<JobSession, Objective>? ObjectiveCompleted;
-    public event Action<JobSession, Objective>? ObjectiveInCompleted;
+    public event Action<JobSession, Objective>? ObjectiveIncompleted;
 
     public JobSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
     {
@@ -85,7 +85,7 @@ public abstract class JobSession : Session
         }
         ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
-        objective.InCompleted += HandleInCompleted;
+        objective.Incompleted += HandleIncompleted;
         objective.Disposed += HandleDisposed;
         return objective;
     }
@@ -93,7 +93,7 @@ public abstract class JobSession : Session
     private void HandleDisposed(Objective objective)
     {
         objective.Completed -= HandleCompleted;
-        objective.InCompleted -= HandleInCompleted;
+        objective.Incompleted -= HandleIncompleted;
         objective.Disposed -= HandleDisposed;
         RemoveObjective(objective);
     }
@@ -108,9 +108,9 @@ public abstract class JobSession : Session
         _completedObjectives++;
     }
 
-    private void HandleInCompleted(Objective objective)
+    private void HandleIncompleted(Objective objective)
     {
-        ObjectiveInCompleted?.Invoke(this, objective);
+        ObjectiveIncompleted?.Invoke(this, objective);
         objective.Dispose();
     }
 }

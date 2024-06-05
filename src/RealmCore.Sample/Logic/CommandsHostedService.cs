@@ -1955,9 +1955,11 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.AddCommandHandler("activefuelcontainer", (player, args) =>
         {
-            var active = player.Vehicle?.Fuel.Active?.FuelType;
+            var fuelContainer = player.Vehicle?.Fuel.Active;
+            var active = fuelContainer.FuelType;
             _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.VehicleId}");
             _chatBox.OutputTo(player, $"Active container: {active}");
+            _chatBox.OutputTo(player, $"Fuel: {fuelContainer.Amount}/{fuelContainer.MaxCapacity}");
         });
 
         _commandService.AddAsyncCommandHandler("discordtest", async (player, args, token) =>

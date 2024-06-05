@@ -18,7 +18,7 @@ public class OneOfObjective : Objective
         foreach (var item in _objectives)
         {
             item.Completed += HandleCompleted;
-            item.InCompleted += HandleInCompleted;
+            item.Incompleted += HandleIncompleted;
             item.Player = Player;
             item.LoadInternal(Player);
         }
@@ -42,7 +42,7 @@ public class OneOfObjective : Objective
         Completed -= handleCompleted;
     }
 
-    private void HandleInCompleted(Objective objective)
+    private void HandleIncompleted(Objective objective)
     {
         lock (_lock)
         {
@@ -75,11 +75,13 @@ public class OneOfObjective : Objective
             if (except != item || true)
             {
                 item.Completed -= HandleCompleted;
-                item.InCompleted -= HandleInCompleted;
+                item.Incompleted -= HandleIncompleted;
                 item.Dispose();
             }
         }
     }
+
+    public override string ToString() => $"Wykonaj jeden z celów: {string.Join(", ", _objectives.Select(x => x.ToString()))}";
 
     public override void Dispose()
     {

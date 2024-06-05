@@ -25,6 +25,8 @@ public class MarkerEnterObjective : Objective
             Complete(this);
     }
 
+    public override string ToString() => "Wejdź w marker";
+
     public override void Dispose()
     {
         if (_marker != null)
