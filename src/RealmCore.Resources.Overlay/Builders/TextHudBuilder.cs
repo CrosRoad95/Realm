@@ -148,7 +148,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
                 size = _size,
                 color = _color,
                 scale = _scale ?? new Size(1,1),
-                font = (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
+                font = (_font != null) ? _assetsService.Map(_font) : _stringFont,
                 alignX = _alignX,
                 alignY = _alignY
             };
@@ -164,7 +164,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
             size = _size,
             color = _color,
             scale = _scale ?? new Size(1, 1),
-            font = (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
+            font = (_font != null) ? _assetsService.Map(_font) : _stringFont,
             alignX = _alignX,
             alignY = _alignY
         };

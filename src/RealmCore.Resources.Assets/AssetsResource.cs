@@ -48,7 +48,7 @@ end
             }
             else
             {
-            using var content = File.OpenRead(path);
+                using var content = File.OpenRead(path);
                 var md5 = Utilities.CreateMD5(content);
                 var pathMd5 = Utilities.CreateMD5(path);
                 var contentByte = Utilities.ReadFully(content);

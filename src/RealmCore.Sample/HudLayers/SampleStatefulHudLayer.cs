@@ -34,8 +34,8 @@ public class SampleStatefulHudLayer : HudLayer<SampleHudState>
     protected override void Build(IHudBuilder<SampleHudState> builder, IHudBuilderContext context)
     {
         builder.AddRectangle(new Vector2(context.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
-        builder.AddText(x => x.Text1, new Vector2(context.Right - 200, 600), new Size(200, 20), font: "default", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(4, 4));
-        builder.AddText("default value", new Vector2(context.Right - 400, 600), new Size(200, 20), font: "sans", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(-4, -4));
+        builder.AddText(x => x.Text1, new Vector2(context.Right - 200, 600), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(4, 4));
+        builder.AddText("default value", new Vector2(context.Right - 400, 600), new Size(200, 20), font: BuildInFonts.Sans, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(-4, -4));
     }
 
     public void Update()

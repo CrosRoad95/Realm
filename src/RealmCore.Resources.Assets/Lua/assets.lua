@@ -22,8 +22,11 @@ end
 function loadAsset(name, assetInfo)
 	local assetType = assetInfo[1]
 	checkIfAssetExists(assetInfo[2])
-	if(assetType == "Font")then
-		loadedAssets[name] = dxCreateFont(assetInfo[2], 12)
+	if(assetType == "MtaFont")then
+		iprint ("MTA FONT", assetInfo)
+		loadedAssets[name] = dassetInfo[3];
+	elseif(assetType == "FileSystemFont")then
+		loadedAssets[name] = dxCreateFont(assetInfo[3], 12)
 		outputDebugString("Loaded font: "..tostring(name))
 	end
 

@@ -23,11 +23,6 @@ internal sealed class HudBuilder<TState> : IHudBuilder<TState>
         _assetsService = assetsService;
     }
 
-    public ITextAndHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
-    {
-        return AddText(b => b.WithText(text).WithPosition(position).WithSize(size).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
-    }
-
     private void AddLuaValue(LuaValue luaValue, AddElementLocation addElementLocation = AddElementLocation.Default)
     {
         switch (addElementLocation)
@@ -74,14 +69,14 @@ internal sealed class HudBuilder<TState> : IHudBuilder<TState>
         return new TextAndHudBuilder<TState>(this, textConstructionInfo);
     }
 
-    public ITextAndHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
+    public ITextAndHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
-        return AddText(b => b.WithText(exp).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
+        return AddText(b => b.WithText(exp).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font ?? BuildInFonts.Default).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
     }
 
-    public ITextAndHudBuilder<TState> AddVehicleSpeed(Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
+    public ITextAndHudBuilder<TState> AddVehicleSpeed(Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
-        return AddText(b => b.WithComputedValue(ComputedValueType.VehicleSpeed).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
+        return AddText(b => b.WithComputedValue(ComputedValueType.VehicleSpeed).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font ?? BuildInFonts.Default).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
     }
 
     public ITextAndHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)

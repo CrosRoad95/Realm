@@ -194,9 +194,9 @@ internal class SampleHud3d2 : Hud3d<SampleState>
     public SampleHud3d2() : base((builder, context) =>
         {
             builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
+            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: BuildInFonts.Default);
             builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
+            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: BuildInFonts.Default);
             builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
         }, new Vector3(4, 2, 0), new SampleState
         {
@@ -212,7 +212,7 @@ internal class SampleStateLessHud3d : Hud3d
 {
     public SampleStateLessHud3d() : base((builder, context) =>
         {
-            builder.AddText("test", new Vector2(10, 10), new Size(10, 10), font: "sans");
+            builder.AddText("test", new Vector2(10, 10), new Size(10, 10), font: BuildInFonts.Sans);
         }, new Vector3(4, 2, 0))
     {
     }

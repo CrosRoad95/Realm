@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Resources.Assets.Classes;
 
-internal class Font : IFont
+internal class FileSystemFont : IFont
 {
     public string Name { get; }
     public string FontPath { get; }
 
-    public Font(string name, string path)
+    public FileSystemFont(string name, string path)
     {
         Name = name;
         FontPath = path;

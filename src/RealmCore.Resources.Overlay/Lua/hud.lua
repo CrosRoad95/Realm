@@ -70,14 +70,16 @@ local function renderHud(position, elements)
 	end
 end
 
-local function prepareAsset(asset)
-	local assetType = asset[1];
-	if(assetType == "Font")then
-		if(not assets[asset[2]])then
-			return requestAsset(asset[2])
+local function prepareAsset(assetInfo)
+	local assetType = assetInfo[1];
+	if(assetType == "FileSystemFont")then
+		if(not assets[assetInfo[2]])then
+			return requestAsset(assetInfo[2])
 		end
+	elseif(assetType == "MtaFont")then
+		return assetInfo[2]
 	end
-	return asset;
+	return assetInfo;
 end
 
 local function prepareElements(elements)

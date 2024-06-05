@@ -70,7 +70,7 @@ public class AssetsCollection : IServerAssetsProvider
     public void AddFont(string name, string path)
     {
         lock (_lock)
-            _assets.Add(name, new Font(name, path));
+            _assets.Add(name, new FileSystemFont(name, path));
     }
 
     public void ReplaceModel(ObjectModel objectModel, IModel model)
@@ -91,7 +91,7 @@ public class AssetsCollection : IServerAssetsProvider
                         yield return model.ColPath;
                         yield return model.DffPath;
                         break;
-                    case IFont font:
+                    case IAssetFont font:
                         yield return font.FontPath;
                         break;
                     default:
