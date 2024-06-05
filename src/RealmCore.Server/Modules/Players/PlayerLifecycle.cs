@@ -27,7 +27,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 
     private void HandleSignedIn(IPlayerUserFeature user, RealmPlayer player)
     {
-        PlayerSignedIn(user, (TPlayer)player);
+        PlayerLoggedIn(user, (TPlayer)player);
     }
 
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
@@ -40,7 +40,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 
     protected virtual void PlayerJoined(TPlayer player) { }
     protected virtual void PlayerLeft(TPlayer player) { }
-    protected virtual void PlayerSignedIn(IPlayerUserFeature user, TPlayer player) { }
+    protected virtual void PlayerLoggedIn(IPlayerUserFeature user, TPlayer player) { }
     protected virtual void PlayerSpawned(TPlayer player) { }
 }
 

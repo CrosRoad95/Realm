@@ -1,16 +1,22 @@
 ﻿namespace RealmCore.Tests.Integration.Elements;
 
-public class InventoryRepositoryTests
+public class InventoryRepositoryTests : IClassFixture<RealmTestingServerHostingFixture>
 {
+    private readonly RealmTestingServerHostingFixture _fixture;
+
+    public InventoryRepositoryTests(RealmTestingServerHostingFixture realmTestingServerHostingFixture)
+    {
+        _fixture = realmTestingServerHostingFixture;
+    }
+
     [Fact]
     public async Task InventoryRepositoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var player = await _fixture.Hosting.CreatePlayer();
 
-        var repository = hosting.GetRequiredService<IInventoryRepository>();
+        var repository = _fixture.Hosting.GetRequiredService<IInventoryRepository>();
         var id = player.User.Id;
-
+         
         var inventoryId = await repository.CreateInventoryForUserId(id, 22);
         var inventory = await repository.GetInventoryById(inventoryId);
 
@@ -23,15 +29,14 @@ public class InventoryRepositoryTests
     [Fact]
     public async Task AddingInventoryViaRepositoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer(name: Guid.NewGuid().ToString());
+        var player = await _fixture.Hosting.CreatePlayer(name: Guid.NewGuid().ToString());
 
-        var repository = hosting.GetRequiredService<IInventoryRepository>();
+        var repository = _fixture.Hosting.GetRequiredService<IInventoryRepository>();
         var id = player.User.Id;
 
-        await hosting.LogOutPlayer(player);
+        await _fixture.Hosting.LogOutPlayer(player);
         await repository.CreateInventoryForUserId(id, 24);
-        await hosting.LoginPlayer(player, false);
+        await _fixture.Hosting.LoginPlayer(player, false);
 
         player.Inventory.Primary!.Size.Should().Be(24);
     }

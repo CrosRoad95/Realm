@@ -11,7 +11,7 @@ internal sealed class FriendsHostedService : PlayerLifecycle, IHostedService
         _logger = logger;
     }
 
-    protected override async void PlayerSignedIn(IPlayerUserFeature user, RealmPlayer player)
+    protected override async void PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
     {
         try
         {

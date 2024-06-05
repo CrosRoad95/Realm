@@ -103,7 +103,6 @@ internal sealed class UsersService : IUsersService
 
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
-        var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
 
         // TODO: Fix it
         //user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
@@ -122,7 +121,6 @@ internal sealed class UsersService : IUsersService
             player.User.Login(user, claimsPrincipal, dontLoadData);
 
             await AuthorizePolicies(player);
-            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             UpdateLastData(player);
 
             await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name);

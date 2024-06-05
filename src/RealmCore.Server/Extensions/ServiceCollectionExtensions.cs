@@ -247,6 +247,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<PlayerJoinedPipelineHostedService>();
         services.AddHostedService<ServerLifecycle>();
         services.AddHostedService<FriendsHostedService>();
+        services.AddHostedService<UserLoggedInHostedService>();
         services.AddHostedService<DefaultStartAllMtaServersHostedService>();
         return services;
     }

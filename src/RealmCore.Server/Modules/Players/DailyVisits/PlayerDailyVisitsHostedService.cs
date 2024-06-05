@@ -19,7 +19,7 @@ internal sealed class PlayerDailyVisitsHostedService : PlayerLifecycle, IHostedS
         return Task.CompletedTask;
     }
 
-    protected override void PlayerSignedIn(IPlayerUserFeature userService, RealmPlayer player)
+    protected override void PlayerLoggedIn(IPlayerUserFeature userService, RealmPlayer player)
     {
         player.DailyVisits.Update(_dateTimeProvider.Now);
     }
