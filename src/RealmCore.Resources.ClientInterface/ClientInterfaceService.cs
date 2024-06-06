@@ -2,9 +2,11 @@
 
 namespace RealmCore.Resources.ClientInterface;
 
+public record struct ClientDebugMessage(string Message, int Level, string File, int Line);
+
 public interface IClientInterfaceService
 {
-    event Action<Player, string, int, string, int>? ClientErrorMessage;
+    event Action<Player, ClientDebugMessage[]>? OnClientDebugMessages;
     event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     event Action<Player, int, int>? ClientScreenSizeChanged;
     event Action<Player, Element?, string?>? FocusedElementChanged;
@@ -23,18 +25,18 @@ public interface IClientInterfaceService
     void SetFocusableRenderingEnabled(Player player, bool enabled);
     void SetWorldDebuggingEnabled(Player player, bool active);
 
-    internal void BroadcastClientErrorMessage(Player player, string message, int level, string file, int line);
-    internal void BroadcastPlayerLocalizationCode(Player player, string code);
-    internal void BroadcastPlayerScreenSize(Player player, int x, int y);
-    internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement);
-    void BroadcastClickedElementChanged(Player player, Element? clickedElement);
+    internal void RelayClienDebugMessages(Player player, ClientDebugMessage[] debugMessages);
+    internal void RelayPlayerLocalizationCode(Player player, string code);
+    internal void RelayPlayerScreenSize(Player player, int x, int y);
+    internal void RelayPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement);
+    void RelayClickedElementChanged(Player player, Element? clickedElement);
     void AddFocusableFor(Element element, Player player);
     void RemoveFocusableFor(Element element, Player player);
 }
 
 internal sealed class ClientInterfaceService : IClientInterfaceService
 {
-    public event Action<Player, string, int, string, int>? ClientErrorMessage;
+    public event Action<Player, ClientDebugMessage[]>? OnClientDebugMessages;
     public event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     public event Action<Player, int, int>? ClientScreenSizeChanged;
     public event Action<Player, Element?, string?>? FocusedElementChanged;
@@ -50,27 +52,27 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
 
     }
 
-    public void BroadcastClientErrorMessage(Player player, string message, int level, string file, int line)
+    public void RelayClienDebugMessages(Player player, ClientDebugMessage[] debugMessages)
     {
-        ClientErrorMessage?.Invoke(player, message, level, file, line);
+        OnClientDebugMessages?.Invoke(player, debugMessages);
     }
 
-    public void BroadcastPlayerLocalizationCode(Player player, string code)
+    public void RelayPlayerLocalizationCode(Player player, string code)
     {
         ClientCultureInfoChanged?.Invoke(player, CultureInfo.GetCultureInfo(code));
     }
 
-    public void BroadcastPlayerScreenSize(Player player, int x, int y)
+    public void RelayPlayerScreenSize(Player player, int x, int y)
     {
         ClientScreenSizeChanged?.Invoke(player, x, y);
     }
 
-    public void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
+    public void RelayPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
     {
         FocusedElementChanged?.Invoke(player, newFocusedElement, childElement);
     }
     
-    public void BroadcastClickedElementChanged(Player player, Element? clickedElement)
+    public void RelayClickedElementChanged(Player player, Element? clickedElement)
     {
         ClickedElementChanged?.Invoke(player, clickedElement);
     }

@@ -20,7 +20,7 @@ internal class ClientInterfaceLogic
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<ClientInterfaceResource>();
-        luaEventService.AddEventHandler("internalDebugMessage", HandleInternalDebugMessage);
+        luaEventService.AddEventHandler("sendDebugMessagesBuffer", HandleDebugMessagesBuffer);
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
         luaEventService.AddEventHandler("sendScreenSize", HandleScreenSize);
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
@@ -102,7 +102,7 @@ internal class ClientInterfaceLogic
 
         if (code != null)
         {
-            _clientInterfaceService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
+            _clientInterfaceService.RelayPlayerLocalizationCode(luaEvent.Player, code);
         }
         else
         {
@@ -115,7 +115,7 @@ internal class ClientInterfaceLogic
         var (id, x, y) = luaEvent.Read<string, int, int>(_fromLuaValueMapper);
         if (x != 0 && y != 0)
         {
-            _clientInterfaceService.BroadcastPlayerScreenSize(luaEvent.Player, x, y);
+            _clientInterfaceService.RelayPlayerScreenSize(luaEvent.Player, x, y);
         }
         else
         {
@@ -123,17 +123,33 @@ internal class ClientInterfaceLogic
         }
     }
 
-    private void HandleInternalDebugMessage(LuaEvent luaEvent)
+    private void HandleDebugMessagesBuffer(LuaEvent luaEvent)
     {
-        var (id, message, level, file, line) = luaEvent.Read<string, string, int, string, int>(_fromLuaValueMapper);
-        _clientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);
+        if (luaEvent.Parameters.Length != 2)
+            return;
+
+        var debugMessages = luaEvent.Parameters[1].TableValue;
+        if (debugMessages == null || debugMessages.Count == 0)
+            return;
+
+        var clientDebugMessages = new ClientDebugMessage[int.Min(128, debugMessages.Count)];
+        for (int i = 0; i < clientDebugMessages.Length; i++)
+        {
+            var dm = debugMessages[i + 1].TableValue;
+            if (dm == null)
+                return;
+
+            clientDebugMessages[i] = new ClientDebugMessage(dm[1].StringValue!, dm[2].IntegerValue.Value, dm[3].StringValue!, dm[4].IntegerValue.Value);
+        }
+
+        _clientInterfaceService.RelayClienDebugMessages(luaEvent.Player, clientDebugMessages);
     }
 
     private void HandleFocusedElementChanged(LuaEvent luaEvent)
     {
         var (id, focusedElement, childElement) = luaEvent.Read<string, Element, string>(_fromLuaValueMapper);
 
-        _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement, childElement);
+        _clientInterfaceService.RelayPlayerElementFocusChanged(luaEvent.Player, focusedElement, childElement);
     }
 
     private void HandleClickedElementChanged(LuaEvent luaEvent)
@@ -143,6 +159,6 @@ internal class ClientInterfaceLogic
         {
             ;
         }
-        _clientInterfaceService.BroadcastClickedElementChanged(luaEvent.Player, clickedElement);
+        _clientInterfaceService.RelayClickedElementChanged(luaEvent.Player, clickedElement);
     }
 }

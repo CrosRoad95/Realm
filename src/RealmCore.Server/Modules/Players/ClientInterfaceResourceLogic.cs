@@ -2,27 +2,23 @@
 
 internal sealed class ClientInterfaceResourceLogic : IHostedService
 {
-    private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IElementFactory _elementFactory;
 
-    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IElementFactory elementFactory)
+    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, IElementFactory elementFactory)
     {
         _clientInterfaceService = clientInterfaceService;
         _elementFactory = elementFactory;
-        _logger = logger;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
         _elementFactory.ElementCreated += HandleElementCreated;
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _clientInterfaceService.ClientErrorMessage -= HandleClientErrorMessage;
         _elementFactory.ElementCreated -= HandleElementCreated;
         return Task.CompletedTask;
     }
@@ -40,32 +36,5 @@ internal sealed class ClientInterfaceResourceLogic : IHostedService
     {
         _clientInterfaceService.RemoveFocusable(element);
         element.Destroyed -= HandleElementDestroyed;
-    }
-
-    private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
-    {
-        var playerName = player.Name;
-        switch (level)
-        {
-            case 0: // Custom
-            case 3: // Information
-                if (line > 0)
-                    _logger.LogTrace("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
-                else
-                    _logger.LogTrace("Clientside: {player} ({level}): {message}", playerName, level, message);
-                break;
-            case 2: // Warning
-                if (line > 0)
-                    _logger.LogWarning("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
-                else
-                    _logger.LogWarning("Clientside: {player} ({level}): {message}", playerName, level, message);
-                break;
-            default: // Error or something else
-                if (line > 0)
-                    _logger.LogError("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
-                else
-                    _logger.LogError("Clientside: {player} ({level}): {message}", playerName, level, message);
-                break;
-        }
     }
 }

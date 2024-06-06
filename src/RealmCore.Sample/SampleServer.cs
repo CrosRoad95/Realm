@@ -59,6 +59,7 @@ public static class SampleServerExtensions
         services.AddHostedService<DefaultChatHostedService>();
         services.AddHostedService<TestHostedService>();
         services.AddHostedService<AntiCheatHostedService>();
+        services.AddHostedService<LogClientDebugMessagesHostedService>();
         return services;
     }
 }
