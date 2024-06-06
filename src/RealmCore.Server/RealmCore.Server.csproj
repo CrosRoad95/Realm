@@ -224,6 +224,7 @@
 		<Using Include="RealmCore.Server.PacketHandling" />
 		<Using Include="RealmCore.Server.Modules.Friends" />
 		<Using Include="RealmCore.Server.Modules.Players.Settings" />
+		<Using Include="System.ComponentModel.DataAnnotations" />
 	</ItemGroup>
 
 </Project>

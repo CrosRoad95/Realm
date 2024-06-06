@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace RealmCore.Server.Modules.Commands;
+﻿namespace RealmCore.Server.Modules.Commands;
 
 [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
 public class CallingPlayerAttribute : Attribute { }
@@ -15,213 +13,8 @@ public class PlayerSearchOptionsAttribute : Attribute
     }
 }
 
-public sealed class RealmCommandService
-{
-    public abstract class CommandInfo
-    {
-        public string CommandName { get; init; }
-        public string[]? RequiredPolicies { get; init; }
-        public string? Description { get; init; }
-        public string? Usage { get; init; }
-        public string? Category { get; init; }
-        public abstract bool IsAsync { get; }
-
-        public CommandInfo(string commandName)
-        {
-            CommandName = commandName;
-        }
-    }
-
-    internal sealed class SyncCommandInfo : CommandInfo
-    {
-        public override bool IsAsync => false;
-
-        internal Action<RealmPlayer, CommandArguments> Callback { get; }
-
-        public SyncCommandInfo(string commandName, Action<RealmPlayer, CommandArguments> callback) : base(commandName)
-        {
-            Callback = callback;
-        }
-    }
-
-    internal sealed class AsyncCommandInfo : CommandInfo
-    {
-        public override bool IsAsync => true;
-        internal Func<RealmPlayer, CommandArguments, CancellationToken, Task> Callback { get; }
-
-        public AsyncCommandInfo(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback) : base(commandName)
-        {
-            Callback = callback;
-        }
-    }
-    
-    internal sealed class DelegateAsyncCommandInfo : CommandInfo
-    {
-        public override bool IsAsync => true;
-        private readonly Delegate _callback;
-        private readonly ParameterInfo[] _parameters;
-
-        public DelegateAsyncCommandInfo(string commandName, Delegate callback) : base(commandName)
-        {
-            var method = callback.GetMethodInfo();
-            _parameters = method.GetParameters();
-            var parameterExpressions = new ParameterExpression[_parameters.Length];
-            int i = 0;
-            foreach (var item in method.GetParameters())
-            {
-                parameterExpressions[i++] = Expression.Parameter(item.ParameterType, item.Name);
-            }
-            var body = Expression.Call(Expression.Constant(callback.Target), method, parameterExpressions);
-            var func = Expression.Lambda(body, parameterExpressions);
-            _callback = func.Compile();
-        }
-
-        public async Task Invoke(RealmPlayer player, CommandArguments arguments, CancellationToken cancellationToken)
-        {
-            int i = 0;
-            var args = new object[_parameters.Length];
-            foreach (var parameterInfo in _parameters)
-            {
-                if(parameterInfo.ParameterType.IsSubclassOf(typeof(Player)))
-                {
-                    Player? plr = null;
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if (attribute is CallingPlayerAttribute)
-                        {
-                            plr = player;
-                            break;
-                        }
-                    }
-
-                    if(plr == null)
-                    {
-                        var playerSearchOption = PlayerSearchOption.All;
-                        var playerSearchOptionsAttribute = parameterInfo.GetCustomAttribute<PlayerSearchOptionsAttribute>();
-                        if(playerSearchOptionsAttribute != null)
-                        {
-                            playerSearchOption = playerSearchOptionsAttribute.PlayerSearchOption;
-                        }
-                        plr = arguments.ReadPlayer(new(playerSearchOption));
-                    }
-                    args[i++] = plr;
-                }
-                else if(parameterInfo.ParameterType == typeof(CancellationToken))
-                {
-                    args[i++] = cancellationToken;
-                }
-                else if(parameterInfo.ParameterType == typeof(string))
-                {
-                    var value = arguments.ReadArgument();
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(short))
-                {
-                    var value = arguments.ReadShort();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(ushort))
-                {
-                    var value = arguments.ReadUShort();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(byte))
-                {
-                    var value = arguments.ReadByte();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(uint))
-                {
-                    var value = arguments.ReadUInt();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(decimal))
-                {
-                    var value = arguments.ReadDecimal();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(float))
-                {
-                    var value = arguments.ReadFloat();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-                else if(parameterInfo.ParameterType == typeof(int))
-                {
-                    var value = arguments.ReadInt();
-                    foreach (var attribute in parameterInfo.GetCustomAttributes())
-                    {
-                        if(attribute is RangeAttribute range)
-                        {
-                            var valid = range.IsValid(value);
-                            if(!valid)
-                                throw new CommandArgumentException(arguments.CurrentArgument, $"liczba powinna być w zakresie od {range.Minimum} do {range.Maximum}", value.ToString());
-                        }
-                    }
-                    args[i++] = value;
-                }
-            }
-            var result = _callback.DynamicInvoke(args);
-            if(result is Task task)
-            {
-                await task;
-            }
-        }
-    }
-
+public sealed class RealmCommandService : PlayerLifecycle
+{   
     private readonly ChatBox _chatBox;
     private readonly ILogger<RealmCommandService> _logger;
 
@@ -231,11 +24,10 @@ public sealed class RealmCommandService
     public string[] CommandNames => [.. _commands.Keys.Concat(_commands.Keys)];
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands) : base(playersEventManager)
     {
         _logger = logger;
         _chatBox = chatBox;
-        playersEventManager.Joined += HandlePlayerJoined;
 
         foreach (var inGameCommand in inGameCommands)
         {
@@ -268,9 +60,13 @@ public sealed class RealmCommandService
         }
     }
 
-    private void HandlePlayerJoined(Player player)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        player.Destroyed += HandleDestroyed;
+        player.CommandEntered += HandleCommandEntered;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
         player.CommandEntered += HandleCommandEntered;
     }
 
@@ -283,15 +79,6 @@ public sealed class RealmCommandService
         catch (Exception ex)
         {
             _logger.LogCritical(ex, "Unexpected exception was thrown while executing async command {command} with arguments {commandArguments}", eventArgs.Command, eventArgs.Arguments);
-        }
-    }
-
-    private void HandleDestroyed(Element element)
-    {
-        if (element is RealmPlayer player)
-        {
-            player.Destroyed -= HandleDestroyed;
-            player.CommandEntered += HandleCommandEntered;
         }
     }
 
@@ -308,58 +95,73 @@ public sealed class RealmCommandService
         }
     }
 
-    public void AddAsyncCommandHandler(string commandName, Delegate callback, string[]? requiredPolicies = null, string? description = null, string? category = null)
+    private void AddCommandCore(CommandInfo commandInfo)
     {
-        CheckIfCommandExists(commandName);
+        CheckIfCommandExists(commandInfo.CommandName);
 
-        _commands.Add(commandName, new DelegateAsyncCommandInfo(commandName, callback)
+        _commands.Add(commandInfo.CommandName, commandInfo);
+
+        if (commandInfo.IsAsync)
         {
-            RequiredPolicies = requiredPolicies,
-            Description = description,
-            Category = category
-        });
-
-        if (requiredPolicies != null)
-            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+            if (commandInfo.RequiredPolicies != null)
+                _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandInfo.CommandName, commandInfo.RequiredPolicies);
+            else
+                _logger.LogInformation("Created async command {commandName}", commandInfo.CommandName);
+        }
         else
-            _logger.LogInformation("Created async command {commandName}", commandName);
-
+        {
+            if (commandInfo.RequiredPolicies != null)
+                _logger.LogInformation("Created sync command {commandName} with required policies: {requiredPolicies}", commandInfo.CommandName, commandInfo.RequiredPolicies);
+            else
+                _logger.LogInformation("Created sync command {commandName}", commandInfo.CommandName);
+        }
     }
 
+    public void AddCommandHandler(string commandName, Delegate callback, string[]? requiredPolicies = null, string? description = null, string? category = null)
+    {
+        var isAsync = callback.Method.ReturnType == typeof(Task);
+        if (isAsync)
+        {
+            AddCommandCore(new DelegateAsyncCommandInfo(commandName, callback)
+            {
+                RequiredPolicies = requiredPolicies,
+                Description = description,
+                Category = category
+            });
+        }
+        else
+        {
+            AddCommandCore(new DelegateSyncCommandInfo(commandName, callback)
+            {
+                RequiredPolicies = requiredPolicies,
+                Description = description,
+                Category = category
+            });
+        }
+    }
+
+    [Obsolete("Use variant with delegate")]
     public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
-        CheckIfCommandExists(commandName);
-
-        _commands.Add(commandName, new AsyncCommandInfo(commandName, callback)
+        AddCommandCore(new AsyncCommandInfo(commandName, callback)
         {
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,
             Category = category
         });
-
-        if (requiredPolicies != null)
-            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
-        else
-            _logger.LogInformation("Created async command {commandName}", commandName);
     }
 
+    [Obsolete("Use variant with delegate")]
     public void AddCommandHandler(string commandName, Action<RealmPlayer, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
-        CheckIfCommandExists(commandName);
-
-        _commands.Add(commandName, new SyncCommandInfo(commandName, callback)
+        AddCommandCore(new SyncCommandInfo(commandName, callback)
         {
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,
             Category = category
         });
-
-        if (requiredPolicies != null)
-            _logger.LogInformation("Created sync command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
-        else
-            _logger.LogInformation("Created sync command {commandName}", commandName);
     }
 
     internal async Task InternalHandleAsyncTriggered(RealmPlayer player, string command, string[] arguments)
@@ -448,6 +250,20 @@ public sealed class RealmCommandService
                     {
                         await delegateAsyncCommandInfo.Invoke(player, commandArguments, cancellationToken);
                     }, token);
+                }
+            }
+            else if (commandInfo is DelegateSyncCommandInfo delegateSyncCommandInfo)
+            {
+                var token = player.CreateCancellationToken();
+                if (player.User.HasClaim("commandsNoLimit"))
+                    delegateSyncCommandInfo.Invoke(player, commandArguments, token);
+                else
+                {
+                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
+                    commandThrottlingPolicy.Execute(() =>
+                    {
+                        delegateSyncCommandInfo.Invoke(player, commandArguments, token);
+                    });
                 }
             }
         }

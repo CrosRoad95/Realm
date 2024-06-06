@@ -125,6 +125,15 @@ public class CommandArguments
         throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
     
+    public bool TryReadInt(out int outValue)
+    {
+        if (TryReadArgument(out var argument) && int.TryParse(argument, out outValue))
+            return true;
+
+        outValue = 0;
+        return false;
+    }
+    
     public float ReadFloat()
     {
         var value = ReadArgument();
