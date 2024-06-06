@@ -35,6 +35,10 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
                             item.Active = false;
                     }
                     _active = value;
+                    if(value != null)
+                    {
+                        value.Active = true;
+                    }
                     ActiveChanged?.Invoke(this, _active);
                 }
             }
