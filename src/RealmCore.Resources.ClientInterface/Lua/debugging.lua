@@ -18,10 +18,3 @@ addEventHandler("onClientDebugMessage", root, function(message, level, file, lin
 	end
 	debugMessagesBuffer[#debugMessagesBuffer + 1] = {message, level, file, line};
 end)
-
-
-addCommandHandler("asd", function()
-	for i = 1, 100 do
-		setElementPosition(false, false, false, false);
-	end
-end)

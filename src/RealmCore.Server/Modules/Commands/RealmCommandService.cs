@@ -78,7 +78,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Unexpected exception was thrown while executing async command {command} with arguments {commandArguments}", eventArgs.Command, eventArgs.Arguments);
+            _logger.LogError(ex, "Unexpected exception was thrown while executing async command {command} with arguments {commandArguments}", eventArgs.Command, eventArgs.Arguments);
         }
     }
 

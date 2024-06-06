@@ -225,6 +225,7 @@
 		<Using Include="RealmCore.Server.Modules.Friends" />
 		<Using Include="RealmCore.Server.Modules.Players.Settings" />
 		<Using Include="System.ComponentModel.DataAnnotations" />
+		<Using Include="System.Collections.Immutable" />
 	</ItemGroup>
 
 </Project>

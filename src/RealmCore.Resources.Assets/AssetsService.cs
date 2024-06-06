@@ -1,7 +1,6 @@
 ﻿using RealmCore.Resources.Assets.Classes;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace RealmCore.Resources.Assets;
 

@@ -155,10 +155,7 @@ internal class ClientInterfaceLogic
     private void HandleClickedElementChanged(LuaEvent luaEvent)
     {
         var (id, clickedElement) = luaEvent.Read<string, Element>(_fromLuaValueMapper);
-        if(clickedElement != null)
-        {
-            ;
-        }
+
         _clientInterfaceService.RelayClickedElementChanged(luaEvent.Player, clickedElement);
     }
 }
