@@ -5,7 +5,7 @@ public class HudTests
     private class SampleLayer : HudLayer
     {
         public bool Disposed { get; set; } = false;
-        protected override void Build(IHudBuilder<object> hudBuilderCallback, IHudBuilderContext hudBuilderContext)
+        protected override void Build(IHudBuilder hudBuilderCallback, IHudBuilderContext hudBuilderContext)
         {
         }
 

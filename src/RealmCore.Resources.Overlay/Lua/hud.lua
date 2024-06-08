@@ -55,13 +55,16 @@ local function renderHud(position, elements)
 	local x,y = unpack(position)
 	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
-			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
-		elseif(v[1] == "computedValue")then
-			if(v[3] == "VehicleSpeed")then
-				local vehicle = getPedOccupiedVehicle(localPlayer)
-				if(vehicle and getVehicleController(vehicle) == localPlayer)then
-					local speed = getElementSpeed(vehicle, "km/s")
-					dxDrawText(string.format("%ikm/h", speed), v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+			local content = v[3];
+			if(content[1] == "constant")then
+				dxDrawText(content[2], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+			elseif(content[1] == "computed")then
+				if(content[2] == "vehicleSpeed")then
+					local vehicle = getPedOccupiedVehicle(localPlayer)
+					if(vehicle and getVehicleController(vehicle) == localPlayer)then
+						local speed = getElementSpeed(vehicle, "km/s")
+						dxDrawText(string.format("%ikm/h", speed), v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+					end
 				end
 			end
 		elseif(v[1] == "rectangle")then
@@ -151,7 +154,7 @@ local function setHudStateCore(elements, newState)
 	for i,v in ipairs(elements)do
 		if(newState[v[2]])then
 			if(v[1] == "text")then
-				v[3] = newState[v[2]]
+				v[3][2] = newState[v[2]]
 			end
 		end
 	end

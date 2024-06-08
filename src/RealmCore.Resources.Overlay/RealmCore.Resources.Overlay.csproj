@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -29,9 +29,6 @@
 	<ItemGroup>
 		<Using Include="RealmCore.Resources.Assets.Interfaces" />
 		<Using Include="RealmCore.Resources.Base.Extensions" />
-		<Using Include="RealmCore.Resources.Overlay.Builders" />
-		<Using Include="RealmCore.Resources.Overlay.Builders.Interfaces" />
-		<Using Include="RealmCore.Resources.Overlay.ConstructionInfos" />
 		<Using Include="RealmCore.Resources.Overlay.Enums" />
 		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
 		<Using Include="SlipeServer.Packets.Definitions.Lua" />
@@ -45,6 +42,8 @@
 		<Using Include="RealmCore.Resources.Assets" />
 		<Using Include="SlipeServer.Server.ServerBuilders" />
 		<Using Include="RealmCore.Resources.Base" />
+		<Using Include="RealmCore.Resources.Overlay.Extensions" />
+		<Using Include="System.Reflection" />
 	</ItemGroup>
 
 </Project>

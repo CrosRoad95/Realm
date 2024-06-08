@@ -70,7 +70,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         return null;
     }
 
-    protected abstract void Build(IHudBuilder<TState> hudBuilderCallback, IHudBuilderContext hudBuilderContext);
+    protected abstract void Build(IHudBuilder hudBuilderCallback, IHudBuilderContext hudBuilderContext);
 
     protected virtual void HudCreated() { }
 
@@ -100,6 +100,10 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         HudCreated();
     }
 
+    protected virtual ITextHudElementContent CreateStatePropertyTextHudElement<TProperty>(Expression<Func<TState, TProperty>> expression)
+    {
+        return StatePropertyTextHudElementContent.Create(expression);
+    }
     public virtual void Dispose() { }
 }
 

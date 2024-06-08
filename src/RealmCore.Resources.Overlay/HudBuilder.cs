@@ -1,23 +1,158 @@
-﻿namespace RealmCore.Resources.Overlay;
+﻿using System.Reflection;
+using Color = System.Drawing.Color;
 
-internal enum AddElementLocation
+namespace RealmCore.Resources.Overlay;
+
+public enum AddElementLocation
 {
     Default,
     AtTheBeginning,
     BeforeLastElement
 }
 
-internal sealed class HudBuilder<TState> : IHudBuilder<TState>
+public interface IHudElement
+{
+    internal IHudElementContent? Content { get; }
+    internal LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService);
+}
+
+public struct RectangleHudElement : IHudElement
+{
+    private readonly Vector2 _position;
+    private readonly Size _size;
+    private readonly Color _color;
+
+    public IHudElementContent? Content { get; } = null;
+
+    public RectangleHudElement(Vector2 position, Size size, Color color)
+    {
+        _position = position;
+        _size = size;
+        _color = color;
+    }
+
+    public LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService)
+    {
+        return new LuaValue(new LuaValue[] { "rectangle", id, _position.X, _position.Y, _size.Width, _size.Height, _color.ToLuaColor() });
+    }
+}
+
+public interface IHudElementContent;
+
+public interface ITextHudElementContent : IHudElementContent
+{
+    internal LuaValue CreateLuaValue(object state);
+}
+
+public interface IComputedTextHudElementContent : ITextHudElementContent
+{
+    internal Delegate Factory { get; }
+}
+
+public struct ConstantTextHudElementContent : ITextHudElementContent
+{
+    public string Content { get; }
+
+    public ConstantTextHudElementContent(string content)
+    {
+        Content = content;
+    }
+
+    public LuaValue CreateLuaValue(object state) => new LuaValue(["constant", Content]);
+}
+
+public struct CurrentVehicleSpeedTextHudElementContent : ITextHudElementContent
+{
+    public LuaValue CreateLuaValue(object state) => new LuaValue(["computed", "vehicleSpeed"]);
+}
+
+internal class PropertyExpressionVisitor : ExpressionVisitor
+{
+    public List<PropertyInfo> Properties { get; private set; } = [];
+
+    protected override Expression VisitMember(MemberExpression node)
+    {
+        if (node.Member is PropertyInfo propertyInfo)
+        {
+            Properties.Add(propertyInfo);
+        }
+        return base.VisitMember(node);
+    }
+}
+
+public struct StatePropertyTextHudElementContent : IComputedTextHudElementContent
+{
+    public Delegate Factory { get; }
+
+    public StatePropertyTextHudElementContent(Expression expression)
+    {
+        if (expression is LambdaExpression lambdaExpression)
+        {
+            Factory = lambdaExpression.Compile();
+        }
+        else
+        {
+            throw new InvalidOperationException();
+        }
+    }
+
+    public static StatePropertyTextHudElementContent Create<TState, TProperty>(Expression<Func<TState, TProperty>> expression)
+    {
+        return new StatePropertyTextHudElementContent(expression);
+    }
+
+    public LuaValue CreateLuaValue(object state){
+
+        return new LuaValue(["constant", Factory.DynamicInvoke(state)?.ToString() ?? ""]);
+    }
+}
+
+public struct TextHudElement : IHudElement
+{
+    private readonly ITextHudElementContent _content;
+    private readonly Vector2 _position;
+    private readonly Size _size;
+    private readonly Color _color;
+    private readonly Size _scale;
+    private readonly IFont _font;
+    private readonly HorizontalAlign _alignX;
+    private readonly VerticalAlign _alignY;
+    public IHudElementContent? Content => _content;
+
+    public TextHudElement(ITextHudElementContent text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
+    {
+        _content = text;
+        _position = position;
+        _size = size;
+        _color = color ?? Color.White;
+        _scale = scale ?? new Size(1,1);
+        _font = font ?? BuildInFonts.Default;
+        _alignX = alignX;
+        _alignY = alignY;
+    }
+
+    public TextHudElement(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top) : this(new ConstantTextHudElementContent(text), position, size, color, scale, font, alignX, alignY) { }
+
+    public LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService)
+    {
+        var font = assetsService.Map(_font);
+        LuaValue content = _content.CreateLuaValue(state);
+        return new LuaValue(
+        new LuaValue[] { "text", id, content, _position.X, _position.Y, _size.Width, _size.Height, _color.ToLuaColor(), _scale.Width, _scale.Height, font, _alignX.AsString(), _alignY.AsString() });
+    }
+}
+
+internal sealed class HudBuilder : IHudBuilder
 {
     private readonly List<LuaValue> _luaValues = [];
-    private readonly TState _state;
+    private readonly object _state;
     private readonly IAssetsService _assetsService;
     private int _id = 0;
 
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
     public Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
-    public HudBuilder(TState defaultState, IAssetsService assetsService)
+    public HudBuilder(object defaultState, IAssetsService assetsService)
     {
         _state = defaultState;
         _assetsService = assetsService;
@@ -40,57 +175,24 @@ internal sealed class HudBuilder<TState> : IHudBuilder<TState>
                 break;
         }
     }
-    
-    internal void AddLuaValue(TextConstructionInfo textConstructionInfo, AddElementLocation addElementLocation = AddElementLocation.Default)
-    {
-        var luaValue = textConstructionInfo.AsLuaValue();
-        AddLuaValue(luaValue, addElementLocation);
-    }
 
     public int AllocateId() => Interlocked.Increment(ref _id);
 
-    public ITextAndHudBuilder<TState> AddText(Action<ITextHudBuilder<TState>> textBuilderCallback)
+    public IHudBuilder Add(IHudElement hudElement, AddElementLocation addElementLocation = AddElementLocation.Default)
     {
-        var builder = new TextHudBuilder<TState>(AllocateId(), _state, _assetsService)
-        {
-            DynamicHudElementAdded = DynamicHudElementAdded
-        };
+        var id = AllocateId();
+        var luaValue = hudElement.CreateLuaValue(_state, id, _assetsService);
+        AddLuaValue(luaValue, addElementLocation);
 
-        try
+        if (hudElement.Content is IComputedTextHudElementContent content)
         {
-            textBuilderCallback(builder);
+            DynamicHudElementAdded?.Invoke(new DynamicHudElement
+            {
+                Id = id,
+                Factory = content.Factory
+            });
         }
-        finally
-        {
-            builder.DynamicHudElementAdded = null;
-        }
-        var textConstructionInfo = builder.Build();
-        AddLuaValue(textConstructionInfo);
-        return new TextAndHudBuilder<TState>(this, textConstructionInfo);
-    }
 
-    public ITextAndHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
-    {
-        return AddText(b => b.WithText(exp).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font ?? BuildInFonts.Default).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
-    }
-
-    public ITextAndHudBuilder<TState> AddVehicleSpeed(Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
-    {
-        return AddText(b => b.WithComputedValue(ComputedValueType.VehicleSpeed).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font ?? BuildInFonts.Default).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
-    }
-
-    public ITextAndHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
-    {
-        if (font == null)
-            throw new ArgumentNullException(nameof(font));
-
-        return AddText(b => b.WithText(text).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
-    }
-
-    public IHudBuilder<TState> AddRectangle(Vector2 position, Size size, Color color)
-    {
-        double luaColor = color.ToLuaColor();
-        AddLuaValue(new LuaValue(new LuaValue[] { "rectangle", AllocateId(), position.X, position.Y, size.Width, size.Height, luaColor }));
         return this;
     }
 }

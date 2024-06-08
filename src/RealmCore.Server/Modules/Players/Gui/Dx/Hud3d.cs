@@ -28,7 +28,7 @@ public abstract class Hud3dBase : IDisposable
 
 public class Hud3d<TState> : Hud3dBase where TState : class
 {
-    private readonly Action<IHudBuilder<TState>, IHudBuilderContext> _hudBuilderCallback;
+    private readonly Action<IHudBuilder, IHudBuilderContext> _hudBuilderCallback;
     private readonly List<DynamicHudElement> _dynamicHudElements = [];
     private readonly TState? _state;
 
@@ -36,14 +36,14 @@ public class Hud3d<TState> : Hud3dBase where TState : class
 
     public Vector3 Position { get; }
 
-    public Hud3d(Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, Vector3 position, TState? defaultState = null) : base()
+    public Hud3d(Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector3 position, TState? defaultState = null) : base()
     {
         _hudBuilderCallback = hudBuilderCallback;
         Position = position;
         _state = defaultState;
     }
 
-    public void UpdateState(Action<TState> callback)
+    public void UpdateState(Action<object> callback)
     {
         if (_state == null || _dynamicHudElements == null || _dynamicHudElements.Count == 0)
             throw new HudException("Hud3d has no state");
@@ -52,7 +52,7 @@ public class Hud3d<TState> : Hud3dBase where TState : class
         Dictionary<int, object?> stateChange = [];
         foreach (var item in _dynamicHudElements)
         {
-            var objectValue = item.PropertyInfo.GetValue(_state);
+            var objectValue = item.Factory.DynamicInvoke(_state);
             stateChange.Add(item.Id, objectValue);
         }
 
@@ -84,7 +84,7 @@ public class Hud3d<TState> : Hud3dBase where TState : class
 
 public class Hud3d : Hud3d<object>
 {
-    public Hud3d(Action<IHudBuilder<object>, IHudBuilderContext> hudBuilderCallback, Vector3 position) : base(hudBuilderCallback, position)
+    public Hud3d(Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector3 position) : base(hudBuilderCallback, position)
     {
     }
 }
