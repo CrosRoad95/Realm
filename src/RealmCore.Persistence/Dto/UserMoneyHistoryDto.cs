@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace RealmCore.Persistence.DTOs;
+namespace RealmCore.Persistence.Dto;
 
 public sealed class UserMoneyHistoryDto
 {

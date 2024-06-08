@@ -1,6 +1,5 @@
 ﻿using RealmCore.Logging;
 using Serilog.Events;
-using Serilog;
 using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
 using RealmCore.Sample.Data;

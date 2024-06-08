@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace RealmCore.Resources.Overlay;
+﻿namespace RealmCore.Resources.Overlay;
 
 public class DynamicHudElement
 {

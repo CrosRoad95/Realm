@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace RealmCore.Resources.Overlay;
 

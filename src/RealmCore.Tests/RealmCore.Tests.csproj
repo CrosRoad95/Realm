@@ -113,7 +113,7 @@
 		<Using Include="RealmCore.Resources.Admin.Enums" />
 		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
 		<Using Include="RealmCore.Server.Modules.Integrations" />
-		<Using Include="RealmCore.Persistence.DTOs" />
+		<Using Include="RealmCore.Persistence.Dto" />
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />

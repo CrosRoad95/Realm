@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Core;
+﻿namespace RealmCore.Server.Modules.Domain;
 
 public class AtomicBool
 {

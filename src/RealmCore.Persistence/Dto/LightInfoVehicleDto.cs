@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistence.Dto;
 
 public sealed class LightInfoVehicleDto
 {

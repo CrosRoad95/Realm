@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using RealmCore.Console.Extra.Integrations.Discord.Handlers;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Grpc;
 using RealmCore.Module.Grpc.Options;
+using RealmCore.Sample.Extra.Integrations.Discord.Handlers;
 
-namespace RealmCore.Console.Extra;
+namespace RealmCore.Sample.Extra;
 
 public static class ServerBuilderExtensions
 {

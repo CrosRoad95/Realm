@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Extra;
+﻿namespace RealmCore.Sample.Extra;
 
 internal class ExtraCommandsLogic
 {
