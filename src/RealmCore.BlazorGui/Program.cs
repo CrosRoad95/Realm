@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
+
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +13,7 @@ configuration.AddUserSecrets(Assembly.GetEntryAssembly()!);
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+builder.Services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
 
 builder.AddRealmServer<RealmPlayer>();
 

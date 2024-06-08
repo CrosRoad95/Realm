@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -11,7 +11,6 @@
   <ItemGroup>
     <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
-    <ProjectReference Include="..\RealmCore.Sample\RealmCore.Sample.csproj" />
     <ProjectReference Include="..\RealmCore.WebHosting\RealmCore.WebHosting.csproj" />
   </ItemGroup>
 
@@ -48,11 +47,62 @@
 	  <Using Include="RealmCore.Discord.Integration.Extensions" />
 	  <Using Include="RealmCore.Module.Discord" />
 	  <Using Include="RealmCore.Module.Discord.Services" />
-	  <Using Include="RealmCore.Sample" />
 	  <Using Include="RealmCore.Server.Modules.Elements" />
 	  <Using Include="RealmCore.WebHosting" />
 	  <Using Include="SlipeServer.Hosting" />
 	  <Using Include="SlipeServer.Server.ServerBuilders" />
 	  <Using Include="System.Reflection" />
+	  <Using Include="SlipeServer.Server.Services" />
+	  <Using Include="RealmCore.Server.Modules.Commands" />
+	  <Using Include="RealmCore.Server.Modules.Players.Gui.Browser" />
+	  <Using Include="Microsoft.AspNetCore.Identity" />
+	  <Using Include="RealmCore.Persistence.Data" />
+	  <Using Include="RealmCore.Server.Modules.Players" />
+	  <Using Include="RealmCore.Server.Modules.Users" />
+	  <Using Include="RealmCore.Server.Modules.Domain" />
+	  <Using Include="RealmCore.Server.Modules.Players.Jobs" />
+	  <Using Include="RealmCore.Server.Modules.Players.Jobs.Objectives" />
+	  <Using Include="System.Drawing" />
+	  <Using Include="RealmCore.Server.Modules.Server" />
+	  <Using Include="RealmCore.Server.Modules.Elements.Interactions" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	  <Using Include="SlipeServer.Server.Enums" />
+	  <Using Include="FluentValidation" />
+	  <Using Include="SlipeServer.Server.ElementCollections" />
+	  <Using Include="RealmCore.Module.Discord.Interfaces" />
+	  <Using Include="RealmCore.Server.Modules.Inventories" />
+	  <Using Include="RealmCore.Server.Modules.World" />
+	  <Using Include="System.Numerics" />
+	  <Using Include="SlipeServer.Server" />
+	  <Using Include="RealmCore.Resources.Overlay" />
+	  <Using Include="RealmCore.Server.Modules.Vehicles.Tuning" />
+	  <Using Include="SlipeServer.Resources.Text3d" />
+	  <Using Include="SlipeServer.Resources.Scoreboard" />
+	  <Using Include="RealmCore.Resources.Nametags" />
+	  <Using Include="SlipeServer.Packets.Lua.Camera" />
+	  <Using Include="RealmCore.Server.Extensions" />
+	  <Using Include="RealmCore.Resources.Admin.Enums" />
+	  <Using Include="RealmCore.BlazorGui.Concepts.Gui.Blazor" />
+	  <Using Include="RealmCore.BlazorGui.Elements" />
+	  <Using Include="RealmCore.Server.Modules.Vehicles" />
+	  <Using Include="SlipeServer.Server.Elements.Enums" />
+	  <Using Include="RealmCore.Resources.ClientInterface" />
+	  <Using Include="Polly.RateLimit" />
+	  <Using Include="RealmCore.BlazorGui.HudLayers" />
+	  <Using Include="RealmCore.Resources.Assets" />
+	  <Using Include="RealmCore.Resources.ElementOutline" />
+	  <Using Include="RealmCore.Resources.MapNames" />
+	  <Using Include="RealmCore.Server.Modules.Elements.Focusable" />
+	  <Using Include="RealmCore.Server.Modules.World.Spawning" />
+	  <Using Include="SlipeServer.Packets.Enums" />
+	  <Using Include="RealmCore.Server.Modules.Players.Gui.Dx" />
+	  <Using Include="RealmCore.Resources.Overlay.Interfaces" />
+	  <Using Include="RealmCore.Resources.Overlay.Enums" />
+	  <Using Include="RealmCore.Server.Modules.Security" />
+	  <Using Include="SlipeServer.Server.Events" />
+	  <Using Include="SlipeServer.Packets.Definitions.Lua" />
+	  <Using Include="RealmCore.Server.Modules.Players.Achievements" />
+	  <Using Include="Microsoft.Extensions.Options" />
+	  <Using Include="RealmCore.Server.Modules.Players.Gui" />
 	</ItemGroup>
 </Project>

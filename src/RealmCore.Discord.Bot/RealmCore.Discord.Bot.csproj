@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
-    <ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +32,6 @@
     <Using Include="Microsoft.Extensions.Hosting" />
     <Using Include="RealmCore.Discord.Integration.Channels" />
     <Using Include="RealmCore.Discord.Integration.Extensions" />
-    <Using Include="RealmCore.Logging" />
     <Using Include="Serilog" />
     <Using Include="Serilog.Events" />
     <Using Include="System.Reflection" />

@@ -1,5 +1,0 @@
-<map>
-    <object id="id1" model="1337" interior="0" dimension="0" name="name1" posX="333.14453" posY="-96.899414" posZ="2" rotX="0" rotY="0" rotZ="0" />
-    <object id="id2" model="1337" interior="0" dimension="0" name="name2" posX="333.14453" posY="-96.899414" posZ="4" rotX="0" rotY="0" rotZ="0" />
-    <object id="id3" model="1337" interior="0" dimension="0" name="name3" posX="333.14453" posY="-96.899414" posZ="6" rotX="0" rotY="0" rotZ="0" />
-</map>

@@ -14,9 +14,7 @@
     })
     .ConfigureServices((hostingContext, services) =>
     {
-        var realmLogger = new RealmLogger("SampleDiscordBot", LogEventLevel.Verbose);
-
-        services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
+        services.AddLogging(x => x.AddSerilog(dispose: true));
 
         services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
         {

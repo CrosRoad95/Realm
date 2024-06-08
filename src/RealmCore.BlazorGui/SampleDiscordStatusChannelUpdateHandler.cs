@@ -1,6 +1,4 @@
-﻿using RealmCore.Module.Discord.Interfaces;
-
-public class SampleDiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
+﻿public class SampleDiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
 {
     public SampleDiscordStatusChannelUpdateHandler()
     {
