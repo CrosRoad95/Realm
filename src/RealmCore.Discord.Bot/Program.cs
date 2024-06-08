@@ -14,7 +14,7 @@
     })
     .ConfigureServices((hostingContext, services) =>
     {
-        services.AddLogging(x => x.AddSerilog(dispose: true));
+        services.AddLogging();
 
         services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
         {
