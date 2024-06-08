@@ -6,18 +6,16 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly ILogger<PlayersHostedService> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly IUsersInUse _activeUsers;
-    private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IHostEnvironment hostEnvironment) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
         _activeUsers = activeUsers;
-        _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
         _hostEnvironment = hostEnvironment;
     }
@@ -134,7 +132,6 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             await StartAllResourcesForPlayer(player, cancellationToken);
         }
 
-        if (_guiBrowserOptions.Value.BrowserSupport)
         {
             using var activity = Activity.StartActivity("WaitForBrowser");
             await WaitForBrowser(player, TimeSpan.FromSeconds(60), cancellationToken);

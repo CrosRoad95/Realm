@@ -74,7 +74,6 @@ public static class ServiceCollectionExtensions
         services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
         services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
         services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
-        services.Configure<GuiBrowserOptions>(configuration.GetSection("GuiBrowser"));
         services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
 
         var connectionString = configuration.GetValue<string>("Database:ConnectionString");

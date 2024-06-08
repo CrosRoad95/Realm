@@ -1,4 +1,8 @@
-﻿namespace RealmCore.TestingTools;
+﻿using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+
+namespace RealmCore.TestingTools;
 
 public class TestingServerHosting2<T> : IDisposable where T : Player
 {
@@ -69,7 +73,6 @@ public class TestingServerHosting2 : TestingServerHosting2<TestingPlayer>
     }
 }
 
-
 public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlayer>
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
@@ -105,6 +108,16 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
 
         hostBuilder.Services.AddRealmServerCore(hostBuilder.Configuration);
         outerApplicationBuilder?.Invoke(hostBuilder);
+
+
+        var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Warning);
+        var logger = new LoggerConfiguration()
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Components", LogEventLevel.Warning)
+            .MinimumLevel.ControlledBy(levelSwitch);
+
+        hostBuilder.Services.AddLogging(x => x.AddSerilog(logger.CreateLogger(), dispose: true));
 
         hostBuilder.Services.AddSingleton<TestDateTimeProvider>();
         hostBuilder.Services.AddSingleton<IDateTimeProvider>(x => x.GetRequiredService<TestDateTimeProvider>());

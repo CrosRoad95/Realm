@@ -17,12 +17,10 @@ internal class BrowserGuiService : IBrowserGuiService
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
     private readonly byte[] _bytes = new byte[64];
-    private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
 
-    public BrowserGuiService(IOptions<GuiBrowserOptions> guiBrowserOptions)
+    public BrowserGuiService()
     {
         _randomNumberGenerator = RandomNumberGenerator.Create();
-        _guiBrowserOptions = guiBrowserOptions;
     }
 
     public string GenerateKey()
@@ -45,9 +43,6 @@ internal class BrowserGuiService : IBrowserGuiService
 
     public bool AuthorizePlayer(string key, RealmPlayer player)
     {
-        if (!_guiBrowserOptions.Value.BrowserSupport)
-            throw new BrowserNotEnabledException();
-
         lock (_lock)
         {
             if (_players.Contains(player) || _playerByKey.ContainsKey(key))

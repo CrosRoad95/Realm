@@ -3,15 +3,13 @@
 internal sealed class BrowserGuiHostedService : PlayerLifecycle, IHostedService
 {
     private readonly ILogger<BrowserGuiHostedService> _logger;
-    private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly IBrowserService _browserService;
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IOptions<BrowserOptions> _browserOptions;
 
-    public BrowserGuiHostedService(PlayersEventManager playersEventManager, ILogger<BrowserGuiHostedService> logger, IOptions<GuiBrowserOptions> guiBrowserOptions, IBrowserService browserService, IBrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(playersEventManager)
+    public BrowserGuiHostedService(PlayersEventManager playersEventManager, ILogger<BrowserGuiHostedService> logger, IBrowserService browserService, IBrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(playersEventManager)
     {
         _logger = logger;
-        _guiBrowserOptions = guiBrowserOptions;
         _browserService = browserService;
         _browserGuiService = browserGuiService;
         _browserOptions = browserOptions;
@@ -62,13 +60,11 @@ internal sealed class BrowserGuiHostedService : PlayerLifecycle, IHostedService
 
     protected override void PlayerJoined(RealmPlayer player)
     {
-        if (_guiBrowserOptions.Value.BrowserSupport)
-            player.Gui.Changed += HandleGuiChanged;
+        player.Gui.Changed += HandleGuiChanged;
     }
 
     protected override void PlayerLeft(RealmPlayer player)
     {
-        if (_guiBrowserOptions.Value.BrowserSupport)
-            player.Gui.Changed -= HandleGuiChanged;
+        player.Gui.Changed -= HandleGuiChanged;
     }
 }
