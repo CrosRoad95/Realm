@@ -66,7 +66,6 @@ function tryReplaceModel(modelId)
 
 	pendingRequestedModels[modelId] = true;
 	local modelToReplace = modelsToReplace[modelId];
-	iprint("modelToReplace",modelToReplace)
 end
 
 function tryReplaceModels()

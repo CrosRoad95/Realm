@@ -198,7 +198,7 @@ public sealed class RealmCommandService : PlayerLifecycle
                 return;
             }
         }
-        _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
+        _logger.LogInformation("{playerName} executed command {command} with arguments {commandArguments}.", player.Name, command, arguments);
         try
         {
             var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<IElementSearchService>(), arguments);
@@ -315,7 +315,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         }
         finally
         {
-            _logger.LogInformation("Ended async command {command} execution with in {totalMilliseconds}milliseconds", command, (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+            _logger.LogInformation("{playerName} Ended async command {command} execution with in {totalMilliseconds}milliseconds", player.Name, command, (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
         }
     }
 
