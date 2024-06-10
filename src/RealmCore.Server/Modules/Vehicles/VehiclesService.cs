@@ -8,7 +8,7 @@ public interface IVehiclesService
     Task<LightInfoVehicleDto[]> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
     Task<VehicleData[]> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
     IEnumerable<RealmPlayer> GetOnlineOwners(RealmVehicle vehicle);
-    Task Save(RealmVehicle vehicle);
+    Task<bool> Save(RealmVehicle vehicle);
 }
 
 internal sealed class VehiclesService : IVehiclesService
@@ -79,12 +79,12 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicle.GetRequiredService<IVehicleService>().Destroy();
     }
 
-    public async Task Save(RealmVehicle vehicle)
+    public async Task<bool> Save(RealmVehicle vehicle)
     {
         if (!vehicle.Persistence.IsLoaded)
-            throw new PersistantVehicleNotLoadedException();
+            return false;
 
-        await vehicle.GetRequiredService<IElementSaveService>().Save();
+        return await vehicle.GetRequiredService<IElementSaveService>().Save();
     }
 
     public async Task<RealmVehicle?> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)

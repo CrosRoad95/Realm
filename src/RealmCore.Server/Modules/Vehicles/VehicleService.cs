@@ -46,11 +46,4 @@ internal sealed class VehicleService : IVehicleService
         }
         _vehicle.Destroy();
     }
-
-    private void SetActive(int vehicleId, RealmVehicle vehicle)
-    {
-        if (!_vehiclesInUse.TrySetActive(vehicleId, vehicle))
-            throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
-    }
-
 }

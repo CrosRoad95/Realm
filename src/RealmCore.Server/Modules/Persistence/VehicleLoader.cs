@@ -39,12 +39,14 @@ internal sealed class VehicleLoader : IVehicleLoader
         {
             var vehicle = await _elementFactory.CreateVehicle(Location.Zero, VehicleModel.Perennial, async (vehicle) =>
             {
-                var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().GetById(id, cancellationToken) ?? throw new PersistantVehicleNotFoundException($"Failed to load vehicle data of id {id}");
+                var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().GetById(id, cancellationToken) ?? throw new Exception("VehicleData not found");
 
                 if (vehicleData.IsRemoved)
-                    throw new VehicleRemovedException(vehicleId);
+                     throw new Exception("Vehicle removed");
 
-                SetActive(vehicleId, vehicle);
+                if (!_vehiclesInUse.TrySetActive(vehicleId, vehicle))
+                    throw new Exception("Failed to create already existing vehicle.");
+
                 vehicle.Persistence.Load(vehicleData);
 
                 await vehicle.GetRequiredService<IVehicleService>().SetVehicleSpawned(true, cancellationToken);
@@ -85,12 +87,6 @@ internal sealed class VehicleLoader : IVehicleLoader
         }
         if (i > 0)
             _logger.LogInformation("Loaded: {amount} vehicles", i);
-    }
-
-    private void SetActive(int vehicleId, RealmVehicle vehicle)
-    {
-        if (!_vehiclesInUse.TrySetActive(vehicleId, vehicle))
-            throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.LoadService", "1.0.0");

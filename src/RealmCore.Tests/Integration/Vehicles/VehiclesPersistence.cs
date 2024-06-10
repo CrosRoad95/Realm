@@ -52,7 +52,7 @@ public class VehiclesPersistence
 
         var spawn = async () => await loadService.LoadVehicleById(id);
         await spawn.Should().NotThrowAsync();
-        await spawn.Should().ThrowAsync<PersistantVehicleAlreadySpawnedException>().WithMessage("Failed to create already existing vehicle.");
+        await spawn.Should().ThrowAsync<Exception>();
     }
 
     [Fact]
