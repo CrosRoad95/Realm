@@ -3,4 +3,5 @@
 public interface IAsset
 {
     string Name { get; }
+    string Checksum { get; }
 }

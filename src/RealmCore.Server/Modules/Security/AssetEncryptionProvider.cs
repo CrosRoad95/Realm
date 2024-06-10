@@ -7,6 +7,8 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
 
     public byte[] Key => _key;
 
+    private HashSet<string> _excludeExtensions =  ["otf", "ttf"];
+
     public AssetEncryptionProvider(IOptions<AssetsOptions> assetsOptions)
     {
         _key = Convert.FromBase64String(assetsOptions.Value.Base64Key);
@@ -14,6 +16,7 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
         _aesCrypto = new AESCrypto(_key, _key, true);
     }
 
+    public bool ShouldEncryptByExtension(string extension) => _excludeExtensions.Contains(extension);
 
     public byte[] Encrypt(byte[] data) => _aesCrypto.PerformAES(data);
 }

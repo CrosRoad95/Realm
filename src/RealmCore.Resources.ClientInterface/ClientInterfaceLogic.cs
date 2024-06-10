@@ -139,7 +139,14 @@ internal class ClientInterfaceLogic
             if (dm == null)
                 return;
 
-            clientDebugMessages[i] = new ClientDebugMessage(dm[1].StringValue!, dm[2].IntegerValue.Value, dm[3].StringValue!, dm[4].IntegerValue.Value);
+            if (dm.Count == 2)
+            {
+                clientDebugMessages[i] = new ClientDebugMessage(dm[1].StringValue!, 0, "", 0);
+            }
+            else if (dm.Count == 4)
+            {
+                clientDebugMessages[i] = new ClientDebugMessage(dm[1].StringValue!, dm[2].IntegerValue.Value, dm[3].StringValue!, dm[4].IntegerValue.Value);
+            }
         }
 
         _clientInterfaceService.RelayClienDebugMessages(luaEvent.Player, clientDebugMessages);

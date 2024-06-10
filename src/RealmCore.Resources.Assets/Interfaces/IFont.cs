@@ -6,5 +6,5 @@ public interface IBuiltInFont : IFont;
 
 public interface IAssetFont : IFont
 {
-    string FontPath { get; }
+    string Path { get; }
 }

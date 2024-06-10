@@ -3,21 +3,24 @@ using SlipeServer.Server.Enums;
 
 namespace RealmCore.Resources.Assets;
 
+public record struct ReplacedModel(int model, string dffPath, string colPath);
+
 public class AssetsCollection : IServerAssetsProvider
 {
     private readonly object _lock = new();
+    private string _bashPath = "Server/Assets";
     private readonly Dictionary<string, IAsset> _assets = [];
-    private readonly Dictionary<ObjectModel, string> _replacedModels = [];
+    private readonly Dictionary<ObjectModel, ReplacedModel> _replacedModels = [];
     public IReadOnlyDictionary<string, IAsset> Assets => _assets;
-    public IReadOnlyDictionary<ObjectModel, string> ReplacedModels => _replacedModels;
+    public IReadOnlyDictionary<ObjectModel, ReplacedModel> ReplacedModels => _replacedModels;
 
     public AssetsCollection()
     {
-        try
-        {
-            Directory.CreateDirectory("Server/Assets/Models/Procedural");
-        }
-        catch(Exception) { }
+        var path = Path.Combine(_bashPath, "Models/Procedural");
+        if (Directory.Exists(path))
+            return;
+
+        Directory.CreateDirectory("Server/Assets/Models/Procedural");
     }
 
     internal IAsset InternalGetAsset(string name)
@@ -47,25 +50,48 @@ public class AssetsCollection : IServerAssetsProvider
             return (IFont)InternalGetAsset(assetName);
     }
 
-    public IModel AddModel(string name, Stream colStream, Stream dffStream)
+    public IAssetDFF AddProceduralDFF(string name, Stream stream)
     {
         lock (_lock)
+        {
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-        var colFileName = $"Server/Assets/Models/Procedural/{name}.col";
-        var dffFileName = $"Server/Assets/Models/Procedural/{name}.dff";
+            var fileName = Path.Combine(_bashPath, $"Models/Procedural/{name}.dff");
 
-    using (var fileStream = File.Create(colFileName))
-            colStream.CopyTo(fileStream);
-    using (var fileStream = File.Create(dffFileName))
-            dffStream.CopyTo(fileStream);
+            var data = stream.ToArray();
+            var checksum = data.CalculateChecksum();
 
-        var model = new Model(name, colFileName, dffFileName);
-        lock (_lock)
-            _assets.Add(name, model);
-        return model;
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            File.WriteAllBytes(fileName, data);
+
+            return new AssetDFF(name, fileName, checksum);
+        }
     }
+
+    public IAssetCOL AddProceduralCOL(string name, Stream stream)
+    {
+        lock (_lock)
+        {
+            if (_assets.ContainsKey(name))
+                throw new Exception($"Name '{name}' already in use");
+
+            var fileName = Path.Combine(_bashPath, $"Models/Procedural/{name}.col");
+
+            var data = stream.ToArray();
+            var checksum = data.CalculateChecksum();
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            File.WriteAllBytes(fileName, data);
+
+            return new AssetCOL(name, fileName, checksum);
+        }
+    }
+
 
     public void AddFont(string name, string path)
     {
@@ -73,10 +99,10 @@ public class AssetsCollection : IServerAssetsProvider
             _assets.Add(name, new FileSystemFont(name, path));
     }
 
-    public void ReplaceModel(ObjectModel objectModel, IModel model)
+    public void ReplaceModel(ObjectModel objectModel, IAssetDFF dff, IAssetCOL col)
     {
         lock (_lock)
-            _replacedModels[objectModel] = model.Name;
+            _replacedModels[objectModel] = new ReplacedModel((int)objectModel, dff.Path, col.Path);
     }
 
     public IEnumerable<string> Provide()
@@ -87,12 +113,14 @@ public class AssetsCollection : IServerAssetsProvider
             {
                 switch (item.Value)
                 {
-                    case IModel model:
-                        yield return model.ColPath;
-                        yield return model.DffPath;
+                    case IAssetDFF assetDFF:
+                        yield return assetDFF.Path;
+                        break;
+                    case IAssetCOL assetCOL:
+                        yield return assetCOL.Path;
                         break;
                     case IAssetFont font:
-                        yield return font.FontPath;
+                        yield return font.Path;
                         break;
                     default:
                         break;

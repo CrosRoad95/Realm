@@ -58,7 +58,7 @@ public class ModelFactory
         });
     }
 
-    public Stream BuildDff()
+    public Stream BuildDFF()
     {
         var dff = _renderWareBuilder.BuildDff();
         MemoryStream stream = new();
@@ -67,7 +67,7 @@ public class ModelFactory
         return stream;
     }
 
-    public Stream BuildCol()
+    public Stream BuildCOL()
     {
         var col = _renderWareBuilder.BuildCol();
         MemoryStream stream = new();

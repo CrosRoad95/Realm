@@ -25,5 +25,6 @@
 	  <Using Include="SlipeServer.Server.Resources" />
 	  <Using Include="System.Runtime.CompilerServices" />
 	  <Using Include="System.Text" />
+	  <Using Include="System.Security.Cryptography" />
 	</ItemGroup>
 </Project>

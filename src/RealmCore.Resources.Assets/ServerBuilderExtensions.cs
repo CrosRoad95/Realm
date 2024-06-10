@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]
@@ -15,7 +16,8 @@ public static class ServerBuilderExtensions
         {
             var resource = new AssetsResource(server);
 
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
+            var additionalFiles = resource.GetAndAddLuaFiles();
+            server.AddAdditionalResource(resource, additionalFiles);
         });
 
         builder.ConfigureServices(services =>

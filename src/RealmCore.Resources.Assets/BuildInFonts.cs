@@ -3,6 +3,8 @@
 internal sealed class BuildInFont : IBuiltInFont
 {
     public string Name { get; }
+    public string Checksum { get; } = string.Empty;
+
     public BuildInFont(string name)
     {
         Name = name;

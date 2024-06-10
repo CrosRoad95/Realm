@@ -2,10 +2,7 @@
 
 internal class AssetsResource : Resource
 {
-    internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
-    {
-        ["assets.lua"] = ResourceFiles.Assets,
-    };
+    internal Dictionary<string, byte[]> AdditionalFiles { get; } = [];
 
     private readonly long _contentSize = 0;
     public long ContentSize => _contentSize;
@@ -33,12 +30,10 @@ end
         var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();
         var assetsCollection = server.GetRequiredService<AssetsCollection>();
 
-        foreach (var (path, content) in AdditionalFiles)
-            Files.Add(ResourceFileFactory.FromBytes(content, path));
-
         var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToArray();
         foreach (var path in assets)
         {
+            var extension = System.IO.Path.GetExtension(path);
             if(path.EndsWith(".otf") || path.EndsWith(".ttf"))
             {
                 var content = File.ReadAllBytes(path);
@@ -49,10 +44,10 @@ end
             else
             {
                 using var content = File.OpenRead(path);
-                var md5 = Utilities.CreateMD5(content);
-                var pathMd5 = Utilities.CreateMD5(path);
-                var contentByte = Utilities.ReadFully(content);
-                var encrypted = encryptionProvider.Encrypt(contentByte);
+                var checksum = content.CalculateChecksum();
+                var pathMd5 = path.CalculateChecksum();
+                var contentBytes = content.ToArray();
+                var encrypted = encryptionProvider.Encrypt(contentBytes);
 
                 Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
                 AdditionalFiles.Add(pathMd5, encrypted);
@@ -65,18 +60,18 @@ end
 
         if(assetsCollection.ReplacedModels.Any())
         {
-            var modelsToReplace = new StringBuilder();
-            foreach (var item in assetsCollection.ReplacedModels)
-            {
-                var asset = assetsCollection.GetAsset<IModel>(item.Value);
-                var col = Utilities.CreateMD5(asset.ColPath);
-                var dff = Utilities.CreateMD5(asset.DffPath);
-                modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");
-                modelsToReplace.AppendLine($"local dff = engineLoadDFF(decryptAsset(\"{dff}\"));engineReplaceModel(dff,{(int)item.Key});");
-            }
+            //var modelsToReplace = new StringBuilder();
+            //foreach (var item in assetsCollection.ReplacedModels)
+            //{
+            //    var asset = assetsCollection.GetAsset<IModel>(item.Value);
+            //    var col = Utilities.CreateMD5(asset.ColPath);
+            //    var dff = Utilities.CreateMD5(asset.DffPath);
+            //    modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");
+            //    modelsToReplace.AppendLine($"local dff = engineLoadDFF(decryptAsset(\"{dff}\"));engineReplaceModel(dff,{(int)item.Key});");
+            //}
 
             NoClientScripts.Add("decrypt.lua", Encoding.UTF8.GetBytes(decryptString));
-            NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
+            //NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
         }
 
         Exports.Add("requestAsset");

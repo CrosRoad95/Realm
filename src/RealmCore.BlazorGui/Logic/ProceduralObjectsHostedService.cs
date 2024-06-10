@@ -2,21 +2,15 @@
 
 namespace RealmCore.BlazorGui.Logic;
 
-internal sealed class ProceduralObjectsHostedService : IHostedService
+internal sealed class ProceduralObjectsHostedService : IHostedLifecycleService
 {
-    public static byte[] ReadFully(Stream input)
+    private readonly AssetsCollection _assetsCollection;
+    private readonly IAssetsService _assetsService;
+
+    public ProceduralObjectsHostedService(AssetsCollection assetsCollection, IAssetsService assetsService)
     {
-        byte[] buffer = new byte[16 * 1024];
-        using (MemoryStream ms = new())
-        {
-            int read;
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                ms.Write(buffer, 0, read);
-            }
-            input.Position = 0;
-            return ms.ToArray();
-        }
+        _assetsCollection = assetsCollection;
+        _assetsService = assetsService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -29,21 +23,35 @@ internal sealed class ProceduralObjectsHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    public ProceduralObjectsHostedService(AssetsCollection assetsCollection)
+    public Task StartedAsync(CancellationToken cancellationToken)
     {
         var modelFactory = new ModelFactory();
         modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
         modelFactory.AddTriangle(new Vector3(0, 10, 0), new Vector3(10, 0, 0), new Vector3(10, 10, 0), "Metal1_128");
-        var dff = modelFactory.BuildDff();
-        var col = modelFactory.BuildCol();
-#if DEBUG
-        if (!Directory.Exists("testoutput"))
-            Directory.CreateDirectory("testoutput");
-        File.WriteAllBytes("testoutput/debugmodel.dff", ReadFully(dff));
-        File.WriteAllBytes("testoutput/debugmodel.col", ReadFully(col));
-#endif
-        var model = assetsCollection.AddModel("test", col, dff);
-        assetsCollection.ReplaceModel((ObjectModel)1338, model);
+        var dffStream = modelFactory.BuildDFF();
+        var colStream = modelFactory.BuildCOL();
+
+        var dff = _assetsCollection.AddProceduralDFF("testDFF", dffStream);
+        var col = _assetsCollection.AddProceduralCOL("testCOL", colStream);
+        _assetsService.ReplaceModel((ObjectModel)1338, "testDFF", "testCOL");
+        _assetsService.ReplaceModel((ObjectModel)1339, "testDFF", "testCOL");
         ;
+
+        return Task.CompletedTask;
+    }
+
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }
