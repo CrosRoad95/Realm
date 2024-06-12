@@ -7,12 +7,12 @@ public sealed class VehicleLoadingOptions
 
 internal sealed class LoadVehicleService : IHostedService
 {
-    private readonly IVehicleLoader _vehicleLoader;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IOptions<VehicleLoadingOptions> _options;
 
-    public LoadVehicleService(IVehicleLoader vehicleLoader, IOptions<VehicleLoadingOptions> options)
+    public LoadVehicleService(IServiceProvider serviceProvider, IOptions<VehicleLoadingOptions> options)
     {
-        _vehicleLoader = vehicleLoader;
+        _serviceProvider = serviceProvider;
         _options = options;
     }
 
@@ -21,7 +21,9 @@ internal sealed class LoadVehicleService : IHostedService
         if (_options.Value.SkipVehicleLoading)
             return;
 
-        await _vehicleLoader.LoadAll(cancellationToken);
+        using var scope = _serviceProvider.CreateScope();
+        var vehicleLoader = scope.ServiceProvider.GetRequiredService<IVehicleLoader>();
+        await vehicleLoader.LoadAll(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
