@@ -168,9 +168,10 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
         SetTools([]);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    private Task HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         Reset();
+        return Task.CompletedTask;
     }
 
     public void Dispose()

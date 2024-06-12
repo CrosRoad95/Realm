@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.BlazorGui.Logic;
 
-internal class WorldHostedService : IHostedService
+internal class WorldHostedService : PlayerLifecycle, IHostedService
 {
     private struct DiscoveryInfo
     {
@@ -22,19 +22,17 @@ internal class WorldHostedService : IHostedService
     };
 
     private readonly IElementFactory _elementFactory;
-    private readonly MtaServer _server;
     private readonly IOverlayService _overlayService;
 
-    public WorldHostedService(IElementFactory elementFactory, MtaServer server)
+    public WorldHostedService(IElementFactory elementFactory, IOverlayService overlayService, PlayersEventManager playersEventManager) : base(playersEventManager)
     {
         _elementFactory = elementFactory;
-        _server = server;
+        _overlayService = overlayService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         HandleServerStarted();
-        _server.PlayerJoined += HandlePlayerJoined;
 
         return Task.CompletedTask;
     }
@@ -44,9 +42,8 @@ internal class WorldHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private void HandlePlayerJoined(Player plr)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
         foreach (var discovery in player.Discoveries)
         {
             HandlePlayerDiscover(player, discovery);

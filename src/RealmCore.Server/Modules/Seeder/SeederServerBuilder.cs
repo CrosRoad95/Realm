@@ -7,7 +7,6 @@ internal sealed class SeederServerBuilder : IDisposable
     private const string _basePath = "Seed";
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
-    private readonly RoleManager<RoleData> _roleManager;
     private readonly IGroupsService _groupService;
     private readonly IElementFactory _elementFactory;
     private readonly IFractionsService _fractionService;
@@ -30,7 +29,6 @@ internal sealed class SeederServerBuilder : IDisposable
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
-        _roleManager = roleManager;
         _groupService = groupService;
         _elementFactory = elementFactory;
         _fractionService = fractionService;
@@ -125,12 +123,14 @@ internal sealed class SeederServerBuilder : IDisposable
 
     private async Task BuildIdentityRoles(Dictionary<string, object> roles)
     {
-        var existingRoles = await _roleManager.Roles.ToListAsync();
+        using var scope = _serviceProvider.CreateScope();
+        using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<RoleData>>();
+        var existingRoles = await roleManager.Roles.ToListAsync();
         foreach (var roleName in roles)
         {
             if (!existingRoles.Any(x => x.Name == roleName.Key))
             {
-                await _roleManager.CreateAsync(new RoleData
+                await roleManager.CreateAsync(new RoleData
                 {
                     Name = roleName.Key
                 });

@@ -49,7 +49,6 @@ public static class ServiceCollectionExtensions
         var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
 
         services.AddRealmServerCore(configuration);
-        services.ConfigureRealmServices();
         services.AddMtaServer(realmConfiguration, services => new MtaDiPlayerServer<TPlayer>(services, realmConfiguration), serverBuilder =>
         {
             serverBuilder.UseConfiguration(realmConfiguration);

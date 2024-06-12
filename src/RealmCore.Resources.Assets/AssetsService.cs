@@ -1,6 +1,4 @@
 ﻿using RealmCore.Resources.Assets.Classes;
-using RenderWareIo.Structs.Col;
-using RenderWareIo.Structs.Dff;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Enums;

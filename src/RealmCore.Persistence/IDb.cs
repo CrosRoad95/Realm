@@ -9,6 +9,7 @@ public interface IDb : IDisposable
     ChangeTracker ChangeTracker { get; }
     EntityEntry Attach(object entity);
     DbSet<UserData> Users { get; }
+    DbSet<IdentityUserRole<int>> UserRoles { get; }
     DbSet<RoleData> Roles { get; }
     DbSet<IdentityUserClaim<int>> UserClaims { get; }
     DbSet<IdentityUserLogin<int>> UserLogins { get; }
@@ -51,10 +52,12 @@ public interface IDb : IDisposable
     DbSet<FriendData> Friends { get; }
     DbSet<PendingFriendRequestData> PendingFriendsRequests { get; }
     DbSet<BlockedUserData> BlockedUsers { get; }
+    DbSynchronizationContex DbSynchronizationContex { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+    Task<int> SaveChangesAsyncRaw(CancellationToken cancellationToken = default);
 
     event EventHandler<SavedChangesEventArgs>? SavedChanges;
 }

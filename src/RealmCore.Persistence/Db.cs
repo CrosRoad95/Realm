@@ -1,5 +1,48 @@
 ﻿namespace RealmCore.Persistence;
 
+public class DbSynchronizationContex
+{
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    public void Execute(Action action)
+    {
+        _semaphoreSlim.Wait();
+        try
+        {
+            action();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task Execute(Func<Task> action)
+    {
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<T> Execute<T>(Func<Task<T>> action)
+    {
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            return await action();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+}
+
 public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityUserClaim<int>,
         IdentityUserRole<int>,
@@ -7,7 +50,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityRoleClaim<int>,
         IdentityUserToken<int>>, IDb where T : Db<T>
 {
-    private SemaphoreSlim _semaphoreSlim = new(1);
+    public DbSynchronizationContex DbSynchronizationContex { get; } = new();
     public DbSet<UserLicenseData> UserLicenses => Set<UserLicenseData>();
     public DbSet<VehicleData> Vehicles => Set<VehicleData>();
     public DbSet<VehicleUserAccessData> VehicleUserAccess => Set<VehicleUserAccessData>();
@@ -862,14 +905,14 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await _semaphoreSlim.WaitAsync(cancellationToken);
-        try
+        return await DbSynchronizationContex.Execute(async () =>
         {
             return await base.SaveChangesAsync(cancellationToken);
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
+        });
+    }
+
+    public async Task<int> SaveChangesAsyncRaw(CancellationToken cancellationToken = default)
+    {
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

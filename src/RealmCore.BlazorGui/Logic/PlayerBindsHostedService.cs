@@ -1,4 +1,6 @@
-﻿namespace RealmCore.BlazorGui.Logic;
+﻿using static RealmCore.Server.Modules.Users.UsersResults;
+
+namespace RealmCore.BlazorGui.Logic;
 
 
 internal class CounterPageGui : BrowserGui
@@ -33,21 +35,21 @@ internal sealed class PlayerBindsHostedService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _usersService.SignedIn += HandleSignedIn;
-        _usersService.SignedOut += HandleSignedOut;
+        _usersService.LoggedIn += HandleLoggedIn;
+        _usersService.LoggedOut += HandleLoggedOut;
 
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _usersService.SignedIn += HandleSignedIn;
-        _usersService.SignedOut += HandleSignedOut;
+        _usersService.LoggedIn += HandleLoggedIn;
+        _usersService.LoggedOut += HandleLoggedOut;
 
         return Task.CompletedTask;
     }
 
-    private void HandleSignedIn(RealmPlayer player)
+    private Task HandleLoggedIn(RealmPlayer player)
     {
         player.SetBind("num_0", (player, keyState) =>
         {
@@ -103,10 +105,13 @@ internal sealed class PlayerBindsHostedService : IHostedService
 
         GuiHelpers.BindGuiPage<HomePageGui>(player, "F6");
         GuiHelpers.BindGuiPage<CounterPageGui>(player, "F7");
+
+        return Task.CompletedTask;
     }
 
-    private void HandleSignedOut(RealmPlayer player)
+    private Task HandleLoggedOut(RealmPlayer player)
     {
         player.RemoveAllBinds();
+        return Task.CompletedTask;
     }
 }

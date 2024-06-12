@@ -23,20 +23,21 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _usersService.SignedIn += HandleSignedIn;
+        _usersService.LoggedIn += HandleLoggedIn;
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _usersService.SignedIn += HandleSignedIn;
+        _usersService.LoggedIn += HandleLoggedIn;
         return Task.CompletedTask;
     }
 
-    private void HandleSignedIn(RealmPlayer player)
+    private Task HandleLoggedIn(RealmPlayer player)
     {
         player.FocusedElementChanged += HandleFocusedElementChanged;
         player.SetBindAsync("x", HandleInteract);
+        return Task.CompletedTask;
     }
 
     private async Task HandleInteract(RealmPlayer player, KeyState keyState, CancellationToken cancellationToken)

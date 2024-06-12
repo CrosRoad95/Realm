@@ -53,9 +53,11 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
         userFeature.LoggedOut += HandleSignedOut;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature userFeature, RealmPlayer player)
+    private Task HandleSignedOut(IPlayerUserFeature userFeature, RealmPlayer player)
     {
         TryClose();
+
+        return Task.CompletedTask;
     }
 
     public TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui

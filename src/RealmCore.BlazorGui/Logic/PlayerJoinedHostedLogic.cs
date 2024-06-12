@@ -25,8 +25,8 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     {
         _playersEventManager.Loaded += HandlePlayerLoaded;
         _playersEventManager.Unloading += HandlePlayerUnloading;
-        _usersService.SignedIn += HandleSignedIn;
-        _usersService.SignedOut += HandleSignedOut;
+        _usersService.LoggedIn += HandleLoggedIn;
+        _usersService.LoggedOut += HandleLoggedOut;
         return Task.CompletedTask;
     }
 
@@ -34,8 +34,8 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     {
         _playersEventManager.Loaded -= HandlePlayerLoaded;
         _playersEventManager.Unloading -= HandlePlayerUnloading;
-        _usersService.SignedIn -= HandleSignedIn;
-        _usersService.SignedOut -= HandleSignedOut;
+        _usersService.LoggedIn -= HandleLoggedIn;
+        _usersService.LoggedOut -= HandleLoggedOut;
         return Task.CompletedTask;
     }
 
@@ -79,21 +79,27 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         }
     }
 
-    private async void HandleSignedIn(RealmPlayer player)
+    private Task HandleLoggedIn(RealmPlayer player)
     {
-        try
+        Task.Run(async () =>
         {
-            await HandleSignedInCore(player);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
+            try
+            {
+                await HandleSignedInCore(player);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogHandleError(ex);
+            }
+        });
+
+        return Task.CompletedTask;
     }
 
-    private void HandleSignedOut(RealmPlayer player)
+    private Task HandleLoggedOut(RealmPlayer player)
     {
         ShowLoginSequence(player);
+        return Task.CompletedTask;
     }
 
     private void ShowLoginSequence(RealmPlayer player)

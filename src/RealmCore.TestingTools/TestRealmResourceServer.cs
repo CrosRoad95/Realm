@@ -2,16 +2,20 @@
 
 public sealed class TestRealmResourceServer : IResourceServer
 {
-    public List<Resource> Resources = [];
+    private readonly IRealmResourcesProvider _realmResourcesProvider;
+
+    public TestRealmResourceServer(IRealmResourcesProvider realmResourcesProvider)
+    {
+        _realmResourcesProvider = realmResourcesProvider;
+    }
     public void AddAdditionalResource(Resource resource, Dictionary<string, byte[]> files)
     {
-        RealmResourceServer._resourceCounter++;
-        Resources.Add(resource);
+        _realmResourcesProvider.Add(resource);
     }
 
     public void RemoveAdditionalResource(Resource resource)
     {
-        RealmResourceServer._resourceCounter--;
+        _realmResourcesProvider.Remove(resource);
     }
 
     public void Start() { }

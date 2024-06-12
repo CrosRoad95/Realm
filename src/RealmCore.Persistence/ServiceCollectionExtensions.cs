@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INewsRepository, NewsRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IFriendRepository, FriendRepository>();
+        services.AddScoped<IUserDataRepository, UserDataRepository>();
         services.AddScoped<ITransactionContext, TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions);
@@ -32,7 +33,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddRealmIdentity<T>(this IServiceCollection services, IdentityConfiguration configuration) where T : Db<T>
+    public static IServiceCollection AddRealmIdentity<T>(this IServiceCollection services, IdentityConfiguration configuration) where T : Db<T>, IDb
     {
         services.AddIdentity<UserData, RoleData>(setup =>
         {
@@ -41,7 +42,6 @@ public static class ServiceCollectionExtensions
            .AddEntityFrameworkStores<T>()
            .AddDefaultTokenProviders()
            .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<UserData>>();
-
         services.AddSingleton(new AuthorizationPoliciesProvider(configuration.Policies.Keys));
 
         services.AddAuthorization(options =>

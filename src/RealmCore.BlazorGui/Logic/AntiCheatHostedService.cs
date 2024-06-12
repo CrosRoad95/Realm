@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.BlazorGui.Logic;
 
-internal sealed class AntiCheatHostedService : BackgroundService
+internal sealed class AntiCheatHostedService : IHostedService
 {
     private readonly IAntiCheat _antiCheat;
     private readonly ILogger<AntiCheatHostedService> _logger;
@@ -16,10 +16,14 @@ internal sealed class AntiCheatHostedService : BackgroundService
         _logger.LogWarning("Violation reported by {playerName}, violation id: {violationId}", player.Name, violationId);
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         _antiCheat.ViolationReported += HandleViolationReported;
+        return Task.CompletedTask;
+    }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
         return Task.CompletedTask;
     }
 }

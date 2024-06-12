@@ -2,34 +2,37 @@
 
 public interface IFractionsService
 {
+    internal Task LoadFractions(CancellationToken cancellationToken = default);
     bool Exists(int fractionId);
     bool HasMember(int fractionId, int userId);
-    Task LoadFractions(CancellationToken cancellationToken = default);
     Task AddMember(int fractionId, int userId, int rank, string rankName, CancellationToken cancellationToken = default);
     Task AddMember(int fractionId, RealmPlayer player, int rank, string rankName, CancellationToken cancellationToken = default);
     internal Task<bool> TryCreateFraction(int id, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default);
 }
 
-internal sealed class FractionService : IFractionsService
+internal sealed class FractionsService : IFractionsService
 {
     private readonly Dictionary<int, FractionDto> _fractions = [];
-    private readonly object _lock = new();
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
     private readonly IFractionRepository _fractionRepository;
+    private readonly IServiceScope _serviceScope;
     private readonly IUsersInUse _usersInUse;
 
     public event Action<IFractionsService, FractionDto>? Created;
 
-    public FractionService(IFractionRepository fractionRepository, IUsersInUse usersInUse)
+    public FractionsService(IServiceProvider serviceProvider, IUsersInUse usersInUse)
     {
-        _fractionRepository = fractionRepository;
+        _serviceScope = serviceProvider.CreateScope();
+        _fractionRepository = _serviceScope.ServiceProvider.GetRequiredService<IFractionRepository>();
         _usersInUse = usersInUse;
     }
 
     public async Task LoadFractions(CancellationToken cancellationToken = default)
     {
-        var fractionDataList = await _fractionRepository.GetAll(cancellationToken);
-        lock (_lock)
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
         {
+            var fractionDataList = await _fractionRepository.GetAll(cancellationToken);
             foreach (var fractionData in fractionDataList)
             {
                 var fractionDto = FractionDto.Map(fractionData);
@@ -37,12 +40,23 @@ internal sealed class FractionService : IFractionsService
                 Created?.Invoke(this, fractionDto);
             }
         }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     public bool Exists(int fractionId)
     {
-        lock (_lock)
+        _semaphoreSlim.Wait();
+        try
+        {
             return _fractions.ContainsKey(fractionId);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     private bool InternalHasMember(int fractionId, int userId)
@@ -55,8 +69,15 @@ internal sealed class FractionService : IFractionsService
 
     public bool HasMember(int fractionId, int userId)
     {
-        lock (_lock)
+        _semaphoreSlim.Wait();
+        try
+        {
             return InternalHasMember(fractionId, userId);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     public async Task AddMember(int fractionId, int userId, int rank, string rankName, CancellationToken cancellationToken = default)
@@ -66,38 +87,57 @@ internal sealed class FractionService : IFractionsService
             await AddMember(fractionId, player, rank, rankName, cancellationToken);
             return;
         }
-        var memberData = await _fractionRepository.TryAddMember(fractionId, userId, rank, rankName, cancellationToken);
-        if (memberData == null)
-            throw new FractionMemberAlreadyAddedException(userId, fractionId);
 
-        lock (_lock)
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            var memberData = await _fractionRepository.TryAddMember(fractionId, userId, rank, rankName, cancellationToken);
+            if (memberData == null)
+                throw new FractionMemberAlreadyAddedException(userId, fractionId);
+
             _fractions[fractionId].Members.Add(FractionMemberDto.Map(memberData));
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     public async Task AddMember(int fractionId, RealmPlayer player, int rank, string rankName, CancellationToken cancellationToken = default)
     {
-        var memberData = await _fractionRepository.TryAddMember(fractionId, player.UserId, rank, rankName, cancellationToken);
-        if (memberData == null)
-            throw new FractionMemberAlreadyAddedException(player.UserId, fractionId);
-        player.Fractions.AddMember(memberData);
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            var memberData = await _fractionRepository.TryAddMember(fractionId, player.UserId, rank, rankName, cancellationToken);
+            if (memberData == null)
+                throw new FractionMemberAlreadyAddedException(player.UserId, fractionId);
+            player.Fractions.AddMember(memberData);
 
-        lock (_lock)
             _fractions[fractionId].Members.Add(FractionMemberDto.Map(memberData));
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     public async Task<bool> TryCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default)
     {
-        var fractionData = await _fractionRepository.CreateOrGet(fractionId, fractionName, fractionCode, cancellationToken);
-        if (fractionData == null)
-            return false;
-
-        lock (_lock)
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
         {
+            var fractionData = await _fractionRepository.CreateOrGet(fractionId, fractionName, fractionCode, cancellationToken);
+            if (fractionData == null)
+                return false;
+
             var fractionDto = FractionDto.Map(fractionData);
             _fractions[fractionData.Id] = fractionDto;
             Created?.Invoke(this, fractionDto);
+            return true;
         }
-
-        return true;
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 }

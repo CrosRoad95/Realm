@@ -19,8 +19,8 @@ public interface IPlayerUserFeature : IPlayerFeature
     DateTime? RegisteredDateTime { get; }
     string[] AuthorizedPolicies { get; }
 
-    event Action<IPlayerUserFeature, RealmPlayer>? LoggedIn;
-    event Action<IPlayerUserFeature, RealmPlayer>? LoggedOut;
+    event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedIn;
+    event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedOut;
 
     string[] GetClaims();
     string[] GetRoles();
@@ -29,8 +29,8 @@ public interface IPlayerUserFeature : IPlayerFeature
     bool HasAuthorizedPolicy(string policy);
     bool HasClaim(string type, string? value = null);
     bool IsInRole(string role);
-    void Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false);
-    void LogOut();
+    Task Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false);
+    Task LogOut();
     bool TryRemoveClaim(string type, string? value = null);
     bool TryRemoveRole(string role);
     void UpdateLastNewsRead();
@@ -72,8 +72,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         }
     }
 
-    public event Action<IPlayerUserFeature, RealmPlayer>? LoggedIn;
-    public event Action<IPlayerUserFeature, RealmPlayer>? LoggedOut;
+    public event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedIn;
+    public event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedOut;
 
     public RealmPlayer Player { get; init; }
 
@@ -84,7 +84,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         _userEventRepository = userEventRepository;
     }
 
-    public void Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
+    public async Task Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
     {
         if (user == null)
             throw new InvalidOperationException();
@@ -102,32 +102,46 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                         usesPlayerPersistentData.LogIn(user);
                 }
             }
-            LoggedIn?.Invoke(this, Player);
+        }
+
+        if(LoggedIn != null)
+        {
+            foreach (Func<IPlayerUserFeature, RealmPlayer, Task> callback in LoggedIn.GetInvocationList())
+            {
+                await callback(this, Player);
+            }
         }
     }
 
-    public void LogOut()
+    public async Task LogOut()
     {
         lock (_lock)
         {
-            if (IsLoggedIn)
+            if (!IsLoggedIn)
+                return;
+
+            if (_user == null)
+                throw new InvalidOperationException();
+
+            _user = null;
+            _claimsPrincipal = null;
+            ClearAuthorizedPoliciesCache();
+
+            foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
             {
-                if (_user == null)
-                    throw new InvalidOperationException();
-
-                _user = null;
-                _claimsPrincipal = null;
-                LoggedOut?.Invoke(this, Player);
-                ClearAuthorizedPoliciesCache();
-
-                foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
+                if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                 {
-                    if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
-                    {
-                        usesPlayerPersistentData.VersionIncreased -= IncreaseVersion;
-                        usesPlayerPersistentData.LogOut();
-                    }
+                    usesPlayerPersistentData.VersionIncreased -= IncreaseVersion;
+                    usesPlayerPersistentData.LogOut();
                 }
+            }
+        }
+
+        if (LoggedOut != null)
+        {
+            foreach (Func<IPlayerUserFeature, RealmPlayer, Task> callback in LoggedOut.GetInvocationList())
+            {
+                await callback(this, Player);
             }
         }
     }

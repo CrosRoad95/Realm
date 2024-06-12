@@ -8,9 +8,10 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly IUsersInUse _activeUsers;
     private readonly ClientConsole _clientConsole;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IRealmResourcesProvider _realmResourcesProvider;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment, IRealmResourcesProvider realmResourcesProvider) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -18,6 +19,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _activeUsers = activeUsers;
         _clientConsole = clientConsole;
         _hostEnvironment = hostEnvironment;
+        _realmResourcesProvider = realmResourcesProvider;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -114,10 +116,10 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             throw new UserNameInUseException(player.Name);
 
         var start = Stopwatch.GetTimestamp();
-        if (RealmResourceServer._resourceCounter == 0)
+        if (_realmResourcesProvider.Count == 0)
             throw new InvalidOperationException("No resources found");
 
-        _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
+        _playerResources[player] = new Latch(_realmResourcesProvider.Count, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
         player.Destroyed += HandlePlayerDestroyed;
 

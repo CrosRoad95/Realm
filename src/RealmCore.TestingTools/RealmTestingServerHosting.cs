@@ -1,5 +1,4 @@
-﻿using Serilog;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
 namespace RealmCore.TestingTools;
@@ -26,10 +25,7 @@ public class TestingServerHosting2<T> : IDisposable where T : Player
 
         var tcs = new TaskCompletionSource();
         var lifecycle = Host.Services.GetRequiredService<IHostApplicationLifetime>();
-        lifecycle.ApplicationStarted.Register(() =>
-        {
-           tcs.SetResult();
-        });
+        lifecycle.ApplicationStarted.Register(tcs.SetResult);
 
         var _ = Task.Run(async () =>
         {
@@ -76,7 +72,7 @@ public class TestingServerHosting2 : TestingServerHosting2<TestingPlayer>
 public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlayer>
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
-    public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
+    public TestDebounceFactory TestDebounceFactory => GetRequiredService<TestDebounceFactory>();
 
     public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<RealmTestingPlayer>(services, new()), hostBuilder =>
     {
@@ -103,7 +99,8 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
             ["Gameplay:Culture"] = "pl-PL",
             ["Database:ConnectionString"] = Environment.GetEnvironmentVariable("RealmCoreTestingDatabaseConnectionString"),
             ["Browser:BaseRemoteUrl"] = "https://localhost:7149",
-            ["Assets:Base64Key"] = "ehFQcEzbNPfHt+CKpDJ41Q=="
+            ["Assets:Base64Key"] = "ehFQcEzbNPfHt+CKpDJ41Q==",
+            ["VehicleLoading:SkipVehicleLoading"] = "true"
         });
 
         hostBuilder.Services.AddRealmServerCore(hostBuilder.Configuration);
@@ -147,19 +144,21 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
 
     public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
-        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name);
+        var userService = player.GetRequiredService<IPlayerUserService>();
+        var user = await userService.GetUserByUserName(player.Name);
 
         if (user == null)
         {
             await Host.Services.GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
 
-            user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name);
+            user = await userService.GetUserByUserName(player.Name);
         }
 
         if (user == null)
             throw new InvalidOperationException();
 
         var success = await player.GetRequiredService<IUsersService>().LogIn(player, user, dontLoadData);
+
         success.Switch(loggedIn =>
         {
             // Ok
@@ -179,16 +178,32 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
 
     public async Task<RealmTestingPlayer> CreatePlayer(bool notLoggedIn = false, string? name = null, bool dontLoadData = true)
     {
-        var player = Server.AddFakePlayer();
+        var tcs = new TaskCompletionSource();
+        RealmTestingPlayer? player = null;
+        var playersEventManager = Server.GetRequiredService<PlayersEventManager>();
+        playersEventManager.Loaded += HandlePlayersEventManagerLoaded;
+
+        player = Server.AddFakePlayer();
+        void HandlePlayersEventManagerLoaded(Player plr)
+        {
+            if(plr == player)
+                tcs.SetResult();
+        }
+
         if (name != null)
             player.Name = name;
 
-        var testRealmResourceServer = Server.GetRequiredService<TestRealmResourceServer>();
+        var realmResourcesProvider = Server.GetRequiredService<IRealmResourcesProvider>();
 
-        foreach (var resource in testRealmResourceServer.Resources)
+
+        foreach (var resource in realmResourcesProvider.All)
         {
             player.TriggerResourceStarted(resource.NetId);
         }
+
+        player.Browser.RelayReady();
+
+        await tcs.Task;
 
         if (!notLoggedIn)
         {

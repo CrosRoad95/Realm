@@ -8,7 +8,14 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
     {
         playersEventManager.Joined += HandlePlayerJoined;
         playersEventManager.Spawned += HandlePlayerSpawned;
+        playersEventManager.Loaded += HandleLoaded;
         _playersEventManager = playersEventManager;
+    }
+
+    private void HandleLoaded(Player plr)
+    {
+        var player = (TPlayer)plr;
+        PlayerLoaded(player);
     }
 
     private void HandlePlayerSpawned(Player plr)
@@ -25,9 +32,9 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
         PlayerJoined(player);
     }
 
-    private void HandleSignedIn(IPlayerUserFeature user, RealmPlayer player)
+    private async Task HandleSignedIn(IPlayerUserFeature user, RealmPlayer player)
     {
-        PlayerLoggedIn(user, (TPlayer)player);
+        await PlayerLoggedIn(user, (TPlayer)player);
     }
 
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
@@ -40,8 +47,9 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 
     protected virtual void PlayerJoined(TPlayer player) { }
     protected virtual void PlayerLeft(TPlayer player) { }
-    protected virtual void PlayerLoggedIn(IPlayerUserFeature user, TPlayer player) { }
+    protected virtual Task PlayerLoggedIn(IPlayerUserFeature user, TPlayer player) { return Task.CompletedTask; }
     protected virtual void PlayerSpawned(TPlayer player) { }
+    protected virtual void PlayerLoaded(TPlayer player) { }
 }
 
 public abstract class PlayerLifecycle : PlayerLifecycle<RealmPlayer>

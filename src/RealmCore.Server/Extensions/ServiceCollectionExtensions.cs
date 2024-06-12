@@ -29,12 +29,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<TInGameCommand>();
         return services;
     }
-    
-    public static IServiceCollection AddServerLoader<TServerLoader>(this IServiceCollection services) where TServerLoader : class, IServerLoader
-    {
-        services.AddTransient<IServerLoader, TServerLoader>();
-        return services;
-    }
 
     public static IServiceCollection AddPlayerScopedFeature<T1, T2>(this IServiceCollection services)
         where T1 : class, IPlayerFeature
@@ -60,14 +54,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection ConfigureRealmServices(this IServiceCollection services)
-    {
-        services.AddServerLoader<SeederServerLoader>();
-        services.AddServerLoader<VehicleServerLoader>();
-
-        return services;
-    }
-
     public static IServiceCollection ConfigureRealmServicesCore(this IServiceCollection services, IConfiguration configuration)
     {
         // Options
@@ -75,6 +61,7 @@ public static class ServiceCollectionExtensions
         services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
         services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
         services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
+        services.Configure<VehicleLoadingOptions>(configuration.GetSection("VehicleLoading"));
 
         var connectionString = configuration.GetValue<string>("Database:ConnectionString");
         if (!string.IsNullOrEmpty(connectionString))
@@ -129,7 +116,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
         services.AddSingleton<IGroupsService, GroupsService>();
-        services.AddScoped<IFractionsService, FractionService>();
+        services.AddSingleton<IFractionsService, FractionsService>();
         services.AddSingleton<IRewardsService, RewardsService>();
         services.AddScoped<IFeedbackService, PlayerFeedbackService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
@@ -146,7 +133,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CollisionShapeBehaviour>();
         services.AddSingleton<ScopedCollisionShapeBehaviour>();
         services.AddSingleton<FriendsService>();
-        services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>()));
+        services.AddSingleton<IRealmResourcesProvider, RealmResourcesProvider>();
+        services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>(), x.GetRequiredService<IRealmResourcesProvider>()));
         services.AddSingleton<IPlayersNotifications, PlayersNotifications>();
         #endregion
 
@@ -216,9 +204,10 @@ public static class ServiceCollectionExtensions
         var serverFilesProvider = new ServerFilesProvider("Server");
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
-        services.AddServerLoader<MigrateDatabaseServerLoader>();
-        services.AddServerLoader<LoadFractionsServerLoader>();
-
+        services.AddHostedService<MigrateDatabaseService>();
+        services.AddHostedService<LoadFractionsService>();
+        services.AddHostedService<SeedServerService>();
+        services.AddHostedService<LoadVehicleService>();
         services.AddHostedService<BrowserGuiHostedService>();
         services.AddHostedService<AdminResourceHostedService>();
         services.AddHostedService<AFKResourceHostedService>();
@@ -261,8 +250,9 @@ internal sealed class ServerLifecycle : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly MtaServer _mtaServer;
     private readonly ScopedCollisionShapeBehaviour _scopedCollisionShapeBehaviour;
+    private readonly IRealmResourcesProvider _realmResourcesProvider;
 
-    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour, IResourceServer resourceServer)
+    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour, IResourceServer resourceServer, IRealmResourcesProvider realmResourcesProvider)
     {
         _logger = logger;
         _gameplayOptions = gameplayOptions;
@@ -271,6 +261,7 @@ internal sealed class ServerLifecycle : IHostedService
         _serviceProvider = serviceProvider;
         _mtaServer = mtaServer;
         _scopedCollisionShapeBehaviour = scopedCollisionShapeBehaviour;
+        _realmResourcesProvider = realmResourcesProvider;
         _mtaServer.AddResourceServer(resourceServer);
     }
 
@@ -278,31 +269,11 @@ internal sealed class ServerLifecycle : IHostedService
     {
         using var activity = Activity.StartActivity(nameof(StartAsync));
 
-        using var scope = _serviceProvider.CreateScope();
-        var serverLoaders = scope.ServiceProvider.GetRequiredService<IEnumerable<IServerLoader>>();
-        {
-            using var serverLoadersActivity = Activity.StartActivity("Loading server");
-            foreach (var item in serverLoaders)
-            {
-                using var serverLoaderActivity = Activity.StartActivity($"Loading {item}");
-                try
-                {
-                    await item.Load();
-                }
-                catch (Exception ex)
-                {
-                    serverLoaderActivity?.SetStatus(ActivityStatusCode.Error);
-                    _logger.LogError(ex, "Failed to load server loader.");
-                    throw;
-                }
-            }
-        }
-
         CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
         CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
 
         _logger.LogInformation("Server started.");
-        _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
+        _logger.LogInformation("Found resources: {resourcesCount}", _realmResourcesProvider.Count);
         _logger.LogInformation("Created commands: {commandsCount}", _realmCommandService.Count);
     }
 

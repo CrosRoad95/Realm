@@ -4,8 +4,8 @@ namespace RealmCore.Server.Modules.Users;
 
 public interface IUsersService
 {
-    event Action<RealmPlayer>? SignedIn;
-    event Action<RealmPlayer>? SignedOut;
+    event Func<RealmPlayer, Task>? LoggedIn;
+    event Func<RealmPlayer, Task>? LoggedOut;
 
     Task<bool> AddToRole(RealmPlayer player, string role);
     ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
@@ -24,8 +24,8 @@ internal sealed class UsersService : IUsersService
     private readonly IServiceProvider _serviceProvider;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
 
-    public event Action<RealmPlayer>? SignedIn;
-    public event Action<RealmPlayer>? SignedOut;
+    public event Func<RealmPlayer, Task>? LoggedIn;
+    public event Func<RealmPlayer, Task>? LoggedOut;
 
     public UsersService(ILogger<UsersService> logger,
         IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
@@ -45,7 +45,8 @@ internal sealed class UsersService : IUsersService
             UserName = username,
         };
 
-        var userManager = _serviceProvider.GetRequiredService<UserManager<UserData>>();
+       using var serviceScope = _serviceProvider.CreateScope();
+        using var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<UserData>>();
         var identityResult = await userManager.CreateAsync(user, password);
         if (identityResult.Succeeded)
         {
@@ -60,8 +61,8 @@ internal sealed class UsersService : IUsersService
     public async Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player, bool dontLoadData = false)
     {
         var serial = player.Client.GetSerial();
-        var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var userData = await userManager.GetUserBySerial(serial, CancellationToken.None) ?? throw new Exception("No account found.");
+        var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+        var userData = await userDataRepository.GetBySerial(serial, CancellationToken.None) ?? throw new Exception("No account found.");
         
         if (!userData.QuickLogin)
             return new QuickLoginDisabled();
@@ -77,7 +78,8 @@ internal sealed class UsersService : IUsersService
 
     public async Task<bool> AddToRole(RealmPlayer player, string role)
     {
-        var userManager = player.GetRequiredService<UserManager<UserData>>();
+        using var serviceScope = _serviceProvider.CreateScope();
+        using var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<UserData>>();
         var result = await userManager.AddToRoleAsync(player.User.UserData, role);
         if (result.Succeeded)
         {
@@ -88,50 +90,47 @@ internal sealed class UsersService : IUsersService
         return false;
     }
 
-    public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user, bool dontLoadData = false)
+    public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData userData, bool dontLoadData = false)
     {
         using var _ = _logger.BeginElement(player);
 
-        if (user.IsDisabled)
-            return new UserDisabled(user.Id);
+        if (userData.IsDisabled)
+            return new UserDisabled(userData.Id);
 
         if (player.User.IsLoggedIn)
             return new PlayerAlreadyLoggedIn();
 
-        if (!_activeUsers.TrySetActive(user.Id, player))
+        if (!_activeUsers.TrySetActive(userData.Id, player))
             return new UserAlreadyInUse();
-
-        var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var signInManager = player.GetRequiredService<SignInManager<UserData>>();
 
         // TODO: Fix it
         //user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
 
         try
         {
-            var serial = player.Client.GetSerial();
+            var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+            var roles = await userDataRepository.GetRoles(userData.Id, CancellationToken.None);
+            var signInManager = player.GetRequiredService<SignInManager<UserData>>();
 
-            var roles = await userManager.GetRolesAsync(user);
-            var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user);
-            foreach (var role in roles)
-            {
-                if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+            var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(userData);
+            if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+                foreach (var role in roles)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
-            }
-            player.User.Login(user, claimsPrincipal, dontLoadData);
+
+            await player.User.Login(userData, claimsPrincipal, dontLoadData);
 
             await AuthorizePolicies(player);
             UpdateLastData(player);
 
-            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name);
-            SignedIn?.Invoke(player);
-            return new LoggedIn(user.Id);
+            //await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name);
+            //SignedIn?.Invoke(player);
+            return new LoggedIn(userData.Id);
         }
         catch (Exception ex)
         {
             if (player.User.IsLoggedIn)
-                player.User.LogOut();
-            _activeUsers.TrySetInactive(user.Id);
+                await player.User.LogOut();
+            _activeUsers.TrySetInactive(userData.Id);
             _logger.LogError(ex, "Failed to sign in a user.");
             throw;
         }
@@ -146,12 +145,19 @@ internal sealed class UsersService : IUsersService
         _activeUsers.TrySetInactive(id);
 
         await player.GetRequiredService<IElementSaveService>().Save(cancellationToken);
-        player.User.LogOut();
+        await player.User.LogOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
         player.Dimension = 0;
-        SignedOut?.Invoke(player);
+        if(LoggedOut != null)
+        {
+            foreach (Func<RealmPlayer, Task> item in LoggedOut.GetInvocationList())
+            {
+                await item.Invoke(player);
+            }
+        }
+
         return new LoggedOut(id);
     }
 

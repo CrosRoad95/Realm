@@ -17,22 +17,10 @@ internal sealed class UserLoggedInHostedService : PlayerLifecycle, IHostedServic
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private async Task PlayerSignedInCore(IPlayerUserFeature user, RealmPlayer player)
+    protected override async Task PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
     {
         var serial = player.Client.GetSerial();
         await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
-    }
-
-    protected override async void PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
-    {
-        try
-        {
-            await PlayerSignedInCore(user, player);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -43,6 +31,7 @@ internal sealed class UserLoggedInHostedService : PlayerLifecycle, IHostedServic
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _serviceScope.Dispose();
+
         return Task.CompletedTask;
     }
 }

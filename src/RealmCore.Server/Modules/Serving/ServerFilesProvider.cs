@@ -11,17 +11,14 @@ internal class ServerFilesProvider : IServerFilesProvider
     public string[] GetFiles(string path)
     {
         string currentDirectory = Directory.GetCurrentDirectory();
-        // TODO:
-        try
+        string fullPath = Path.Combine(_basePath, path);
+        if (Directory.Exists(fullPath))
         {
-            return Directory.GetFiles(Path.Combine(_basePath, path))
+            return Directory.GetFiles(fullPath)
                 .Select(x => Path.GetRelativePath(currentDirectory, x))
                 .ToArray();
         }
-        catch (Exception)
-        {
-            return [];
-        }
+        return Array.Empty<string>();
     }
 
     public async Task<string?> ReadAllText(string path)

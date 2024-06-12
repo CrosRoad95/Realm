@@ -11,18 +11,11 @@ internal sealed class FriendsHostedService : PlayerLifecycle, IHostedService
         _logger = logger;
     }
 
-    protected override async void PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
+    protected override async Task PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
     {
-        try
-        {
-            var friends = await _friendsService.GetAllFriends(user.Id);
-            // TODO:
-            ;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
+        var friends = await _friendsService.GetAllFriends(user.Id);
+        // TODO:
+        ;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
