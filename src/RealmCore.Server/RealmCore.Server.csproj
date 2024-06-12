@@ -41,7 +41,6 @@
 		<ProjectReference Include="..\RealmCore.Resources.Overlay\RealmCore.Resources.Overlay.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.StatisticsCounter\RealmCore.Resources.StatisticsCounter.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.ElementOutline\RealmCore.Resources.ElementOutline.csproj" />
-		<ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

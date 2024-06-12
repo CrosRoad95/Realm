@@ -75,6 +75,10 @@ public static class ServiceCollectionExtensions
                 throw new Exception("Identity configuration is null");
             services.AddRealmIdentity<MySqlDb>(identityConfiguration);
         }
+        else
+        {
+            throw new Exception("Database connection string is not configured.");
+        }
 
         services.AddResources();
         services.AddSingleton<HelpCommand>();
