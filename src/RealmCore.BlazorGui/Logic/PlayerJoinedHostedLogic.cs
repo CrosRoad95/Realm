@@ -54,7 +54,7 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         ShowLoginSequence(playerBrowser.Player);
     }
 
-    private async Task HandleSignedInCore(RealmPlayer player)
+    private async Task HandleLoggedIn(RealmPlayer player)
     {
         await player.FadeCameraAsync(CameraFade.Out);
         _chatBox.SetVisibleFor(player, true);
@@ -77,23 +77,6 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         {
             _chatBox.OutputTo(player, $"Witaj {name}");
         }
-    }
-
-    private Task HandleLoggedIn(RealmPlayer player)
-    {
-        Task.Run(async () =>
-        {
-            try
-            {
-                await HandleSignedInCore(player);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogHandleError(ex);
-            }
-        });
-
-        return Task.CompletedTask;
     }
 
     private Task HandleLoggedOut(RealmPlayer player)
@@ -129,12 +112,12 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
             player.Browser.Ready += HandleReady;
 
             ShowLoginSequence(player);
-            player.Level.LevelChanged += HandleLevelChanged;
+            player.Level.Changed += HandleLevelChanged;
         }
     }
 
     private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, LevelChange levelChange)
     {
-        _logger.LogInformation("Player leveled up: {level}", level);
+        _logger.LogInformation("Player level changed to: {level}, change: {levelChange}", level, levelChange);
     }
 }

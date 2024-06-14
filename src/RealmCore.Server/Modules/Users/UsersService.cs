@@ -122,8 +122,14 @@ internal sealed class UsersService : IUsersService
             await AuthorizePolicies(player);
             UpdateLastData(player);
 
-            //await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name);
-            //SignedIn?.Invoke(player);
+            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(userData.Id, player.Name);
+            if (LoggedIn != null)
+            {
+                foreach (Func<RealmPlayer, Task> item in LoggedIn.GetInvocationList())
+                {
+                    await item.Invoke(player);
+                }
+            }
             return new LoggedIn(userData.Id);
         }
         catch (Exception ex)

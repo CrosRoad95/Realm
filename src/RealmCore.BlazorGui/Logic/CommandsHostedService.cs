@@ -63,6 +63,11 @@ internal sealed class CommandsHostedService : IHostedService
         var debounce = new Debounce(500);
         var debounceCounter = 0;
 
+        _commandService.AddCommandHandler("testpolicy", () =>
+        {
+            _chatBox.Output("Ok");
+        }, ["Admin"]);
+
         _commandService.AddCommandHandler("cmdbasic", async ([CallingPlayer] RealmPlayer player, [Range(1, 20)] int a, int b) =>
         {
             await Task.Delay(100);

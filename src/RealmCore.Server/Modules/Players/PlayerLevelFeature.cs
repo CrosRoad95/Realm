@@ -13,7 +13,7 @@ public interface IPlayerLevelFeature : IPlayerFeature
     uint Current { get; set; }
     uint Experience { get; set; }
 
-    event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
+    event Action<IPlayerLevelFeature, uint, LevelChange>? Changed;
     event Action<IPlayerLevelFeature, uint, uint>? ExperienceChanged;
 
     void GiveExperience(uint amount);
@@ -27,7 +27,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
     private uint _experience;
     private UserData? _userData;
 
-    public event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
+    public event Action<IPlayerLevelFeature, uint, LevelChange>? Changed;
     public event Action<IPlayerLevelFeature, uint, uint>? ExperienceChanged;
     public event Action? VersionIncreased;
 
@@ -46,7 +46,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         _level = userData.Level;
         _experience = userData.Experience;
         _userData = userData;
-        LevelChanged?.Invoke(this, _level, LevelChange.Set);
+        Changed?.Invoke(this, _level, LevelChange.Set);
         ExperienceChanged?.Invoke(this, before, _experience);
     }
 
@@ -58,7 +58,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         _level = 0;
         _experience = 0;
         _userData = null;
-        LevelChanged?.Invoke(this, _level, LevelChange.Set);
+        Changed?.Invoke(this, _level, LevelChange.Set);
         ExperienceChanged?.Invoke(this, before, _experience);
     }
 
@@ -84,7 +84,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
                 for (var i = _level; value > _level; i++)
                 {
                     _level = i;
-                    LevelChanged?.Invoke(this, i, LevelChange.Increase);
+                    Changed?.Invoke(this, i, LevelChange.Increase);
                 }
             }
             else
@@ -92,7 +92,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
                 for (var i = _level; value < _level; i--)
                 {
                     _level = i;
-                    LevelChanged?.Invoke(this, i, LevelChange.Decrease);
+                    Changed?.Invoke(this, i, LevelChange.Decrease);
                 }
             }
             _level = value;
@@ -147,7 +147,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
             if (_userData != null)
                 _userData.Level = _level;
 
-            LevelChanged?.Invoke(this, _level, LevelChange.Increase);
+            Changed?.Invoke(this, _level, LevelChange.Increase);
             CheckForNextLevel();
         }
     }

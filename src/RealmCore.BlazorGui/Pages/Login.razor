@@ -2,16 +2,20 @@
 @layout RealmGuiBaseLayout<LoginGui>
 <PageTitle>login</PageTitle>
 
-<button @onclick="HandleLogin">login</button>
+<button @onclick="HandleLoginAdmin">login admin</button>
+<button @onclick="HandleLoginUser">login user</button>
 
 @code{
-
     [CascadingParameter]
     private LoginGui Gui { get; set; }
 
-
-    private async Task HandleLogin()
+    private async Task HandleLoginAdmin()
     {
-        await Gui.Login();
+        await Gui.LoginAdmin();
+    }
+
+    private async Task HandleLoginUser()
+    {
+        await Gui.LoginUser();
     }
 }

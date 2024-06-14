@@ -319,6 +319,21 @@ public class InventoryTests
         inventory.HasSpaceForItem(itemsCollection, 1, 101).Should().BeFalse();
     }
 
+    [Fact]
+    public async Task HasSpaceForEdgeCase()
+    {
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
+        Seed(hosting);
+        var inventory = player.Inventory.CreatePrimary(100);
+
+        inventory.Size = 10;
+        inventory.HasSpaceForItem(itemsCollection, 1, 10).Should().BeTrue();
+        inventory.HasSpaceForItem(itemsCollection, 1, 11).Should().BeFalse();
+    }
+
     private void HandleItemUsed(Inventory inventory, InventoryItem usedItem, ItemAction flags)
     {
         usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);

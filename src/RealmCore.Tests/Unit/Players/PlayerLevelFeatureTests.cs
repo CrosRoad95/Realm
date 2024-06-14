@@ -27,7 +27,7 @@ public class PlayerLevelFeatureTests
         int addedLevels = 0;
         var monitor = level.Monitor();
 
-        level.LevelChanged += (e, level, levelChange) =>
+        level.Changed += (e, level, levelChange) =>
         {
             if(levelChange == LevelChange.Increase)
                 addedLevels++;

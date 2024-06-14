@@ -95,6 +95,9 @@
 					"UserId": 254302438234783746
 				}
 			}
+		},
+		"user": {
+			"Password": "asdASD123!@#"
 		}
 	},
 	"Upgrades": {
