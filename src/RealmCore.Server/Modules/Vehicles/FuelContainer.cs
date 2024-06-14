@@ -100,8 +100,6 @@ public class FuelContainer
             if (value >= MaxCapacity)
                 value = MaxCapacity;
             _amount = value;
-            if (_vehicleFuelData != null)
-                _vehicleFuelData.Amount = value;
             Update(true);
             AmountChanged?.Invoke(this, value);
         }
@@ -124,6 +122,8 @@ public class FuelContainer
                 _amount = _maxCapacity;
             if (_vehicleFuelData != null)
                 _vehicleFuelData.MaxCapacity = value;
+
+            _lastPosition = Vehicle.Position;
             Update(true);
             MaxCapacityChanged?.Invoke(this, value);
         }
@@ -180,12 +180,20 @@ public class FuelContainer
             return;
 
         _amount -= consumedFuel;
-        if (_amount <= 0)
+        try
         {
-            _amount = 0;
-            Vehicle.IsEngineOn = false;
-            FuelRanOut?.Invoke(this);
+            if (_amount <= 0)
+            {
+                _amount = 0;
+                Vehicle.IsEngineOn = false;
+                FuelRanOut?.Invoke(this);
+            }
+            AmountChanged?.Invoke(this, _amount);
         }
-        AmountChanged?.Invoke(this, _amount);
+        finally
+        {
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.Amount = _amount;
+        }
     }
 }

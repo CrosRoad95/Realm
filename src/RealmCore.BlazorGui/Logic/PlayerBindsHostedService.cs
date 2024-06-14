@@ -1,6 +1,4 @@
-﻿using static RealmCore.Server.Modules.Users.UsersResults;
-
-namespace RealmCore.BlazorGui.Logic;
+﻿namespace RealmCore.BlazorGui.Logic;
 
 
 internal class CounterPageGui : BrowserGui

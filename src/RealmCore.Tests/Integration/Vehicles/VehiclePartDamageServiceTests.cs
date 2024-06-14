@@ -8,7 +8,7 @@ public class VehiclePartDamageServiceTests
         using var hosting = new RealmTestingServerHosting();
         var vehicle = hosting.CreateVehicle();
 
-        var addPart = () => vehicle.PartDamage.AddPart(1, 100);
+        var addPart = () => vehicle.PartDamage.TryAddPart(1, 100);
 
         addPart.Should().NotThrow();
 
@@ -27,7 +27,7 @@ public class VehiclePartDamageServiceTests
         using var hosting = new RealmTestingServerHosting();
         var vehicle = hosting.CreateVehicle();
 
-        var addPart = () => vehicle.PartDamage.AddPart(1, -100);
+        var addPart = () => vehicle.PartDamage.TryAddPart(1, -100);
 
         addPart.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -44,7 +44,7 @@ public class VehiclePartDamageServiceTests
             destroyed = true;
         }
         vehicle.PartDamage.PartDestroyed += handlePartDestroyed;
-        vehicle.PartDamage.AddPart(1, 0);
+        vehicle.PartDamage.TryAddPart(1, 0);
 
         destroyed.Should().BeTrue();
     }
@@ -55,8 +55,8 @@ public class VehiclePartDamageServiceTests
         using var hosting = new RealmTestingServerHosting();
         var vehicle = hosting.CreateVehicle();
 
-        vehicle.PartDamage.AddPart(1, 100);
-        vehicle.PartDamage.RemovePart(1);
+        vehicle.PartDamage.TryAddPart(1, 100).Should().BeTrue();
+        vehicle.PartDamage.TryRemovePart(1).Should().BeFalse();
 
         vehicle.PartDamage.Parts.Should().BeEmpty();
     }
@@ -75,7 +75,7 @@ public class VehiclePartDamageServiceTests
             destroyed = true;
         }
         vehicle.PartDamage.PartDestroyed += handlePartDestroyed;
-        vehicle.PartDamage.AddPart(1, 100);
+        vehicle.PartDamage.TryAddPart(1, 100);
 
         vehicle.PartDamage.Modify(1, difference);
         destroyed.Should().Be(shouldBeDestroyed);

@@ -16,6 +16,7 @@ public class PlayerSearchOptionsAttribute : Attribute
 public sealed class RealmCommandService : PlayerLifecycle
 {   
     private readonly ChatBox _chatBox;
+    private readonly IOptions<CommandsOptions> _options;
     private readonly ILogger<RealmCommandService> _logger;
 
     private readonly Dictionary<string, CommandInfo> _commands = [];
@@ -24,11 +25,11 @@ public sealed class RealmCommandService : PlayerLifecycle
     public string[] CommandNames => [.. _commands.Keys.Concat(_commands.Keys)];
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands) : base(playersEventManager)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands, IOptions<CommandsOptions> options) : base(playersEventManager)
     {
         _logger = logger;
         _chatBox = chatBox;
-
+        _options = options;
         foreach (var inGameCommand in inGameCommands)
         {
             var type = inGameCommand.GetType();
@@ -100,6 +101,9 @@ public sealed class RealmCommandService : PlayerLifecycle
         CheckIfCommandExists(commandInfo.CommandName);
 
         _commands.Add(commandInfo.CommandName, commandInfo);
+
+        if (!_options.Value.LogCreatedCommands)
+            return;
 
         if (commandInfo.IsAsync)
         {

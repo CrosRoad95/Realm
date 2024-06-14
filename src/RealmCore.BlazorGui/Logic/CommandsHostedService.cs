@@ -1,13 +1,4 @@
-﻿using RealmCore.Persistence.Repository;
-using RealmCore.Server.Modules.Persistence;
-using RealmCore.Server.Modules.Players.Money;
-using RealmCore.Server.Modules.Search;
-using RealmCore.Server.Modules.Vehicles.Access.Controllers;
-using SlipeServer.Server.Elements.ColShapes;
-using SlipeServer.Server.Elements.Events;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -29,21 +20,10 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly IElementCollection _elementCollection;
     private readonly RealmDiscordService? _discordService;
 
-    private class TestState
-    {
-        public string Text { get; set; }
-    }
-
-    private enum TestEnum
-    {
-        Test1,
-        Test2,
-    }
-
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, RealmDiscordService? discordService = null)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, RealmDiscordService? discordService = null)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -60,7 +40,7 @@ internal sealed class CommandsHostedService : IHostedService
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         _discordService = discordService;
-        var debounce = new Debounce(500);
+        var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
         _commandService.AddCommandHandler("testpolicy", () =>
@@ -196,7 +176,7 @@ internal sealed class CommandsHostedService : IHostedService
         {
             var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)args.ReadUShort());
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            vehicle.PartDamage.AddPart(1, 1337);
+            vehicle.PartDamage.TryAddPart(1, 1337);
             vehicle.AccessController = new VehicleExclusiveAccessController(player);
             _chatBox.OutputTo(player, $"veh created");
         });
@@ -209,7 +189,7 @@ internal sealed class CommandsHostedService : IHostedService
 
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            vehicle.PartDamage.AddPart(1, 1337);
+            vehicle.PartDamage.TryAddPart(1, 1337);
             vehicle.Access.AddAsOwner(player);
             _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.VehicleId}");
         });
@@ -219,7 +199,7 @@ internal sealed class CommandsHostedService : IHostedService
             var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            vehicle.PartDamage.AddPart(1, 1337);
+            vehicle.PartDamage.TryAddPart(1, 1337);
             vehicle.Access.AddAsOwner(player);
             _chatBox.OutputTo(player, "Stworzono pojazd.");
         });
@@ -415,7 +395,7 @@ internal sealed class CommandsHostedService : IHostedService
 
                 vehicle.Upgrades.AddUpgrade(1);
                 vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-                vehicle.PartDamage.AddPart(1, 1337);
+                vehicle.PartDamage.TryAddPart(1, 1337);
             }
         });
 

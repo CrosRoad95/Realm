@@ -108,5 +108,14 @@
 	  <Using Include="RealmCore.Server.Modules.Players.Achievements" />
 	  <Using Include="Microsoft.Extensions.Options" />
 	  <Using Include="RealmCore.Server.Modules.Players.Gui" />
+	  <Using Include="RealmCore.Persistence.Repository" />
+	  <Using Include="RealmCore.Server.Modules.Persistence" />
+	  <Using Include="RealmCore.Server.Modules.Players.Money" />
+	  <Using Include="RealmCore.Server.Modules.Search" />
+	  <Using Include="RealmCore.Server.Modules.Vehicles.Access.Controllers" />
+	  <Using Include="SlipeServer.Server.Elements.ColShapes" />
+	  <Using Include="SlipeServer.Server.Elements.Events" />
+	  <Using Include="System.ComponentModel.DataAnnotations" />
+	  <Using Include="System.Diagnostics" />
 	</ItemGroup>
 </Project>

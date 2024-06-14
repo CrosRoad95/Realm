@@ -581,10 +581,6 @@ public class RealmPlayer : Player, IDisposable
                     throw new NotSupportedException();
             }
         }
-        catch (Exception)
-        {
-            throw;
-        }
         finally
         {
             scope?.Dispose();
@@ -689,10 +685,6 @@ public class RealmPlayer : Player, IDisposable
             DoAnimationInternal(animation, ref timeSpan);
             if (timeSpan != null)
                 await Task.Delay(timeSpan.Value, cancellationToken);
-        }
-        catch (Exception)
-        {
-            throw;
         }
         finally
         {

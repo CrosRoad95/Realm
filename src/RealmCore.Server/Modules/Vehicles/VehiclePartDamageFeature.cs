@@ -9,11 +9,11 @@ public interface IVehiclePartDamageFeature : IVehicleFeature
     /// </summary>
     event Action<IVehiclePartDamageFeature, short>? PartDestroyed;
 
-    void AddPart(short partId, float state);
+    bool TryAddPart(short partId, float state);
     float GetState(short partId);
     bool HasPart(short partId);
     void Modify(short partId, float difference);
-    void RemovePart(short partId);
+    bool TryRemovePart(short partId);
     bool TryGetState(short partId, out float state);
 }
 
@@ -42,7 +42,7 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUse
         Vehicle = vehicleContext.Vehicle;
     }
 
-    public void AddPart(short partId, float state)
+    public bool TryAddPart(short partId, float state)
     {
         lock (_lock)
         {
@@ -50,7 +50,7 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUse
                 throw new ArgumentOutOfRangeException(nameof(state));
             var exists = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
             if (exists != null)
-                throw new ArgumentException("Part id already added");
+                return false;
 
             _vehiclePartDamages.Add(new VehiclePartDamageData
             {
@@ -61,16 +61,21 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUse
 
         if (state == 0)
             PartDestroyed?.Invoke(this, partId);
+
+        return true;
     }
 
-    public void RemovePart(short partId)
+    public bool TryRemovePart(short partId)
     {
+        bool removed = false;
         lock (_lock)
         {
             var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId) ?? throw new ArgumentException("Part id doesn't exists");
             _vehiclePartDamages.Remove(vehiclePartDamage);
         }
         PartDestroyed?.Invoke(this, partId);
+
+        return removed;
     }
 
     public void Modify(short partId, float difference)

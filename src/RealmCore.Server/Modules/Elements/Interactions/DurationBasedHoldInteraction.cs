@@ -36,10 +36,6 @@ public abstract class DurationBasedHoldInteraction : Interaction
             _interactionTaskCompletionSource = new TaskCompletionSource();
             _interactionTask = Task.Delay(Time, cancellationToken);
         }
-        catch (Exception)
-        {
-            throw;
-        }
         finally
         {
             _semaphore.Release();
@@ -57,10 +53,6 @@ public abstract class DurationBasedHoldInteraction : Interaction
                 return true;
             }
             return false;
-        }
-        catch (Exception)
-        {
-            throw;
         }
         finally
         {
@@ -109,10 +101,6 @@ public abstract class DurationBasedHoldInteraction : Interaction
             }
 
             return true;
-        }
-        catch (Exception)
-        {
-            throw;
         }
         finally
         {

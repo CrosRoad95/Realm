@@ -9,7 +9,7 @@ public interface IDebounce
     Task InvokeAsync(Func<Task> task, CancellationToken cancellationToken = default);
 }
 
-public class Debounce : IDebounce
+internal sealed class Debounce : IDebounce
 {
     private int _milliseconds;
     private CancellationTokenSource? _cancelationTokenSource;
@@ -62,10 +62,6 @@ public class Debounce : IDebounce
         {
             // Ignore
         }
-        catch (Exception)
-        {
-            throw;
-        }
     }
 
     public async Task InvokeAsync(Func<Task> task, CancellationToken cancellationToken = default)
@@ -83,10 +79,6 @@ public class Debounce : IDebounce
         catch (TaskCanceledException)
         {
             // Ignore
-        }
-        catch (Exception)
-        {
-            throw;
         }
     }
 }

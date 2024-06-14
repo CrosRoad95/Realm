@@ -55,10 +55,6 @@ public class TestDebounce : IDebounce
         {
             // Ignore
         }
-        catch (Exception)
-        {
-            throw;
-        }
     }
 
     public async Task InvokeAsync(Func<Task> task, CancellationToken cancellationToken = default)
@@ -72,10 +68,6 @@ public class TestDebounce : IDebounce
         catch (TaskCanceledException)
         {
             // Ignore
-        }
-        catch (Exception)
-        {
-            throw;
         }
     }
 }

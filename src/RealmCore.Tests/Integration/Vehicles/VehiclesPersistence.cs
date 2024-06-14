@@ -71,7 +71,7 @@ public class VehiclesPersistence
         vehicle1.Access.AddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;
         vehicle1.Upgrades.AddUpgrade(250, false);
-        vehicle1.PartDamage.AddPart(200, 300);
+        vehicle1.PartDamage.TryAddPart(200, 300);
         vehicle1.Engines.TryAdd(50);
         var id = vehicle1.VehicleId;
         await vehiclesService.Destroy(vehicle1);

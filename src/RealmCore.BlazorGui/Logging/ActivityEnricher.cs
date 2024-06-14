@@ -1,6 +1,5 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.BlazorGui.Logging;
