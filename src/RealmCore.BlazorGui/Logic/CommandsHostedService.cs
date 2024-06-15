@@ -43,23 +43,23 @@ internal sealed class CommandsHostedService : IHostedService
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
-        _commandService.AddCommandHandler("testpolicy", () =>
+        _commandService.Add("testpolicy", () =>
         {
             _chatBox.Output("Ok");
         }, ["Admin"]);
 
-        _commandService.AddCommandHandler("cmdbasic", async ([CallingPlayer] RealmPlayer player, [Range(1, 20)] int a, int b) =>
+        _commandService.Add("cmdbasic", async ([CallingPlayer] RealmPlayer player, [Range(1, 20)] int a, int b) =>
         {
             await Task.Delay(100);
             _chatBox.Output($"foo: {a}, {b}");
         });
 
-        _commandService.AddCommandHandler("cmdplr", (RealmPlayer player, CancellationToken cancellationToken, int x) =>
+        _commandService.Add("cmdplr", (RealmPlayer player, CancellationToken cancellationToken, int x) =>
         {
             _chatBox.Output($"foo: {player.Name} {cancellationToken} x={x}");
         });
 
-        _commandService.AddCommandHandler("defaultarg", (int x = 10) =>
+        _commandService.Add("defaultarg", (int x = 10) =>
         {
             _chatBox.Output($"x={x}");
         });

@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Commands;
 
 [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
-public class CallingPlayerAttribute : Attribute { }
-
-[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
-public class PlayerSearchOptionsAttribute : Attribute
+public class CommandAttribute : Attribute { }
+public class CallingPlayerAttribute : CommandAttribute { }
+public class ReadRestAsStringAttribute : CommandAttribute { }
+public class PlayerSearchOptionsAttribute : CommandAttribute
 {
     public PlayerSearchOption PlayerSearchOption { get; }
     public PlayerSearchOptionsAttribute(PlayerSearchOption playerSearchOption = PlayerSearchOption.All)
@@ -68,7 +68,7 @@ public sealed class RealmCommandService : PlayerLifecycle
 
     protected override void PlayerLeft(RealmPlayer player)
     {
-        player.CommandEntered += HandleCommandEntered;
+        player.CommandEntered -= HandleCommandEntered;
     }
 
     private async void HandleCommandEntered(Player player, PlayerCommandEventArgs eventArgs)
@@ -96,7 +96,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         }
     }
 
-    private void AddCommandCore(CommandInfo commandInfo)
+    private void AddCore(CommandInfo commandInfo)
     {
         CheckIfCommandExists(commandInfo.CommandName);
 
@@ -121,12 +121,12 @@ public sealed class RealmCommandService : PlayerLifecycle
         }
     }
 
-    public void AddCommandHandler(string commandName, Delegate callback, string[]? requiredPolicies = null, string? description = null, string? category = null)
+    public void Add(string commandName, Delegate callback, string[]? requiredPolicies = null, string? description = null, string? category = null)
     {
         var isAsync = callback.Method.ReturnType == typeof(Task);
         if (isAsync)
         {
-            AddCommandCore(new DelegateAsyncCommandInfo(commandName, callback)
+            AddCore(new DelegateAsyncCommandInfo(commandName, callback)
             {
                 RequiredPolicies = requiredPolicies,
                 Description = description,
@@ -135,7 +135,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         }
         else
         {
-            AddCommandCore(new DelegateSyncCommandInfo(commandName, callback)
+            AddCore(new DelegateSyncCommandInfo(commandName, callback)
             {
                 RequiredPolicies = requiredPolicies,
                 Description = description,
@@ -147,7 +147,7 @@ public sealed class RealmCommandService : PlayerLifecycle
     [Obsolete("Use variant with delegate")]
     public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
-        AddCommandCore(new AsyncCommandInfo(commandName, callback)
+        AddCore(new AsyncCommandInfo(commandName, callback)
         {
             RequiredPolicies = requiredPolicies,
             Description = description,
@@ -159,7 +159,7 @@ public sealed class RealmCommandService : PlayerLifecycle
     [Obsolete("Use variant with delegate")]
     public void AddCommandHandler(string commandName, Action<RealmPlayer, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
-        AddCommandCore(new SyncCommandInfo(commandName, callback)
+        AddCore(new SyncCommandInfo(commandName, callback)
         {
             RequiredPolicies = requiredPolicies,
             Description = description,

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Commands;
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace RealmCore.Server.Modules.Commands;
 
 public abstract class CommandInfo
 {
@@ -84,6 +86,29 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
         return plr;
 
     }
+
+    private bool IsNumericType(Type type) => Type.GetTypeCode(type) switch
+    {
+        TypeCode.Byte or TypeCode.SByte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or TypeCode.Decimal or TypeCode.Double or TypeCode.Single => true,
+        _ => false,
+    };
+
+    public object ConvertToNumber(string input, TypeCode targetType) => targetType switch
+    {
+        TypeCode.Byte => Convert.ToByte(input),
+        TypeCode.SByte => Convert.ToSByte(input),
+        TypeCode.UInt16 => Convert.ToUInt16(input),
+        TypeCode.UInt32 => Convert.ToUInt32(input),
+        TypeCode.UInt64 => Convert.ToUInt64(input),
+        TypeCode.Int16 => Convert.ToInt16(input),
+        TypeCode.Int32 => Convert.ToInt32(input),
+        TypeCode.Int64 => Convert.ToInt64(input),
+        TypeCode.Decimal => Convert.ToDecimal(input),
+        TypeCode.Double => Convert.ToDouble(input),
+        TypeCode.Single => Convert.ToSingle(input),
+        _ => throw new ArgumentException("Unsupported TypeCode", nameof(targetType)),
+    };
+
     protected object[] GetArgs(RealmPlayer player, CommandArguments arguments, CancellationToken cancellationToken)
     {
         int i = 0;
@@ -102,48 +127,36 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
             }
             else if (parameterInfo.ParameterType == typeof(string))
             {
-                value = arguments.ReadArgument();
+                bool readAll = false;
+                foreach (var attribute in parameterInfo.GetCustomAttributes())
+                {
+                    if (attribute is ReadRestAsStringAttribute)
+                    {
+                        value = arguments.ReadAllAsString();
+                        break;
+                    }
+                }
+
+                if(!readAll)
+                    value = arguments.ReadArgument();
             }
-            else if (parameterInfo.ParameterType == typeof(short))
-            {
-                value = arguments.ReadShort();
-            }
-            else if (parameterInfo.ParameterType == typeof(ushort))
-            {
-                value = arguments.ReadUShort();
-            }
-            else if (parameterInfo.ParameterType == typeof(byte))
-            {
-                value = arguments.ReadByte();
-            }
-            else if (parameterInfo.ParameterType == typeof(uint))
-            {
-                value = arguments.ReadUInt();
-            }
-            else if (parameterInfo.ParameterType == typeof(decimal))
-            {
-                value = arguments.ReadDecimal();
-            }
-            else if (parameterInfo.ParameterType == typeof(float))
-            {
-                value = arguments.ReadFloat();
-            }
-            else if (parameterInfo.ParameterType == typeof(int))
+            else if (IsNumericType(parameterInfo.ParameterType))
             {
                 if (parameterInfo.HasDefaultValue)
                 {
-                    if(arguments.TryReadInt(out int intValue))
+                    if(arguments.TryReadArgument(out string? str) && str != null)
                     {
-                        value = intValue;
+                        value = ConvertToNumber(str, Type.GetTypeCode(parameterInfo.ParameterType));
                     }
                     else
                     {
-                        value = (int)parameterInfo.DefaultValue;
+                        value = parameterInfo.DefaultValue;
                     }
                 }
                 else
                 {
-                    value = arguments.ReadInt();
+                    var number = arguments.ReadArgument();
+                    value = ConvertToNumber(number, Type.GetTypeCode(parameterInfo.ParameterType));
                 }
             }
             else

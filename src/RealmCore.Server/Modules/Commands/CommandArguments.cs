@@ -165,7 +165,7 @@ public class CommandArguments
             return value2;
         throw new CommandArgumentException(CurrentArgument, "Liczba jest poza zakresem", value);
     }
-
+    
     public uint ReadUInt()
     {
         var value = ReadArgument();
