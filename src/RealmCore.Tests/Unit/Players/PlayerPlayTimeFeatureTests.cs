@@ -21,7 +21,7 @@ public class PlayerPlayTimeFeatureTests
         playTime2.PlayTime.Should().Be(TimeSpan.Zero);
         playTime2.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1000));
 
-        dateTimeProvider.AddOffset(TimeSpan.FromSeconds(50));
+        dateTimeProvider.Add(TimeSpan.FromSeconds(50));
 
         playTime1.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
         playTime1.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
@@ -39,9 +39,9 @@ public class PlayerPlayTimeFeatureTests
         var playTime = player.PlayTime;
 
         playTime.Category = 1;
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
         playTime.Category = 2;
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
 
         playTime.ToArray().Should().BeEquivalentTo([
             new PlayerPlayTimeDto(1, TimeSpan.FromSeconds(30)),
@@ -58,8 +58,8 @@ public class PlayerPlayTimeFeatureTests
         var playTime = player.PlayTime;
 
         playTime.Category = 1;
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
 
         playTime.GetByCategory(1).Should().Be(TimeSpan.FromMinutes(1));
     }

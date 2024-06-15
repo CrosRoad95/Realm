@@ -8,7 +8,7 @@ public class TestDateTimeProvider : IDateTimeProvider
         _now = now ?? DateTime.Now;
     }
 
-    public void AddOffset(TimeSpan timeSpan)
+    public void Add(TimeSpan timeSpan)
     {
         _now += timeSpan;
     }

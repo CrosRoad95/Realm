@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace RealmCore.Server.Modules.Commands;
+﻿namespace RealmCore.Server.Modules.Commands;
 
 public abstract class CommandInfo
 {

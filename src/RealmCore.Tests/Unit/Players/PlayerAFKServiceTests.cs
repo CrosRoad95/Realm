@@ -1,15 +1,24 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerAFKServiceTests
+public class PlayerAFKServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingPlayer _player;
+    private readonly TestDateTimeProvider _dateTimeProvider;
+    private readonly TestDebounceFactory _debounceFactory;
+
+    public PlayerAFKServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _dateTimeProvider = _fixture.Hosting.DateTimeProvider;
+        _debounceFactory = _fixture.Hosting.DebounceFactory;
+    }
+
     [Fact]
     public async Task ServiceShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var afkService = player.AFK;
-        var dateTimeProvider = hosting.DateTimeProvider;
+        var afkService = _player.AFK;
 
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;
@@ -22,14 +31,14 @@ public class PlayerAFKServiceTests
 
         afkService.IsAFK.Should().BeFalse();
 
-        var debounce = hosting.TestDebounceFactory.LastDebounce;
+        var debounce = _debounceFactory.LastDebounce;
         afkService.HandleAFKStarted();
         await debounce.Release();
         _elapsed.Should().Be(TimeSpan.Zero);
         _isAfk.Should().BeTrue();
         afkService.IsAFK.Should().BeTrue();
 
-        dateTimeProvider.AddOffset(TimeSpan.FromMinutes(5));
+        _dateTimeProvider.Add(TimeSpan.FromMinutes(5));
         afkService.HandleAFKStopped();
 
         _elapsed.Should().Be(TimeSpan.FromMinutes(5));

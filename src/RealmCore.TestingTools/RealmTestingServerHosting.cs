@@ -1,17 +1,18 @@
 ﻿namespace RealmCore.TestingTools;
 
-public class TestingServerHosting2<T> : IDisposable where T : Player
+public class TestingServerHosting2<TPlayer> : IDisposable where TPlayer : Player
 {
     private readonly IHost host;
 
-    public TestingServer<T> Server { get; }
+    public TestingServer<TPlayer> Server { get; }
+
     public IHost Host => this.host;
 
-    public TestingServerHosting2(Configuration configuration, Func<IServiceProvider, TestingServer<T>> serverFactory, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null)
+    public TestingServerHosting2(Configuration configuration, Func<IServiceProvider, TestingServer<TPlayer>> serverFactory, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null)
     {
         var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 
-        builder.Services.AddMtaServer<TestingServer<T>>(configuration, serverFactory, builder =>
+        builder.Services.AddMtaServer<TestingServer<TPlayer>>(configuration, serverFactory, builder =>
         {
             builder.AddDefaultServices();
             serverBuilder?.Invoke(builder);
@@ -43,7 +44,7 @@ public class TestingServerHosting2<T> : IDisposable where T : Player
 
         tcs.Task.Wait();
 
-        this.Server = this.host.Services.GetRequiredService<TestingServer<T>>();
+        this.Server = this.host.Services.GetRequiredService<TestingServer<TPlayer>>();
     }
 
     public void Dispose()
@@ -58,20 +59,12 @@ public class TestingServerHosting2<T> : IDisposable where T : Player
     }
 }
 
-public class TestingServerHosting2 : TestingServerHosting2<TestingPlayer>
-{
-    public TestingServerHosting2(Configuration configuration, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null) : base(configuration, services => new TestingServer<TestingPlayer>(services, configuration), applicationBuilder, serverBuilder)
-    {
-
-    }
-}
-
-public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlayer>
+public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer> where TPlayer: RealmPlayer
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
-    public TestDebounceFactory TestDebounceFactory => GetRequiredService<TestDebounceFactory>();
+    public TestDebounceFactory DebounceFactory => GetRequiredService<TestDebounceFactory>();
 
-    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<RealmTestingPlayer>(services, new()), hostBuilder =>
+    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<TPlayer>(services, new()), hostBuilder =>
     {
         hostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -87,7 +80,6 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
             ["Discord:StatusChannel:ChannelId"] = "1025774028255932497",
             ["Identity:Policies:SampleRole:RequireRoles:0"] = "SampleRole",
             ["Identity:Policies:Admin:RequireRoles:0"] = "Admin",
-            //["Identity:Policies:Admin:RequireClaims:Test"] = "true",
             ["Gameplay:MoneyLimit"] = "1000000",
             ["Gameplay:MoneyPrecision"] = "4",
             ["Gameplay:DefaultInventorySize"] = "20",
@@ -168,17 +160,18 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
         return player;
     }
 
-    public async Task<RealmTestingPlayer> CreatePlayer(bool notLoggedIn = false, string? name = null, bool dontLoadData = true)
+    public async Task<TPlayer> CreatePlayer(bool notLoggedIn = false, string? name = null, bool dontLoadData = true)
     {
         var tcs = new TaskCompletionSource();
-        RealmTestingPlayer? player = null;
+        TPlayer? player = null;
         var playersEventManager = Server.GetRequiredService<PlayersEventManager>();
         playersEventManager.Loaded += HandlePlayersEventManagerLoaded;
 
         player = Server.AddFakePlayer();
+
         void HandlePlayersEventManagerLoaded(Player plr)
         {
-            if(plr == player)
+            if (plr == player)
                 tcs.SetResult();
         }
 
@@ -186,7 +179,6 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
             player.Name = name;
 
         var realmResourcesProvider = Server.GetRequiredService<IRealmResourcesProvider>();
-
 
         foreach (var resource in realmResourcesProvider.All)
         {
@@ -245,9 +237,16 @@ public class RealmTestingServerHosting : TestingServerHosting2<RealmTestingPlaye
         await tcs.Task;
     }
 
-
     public async Task LogOutPlayer(RealmPlayer player)
     {
         await player.GetRequiredService<IUsersService>().LogOut(player);
+    }
+}
+
+public class RealmTestingServerHosting : RealmTestingServerHosting<RealmTestingPlayer>
+{
+    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(outerApplicationBuilder, outerServerBuilder)
+    {
+
     }
 }

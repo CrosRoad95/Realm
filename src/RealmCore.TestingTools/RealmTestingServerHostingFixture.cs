@@ -1,15 +1,16 @@
-﻿
+﻿using Microsoft.Extensions.Options;
+
 namespace RealmCore.TestingTools;
 
 public class RealmTestingServerHostingFixture : IDisposable
 {
-    private readonly RealmTestingServerHosting _hosting;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
 
-    public RealmTestingServerHosting Hosting => _hosting;
+    public RealmTestingServerHosting<RealmTestingPlayer> Hosting => _hosting;
 
     public RealmTestingServerHostingFixture()
     {
-        _hosting = new RealmTestingServerHosting();
+        _hosting = new RealmTestingServerHosting<RealmTestingPlayer>();
     }
 
     public void Dispose()
@@ -18,17 +19,17 @@ public class RealmTestingServerHostingFixture : IDisposable
     }
 }
 
-public class RealmTestingServerHostingFixtureWithPlayer : IAsyncLifetime
+public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetime where TPlayer: RealmPlayer
 {
-    private readonly RealmTestingServerHosting _hosting;
-    private RealmTestingPlayer? _player;
+    private readonly RealmTestingServerHosting<TPlayer> _hosting;
+    private TPlayer? _player;
 
-    public RealmTestingServerHosting Hosting => _hosting;
-    public RealmTestingPlayer Player => _player ?? throw new InvalidOperationException();
+    public RealmTestingServerHosting<TPlayer> Hosting => _hosting;
+    public TPlayer Player => _player ?? throw new InvalidOperationException();
 
     public RealmTestingServerHostingFixtureWithPlayer()
     {
-        _hosting = new RealmTestingServerHosting();
+        _hosting = new RealmTestingServerHosting<TPlayer>();
     }
 
     public async Task InitializeAsync()
@@ -38,8 +39,20 @@ public class RealmTestingServerHostingFixtureWithPlayer : IAsyncLifetime
 
     public Task DisposeAsync()
     {
-
         _hosting.Dispose();
         return Task.CompletedTask;
     }
+
+    public virtual void CleanPlayer(RealmPlayer player)
+    {
+        var gameplayOptions = _hosting.GetRequiredService<IOptions<GameplayOptions>>().Value;
+        player.Money.Clean();
+
+        player.Money.SetLimitAndPrecision(gameplayOptions.MoneyLimit, gameplayOptions.MoneyPrecision);
+    }
+}
+
+public class RealmTestingServerHostingFixtureWithPlayer : RealmTestingServerHostingFixtureWithPlayer<RealmTestingPlayer>
+{
+
 }

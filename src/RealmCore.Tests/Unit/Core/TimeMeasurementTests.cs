@@ -9,7 +9,7 @@ public class TimeMeasurementTests
         var timeMeasurement = new TimeMeasurement(dateTimeProvider);
         timeMeasurement.TryStart();
 
-        dateTimeProvider.AddOffset(TimeSpan.FromSeconds(10));
+        dateTimeProvider.Add(TimeSpan.FromSeconds(10));
 
         timeMeasurement.TryStop();
 

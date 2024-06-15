@@ -294,11 +294,11 @@ public class PlayerSessionsTests
 
         var session = player.Sessions.Begin<TestSession>();
 
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
         session.TryStop();
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
         session.TryStart();
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
 
         session.Elapsed.Should().Be(TimeSpan.FromMinutes(1));
     }

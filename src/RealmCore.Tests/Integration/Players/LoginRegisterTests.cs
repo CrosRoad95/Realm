@@ -31,7 +31,7 @@ public class LoginRegisterTests
             player.Money.Amount.Should().Be(0);
         }
 
-        hosting.DateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        hosting.DateTimeProvider.Add(TimeSpan.FromDays(1));
 
         void assert(RealmTestingServerHosting server, RealmPlayer player)
         {

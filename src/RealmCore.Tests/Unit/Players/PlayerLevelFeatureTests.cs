@@ -41,7 +41,7 @@ public class PlayerLevelFeatureTests
         monitor.OccurredEvents[0].Parameters.Should().BeEquivalentTo(new object[] { level, 1, LevelChange.Increase });
         monitor.OccurredEvents[1].Parameters.Should().BeEquivalentTo(new object[] { level, 2, LevelChange.Increase });
         monitor.OccurredEvents[2].Parameters.Should().BeEquivalentTo(new object[] { level, 0, 20 });
-        monitor.GetOccurredEvents().Should().BeEquivalentTo(["LevelChanged", "LevelChanged", "ExperienceChanged"]);
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(["Changed", "Changed", "ExperienceChanged"]);
         monitor.Clear();
 
         level.GiveExperience(1000);

@@ -28,9 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="xunit.runner.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
+		<Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -129,6 +127,7 @@
 		<Using Include="Microsoft.Extensions.Hosting" />
 		<Using Include="SlipeServer.Packets.Lua.Camera" />
 		<Using Include="RealmCore.Server.Modules.Search" />
+		<Using Include="RealmCore.TestingTools.Classes" />
 	</ItemGroup>
 
 </Project>

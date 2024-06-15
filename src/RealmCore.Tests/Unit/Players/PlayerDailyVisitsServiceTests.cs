@@ -32,7 +32,7 @@ public class PlayerDailyVisitsServiceTests
         dailyVisits.VisitsInRow.Should().Be(dayCounter);
         dailyVisits.VisitsInRowRecord.Should().Be(1);
 
-        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        testDateTimeProvider.Add(TimeSpan.FromDays(1));
         dailyVisits.Update(testDateTimeProvider.Now);
         dayCounter++;
 
@@ -42,7 +42,7 @@ public class PlayerDailyVisitsServiceTests
         _reset.Should().BeFalse();
         _record.Should().Be(2);
 
-        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        testDateTimeProvider.Add(TimeSpan.FromDays(1));
         dailyVisits.Update(testDateTimeProvider.Now);
         dayCounter++;
 
@@ -52,7 +52,7 @@ public class PlayerDailyVisitsServiceTests
         _reset.Should().BeFalse();
         _record.Should().Be(3);
 
-        testDateTimeProvider.AddOffset(TimeSpan.FromDays(2));
+        testDateTimeProvider.Add(TimeSpan.FromDays(2));
         dailyVisits.Update(testDateTimeProvider.Now);
         dayCounter = 0;
 
