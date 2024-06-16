@@ -96,7 +96,11 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
 
         hostBuilder.Services.AddLogging( builder =>
         {
-            builder.AddFilter("Microsoft", LogLevel.Warning).AddFilter("System", LogLevel.Warning).AddConsole();
+            builder
+                .AddFilter("Microsoft", LogLevel.Warning)
+                .AddFilter("System", LogLevel.Warning)
+                .AddFilter("RealmCore", LogLevel.Warning)
+                .AddConsole();
         });
 
         hostBuilder.Services.AddSingleton<TestDateTimeProvider>();

@@ -41,11 +41,6 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
 
         services.ConfigureRealmServicesCore(configuration);
-        //services.AddSingleton<MtaServer>(x => x.GetRequiredService<T>());
-        //services.AddSingleton(factory);
-        //services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
-        //services.AddHostedService<RealmServerHostedService>();
-        //services.AddHostedService<ExternalModulesHostedService>();
         return services;
     }
 }
