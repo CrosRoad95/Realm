@@ -45,7 +45,7 @@ internal sealed class BrowserService : IBrowserService
         }
         else
         {
-            _baseUrl = new Uri("");
+            throw new NullReferenceException("Browser BaseRemoteUrl is null");
         }
     }
 

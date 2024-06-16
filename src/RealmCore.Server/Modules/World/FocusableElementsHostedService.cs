@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-internal sealed class FocusableElementsHostedService : PlayerLifecycle, IHostedService
+internal sealed class FocusableElementsHostedService : PlayerLifecycle, IHostedLifecycleService
 {
     private readonly IElementFactory _elementFactory;
     private readonly IClientInterfaceService _clientInterfaceService;
@@ -13,11 +13,11 @@ internal sealed class FocusableElementsHostedService : PlayerLifecycle, IHostedS
 
     private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
-        if (element is IFocusableElement)
-        {
-            _clientInterfaceService.AddFocusable(element);
-            element.Destroyed += HandleDestroyed;
-        }
+        if (element is not IFocusableElement)
+            return;
+
+        _clientInterfaceService.AddFocusable(element);
+        element.Destroyed += HandleDestroyed;
     }
     
     private void HandleScopedElementCreated(IElementFactory elementFactory, Element element)
@@ -69,7 +69,12 @@ internal sealed class FocusableElementsHostedService : PlayerLifecycle, IHostedS
         }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StartingAsync(CancellationToken cancellationToken)
     {
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
         _clientInterfaceService.ClickedElementChanged += HandleClickedElementChanged;
@@ -77,11 +82,26 @@ internal sealed class FocusableElementsHostedService : PlayerLifecycle, IHostedS
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public Task StoppedAsync(CancellationToken cancellationToken)
     {
         _clientInterfaceService.FocusedElementChanged -= HandleFocusedElementChanged;
         _clientInterfaceService.ClickedElementChanged -= HandleClickedElementChanged;
         _elementFactory.ElementCreated -= HandleElementCreated;
+        return Task.CompletedTask;
+    }
+
+    public Task StoppingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
         return Task.CompletedTask;
     }
 }

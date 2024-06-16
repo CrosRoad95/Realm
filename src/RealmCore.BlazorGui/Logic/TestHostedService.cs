@@ -29,12 +29,18 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 
     protected override void PlayerJoined(RealmPlayer player)
     {
+        player.FocusedElementChanged += HandleFocusedElementChanged;
         player.FocusedVehiclePartChanged += HandleFocusedVehiclePartChanged;
+    }
+
+    void HandleFocusedElementChanged(RealmPlayer arg1, Element? previous, Element? current)
+    {
+        _chatBox.Output($"Changed focused element to: {current?.ToString() ?? "<brak>"}");
     }
 
     private void HandleFocusedVehiclePartChanged(RealmPlayer player, string? arg2, string? arg3)
     {
-        _chatBox.OutputTo(player, $"Changed focused vehicle element to: {arg3 ?? "<brak>"}");
+        _chatBox.OutputTo(player, $"Changed focused vehicle part from {arg2 ?? "<brak>"} to: {arg3 ?? "<brak>"}");
     }
 
     private void SchedulerTests()

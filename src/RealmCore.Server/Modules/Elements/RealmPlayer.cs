@@ -83,7 +83,7 @@ public class RealmPlayer : Player, IDisposable
             {
                 switch (_focusedElement)
                 {
-                    case FocusableRealmVehicle vehicle:
+                    case RealmVehicle vehicle:
                         vehicle.RemoveFocusedPlayer(this);
                         break;
                     case FocusableRealmWorldObject worldObject:
@@ -97,7 +97,7 @@ public class RealmPlayer : Player, IDisposable
 
                 switch (value)
                 {
-                    case FocusableRealmVehicle vehicle:
+                    case RealmVehicle vehicle:
                         vehicle.AddFocusedPlayer(this);
                         break;
                     case FocusableRealmWorldObject worldObject:
@@ -116,8 +116,11 @@ public class RealmPlayer : Player, IDisposable
             if (value != _focusedVehiclePart)
             {
                 var previous = _focusedVehiclePart;
-                _focusedVehiclePart = value;
-                FocusedVehiclePartChanged?.Invoke(this, previous, value);
+                if(_focusedVehiclePart != value)
+                {
+                    _focusedVehiclePart = value;
+                    FocusedVehiclePartChanged?.Invoke(this, previous, value);
+                }
             }
         }
     }

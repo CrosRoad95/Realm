@@ -5,7 +5,7 @@ public sealed class VehicleLoadingOptions
     public bool SkipVehicleLoading { get; set; }
 }
 
-internal sealed class LoadVehicleService : IHostedService
+internal sealed class LoadVehicleService : IHostedLifecycleService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptions<VehicleLoadingOptions> _options;
@@ -16,7 +16,12 @@ internal sealed class LoadVehicleService : IHostedService
         _options = options;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task StartedAsync(CancellationToken cancellationToken)
     {
         if (_options.Value.SkipVehicleLoading)
             return;
@@ -26,7 +31,22 @@ internal sealed class LoadVehicleService : IHostedService
         await vehicleLoader.LoadAll(cancellationToken);
     }
 
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppingAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

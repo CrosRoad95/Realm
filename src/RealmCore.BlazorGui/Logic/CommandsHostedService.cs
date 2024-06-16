@@ -1898,13 +1898,6 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, "took 10 money");
         });
 
-        _commandService.AddCommandHandler("focusablevehicle", (player, args) =>
-        {
-            var veh = new FocusableRealmVehicle(_serviceProvider, 404, player.Position);
-            _elementFactory.AssociateWithServer(veh);
-            _elementFactory.RelayCreated(veh);
-        });
-
         _commandService.AddCommandHandler("createcolsphere", (player, args) =>
         {
             var sphere = _elementFactory.CreateCollisionSphere(player.Position, 5);

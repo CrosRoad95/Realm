@@ -1,11 +1,38 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmVehicle : Vehicle
+public class RealmVehicle : Vehicle, IFocusableElement
 {
+    private readonly object _focuseLock = new();
+    private readonly List<RealmPlayer> _focusedPlayers = [];
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
     private VehicleAccessController _accessController = VehicleDefaultAccessController.Instance;
 
+    public event Action<Element, RealmPlayer>? PlayerFocused;
+    public event Action<Element, RealmPlayer>? PlayerLostFocus;
+
+    public int FocusedPlayerCount
+    {
+        get
+        {
+            lock (_focuseLock)
+                return _focusedPlayers.Count;
+        }
+    }
+
+    public IEnumerable<RealmPlayer> FocusedPlayers
+    {
+        get
+        {
+            lock (_focuseLock)
+            {
+                foreach (var focusedPlayer in _focusedPlayers)
+                {
+                    yield return focusedPlayer;
+                }
+            }
+        }
+    }
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int VehicleId => Persistence.Id;
 
@@ -61,6 +88,47 @@ public class RealmVehicle : Vehicle
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
 
+    public bool AddFocusedPlayer(RealmPlayer player)
+    {
+        lock (_focuseLock)
+        {
+            if (!_focusedPlayers.Contains(player))
+            {
+                _focusedPlayers.Add(player);
+                player.Destroyed += HandlePlayerDestroyed;
+                PlayerFocused?.Invoke(this, player);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool RemoveFocusedPlayer(RealmPlayer player)
+    {
+        lock (_focuseLock)
+        {
+            if (_focusedPlayers.Remove(player))
+            {
+                player.Destroyed -= HandlePlayerDestroyed;
+                PlayerLostFocus?.Invoke(this, player);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void HandlePlayerDestroyed(Element element)
+    {
+        lock (_focuseLock)
+        {
+            var player = (RealmPlayer)element;
+            if (_focusedPlayers.Remove(player))
+            {
+                element.Destroyed -= HandlePlayerDestroyed;
+                PlayerLostFocus?.Invoke(this, player);
+            }
+        }
+    }
     public override bool Destroy()
     {
         if (base.Destroy())

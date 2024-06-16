@@ -62,7 +62,7 @@ public static class ServiceCollectionExtensions
         services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
         services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
         services.Configure<VehicleLoadingOptions>(configuration.GetSection("VehicleLoading"));
-        services.Configure<VehicleLoadingOptions>(configuration.GetSection("Commands"));
+        services.Configure<CommandsOptions>(configuration.GetSection("Commands"));
 
         var connectionString = configuration.GetValue<string>("Database:ConnectionString");
         if (!string.IsNullOrEmpty(connectionString))

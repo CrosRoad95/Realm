@@ -12,12 +12,13 @@ public class TestingServerHosting2<TPlayer> : IDisposable where TPlayer : Player
     {
         var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 
-        builder.AddMtaServer<TestingServer<TPlayer>>(new TestingServer<TPlayer>(configuration, x =>
+        applicationBuilder?.Invoke(builder);
+
+        builder.AddMtaServerWithDiSupport<TPlayer>(x =>
         {
             serverBuilder?.Invoke(x);
-        }));
+        });
 
-        applicationBuilder?.Invoke(builder);
         this.host = builder.Build();
 
         var tcs = new TaskCompletionSource();
