@@ -9,19 +9,25 @@ namespace RealmCore.WebHosting;
 
 public static class HostApplicationBuilderExtensions
 {
-    public static IHostApplicationBuilder AddRealmServer<TPlayer>(this IHostApplicationBuilder builder, Action<ServerBuilder>? serverBuilder = null) where TPlayer : RealmPlayer
+    public static IHostApplicationBuilder AddRealmServer<TPlayer>(this IHostApplicationBuilder builder, Action<ServerBuilder>? outerServerBuilder = null) where TPlayer : RealmPlayer
     {
-        builder.ConfigureMtaServers(configure =>
+        builder.Services.AddRealmServerCore(builder.Configuration);
+
+        builder.AddMtaServerWithDiSupport<TPlayer>(serverBuilder =>
         {
+            var configuration = builder.Configuration.GetRequiredSection("Server").Get<Configuration>()!;
             var isDevelopment = builder.Environment.IsDevelopment();
             var exceptBehaviours = isDevelopment ? ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour : ServerBuilderDefaultBehaviours.None;
 
-            var except = ServerBuilderDefaultPacketHandlers.ExplosionPacketHandler;
-            configure.AddDefaultPacketHandlers(except);
-            configure.AddDefaultBehaviours(exceptBehaviours | ServerBuilderDefaultBehaviours.DefaultChatBehaviour);
+            serverBuilder.UseConfiguration(configuration!);
+            serverBuilder.AddHostedDefaults(exceptBehaviours: exceptBehaviours | ServerBuilderDefaultBehaviours.DefaultChatBehaviour);
+
+            serverBuilder.AddDefaultServices();
+            serverBuilder.AddDefaultLuaMappings();
+            serverBuilder.AddResources();
+            outerServerBuilder?.Invoke(serverBuilder);
         });
 
-        builder.Services.AddRealmServer<TPlayer>(builder.Configuration, serverBuilder);
         return builder;
     }
 }
@@ -30,7 +36,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRealmServerCore(this IServiceCollection services, IConfiguration configuration)
     {
-        var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
         services.AddDefaultMtaServerServices();
         services.AddSingleton<BasicHttpServer>();
         services.TryAddSingleton<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
@@ -41,24 +46,6 @@ public static class ServiceCollectionExtensions
         //services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
         //services.AddHostedService<RealmServerHostedService>();
         //services.AddHostedService<ExternalModulesHostedService>();
-        return services;
-    }
-    
-    public static IServiceCollection AddRealmServer<TPlayer>(this IServiceCollection services, IConfiguration configuration,  Action<ServerBuilder>? builder = null) where TPlayer : RealmPlayer
-    {
-        var realmConfiguration = configuration.GetRequiredSection("Server").Get<Configuration>()!;
-
-        services.AddRealmServerCore(configuration);
-        services.AddMtaServer(realmConfiguration, services => new MtaDiPlayerServer<TPlayer>(services, realmConfiguration), serverBuilder =>
-        {
-            serverBuilder.UseConfiguration(realmConfiguration);
-            serverBuilder.AddDefaultServices();
-            serverBuilder.AddDefaultLuaMappings();
-            serverBuilder.AddDefaultNetWrapper();
-            serverBuilder.AddResources();
-            builder?.Invoke(serverBuilder);
-        });
-
         return services;
     }
 }

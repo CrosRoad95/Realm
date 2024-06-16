@@ -34,7 +34,6 @@ internal sealed class RealmResourceServer : IResourceServer
 
     public RealmResourceServer(IResourceServer resourceServer, IRealmResourcesProvider realmResourcesProvider)
     {
-        _realmResourcesProvider = realmResourcesProvider;
         _resourceServer = resourceServer;
         _realmResourcesProvider = realmResourcesProvider;
     }
@@ -51,7 +50,7 @@ internal sealed class RealmResourceServer : IResourceServer
         _resourceServer.RemoveAdditionalResource(resource);
     }
 
-    public void Start() => _resourceServer.Start();
+    public void Start() { }
 
-    public void Stop() => _resourceServer.Stop();
+    public void Stop() { }
 }

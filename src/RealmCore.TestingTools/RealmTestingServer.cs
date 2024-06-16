@@ -92,7 +92,7 @@ internal class TestResourceProvider : IResourceProvider
 public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer : Player
 {
     protected int _playerCounter = 0;
-    public RealmTestingServer(IServiceProvider serviceProvider, Configuration? configuration = null) : base(serviceProvider, configuration)
+    public RealmTestingServer(IServiceProvider serviceProvider, Action<ServerBuilder>? serverBuilder = null) : base(serviceProvider, serverBuilder)
     {
         this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
             .Returns(new Tuple<string, string, string>("7815696ECBF1C96E6894B779456D330E", "", ""));

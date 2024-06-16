@@ -12,11 +12,10 @@ public class TestingServerHosting2<TPlayer> : IDisposable where TPlayer : Player
     {
         var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 
-        builder.Services.AddMtaServer<TestingServer<TPlayer>>(configuration, serverFactory, builder =>
+        builder.AddMtaServer<TestingServer<TPlayer>>(new TestingServer<TPlayer>(configuration, x =>
         {
-            builder.AddDefaultServices();
-            serverBuilder?.Invoke(builder);
-        });
+            serverBuilder?.Invoke(x);
+        }));
 
         applicationBuilder?.Invoke(builder);
         this.host = builder.Build();
@@ -64,7 +63,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
     public TestDebounceFactory DebounceFactory => GetRequiredService<TestDebounceFactory>();
 
-    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<TPlayer>(services, new()), hostBuilder =>
+    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<TPlayer>(services, outerServerBuilder), hostBuilder =>
     {
         hostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -109,6 +108,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
         hostBuilder.Services.AddHttpClient();
     }, serverBuilder =>
     {
+        serverBuilder.AddDefaultServices();
         serverBuilder.AddDefaultLuaMappings();
         serverBuilder.AddResources();
         outerServerBuilder?.Invoke(serverBuilder);

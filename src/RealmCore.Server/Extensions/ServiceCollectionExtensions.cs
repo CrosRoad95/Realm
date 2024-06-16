@@ -81,7 +81,6 @@ public static class ServiceCollectionExtensions
             throw new Exception("Database connection string is not configured.");
         }
 
-        services.AddResources();
         services.AddSingleton<HelpCommand>();
         services.AddCommand<SaveCommand>();
         services.AddCommand<ServerInfoCommand>();
@@ -241,7 +240,9 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<ServerLifecycle>();
         services.AddHostedService<FriendsHostedService>();
         services.AddHostedService<UserLoggedInHostedService>();
-        services.AddHostedService<DefaultStartAllMtaServersHostedService>();
+
+        services.AddResources();
+
         return services;
     }
 }
@@ -270,16 +271,15 @@ internal sealed class ServerLifecycle : IHostedService
         _mtaServer.AddResourceServer(resourceServer);
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        using var activity = Activity.StartActivity(nameof(StartAsync));
-
         CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
         CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
 
         _logger.LogInformation("Server started.");
         _logger.LogInformation("Found resources: {resourcesCount}", _realmResourcesProvider.Count);
         _logger.LogInformation("Created commands: {commandsCount}", _realmCommandService.Count);
+        return Task.CompletedTask;
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
