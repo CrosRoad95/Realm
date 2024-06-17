@@ -115,20 +115,20 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Services
-        services.AddSingleton<IUsersService, UsersService>();
         services.AddScoped<IElementSaveService, ElementSaveService>();
         services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
-        services.AddSingleton<IGroupsService, GroupsService>();
-        services.AddSingleton<IFractionsService, FractionsService>();
-        services.AddSingleton<IRewardsService, RewardsService>();
-        services.AddScoped<IFeedbackService, PlayerFeedbackService>();
-        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddScoped<IPlayerNewsService, PlayerNewsService>();
-        services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
         services.AddScoped<IPlayerMapsService, PlayerMapsService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
         services.AddScoped<IPlayerUserService, PlayersUsersService>();
+        services.AddSingleton<IUsersService, UsersService>();
+        services.AddSingleton<IGroupsService, GroupsService>();
+        services.AddSingleton<IFractionsService, FractionsService>();
+        services.AddSingleton<IRewardsService, RewardsService>();
+        services.AddSingleton<IFeedbackService, PlayerFeedbackService>();
+        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
+        services.AddSingleton<INewsService, NewsService>();
+        services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<PlayersEventManager>();

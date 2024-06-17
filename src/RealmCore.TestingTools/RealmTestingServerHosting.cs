@@ -14,10 +14,10 @@ public class TestingServerHosting2<TPlayer> : IDisposable where TPlayer : Player
 
         applicationBuilder?.Invoke(builder);
 
-        builder.AddMtaServerWithDiSupport<TPlayer>(x =>
+        builder.AddMtaServer<TestingServer<TPlayer>>(new TestingServer<TPlayer>(configuration, x =>
         {
             serverBuilder?.Invoke(x);
-        });
+        }));
 
         this.host = builder.Build();
 

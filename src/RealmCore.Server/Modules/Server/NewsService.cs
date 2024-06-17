@@ -1,18 +1,20 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-public interface IPlayerNewsService
+public interface INewsService
 {
     Task<NewsDto[]> Get(int limit = 10, CancellationToken cancellationToken = default);
 }
 
-internal sealed class PlayerNewsService : IPlayerNewsService
+internal sealed class NewsService : INewsService
 {
     private readonly INewsRepository _newsRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IServiceScope _serviceScope;
 
-    public PlayerNewsService(INewsRepository newsRepository, IDateTimeProvider dateTimeProvider)
+    public NewsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
-        _newsRepository = newsRepository;
+        _serviceScope = serviceProvider.CreateScope();
+        _newsRepository = _serviceScope.ServiceProvider.GetRequiredService<INewsRepository>();
         _dateTimeProvider = dateTimeProvider;
     }
 

@@ -14,11 +14,13 @@ internal sealed class PlayerFeedbackService : IFeedbackService
     private readonly IRatingRepository _ratingRepository;
     private readonly IOpinionRepository _opinionRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IServiceScope _serviceScope;
 
-    public PlayerFeedbackService(IRatingRepository ratingRepository, IOpinionRepository opinionRepository, IDateTimeProvider dateTimeProvider)
+    public PlayerFeedbackService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
-        _ratingRepository = ratingRepository;
-        _opinionRepository = opinionRepository;
+        _serviceScope = serviceProvider.CreateScope();
+        _ratingRepository = _serviceScope.ServiceProvider.GetRequiredService<IRatingRepository>();
+        _opinionRepository = _serviceScope.ServiceProvider.GetRequiredService<IOpinionRepository>();
         _dateTimeProvider = dateTimeProvider;
     }
 

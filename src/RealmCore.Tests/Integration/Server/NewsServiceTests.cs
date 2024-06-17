@@ -8,7 +8,7 @@ public class NewsServiceTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
         var now = hosting.DateTimeProvider.Now;
-        var newsService = hosting.GetRequiredService<IPlayerNewsService>();
+        var newsService = hosting.GetRequiredService<INewsService>();
         var context = hosting.GetRequiredService<IDb>();
 
         var tag1 = Guid.NewGuid().ToString();
