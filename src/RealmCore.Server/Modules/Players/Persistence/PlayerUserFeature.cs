@@ -1,10 +1,36 @@
-﻿namespace RealmCore.Server.Modules.Players.Persistence;
+﻿using Microsoft.AspNetCore.Components;
+
+namespace RealmCore.Server.Modules.Players.Persistence;
 
 public interface IUsesUserPersistentData
 {
     void LogIn(UserData userData);
     void LogOut();
     event Action? VersionIncreased;
+}
+
+public class PlayerLoggedInEventArgs : EventArgs
+{
+    public IPlayerUserFeature PlayerUserFeature { get; }
+    public RealmPlayer Player { get; }
+
+    public PlayerLoggedInEventArgs(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    {
+        PlayerUserFeature = playerUserFeature;
+        Player = player;
+    }
+}
+
+public class PlayerLoggedOutEventArgs : EventArgs
+{
+    public IPlayerUserFeature PlayerUserFeature { get; }
+    public RealmPlayer Player { get; }
+
+    public PlayerLoggedOutEventArgs(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    {
+        PlayerUserFeature = playerUserFeature;
+        Player = player;
+    }
 }
 
 public interface IPlayerUserFeature : IPlayerFeature
@@ -18,9 +44,8 @@ public interface IPlayerUserFeature : IPlayerFeature
     bool IsLoggedIn { get; }
     DateTime? RegisteredDateTime { get; }
     string[] AuthorizedPolicies { get; }
-
-    event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedIn;
-    event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedOut;
+    AsyncEvent<PlayerLoggedInEventArgs> LoggedIn { get; set; }
+    AsyncEvent<PlayerLoggedOutEventArgs> LoggedOut { get; set; }
 
     string[] GetClaims();
     string[] GetRoles();
@@ -72,8 +97,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         }
     }
 
-    public event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedIn;
-    public event Func<IPlayerUserFeature, RealmPlayer, Task>? LoggedOut;
+    public AsyncEvent<PlayerLoggedInEventArgs> LoggedIn { get; set; }
+    public AsyncEvent<PlayerLoggedOutEventArgs> LoggedOut { get; set; }
 
     public RealmPlayer Player { get; init; }
 
@@ -91,6 +116,9 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
         lock (_lock)
         {
+            if (_user == null)
+                throw new InvalidOperationException();
+
             _user = user;
             _claimsPrincipal = claimsPrincipal;
             foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
@@ -104,13 +132,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
             }
         }
 
-        if(LoggedIn != null)
-        {
-            foreach (Func<IPlayerUserFeature, RealmPlayer, Task> callback in LoggedIn.GetInvocationList())
-            {
-                await callback(this, Player);
-            }
-        }
+        await LoggedIn.InvokeAsync(this, new PlayerLoggedInEventArgs(this, Player));
     }
 
     public async Task LogOut()
@@ -137,13 +159,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
             }
         }
 
-        if (LoggedOut != null)
-        {
-            foreach (Func<IPlayerUserFeature, RealmPlayer, Task> callback in LoggedOut.GetInvocationList())
-            {
-                await callback(this, Player);
-            }
-        }
+        await LoggedOut.InvokeAsync(this, new PlayerLoggedOutEventArgs(this, Player));
+
     }
 
     public void IncreaseVersion()

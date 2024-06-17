@@ -137,7 +137,7 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
     {
         _playerUserFeature = playerUserFeature;
         Player = playerContext.Player;
-        playerUserFeature.LoggedOut += HandleSignedOut;
+        playerUserFeature.LoggedOut += HandleLoggedOut;
     }
 
     public void SetTools(IEnumerable<AdminTool> adminTools)
@@ -168,7 +168,7 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
         SetTools([]);
     }
 
-    private Task HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    private Task HandleLoggedOut(object? sender, PlayerLoggedOutEventArgs args)
     {
         Reset();
         return Task.CompletedTask;
@@ -176,6 +176,6 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
 
     public void Dispose()
     {
-        _playerUserFeature.LoggedOut -= HandleSignedOut;
+        _playerUserFeature.LoggedOut -= HandleLoggedOut;
     }
 }

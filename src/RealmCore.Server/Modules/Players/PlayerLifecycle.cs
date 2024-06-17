@@ -27,20 +27,20 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
     private void HandlePlayerJoined(Player plr)
     {
         var player = (TPlayer)plr;
-        player.User.LoggedIn += HandleSignedIn;
+        player.User.LoggedIn += HandleLoggedIn;
         player.Disconnected += HandleDisconnected;
         PlayerJoined(player);
     }
 
-    private async Task HandleSignedIn(IPlayerUserFeature user, RealmPlayer player)
+    private async Task HandleLoggedIn(object? sender, PlayerLoggedInEventArgs args)
     {
-        await PlayerLoggedIn(user, (TPlayer)player);
+        await PlayerLoggedIn(args.PlayerUserFeature, (TPlayer)args.Player);
     }
 
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
     {
         var player = (TPlayer)plr;
-        player.User.LoggedIn -= HandleSignedIn;
+        player.User.LoggedIn -= HandleLoggedIn;
         player.Disconnected -= HandleDisconnected;
         PlayerLeft(player);
     }
