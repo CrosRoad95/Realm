@@ -1,6 +1,4 @@
-﻿using SlipeServer.Hosting;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {

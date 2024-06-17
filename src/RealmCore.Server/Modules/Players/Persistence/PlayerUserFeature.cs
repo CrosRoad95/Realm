@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace RealmCore.Server.Modules.Players.Persistence;
+﻿namespace RealmCore.Server.Modules.Players.Persistence;
 
 public interface IUsesUserPersistentData
 {
@@ -97,8 +95,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         }
     }
 
-    public AsyncEvent<PlayerLoggedInEventArgs> LoggedIn { get; set; }
-    public AsyncEvent<PlayerLoggedOutEventArgs> LoggedOut { get; set; }
+    public AsyncEvent<PlayerLoggedInEventArgs> LoggedIn { get; set; } = new();
+    public AsyncEvent<PlayerLoggedOutEventArgs> LoggedOut { get; set; } = new();
 
     public RealmPlayer Player { get; init; }
 
@@ -116,7 +114,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
         lock (_lock)
         {
-            if (_user == null)
+            if (_user != null)
                 throw new InvalidOperationException();
 
             _user = user;
