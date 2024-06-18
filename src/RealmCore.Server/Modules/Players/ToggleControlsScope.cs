@@ -69,6 +69,7 @@ public class ToggleControlsScope : IDisposable
         _brakeReverseEnabled = controls.BrakeReverseEnabled;
         _hornEnabled = controls.HornEnabled;
         _enterPassengerEnabled = controls.EnterPassengerEnabled;
+        player.ToggleAllControls(false, true, false);
     }
 
     public virtual void Dispose()
@@ -107,24 +108,5 @@ public class ToggleControlsScope : IDisposable
         controls.BrakeReverseEnabled = _brakeReverseEnabled;
         controls.HornEnabled = _hornEnabled;
         controls.EnterPassengerEnabled = _enterPassengerEnabled;
-    }
-}
-
-public class ToggleAllControlsScope : ToggleControlsScope
-{
-    public ToggleAllControlsScope(RealmPlayer player) : base(player)
-    {
-        player.ToggleAllControls(false, true, false);
-    }
-
-    public override void Dispose()
-    {
-        if (_player.IsDestroyed)
-            return;
-
-        if (!_player.ExitToggleControlScope())
-            throw new InvalidOperationException("Scope already exited");
-
-        _player.ToggleAllControls(true, true, false);
     }
 }

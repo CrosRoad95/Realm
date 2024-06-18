@@ -1823,11 +1823,12 @@ internal sealed class CommandsHostedService : IHostedService
             }
         });
 
-        _commandService.AddAsyncCommandHandler("toggleAllControlsScope", async (player, args, token) =>
+        _commandService.Add("toggleAllControlsScope", async ([CallingPlayer] RealmPlayer player) =>
         {
-            using var _ = new ToggleAllControlsScope(player);
+            using var _ = new ToggleControlsScope(player);
 
-            await Task.Delay(500, token);
+            await Task.Delay(2500);
+            _chatBox.OutputTo(player, "done");
         });
 
         _commandService.AddCommandHandler("mapnameadd", (player, args) =>
