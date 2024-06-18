@@ -138,6 +138,28 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
                 if(!readAll)
                     value = arguments.ReadArgument();
             }
+            else if (parameterInfo.ParameterType.IsEnum)
+            {
+                string? argument;
+
+                argument = parameterInfo.HasDefaultValue
+                    ? arguments.TryReadArgument(out argument) ? argument : null
+                    : arguments.ReadArgument();
+
+                if (argument == null)
+                {
+                    value = parameterInfo.DefaultValue;
+                    argument = ""; // Optional: This can be removed if argument is not needed further
+                }
+                else if (Enum.TryParse(parameterInfo.ParameterType, argument, out var result) && Enum.IsDefined(parameterInfo.ParameterType, result))
+                {
+                    value = result;
+                }
+                else
+                {
+                    throw new CommandArgumentException(arguments.CurrentArgument, $"Podany argument '{argument}' jest niepoprawny.", null);
+                }
+            }
             else if (IsNumericType(parameterInfo.ParameterType))
             {
                 if (parameterInfo.HasDefaultValue)

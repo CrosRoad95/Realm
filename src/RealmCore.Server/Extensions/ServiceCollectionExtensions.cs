@@ -55,6 +55,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureRealmServicesCore(this IServiceCollection services, IConfiguration configuration)
     {
         // Options
+        services.Configure<HostOptions>(options =>
+        {
+            options.ServicesStartConcurrently = true;
+            options.ServicesStopConcurrently = true;
+        });
+
         services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
         services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
         services.Configure<AssetsOptions>(configuration.GetSection("Assets"));

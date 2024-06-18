@@ -2,6 +2,13 @@
 
 namespace RealmCore.BlazorGui.Logic;
 
+enum SampleEnum
+{
+    Value1,
+    Value2,
+    Value3,
+}
+
 internal sealed class CommandsHostedService : IHostedService
 {
     private readonly RealmCommandService _commandService;
@@ -62,6 +69,11 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("defaultarg", (int x = 10) =>
         {
             _chatBox.Output($"x={x}");
+        });
+        
+        _commandService.Add("enum", (SampleEnum sampleEnum) =>
+        {
+            _chatBox.Output($"sampleEnum={sampleEnum}");
         });
 
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
