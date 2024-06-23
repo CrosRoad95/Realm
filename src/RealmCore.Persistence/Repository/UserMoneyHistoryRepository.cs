@@ -40,6 +40,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
         };
         _db.UserMoneyHistory.Add(userMoneyHistoryData);
         await _db.SaveChangesAsync(cancellationToken);
+        _db.ChangeTracker.Clear();
         return userMoneyHistoryData;
     }
 

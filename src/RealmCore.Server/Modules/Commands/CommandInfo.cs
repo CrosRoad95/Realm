@@ -162,11 +162,13 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
             }
             else if (IsNumericType(parameterInfo.ParameterType))
             {
+                string? argument;
+
                 if (parameterInfo.HasDefaultValue)
                 {
-                    if(arguments.TryReadArgument(out string? str) && str != null)
+                    if (arguments.TryReadArgument(out argument) && argument != null)
                     {
-                        value = ConvertToNumber(str, Type.GetTypeCode(parameterInfo.ParameterType));
+                        value = ConvertToNumber(argument, Type.GetTypeCode(parameterInfo.ParameterType));
                     }
                     else
                     {
@@ -175,8 +177,8 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
                 }
                 else
                 {
-                    var number = arguments.ReadArgument();
-                    value = ConvertToNumber(number, Type.GetTypeCode(parameterInfo.ParameterType));
+                    argument = arguments.ReadArgument();
+                    value = ConvertToNumber(argument, Type.GetTypeCode(parameterInfo.ParameterType));
                 }
             }
             else
