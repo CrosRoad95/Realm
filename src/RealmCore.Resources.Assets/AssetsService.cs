@@ -27,7 +27,7 @@ internal sealed class AssetsService : IAssetsService
     {
         return asset switch
         {
-            FileSystemFont font => new LuaValue(new LuaValue[] { "FileSystemFont", font.Name, font.FontPath }),
+            FileSystemFont font => new LuaValue(new LuaValue[] { "FileSystemFont", font.Name, font.Path }),
             BuildInFont font => new LuaValue(new LuaValue[] { "MtaFont", font.Name }),
             AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, dff.Path }),
             AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, col.Path }),

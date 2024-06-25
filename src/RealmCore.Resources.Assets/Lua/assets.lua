@@ -12,7 +12,6 @@ function requestAsset(name)
 	if(not loadedAssets[name])then
 		loadAsset(name, assetInfo)
 	end
-
 	return loadedAssets[name]
 end
 
@@ -24,10 +23,10 @@ end
 
 function loadAsset(name, assetInfo)
 	local assetType = assetInfo[1]
-	checkIfAssetExists(assetInfo[2])
 	if(assetType == "MtaFont")then
 		loadedAssets[name] = dassetInfo[3];
 	elseif(assetType == "FileSystemFont")then
+		checkIfAssetExists(assetInfo[3])
 		loadedAssets[name] = dxCreateFont(assetInfo[3], 12)
 	end
 
@@ -40,7 +39,7 @@ addEventHandler("internalSetAssetsList", localPlayer, function(assetsList, newMo
 	for i,v in ipairs({fromJSON(newModelsToReplace)})do
 		modelsToReplace[v.model] = v
 	end
-	assetsInfoList = receivedAssets;
+	assetsInfoList = assetsList;
 	tryReplaceModels();
 end)
 
@@ -83,6 +82,3 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 		tryReplaceModel(getElementModel(source))
 	end)
 end)
-
-createObject(1337, 1000,1000,5)
-createObject(1338, 10,0,6)

@@ -5,6 +5,7 @@ using SlipeServer.Packets.Definitions.Lua;
 using Microsoft.Extensions.Logging;
 using SlipeServer.Server.Enums;
 using Newtonsoft.Json;
+using SlipeServer.Server;
 
 namespace RealmCore.Resources.Assets;
 
@@ -12,7 +13,7 @@ internal record struct ReplaceModel(ushort model, string dff, string col);
 
 internal class AssetsLogic
 {
-    private readonly AssetsResource _resource;
+    private readonly MtaServer _mtaServer;
     private readonly AssetsCollection _assetsCollection;
     private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
@@ -20,26 +21,27 @@ internal class AssetsLogic
 
     private readonly List<ReplaceModel> _replaceModels = [];
 
-    public AssetsLogic(MtaServer server, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService, ILogger<AssetsLogic> logger)
+    public AssetsLogic(MtaServer mtaServer, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService, ILogger<AssetsLogic> logger)
     {
+        _mtaServer = mtaServer;
         _assetsCollection = assetsCollection;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
         _logger = logger;
-        _resource = server.GetAdditionalResource<AssetsResource>();
 
         _assetsService.ModelReplaced = HandleModelReplaced;
         _assetsService.ReplaceModelForPlayer = HandleReplaceModelForPlayer;
         _assetsService.RestoreModelForPlayer = HandleRestoreModelForPlayer;
 
-        server.PlayerJoined += HandlePlayerJoin;
+        mtaServer.PlayerJoined += HandlePlayerJoin;
     }
 
     private async void HandlePlayerJoin(Player player)
     {
         try
         {
-            await _resource.StartForAsync(player);
+            var resource = _mtaServer.GetAdditionalResource<AssetsResource>();
+            await resource.StartForAsync(player);
             SendAssetsList(player);
         }
         catch(Exception ex)

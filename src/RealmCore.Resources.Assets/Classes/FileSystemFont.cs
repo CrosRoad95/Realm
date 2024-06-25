@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Resources.Assets.Classes;
 
-internal class FileSystemFont : IFont
+internal class FileSystemFont : IAssetFont
 {
     public string Name { get; }
-    public string FontPath { get; }
+    public string Path { get; }
     public string Checksum { get; } = string.Empty;
 
     public FileSystemFont(string name, string path)
     {
         Name = name;
-        FontPath = path;
+        Path = path;
     }
 }

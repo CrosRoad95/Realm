@@ -5,10 +5,10 @@ namespace RealmCore.Resources.Assets;
 
 public record struct ReplacedModel(int model, string dffPath, string colPath);
 
-public class AssetsCollection : IServerAssetsProvider
+public class AssetsCollection
 {
     private readonly object _lock = new();
-    private string _bashPath = "Server/Assets";
+    private readonly string _basePath = "Server/Assets";
     private readonly Dictionary<string, IAsset> _assets = [];
     private readonly Dictionary<ObjectModel, ReplacedModel> _replacedModels = [];
     public IReadOnlyDictionary<string, IAsset> Assets => _assets;
@@ -16,11 +16,29 @@ public class AssetsCollection : IServerAssetsProvider
 
     public AssetsCollection()
     {
-        var path = Path.Combine(_bashPath, "Models/Procedural");
-        if (Directory.Exists(path))
+        if (Directory.Exists(_basePath))
+        {
+            foreach (var item in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
+            {
+                var fileName = Path.GetRelativePath(_basePath, item);
+
+                switch (Path.GetDirectoryName(fileName))
+                {
+                    case "Fonts":
+                        AddFont(Path.GetFileNameWithoutExtension(fileName), fileName);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void CreateDirectory(string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        if (directory == null || Directory.Exists(directory))
             return;
 
-        Directory.CreateDirectory("Server/Assets/Models/Procedural");
+        Directory.CreateDirectory(directory);
     }
 
     internal IAsset InternalGetAsset(string name)
@@ -57,7 +75,7 @@ public class AssetsCollection : IServerAssetsProvider
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = Path.Combine(_bashPath, $"Models/Procedural/{name}.dff");
+            var fileName = Path.Combine(_basePath, $"Models/Procedural/{name}.dff");
 
             var data = stream.ToArray();
             var checksum = data.CalculateChecksum();
@@ -78,7 +96,7 @@ public class AssetsCollection : IServerAssetsProvider
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = Path.Combine(_bashPath, $"Models/Procedural/{name}.col");
+            var fileName = Path.Combine(_basePath, $"Models/Procedural/{name}.col");
 
             var data = stream.ToArray();
             var checksum = data.CalculateChecksum();
@@ -92,11 +110,14 @@ public class AssetsCollection : IServerAssetsProvider
         }
     }
 
-
     public void AddFont(string name, string path)
     {
         lock (_lock)
-            _assets.Add(name, new FileSystemFont(name, path));
+        {
+            var fullPath = Path.Combine(_basePath, path);
+            CreateDirectory(fullPath);
+            _assets.Add(name, new FileSystemFont(name, fullPath));
+        }
     }
 
     public void ReplaceModel(ObjectModel objectModel, IAssetDFF dff, IAssetCOL col)
@@ -105,7 +126,7 @@ public class AssetsCollection : IServerAssetsProvider
             _replacedModels[objectModel] = new ReplacedModel((int)objectModel, dff.Path, col.Path);
     }
 
-    public IEnumerable<string> Provide()
+    internal IEnumerable<string> GetAllFiles()
     {
         lock (_lock)
         {

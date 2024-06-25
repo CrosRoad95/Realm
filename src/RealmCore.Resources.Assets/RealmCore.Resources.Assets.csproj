@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
 		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
 	</ItemGroup>

@@ -3,9 +3,7 @@
 internal class AssetsResource : Resource
 {
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = [];
-
-    private readonly long _contentSize = 0;
-    public long ContentSize => _contentSize;
+    public long ContentSize { get; private set; }
 
     private readonly string _decryptScript = """
 do
@@ -26,39 +24,45 @@ end
     internal AssetsResource(MtaServer server)
         : base(server, server.RootElement, "Assets")
     {
-        var serverAssetsProviders = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>();
-        var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();
-        var assetsCollection = server.GetRequiredService<AssetsCollection>();
+        Exports.Add("requestAsset");
+    }
 
-        var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToArray();
-        foreach (var path in assets)
+    public void AddFiles(IAssetEncryptionProvider assetEncryptionProvider, AssetsCollection assetsCollection)
+    {
+        foreach (var path in assetsCollection.GetAllFiles())
         {
             var extension = System.IO.Path.GetExtension(path);
-            if(path.EndsWith(".otf") || path.EndsWith(".ttf"))
+            switch (extension)
             {
-                var content = File.ReadAllBytes(path);
-                Files.Add(ResourceFileFactory.FromBytes(content, path));
-                AdditionalFiles.Add(path, content);
-                _contentSize += content.Length;
-            }
-            else
-            {
-                using var content = File.OpenRead(path);
-                var checksum = content.CalculateChecksum();
-                var pathMd5 = path.CalculateChecksum();
-                var contentBytes = content.ToArray();
-                var encrypted = encryptionProvider.Encrypt(contentBytes);
+                case ".otf":
+                case ".ttf":
+                    {
+                        var content = File.ReadAllBytes(path);
+                        Files.Add(ResourceFileFactory.FromBytes(content, path));
+                        AdditionalFiles.Add(path, content);
+                        ContentSize += content.Length;
+                    }
+                    break;
+                default:
+                    {
+                        using var content = File.OpenRead(path);
+                        var checksum = content.CalculateChecksum();
+                        var pathMd5 = path.CalculateChecksum();
+                        var contentBytes = content.ToArray();
+                        var encrypted = assetEncryptionProvider.Encrypt(contentBytes);
 
-                Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
-                AdditionalFiles.Add(pathMd5, encrypted);
-                _contentSize += content.Length;
+                        Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
+                        AdditionalFiles.Add(pathMd5, encrypted);
+                        ContentSize += content.Length;
+                    }
+                    break;
             }
         }
 
-        var keyBase64 = Convert.ToBase64String(encryptionProvider.Key);
+        var keyBase64 = Convert.ToBase64String(assetEncryptionProvider.Key);
         var decryptString = string.Format(_decryptScript, keyBase64, "{", "}");
 
-        if(assetsCollection.ReplacedModels.Any())
+        if (assetsCollection.ReplacedModels.Any())
         {
             //var modelsToReplace = new StringBuilder();
             //foreach (var item in assetsCollection.ReplacedModels)
@@ -74,6 +78,5 @@ end
             //NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
         }
 
-        Exports.Add("requestAsset");
     }
 }

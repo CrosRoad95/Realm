@@ -39,7 +39,7 @@ internal sealed class RealmResourceServer : IResourceServer
     }
 
     public void AddAdditionalResource(Resource resource, Dictionary<string, byte[]> files)
-    {
+    { 
         _realmResourcesProvider.Add(resource);
         _resourceServer.AddAdditionalResource(resource, files);
     }

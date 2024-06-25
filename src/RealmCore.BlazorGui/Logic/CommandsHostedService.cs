@@ -653,13 +653,13 @@ internal sealed class CommandsHostedService : IHostedService
         //    player.AddComponent(new SampleVehicleHud(assetsRegistry));
         //});
 
-        _commandService.AddAsyncCommandHandler("createhud", async (player, args, token) =>
+        _commandService.Add("createhud", async ([CallingPlayer] RealmPlayer player) =>
         {
             var hud = player.Hud.AddLayer<SampleHudLayer>();
             if (hud == null)
                 return;
 
-            await Task.Delay(1000, token);
+            await Task.Delay(1000);
             hud.Offset = new Vector2(0, 100);
         });
 
