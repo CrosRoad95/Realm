@@ -5,7 +5,6 @@ using SlipeServer.Packets.Definitions.Lua;
 using Microsoft.Extensions.Logging;
 using SlipeServer.Server.Enums;
 using Newtonsoft.Json;
-using SlipeServer.Server;
 
 namespace RealmCore.Resources.Assets;
 

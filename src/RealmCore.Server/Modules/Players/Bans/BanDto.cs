@@ -9,10 +9,13 @@ public sealed class BanDto : IEqualityComparer<BanDto>
     public required string? Reason { get; init; }
     public required string? Responsible { get; init; }
     public required int Type { get; init; }
+    public required bool Active { get; init; }
 
     public bool Equals(BanDto? x, BanDto? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] BanDto obj) => obj.Id;
+
+    public bool IsActive(DateTime now) => Active && End > now;
 
     [return: NotNullIfNotNull(nameof(banData))]
     public static BanDto? Map(BanData? banData)
@@ -28,7 +31,8 @@ public sealed class BanDto : IEqualityComparer<BanDto>
             Reason = banData.Reason,
             Responsible = banData.Responsible,
             Serial = banData.Serial,
-            Type = banData.Type
+            Type = banData.Type,
+            Active = banData.Active,
         };
     }
 }

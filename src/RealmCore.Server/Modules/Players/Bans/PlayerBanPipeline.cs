@@ -4,11 +4,13 @@ public sealed class PlayerBanPipeline : IPlayerJoinedPipeline
 {
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IBansService _bansService;
 
-    public PlayerBanPipeline(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider)
+    public PlayerBanPipeline(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, IBansService bansService)
     {
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
+        _bansService = bansService;
     }
 
     public async Task<bool> Next(Player plr)
@@ -26,9 +28,8 @@ public sealed class PlayerBanPipeline : IPlayerJoinedPipeline
         }
 
         var now = _dateTimeProvider.Now;
-        var bansRepository = player.GetRequiredService<IBanRepository>();
 
-        var bans = await player.GetRequiredService<IBanRepository>().GetBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
+        var bans = await _bansService.GetBySerial(player.Client.Serial, _gameplayOptions.CurrentValue.BanType);
 
         var ban = bans.FirstOrDefault(x => x.IsActive(now));
         if (ban != null)

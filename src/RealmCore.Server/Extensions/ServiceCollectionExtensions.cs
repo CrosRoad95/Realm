@@ -128,6 +128,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUsersService, UsersService>();
         services.AddSingleton<IGroupsService, GroupsService>();
         services.AddSingleton<IFractionsService, FractionsService>();
+        services.AddSingleton<IBansService, BansService>();
         services.AddSingleton<IRewardsService, RewardsService>();
         services.AddSingleton<IFeedbackService, PlayerFeedbackService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
