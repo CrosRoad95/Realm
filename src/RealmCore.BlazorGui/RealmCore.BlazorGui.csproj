@@ -9,8 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
-    <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.WebHosting\RealmCore.WebHosting.csproj" />
   </ItemGroup>
 
@@ -48,9 +46,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Using Include="RealmCore.BlazorGui" />
-	  <Using Include="RealmCore.Discord.Integration.Extensions" />
-	  <Using Include="RealmCore.Module.Discord" />
-	  <Using Include="RealmCore.Module.Discord.Services" />
 	  <Using Include="RealmCore.Server.Modules.Elements" />
 	  <Using Include="RealmCore.WebHosting" />
 	  <Using Include="SlipeServer.Hosting" />
@@ -73,7 +68,6 @@
 	  <Using Include="SlipeServer.Server.Enums" />
 	  <Using Include="FluentValidation" />
 	  <Using Include="SlipeServer.Server.ElementCollections" />
-	  <Using Include="RealmCore.Module.Discord.Interfaces" />
 	  <Using Include="RealmCore.Server.Modules.Inventories" />
 	  <Using Include="RealmCore.Server.Modules.World" />
 	  <Using Include="System.Numerics" />

@@ -42,8 +42,6 @@ public static class SampleServerExtensions
         services.AddPlayerJoinedPipeline<PlayerBanPipeline>();
         services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
 
-        services.AddDiscordSupport();
-
         services.AddHostedService<PlayerJoinedHostedLogic>();
         services.AddHostedService<SamplePickupsHostedService>();
         services.AddHostedService<PlayerBindsHostedService>();

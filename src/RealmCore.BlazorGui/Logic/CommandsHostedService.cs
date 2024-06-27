@@ -25,12 +25,11 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
-    private readonly RealmDiscordService? _discordService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, RealmDiscordService? discordService = null)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -46,7 +45,6 @@ internal sealed class CommandsHostedService : IHostedService
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
-        _discordService = discordService;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -718,20 +716,6 @@ internal sealed class CommandsHostedService : IHostedService
         //{
         //    player.TryDestroyComponent<SampleHud>();
         //    player.TryDestroyComponent<SampleStatefulHud>();
-        //});
-
-        //_commandService.AddCommandHandler("discord", (player, args) =>
-        //{
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-        //    if (player.HasComponent<DiscordIntegrationComponent>())
-        //    {
-        //        _chatBox.OutputTo(player, "Twoje konto jest już połączone z discordem.");
-        //    }
-        //    player.TryDestroyComponent<PendingDiscordIntegrationComponent>();
-        //    var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent(dateTimeProvider);
-        //    var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
-        //    player.AddComponent(pendingDiscordIntegrationComponent);
-        //    _chatBox.OutputTo(player, $"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
         //});
 
         //_commandService.AddCommandHandler("adduserupgrade", (player, args) =>
@@ -1943,14 +1927,6 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"Active container: {active}");
             _chatBox.OutputTo(player, $"Fuel: {fuelContainer.Amount}/{fuelContainer.MaxCapacity}");
         });
-
-        _commandService.AddAsyncCommandHandler("discordtest", async (player, args, token) =>
-        {
-            if (_discordService == null || _discordService.SendMessage == null)
-                return;
-            await _discordService.SendMessage(1135218612764934224, "test", token);
-        });
-
 
         _commandService.AddAsyncCommandHandler("saveall", async (player, args, token) =>
         {

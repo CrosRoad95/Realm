@@ -18,10 +18,7 @@ builder.Services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
 builder.AddRealmServer<RealmPlayer>();
 
 builder.AddRealmBlazorGuiSupport();
-builder.AddRealmServerDiscordBotIntegration();
-builder.Services.AddSingleton<RealmDiscordService>();
 builder.Services.AddSampleServer();
-builder.Services.AddDiscordStatusChannelUpdateHandler<SampleDiscordStatusChannelUpdateHandler>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
