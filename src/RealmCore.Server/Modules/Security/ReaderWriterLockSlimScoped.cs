@@ -81,7 +81,8 @@ public sealed class ReaderWriterLockSlimScopedAsync
 
     public IDisposable Begin(CancellationToken cancellationToken = default)
     {
-        _lock.Wait(1000, cancellationToken);
+        if(!_lock.Wait(1000, cancellationToken))
+            throw new TimeoutException();
 
         return new ReadLockScope
         {
@@ -91,7 +92,8 @@ public sealed class ReaderWriterLockSlimScopedAsync
 
     public async Task<IDisposable> BeginAsync(CancellationToken cancellationToken = default)
     {
-        await _lock.WaitAsync(1000, cancellationToken);
+        if (!await _lock.WaitAsync(1000, cancellationToken))
+            throw new TimeoutException();
 
         return new ReadLockScope
         {

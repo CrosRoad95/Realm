@@ -14,6 +14,7 @@ internal sealed class SeederServerBuilder : IDisposable
     private readonly Text3dService _text3dService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IPlayerUserService _playerUserService;
     private readonly IServiceScope _serviceScope;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
@@ -24,7 +25,7 @@ internal sealed class SeederServerBuilder : IDisposable
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupsService groupService, IElementFactory elementFactory, IFractionsService fractionService, IEnumerable<ISeederProvider> seederProviders,
-        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
+        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider, IPlayerUserService playerUserService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
@@ -36,6 +37,7 @@ internal sealed class SeederServerBuilder : IDisposable
         _text3dService = text3dService;
         _dateTimeProvider = dateTimeProvider;
         _serviceProvider = serviceProvider;
+        _playerUserService = playerUserService;
         _serviceScope = serviceProvider.CreateScope();
         foreach (var seederProvider in seederProviders)
         {
@@ -142,11 +144,10 @@ internal sealed class SeederServerBuilder : IDisposable
 
     private async Task BuildIdentityUsers(Dictionary<string, UserSeedData> users)
     {
-        var playerUserService = _serviceScope.ServiceProvider.GetRequiredService<IPlayerUserService>();
         foreach (var pair in users)
         {
             var userSeedData = pair.Value;
-            var user = await playerUserService.GetUserByUserName(pair.Key);
+            var user = await _playerUserService.GetUserByUserName(pair.Key);
 
             if (user == null)
             {

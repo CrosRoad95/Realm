@@ -103,9 +103,6 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetActive(userData.Id, player))
             return new UserAlreadyInUse();
 
-        // TODO: Fix it
-        //user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
-
         try
         {
             var userDataRepository = player.GetRequiredService<IUserDataRepository>();

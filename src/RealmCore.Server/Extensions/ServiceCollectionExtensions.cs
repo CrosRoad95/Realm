@@ -124,7 +124,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleService, VehicleService>();
         services.AddScoped<IPlayerMapsService, PlayerMapsService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
-        services.AddScoped<IPlayerUserService, PlayersUsersService>();
+        services.AddSingleton<IPlayerUserService, PlayersUsersService>();
         services.AddSingleton<IUsersService, UsersService>();
         services.AddSingleton<IGroupsService, GroupsService>();
         services.AddSingleton<IFractionsService, FractionsService>();

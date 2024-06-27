@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Users;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace RealmCore.Server.Modules.Users;
 
 public interface IPlayerUserService
 {
@@ -8,18 +10,21 @@ public interface IPlayerUserService
 
 internal sealed class PlayersUsersService : IPlayerUserService
 {
-    private readonly IDb _db;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public PlayersUsersService(IDb db, IDateTimeProvider dateTimeProvider)
+    public PlayersUsersService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
-        _db = db;
+        _serviceProvider = serviceProvider;
         _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default)
     {
-        var query = _db.Users
+        await using var serviceScope = _serviceProvider.CreateAsyncScope();
+        var db = serviceScope.ServiceProvider.GetRequiredService<IDb>();
+
+        var query = db.Users
             .TagWithSource(nameof(PlayersUsersService))
             .IncludeAll(_dateTimeProvider.Now)
             .Where(u => u.UserName == userName);
@@ -29,7 +34,10 @@ internal sealed class PlayersUsersService : IPlayerUserService
 
     public async Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default)
     {
-        var query = _db.Users
+        await using var serviceScope = _serviceProvider.CreateAsyncScope();
+        var db = serviceScope.ServiceProvider.GetRequiredService<IDb>();
+
+        var query = db.Users
             .TagWithSource(nameof(PlayersUsersService))
             .Where(u => u.Id == userId);
 
