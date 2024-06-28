@@ -21,7 +21,7 @@ internal sealed class BansService : IBansService
 
     public async Task<BanDto[]> GetBySerial(string serial, int? type = null, CancellationToken cancellationToken = default)
     {
-        await _lock.BeginAsync(cancellationToken);
+        using var _ = await _lock.BeginAsync(cancellationToken);
 
         var bans = await _banRepository.GetBySerial(serial, _dateTimeProvider.Now, type, cancellationToken);
         return bans.Select(BanDto.Map).ToArray();
