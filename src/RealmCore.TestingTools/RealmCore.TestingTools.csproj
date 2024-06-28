@@ -13,9 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20240615-165552" />
-		<PackageReference Include="Testcontainers" Version="3.7.0" />
-		<PackageReference Include="Testcontainers.MySql" Version="3.7.0" />
+		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20240628-164411" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 	</ItemGroup>
 
@@ -30,7 +28,6 @@
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Drawing" />
-		<Using Include="Testcontainers.MySql" />
 
 		<Using Include="Microsoft.Extensions.Configuration" />
 		<Using Include="Microsoft.Extensions.DependencyInjection" />

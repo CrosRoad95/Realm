@@ -74,6 +74,8 @@ public class RealmCommandServiceTests : IClassFixture<RealmTestingServerHostingF
             _player.TriggerCommand(command, ["123"]);
         }
 
+        using var _ = new AssertionScope();
+
         outNumber1.Should().Be(123);
         outNumber2.Should().Be(value != null ? 1337 : 321);
     }

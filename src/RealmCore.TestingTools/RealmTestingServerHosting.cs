@@ -1,70 +1,11 @@
 ﻿namespace RealmCore.TestingTools;
 
-public class TestingServerHosting2<TPlayer> : IDisposable where TPlayer : Player
-{
-    private readonly IHost host;
-
-    public TestingServer<TPlayer> Server { get; }
-
-    public IHost Host => this.host;
-
-    public TestingServerHosting2(Configuration configuration, Func<IServiceProvider, TestingServer<TPlayer>> serverFactory, Action<HostApplicationBuilder>? applicationBuilder = null, Action<ServerBuilder>? serverBuilder = null)
-    {
-        var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
-
-        applicationBuilder?.Invoke(builder);
-
-        builder.AddMtaServer<TestingServer<TPlayer>>(new TestingServer<TPlayer>(configuration, x =>
-        {
-            serverBuilder?.Invoke(x);
-        }));
-
-        this.host = builder.Build();
-
-        var tcs = new TaskCompletionSource();
-        var lifecycle = Host.Services.GetRequiredService<IHostApplicationLifetime>();
-        lifecycle.ApplicationStarted.Register(tcs.SetResult);
-
-        var _ = Task.Run(async () =>
-        {
-            try
-            {
-                await this.host.RunAsync();
-            }
-            catch(Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-
-        if (!tcs.WaitWithTimeout(TimeSpan.FromSeconds(60)).Result)
-        {
-            throw new XunitException("Testing hosting failed to start.");
-        }
-
-        tcs.Task.Wait();
-
-        this.Server = this.host.Services.GetRequiredService<TestingServer<TPlayer>>();
-    }
-
-    public void Dispose()
-    {
-        var waitHandle = new AutoResetEvent(false);
-        this.Server.Stopped += () =>
-        {
-            waitHandle.Set();
-        };
-        this.host.StopAsync().Wait();
-        waitHandle.WaitOne(TimeSpan.FromSeconds(30));
-    }
-}
-
-public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer> where TPlayer: RealmPlayer
+public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> where TPlayer: RealmPlayer
 {
     public TestDateTimeProvider DateTimeProvider => Host.Services.GetRequiredService<TestDateTimeProvider>();
     public TestDebounceFactory DebounceFactory => GetRequiredService<TestDebounceFactory>();
 
-    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), services => new RealmTestingServer<TPlayer>(services, outerServerBuilder), hostBuilder =>
+    public RealmTestingServerHosting(Action<HostApplicationBuilder>? outerApplicationBuilder = null, Action<ServerBuilder>? outerServerBuilder = null) : base(new(), hostBuilder =>
     {
         hostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -116,6 +57,9 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
         outerServerBuilder?.Invoke(serverBuilder);
     })
     {
+        this.Server.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
+            .Returns(new Tuple<string, string, string>("A8F5F167F44F4964E6C998DEE827110C", "123", "1.6.0-001"));
+
         var waitHandle = new AutoResetEvent(false);
         var lifecycle = Host.Services.GetRequiredService<IHostApplicationLifetime>();
         lifecycle.ApplicationStarted.Register(() =>
@@ -125,8 +69,6 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
 
         waitHandle.WaitOne(TimeSpan.FromSeconds(30.0));
     }
-
-    public T GetRequiredService<T>() where T: class => Host.Services.GetRequiredService<T>();
 
     public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
@@ -138,6 +80,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
             await Host.Services.GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
 
             user = await userService.GetUserByUserName(player.Name);
+            ;
         }
 
         if (user == null)
@@ -170,6 +113,8 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting2<TPlayer>
         playersEventManager.Loaded += HandlePlayersEventManagerLoaded;
 
         player = Server.AddFakePlayer();
+        player.Name = "TestPlayer";
+        player.Client.FetchSerial();
 
         void HandlePlayersEventManagerLoaded(Player plr)
         {

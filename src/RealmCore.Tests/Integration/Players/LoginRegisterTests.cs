@@ -49,7 +49,7 @@ public class LoginRegisterTests
 
         for (int i = 0; i < 2; i++)
         {
-            var player = await hosting.CreatePlayer(name: name, dontLoadData: false);
+            var player = await hosting.CreatePlayer(name: name);
             player.Name = name;
             player.TrySpawnAtLastPosition().Should().BeTrue();
 

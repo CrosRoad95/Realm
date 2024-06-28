@@ -38,7 +38,6 @@
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Drawing" />
-		<Using Include="Testcontainers.MySql" />
 		<Using Include="Xunit" />
 
 		<Using Include="Microsoft.Extensions.Configuration" />

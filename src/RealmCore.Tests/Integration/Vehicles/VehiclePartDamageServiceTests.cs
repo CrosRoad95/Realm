@@ -8,9 +8,7 @@ public class VehiclePartDamageServiceTests
         using var hosting = new RealmTestingServerHosting();
         var vehicle = hosting.CreateVehicle();
 
-        var addPart = () => vehicle.PartDamage.TryAddPart(1, 100);
-
-        addPart.Should().NotThrow();
+        vehicle.PartDamage.TryAddPart(1, 100).Should().BeTrue();
 
         vehicle.PartDamage.HasPart(1).Should().BeTrue();
         vehicle.PartDamage.TryGetState(1, out float state1).Should().BeTrue();
@@ -18,7 +16,7 @@ public class VehiclePartDamageServiceTests
         vehicle.PartDamage.TryGetState(2, out float state2).Should().BeFalse();
         state2.Should().Be(0);
 
-        addPart.Should().Throw<ArgumentException>();
+        vehicle.PartDamage.TryAddPart(1, 100).Should().BeFalse();
     }
 
     [Fact]
