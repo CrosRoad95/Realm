@@ -18,8 +18,7 @@ internal sealed class AFKHostedService : PlayerLifecycle, IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
-        _afkCooldown = _gameplayOptions.CurrentValue.AfkCooldown ?? _defaultAfkCooldown;
-        _logger.LogInformation("Set afk cooldown to: {miliseconds}", _afkCooldown);
+        HandleGameplayOptionsChanged(_gameplayOptions.CurrentValue);
         return Task.CompletedTask;
     }
 
@@ -28,7 +27,7 @@ internal sealed class AFKHostedService : PlayerLifecycle, IHostedService
         return Task.CompletedTask;
     }
 
-    private void HandleGameplayOptionsChanged(GameplayOptions gameplayOptions, string? asd)
+    private void HandleGameplayOptionsChanged(GameplayOptions gameplayOptions)
     {
         if(gameplayOptions.AfkCooldown == _afkCooldown)
             return;

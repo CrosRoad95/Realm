@@ -1,8 +1,6 @@
 ﻿local sx, sy = guiGetScreenSize();
 local webBrowser = nil;
 local browser = nil;
-local selectedMode = "";
-local currentPath = "index"
 local isRemote = false;
 local trace = false;
 local baseRemoteUrl = "";
@@ -26,7 +24,6 @@ function handleSetVisible(visible)
 end
 
 function handleSetPath(path)
-	currentPath = path;
 	itrace("handleSetPath", path)
 	loadBrowserURL(webBrowser, path)
 end
@@ -90,15 +87,11 @@ local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 		end
 	)
 end
-local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
-	selectedMode = mode;
-	itrace("handleLoad mode, x, y, remoteUrl", mode, x, y, remoteUrl)
-	if(mode == "remote")then
-		baseRemoteUrl = remoteUrl;
-		createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
-	elseif(mode == "local")then
-		createLocalBrowser(x, y)
-	end
+
+local function handleLoad(x, y, remoteUrl, requestWhitelistUrl)
+	itrace("handleLoad, x, y, remoteUrl", x, y, remoteUrl)
+	baseRemoteUrl = remoteUrl;
+	createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

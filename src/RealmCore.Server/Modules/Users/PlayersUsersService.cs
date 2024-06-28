@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.Server.Modules.Users;
+﻿namespace RealmCore.Server.Modules.Users;
 
 public interface IPlayerUserService
 {

@@ -2,7 +2,6 @@
 
 public sealed class BrowserOptions
 {
-    public BrowserMode Mode { get; set; }
     public int BrowserWidth { get; set; }
     public int BrowserHeight { get; set; }
     public bool DebuggingServer { get; set; }

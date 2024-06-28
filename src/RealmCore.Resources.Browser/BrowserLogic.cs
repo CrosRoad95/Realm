@@ -31,12 +31,11 @@ internal sealed class BrowserLogic
         try
         {
             await _resource.StartForAsync(player);
-            var mode = _browserOptions.Value.Mode.ToString().ToLower();
             var width = _browserOptions.Value.BrowserWidth;
             var height = _browserOptions.Value.BrowserHeight;
             var remoteUrl = _browserOptions.Value.BaseRemoteUrl;
             var requestWhitelistUrl = _browserOptions.Value.RequestWhitelistUrl;
-            _luaEventHub.Invoke(player, x => x.Load(mode, width, height, remoteUrl, requestWhitelistUrl));
+            _luaEventHub.Invoke(player, x => x.Load(width, height, remoteUrl, requestWhitelistUrl));
         }
         catch(Exception ex)
         {
