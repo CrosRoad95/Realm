@@ -107,9 +107,9 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         _userEventRepository = userEventRepository;
     }
 
-    public async Task Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
+    public async Task Login(UserData userData, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
     {
-        if (user == null)
+        if (userData == null)
             throw new InvalidOperationException();
 
         lock (_lock)
@@ -117,15 +117,17 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
             if (_user != null)
                 throw new InvalidOperationException();
 
-            _user = user;
+            _user = userData;
             _claimsPrincipal = claimsPrincipal;
+            var db = Player.GetRequiredService<IDb>();
+            db.Attach(userData);
             foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
             {
                 if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                 {
                     usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
                     if(!dontLoadData)
-                        usesPlayerPersistentData.LogIn(user);
+                        usesPlayerPersistentData.LogIn(userData);
                 }
             }
         }
