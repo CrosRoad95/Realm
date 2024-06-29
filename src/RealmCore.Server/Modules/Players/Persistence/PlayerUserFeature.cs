@@ -119,16 +119,27 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
             _user = userData;
             _claimsPrincipal = claimsPrincipal;
-            var db = Player.GetRequiredService<IDb>();
-            db.Attach(userData);
-            foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
+
+            try
             {
-                if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
                 {
-                    usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
-                    if(!dontLoadData)
-                        usesPlayerPersistentData.LogIn(userData);
+                    if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                    {
+                        usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
+                        if(!dontLoadData)
+                            usesPlayerPersistentData.LogIn(userData);
+                    }
                 }
+
+                var db = Player.GetRequiredService<IDb>();
+                db.Attach(userData);
+            }
+            catch(Exception)
+            {
+                _user = null;
+                _claimsPrincipal = null;
+                throw;
             }
         }
 
