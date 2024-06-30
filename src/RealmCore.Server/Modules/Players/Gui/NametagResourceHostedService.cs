@@ -23,6 +23,8 @@ internal sealed class NametagResourceHostedService : PlayerLifecycle, IHostedSer
     protected override void PlayerJoined(RealmPlayer player)
     {
         player.NametagTextChanged += HandleNametagTextChanged;
+        if(player.NametagText != null)
+            _nametagsService.SetNametag(player, player.NametagText);
     }
 
     private void HandleNametagTextChanged(RealmPlayer player, string? nametagText)

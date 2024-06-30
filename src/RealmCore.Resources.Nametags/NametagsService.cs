@@ -28,5 +28,4 @@ internal sealed class NametagsService : INametagsService
     public void SetLocalPlayerRenderingEnabled(Player player, bool enabled) => HandleSetLocalPlayerRenderingEnabled?.Invoke(player, enabled);
     public void RemoveNametag(Ped ped) => HandleRemoveNametag?.Invoke(ped);
     public void SetNametag(Ped ped, string text) => HandleSetNametag?.Invoke(ped, text);
-
 }

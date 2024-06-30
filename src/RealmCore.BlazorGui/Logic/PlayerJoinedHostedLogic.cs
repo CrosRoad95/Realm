@@ -93,6 +93,7 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         _chatBox.ClearFor(player);
         player.Camera.Fade(CameraFade.In);
         player.Camera.SetMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
+        player.NametagText = player.Name;
         var admin = player.Admin;
         admin.DebugView = true;
         admin.DevelopmentMode = true;
