@@ -9,9 +9,10 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly ClientConsole _clientConsole;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IRealmResourcesProvider _realmResourcesProvider;
+    private readonly IBrowserService _browserService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment, IRealmResourcesProvider realmResourcesProvider) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment, IRealmResourcesProvider realmResourcesProvider, IBrowserService browserService) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -20,6 +21,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _clientConsole = clientConsole;
         _hostEnvironment = hostEnvironment;
         _realmResourcesProvider = realmResourcesProvider;
+        _browserService = browserService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -68,6 +70,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
         player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
         player.Culture = cultureInfo;
+        _browserService.Load(player, player.ScreenSize);
     }
 
     private async Task StartAllResourcesForPlayer(RealmPlayer player, CancellationToken cancellationToken = default)

@@ -1,6 +1,8 @@
 ﻿using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
+using System.Numerics;
 
 namespace RealmCore.Resources.Browser;
 
@@ -31,11 +33,6 @@ internal sealed class BrowserLogic
         try
         {
             await _resource.StartForAsync(player);
-            var width = _browserOptions.Value.BrowserWidth;
-            var height = _browserOptions.Value.BrowserHeight;
-            var remoteUrl = _browserOptions.Value.BaseRemoteUrl;
-            var requestWhitelistUrl = _browserOptions.Value.RequestWhitelistUrl;
-            _luaEventHub.Invoke(player, x => x.Load(width, height, remoteUrl, requestWhitelistUrl));
         }
         catch(Exception ex)
         {
@@ -57,6 +54,13 @@ internal sealed class BrowserLogic
                 break;
             case SetPathMessage setPathMessage:
                 _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path));
+                break;
+            case LoadBrowser loadBrowser:
+                {
+                    var width = (int)loadBrowser.Size.X;
+                    var height = (int)loadBrowser.Size.Y;
+                    _luaEventHub.Invoke(loadBrowser.Player, x => x.Load(width, height, loadBrowser.RemoteUrl, loadBrowser.RequestWhitelistUrl));
+                }
                 break;
         }
     }

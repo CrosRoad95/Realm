@@ -1,4 +1,7 @@
 ﻿using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Resources.Base;
+using SlipeServer.Server.Elements;
+using System.Numerics;
 
 namespace RealmCore.Resources.Browser;
 
@@ -16,6 +19,7 @@ public interface IBrowserService
     void SetVisible(Player player, bool visible);
     void SetPath(Player player, string path);
     void RelayBrowserStarted(Player player);
+    void Load(Player player, Vector2 screenSize);
 }
 
 internal sealed class BrowserService : IBrowserService
@@ -26,12 +30,13 @@ internal sealed class BrowserService : IBrowserService
 
     public Action<IMessage>? MessageHandler { get; set; }
 
-
     private readonly Uri _baseUrl;
+    private readonly IOptions<BrowserOptions> _browserOptions;
 
     public BrowserService(IOptions<BrowserOptions> browserOptions, ILogger<BrowserService> logger)
     {
-        if(browserOptions.Value.BaseRemoteUrl != null)
+        _browserOptions = browserOptions;
+        if (browserOptions.Value.BaseRemoteUrl != null)
         {
             try
             {
@@ -47,6 +52,31 @@ internal sealed class BrowserService : IBrowserService
         {
             throw new NullReferenceException("Browser BaseRemoteUrl is null");
         }
+    }
+
+    private Vector2 GetBrowserSize(Vector2 screenSize)
+    {
+        int largeThresholdWidth = 1920;
+        int mediumThresholdWidth = 1280;
+
+        if (screenSize.X >= largeThresholdWidth)
+        {
+            return new Vector2(1366, 768);
+        }
+        else if (screenSize.X >= mediumThresholdWidth)
+        {
+            return new Vector2(1024, 600);
+        }
+        else
+        {
+            return new Vector2(800, 600);
+        }
+    }
+
+    public void Load(Player player, Vector2 screenSize)
+    {
+        var browserSize = GetBrowserSize(screenSize);
+        MessageHandler?.Invoke(new LoadBrowser(player, browserSize, _browserOptions.Value.BaseRemoteUrl, _browserOptions.Value.RequestWhitelistUrl));
     }
 
     public void RelayBrowserReady(Player player)
