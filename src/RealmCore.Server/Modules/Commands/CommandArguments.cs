@@ -32,7 +32,7 @@ public class CommandArguments
 
     public string ReadAllAsString()
     {
-        return string.Join(", ", _args.Skip(_index));
+        return string.Join(' ', _args.Skip(_index));
     }
 
     public string ReadArgument()

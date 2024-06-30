@@ -133,6 +133,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                 }
 
                 var db = Player.GetRequiredService<IDb>();
+                db.ChangeTracker.Clear();
                 db.Attach(userData);
             }
             catch(Exception)
