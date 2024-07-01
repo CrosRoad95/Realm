@@ -70,7 +70,6 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
         player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
         player.Culture = cultureInfo;
-        _browserService.Load(player, player.ScreenSize);
     }
 
     private async Task StartAllResourcesForPlayer(RealmPlayer player, CancellationToken cancellationToken = default)
@@ -106,7 +105,9 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
                 player.Browser.Ready -= handleBrowserReady;
         }
 
-        if(!await waitForBrowser.WaitWithTimeout(timeout, cancellationToken))
+        _browserService.Load(player, player.ScreenSize);
+
+        if (!await waitForBrowser.WaitWithTimeout(timeout, cancellationToken))
         {
             throw new BrowserLoadingTimeoutException();
         }
