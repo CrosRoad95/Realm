@@ -49,7 +49,6 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
     public PlayerStatisticsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, true);
     }
 
     public void LogIn(UserData userData)
@@ -63,6 +62,8 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
             {
                 Player.SetStat((PedStat)gtaSaStat.StatId, gtaSaStat.Value);
             }
+
+            Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, true);
         }
     }
 
@@ -199,6 +200,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
 
     public void Dispose()
     {
+        Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, false);
         lock (_lock)
         {
             _stats = [];

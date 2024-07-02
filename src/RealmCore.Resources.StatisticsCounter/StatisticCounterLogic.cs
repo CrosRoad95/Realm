@@ -11,6 +11,7 @@ namespace RealmCore.Resources.StatisticsCounter;
 
 internal class StatisticCounterLogic
 {
+    private readonly object _lock = new();
     private readonly LuaEventService _luaEventService;
     private readonly StatisticsCounterResource _resource;
     private readonly IStatisticsCounterService _statisticsCounterService;
@@ -35,27 +36,41 @@ internal class StatisticCounterLogic
 
     private void HandleCounterStateChanged(Player player, bool enabled)
     {
-        if (enabled)
+        lock (_lock)
         {
-            if (_players.Add(player))
+            if (enabled)
             {
-                _luaEventService.TriggerEventFor(player, "internalSetCounterEnabled", player, true);
-                player.Disconnected += HandlePlayerQuit;
+                if (_players.Add(player))
+                {
+                    player.Disconnected += HandlePlayerQuit;
+                    if (player.IsDestroyed)
+                    {
+                        player.Disconnected -= HandlePlayerQuit;
+                        _players.Remove(player);
+                        return;
+                    }
+
+                    _luaEventService.TriggerEventFor(player, "internalSetCounterEnabled", player, true);
+                }
             }
-        }
-        else
-        {
-            if (_players.Remove(player))
+            else
             {
-                _luaEventService.TriggerEventFor(player, "internalSetCounterEnabled", player, false);
-                player.Disconnected -= HandlePlayerQuit;
+                if (_players.Remove(player))
+                {
+                    _luaEventService.TriggerEventFor(player, "internalSetCounterEnabled", player, false);
+                    player.Disconnected -= HandlePlayerQuit;
+                }
             }
         }
     }
 
     private void HandlePlayerQuit(Player player, PlayerQuitEventArgs e)
     {
-        _players.Remove(player);
+        lock (_lock)
+        {
+            if(_players.Remove(player))
+                player.Disconnected -= HandlePlayerQuit;
+        }
     }
 
     private void HandlePlayerJoin(Player player)
