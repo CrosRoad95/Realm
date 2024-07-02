@@ -1,4 +1,6 @@
-﻿namespace RealmCore.BlazorGui.Logic;
+﻿using RealmCore.Server.Modules.Elements;
+
+namespace RealmCore.BlazorGui.Logic;
 
 internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 {
@@ -6,20 +8,26 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
     private readonly ISchedulerService _schedulerService;
     private readonly ILogger<TestHostedService> _logger;
     private readonly ChatBox _chatBox;
+    private readonly INametagsService _nametagsService;
 
-    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox) : base(playersEventManager)
+    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox, INametagsService nametagsService) : base(playersEventManager)
     {
-        var marker = elementFactory.CreateMarker(new Location(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, 1, Color.Red);
-        marker.Size = 4;
         _elementFactory = elementFactory;
         _schedulerService = schedulerService;
         _logger = logger;
         _chatBox = chatBox;
+        _nametagsService = nametagsService;
         //SchedulerTests();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        var marker = _elementFactory.CreateMarker(new Location(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, 1, Color.Red);
+        marker.Size = 4;
+
+        var ped = _elementFactory.CreatePed(new Location(232.93f, -73.18f, 1.43f), PedModel.Cj);
+        ped.NametagText = "sample nametag";
+
         return Task.CompletedTask;
     }
 

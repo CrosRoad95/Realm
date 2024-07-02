@@ -10,7 +10,7 @@ internal class NametagsLogic
     private readonly ILuaEventHub<INametagsEventHub> _luaEventHub;
     private readonly NametagsResource _resource;
     private readonly object _lock = new();
-    private readonly LuaValue _nametagsCache = new(new Dictionary<LuaValue, LuaValue>());
+    private readonly Dictionary<Ped, Nametag> _nametagsCache = [];
 
     public NametagsLogic(MtaServer server, INametagsService nametagsService, ILogger<NametagsLogic> logger, ILuaEventHub<INametagsEventHub> luaEventHub)
     {
@@ -20,10 +20,10 @@ internal class NametagsLogic
 
         server.PlayerJoined += HandlePlayerJoin;
 
-        nametagsService.HandleSetNametag = HandleSetNametag;
-        nametagsService.HandleRemoveNametag = HandleRemoveNametag;
-        nametagsService.HandleSetNametagRenderingEnabled = HandleSetNametagRenderingEnabled;
-        nametagsService.HandleSetLocalPlayerRenderingEnabled = HandleSetLocalPlayerRenderingEnabled;
+        nametagsService.RelaySetNametag = HandleSetNametag;
+        nametagsService.RelayRemoveNametag = HandleRemoveNametag;
+        nametagsService.RelaySetNametagRenderingEnabled = HandleSetNametagRenderingEnabled;
+        nametagsService.RelaySetLocalPlayerRenderingEnabled = HandleSetLocalPlayerRenderingEnabled;
     }
 
     private void HandleSetNametagRenderingEnabled(Player player, bool enabled)
@@ -39,16 +39,22 @@ internal class NametagsLogic
     private void HandleRemoveNametag(Ped ped)
     {
         lock (_lock)
-            _nametagsCache.TableValue!.Remove(ped);
+        {
+            if (!_nametagsCache.Remove(ped))
+                return;
+        }
         _luaEventHub.Broadcast(x => x.RemoveNametag(), ped);
     }
 
-    public void ResendAllNametagsToAllPlayer(Player player)
+    public void ResendAllNametagsToPlayer(Player player)
     {
         lock (_lock)
         {
-            if (_nametagsCache.TableValue!.Count > 0)
-                _luaEventHub.Invoke(player, x => x.AddNametags(_nametagsCache));
+            if (_nametagsCache.Count == 0)
+                return;
+
+            var luaValue = new LuaValue(_nametagsCache.ToDictionary(x => new LuaValue(x.Key.Id), y => y.Value.LuaValue));
+            _luaEventHub.Invoke(player, x => x.AddNametags(luaValue));
         }
     }
 
@@ -56,8 +62,8 @@ internal class NametagsLogic
     {
         lock (_lock)
         {
-            var value = _nametagsCache.TableValue![ped];
-            _luaEventHub.Broadcast(x => x.SetPedNametag(value), ped);
+            var luaValue = new LuaValue(_nametagsCache.ToDictionary(x => new LuaValue(x.Key.Id), y => y.Value.LuaValue));
+            _luaEventHub.Broadcast(x => x.SetPedNametag(luaValue), ped);
         }
     }
 
@@ -69,7 +75,9 @@ internal class NametagsLogic
         };
 
         lock (_lock)
-            _nametagsCache.TableValue![ped] = nametag.LuaValue;
+        {
+            _nametagsCache[ped] = nametag;
+        }
         ResendPedNametagToAllPlayers(ped);
     }
 
@@ -79,7 +87,7 @@ internal class NametagsLogic
         {
             await _resource.StartForAsync(player);
             player.Disconnected += HandleDisconnected;
-            ResendAllNametagsToAllPlayer(player);
+            ResendAllNametagsToPlayer(player);
         }
         catch (Exception ex)
         {
@@ -91,6 +99,8 @@ internal class NametagsLogic
     {
         player.Disconnected -= HandleDisconnected;
         lock (_lock)
-            _nametagsCache.TableValue!.Remove(player);
+        {
+            _nametagsCache.Remove(player);
+        }
     }
 }

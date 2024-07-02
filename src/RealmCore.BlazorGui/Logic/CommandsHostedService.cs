@@ -1984,6 +1984,17 @@ internal sealed class CommandsHostedService : IHostedService
             }
         });
 
+        _commandService.Add("kickme", ([CallingPlayer] RealmPlayer player) =>
+        {
+            void Player_Disconnected(Player sender, PlayerQuitEventArgs e)
+            {
+                Console.WriteLine("Kicked");
+            }
+
+            player.Disconnected += Player_Disconnected;
+            player.Kick();
+        });
+
         AddInventoryCommands();
     }
 
@@ -2023,16 +2034,23 @@ internal sealed class CommandsHostedService : IHostedService
             }
         });
 
-        _commandService.AddCommandHandler("givedefaultinventory", (player, args) =>
+        _commandService.Add("givedefaultinventory", ([CallingPlayer] RealmPlayer player) =>
         {
             player.Inventory.CreatePrimary(20);
             _chatBox.OutputTo(player, "Inventory created");
         });
 
-        _commandService.AddCommandHandler("listitems", (player, args) =>
+        _commandService.Add("listitems", ([CallingPlayer] RealmPlayer player) =>
         {
-            _chatBox.OutputTo(player, $"Nuumber: {player.Inventory.Primary!.Number}");
-            foreach (var item in player.Inventory.Primary!.Items)
+            var inventory = player.Inventory.Primary;
+            if (inventory == null)
+            {
+                _chatBox.OutputTo(player, $"Błąd, nie masz ekwipunku");
+                return;
+            }
+
+            _chatBox.OutputTo(player, $"Number: {inventory.Number}");
+            foreach (var item in inventory.Items)
             {
                 _chatBox.OutputTo(player, $"Item: {item.ItemId}");
             }
