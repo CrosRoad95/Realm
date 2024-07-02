@@ -758,7 +758,7 @@ public class RealmPlayer : Player, IDisposable
         if (_blip != null)
             return false;
 
-        _blip = ElementFactory.CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
+        _blip = GetRequiredService<IElementFactory>().CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
         {
             blip.Color = color;
         });

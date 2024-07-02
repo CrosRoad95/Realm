@@ -42,7 +42,6 @@ end
 
 addEvent("internalSetCounterEnabled", true)
 addEventHandler("internalSetCounterEnabled", localPlayer, function(enabled)
-	setTimer(iprint, 1000, 10, "internalSetCounterEnabled!!!", enabled)
 	counters = {}
 	lastX, lastY, lastZ = getElementPosition(localPlayer)
 	if(enabled)then
