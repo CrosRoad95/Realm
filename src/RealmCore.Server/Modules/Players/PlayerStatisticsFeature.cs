@@ -16,7 +16,7 @@ public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStat
     float GetGtaSa(PedStat statId);
 }
 
-internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesUserPersistentData, IDisposable
+internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<UserStatData> _stats = [];
@@ -67,18 +67,6 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
 
             _statisticsCounterService.SetCounterEnabledFor(Player, true);
         }
-    }
-
-    public void LogOut()
-    {
-        _stats = [];
-
-        foreach (var gtaSaStat in _gtaSaStats)
-        {
-            Player.SetStat((PedStat)gtaSaStat.StatId, 0);
-        }
-
-        _gtaSaStats = [];
     }
 
     private UserStatData GetStatById(int id)
@@ -199,14 +187,4 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesU
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Dispose()
-    {
-        _statisticsCounterService.SetCounterEnabledFor(Player, false);
-        lock (_lock)
-        {
-            _stats = [];
-            _gtaSaStats = [];
-        }
-    }
 }

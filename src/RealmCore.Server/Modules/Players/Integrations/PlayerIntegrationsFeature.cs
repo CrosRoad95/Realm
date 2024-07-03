@@ -32,9 +32,4 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IU
         if (userData.DiscordIntegration != null)
             Discord.Integrate(userData.DiscordIntegration.DiscordUserId);
     }
-
-    public void LogOut()
-    {
-        Discord.TryRemove();
-    }
 }

@@ -80,19 +80,6 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         }
     }
 
-    public void LogOut()
-    {
-        _lock.Wait();
-        try
-        {
-            _bans = [];
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
     public bool Add(int type, DateTime? until = null, string? reason = null, string? responsible = null)
     {
         var banData = new BanData

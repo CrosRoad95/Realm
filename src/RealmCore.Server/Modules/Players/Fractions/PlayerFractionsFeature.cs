@@ -30,12 +30,6 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature, IUsesUse
             _fractionMembers = userData.FractionMembers;
     }
 
-    public void LogOut()
-    {
-        lock (_lock)
-            _fractionMembers = [];
-    }
-
     public bool IsMember(int fractionId)
     {
         lock (_lock)

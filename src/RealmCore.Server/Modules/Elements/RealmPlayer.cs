@@ -25,12 +25,12 @@ internal abstract record BindHandlerBase(KeyState KeyState);
 internal record BindHandler(KeyState KeyState, Action<RealmPlayer, KeyState> Callback) : BindHandlerBase(KeyState);
 internal record AsyncBindHandler(KeyState KeyState, Func<RealmPlayer, KeyState, CancellationToken, Task> Callback) : BindHandlerBase(KeyState);
 
-public class RealmPlayer : Player, IDisposable
+public class RealmPlayer : Player, IAsyncDisposable
 {
     private readonly object _lock = new();
     private readonly AtomicBool _inToggleControlScopeFlag = new();
     private readonly IServiceProvider _serviceProvider;
-    private readonly IServiceScope _serviceScope;
+    private readonly AsyncServiceScope _serviceScope;
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     private Element? _focusedElement;
@@ -174,6 +174,7 @@ public class RealmPlayer : Player, IDisposable
     public CultureInfo Culture { get => _culture; set => _culture = value; }
     public int UserId => User.Id;
 
+    public IElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public new IPlayerMoneyFeature Money { get; init; }
     public IPlayerBrowserFeature Browser { get; init; }
@@ -207,10 +208,12 @@ public class RealmPlayer : Player, IDisposable
 
     public RealmPlayer(IServiceProvider serviceProvider)
     {
-        _serviceScope = serviceProvider.CreateScope();
+        _serviceScope = serviceProvider.CreateAsyncScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         GetRequiredService<PlayerContext>().Player = this;
         GetRequiredService<ElementContext>().Element = this;
+
+        Saving = GetRequiredService<IElementSaveService>();
 
         #region Initialize scope services
         Money = GetRequiredService<IPlayerMoneyFeature>();
@@ -777,12 +780,14 @@ public class RealmPlayer : Player, IDisposable
         }
     }
 
-    public bool RemoveBlip()
+    public bool TryRemoveBlip()
     {
         if (_blip != null)
         {
             PositionChanged -= HandlePositionChanged;
-            return _blip.Destroy();
+            var result = _blip.Destroy();
+            _blip = null;
+            return result;
         }
         return false;
     }
@@ -797,12 +802,12 @@ public class RealmPlayer : Player, IDisposable
 
     public event Action<RealmPlayer>? Disposed;
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        IsSpawned = false;
         Wasted -= HandleWasted;
-        RemoveBlip();
-        _serviceScope.Dispose();
+        TryRemoveBlip();
+        await _serviceScope.DisposeAsync();
+        IsSpawned = false;
         Disposed?.Invoke(this);
     }
 }

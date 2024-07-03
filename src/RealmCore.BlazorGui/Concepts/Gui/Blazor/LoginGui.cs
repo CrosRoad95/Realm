@@ -2,15 +2,13 @@
 
 public class LoginGui : BrowserGui
 {
-    private readonly UserManager<UserData> _userManager;
     private readonly IUsersService _usersService;
 
-    public LoginGui(PlayerContext playerContext, UserManager<UserData> userManager, IUsersService usersService) : base(playerContext.Player, "/realmUi/login", new Dictionary<string, string?>
+    public LoginGui(PlayerContext playerContext, IUsersService usersService) : base(playerContext.Player, "/realmUi/login", new Dictionary<string, string?>
     {
         ["initialCounter"] = "1337"
     })
     {
-        _userManager = userManager;
         _usersService = usersService;
     }
 

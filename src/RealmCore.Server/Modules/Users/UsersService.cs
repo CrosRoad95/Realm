@@ -1,4 +1,6 @@
-﻿using static RealmCore.Server.Modules.Users.UsersResults;
+﻿using RealmCore.Persistence.Data;
+using SlipeServer.Server.Elements;
+using static RealmCore.Server.Modules.Users.UsersResults;
 
 namespace RealmCore.Server.Modules.Users;
 
@@ -17,12 +19,15 @@ public interface IUsersService
 
 internal sealed class UsersService : IUsersService
 {
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    private readonly IServiceScope _serviceScope;
     private readonly ILogger<UsersService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService? _authorizationService;
     private readonly IUsersInUse _activeUsers;
     private readonly IServiceProvider _serviceProvider;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
+    private readonly SignInManager<UserData> _signInManager;
 
     public event Func<RealmPlayer, Task>? LoggedIn;
     public event Func<RealmPlayer, Task>? LoggedOut;
@@ -35,7 +40,9 @@ internal sealed class UsersService : IUsersService
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
         _serviceProvider = serviceProvider;
+        _serviceScope = serviceProvider.CreateScope();
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
+        _signInManager = _serviceScope.ServiceProvider.GetRequiredService<SignInManager<UserData>>();
     }
 
     public async Task<OneOf<Registered, FailedToRegister>> Register(string username, string password)
@@ -92,50 +99,59 @@ internal sealed class UsersService : IUsersService
 
     public async Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData userData, bool dontLoadData = false)
     {
-        using var _ = _logger.BeginElement(player);
-
-        if (userData.IsDisabled)
-            return new UserDisabled(userData.Id);
-
-        if (player.User.IsLoggedIn)
-            return new PlayerAlreadyLoggedIn();
-
-        if (!_activeUsers.TrySetActive(userData.Id, player))
-            return new UserAlreadyInUse();
-
+        await _semaphoreSlim.WaitAsync();
         try
         {
-            var userDataRepository = player.GetRequiredService<IUserDataRepository>();
-            var roles = await userDataRepository.GetRoles(userData.Id, CancellationToken.None);
-            var signInManager = player.GetRequiredService<SignInManager<UserData>>();
+            using var _ = _logger.BeginElement(player);
 
-            var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(userData);
-            if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
-                foreach (var role in roles)
-                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            if (userData.IsDisabled)
+                return new UserDisabled(userData.Id);
 
-            await player.User.Login(userData, claimsPrincipal, dontLoadData);
-
-            await AuthorizePolicies(player);
-            UpdateLastData(player);
-
-            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(userData.Id, player.Name);
-            if (LoggedIn != null)
-            {
-                foreach (Func<RealmPlayer, Task> item in LoggedIn.GetInvocationList())
-                {
-                    await item.Invoke(player);
-                }
-            }
-            return new LoggedIn(userData.Id);
-        }
-        catch (Exception ex)
-        {
             if (player.User.IsLoggedIn)
-                await player.User.LogOut();
-            _activeUsers.TrySetInactive(userData.Id);
-            _logger.LogError(ex, "Failed to sign in a user.");
-            throw;
+                return new PlayerAlreadyLoggedIn();
+
+            if (!_activeUsers.TrySetActive(userData.Id, player))
+                return new UserAlreadyInUse();
+
+            try
+            {
+                var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+                var roles = await userDataRepository.GetRoles(userData.Id, CancellationToken.None);
+
+                var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(userData);
+
+                if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+                    foreach (var role in roles)
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+
+                await player.User.Login(userData, claimsPrincipal, dontLoadData);
+
+                await AuthorizePolicies(player);
+                UpdateLastData(player);
+
+                await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(userData.Id, player.Name);
+                if (LoggedIn != null)
+                {
+                    foreach (Func<RealmPlayer, Task> item in LoggedIn.GetInvocationList())
+                    {
+                        await item.Invoke(player);
+                    }
+                }
+                return new LoggedIn(userData.Id);
+            }
+            catch (Exception ex)
+            {
+                if (player.User.IsLoggedIn)
+                    await player.User.LogOut();
+                _activeUsers.TrySetInactive(userData.Id);
+                _logger.LogError(ex, "Failed to sign in a user.");
+                throw;
+            }
+
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
         }
     }
 
@@ -147,7 +163,7 @@ internal sealed class UsersService : IUsersService
         var id = player.UserId;
         _activeUsers.TrySetInactive(id);
 
-        await player.GetRequiredService<IElementSaveService>().Save(cancellationToken);
+        await player.Saving.Save(cancellationToken);
         await player.User.LogOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

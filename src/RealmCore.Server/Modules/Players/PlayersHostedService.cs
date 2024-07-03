@@ -226,8 +226,6 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             {
                 if (_activeUsers.TrySetInactive(player.UserId))
                     _playersEventManager.RelayUnloading(player);
-
-                await player.GetRequiredService<IElementSaveService>().Save();
             }
         }
         catch (Exception ex)
@@ -237,7 +235,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
         try
         {
-            player.Dispose();
+            await player.DisposeAsync();
         }
         catch (Exception ex)
         {

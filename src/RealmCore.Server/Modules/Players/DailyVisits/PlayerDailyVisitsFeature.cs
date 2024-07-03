@@ -76,11 +76,6 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
         }
     }
 
-    public void LogOut()
-    {
-        _dailyVisitsData = null;
-    }
-
     public void Update(DateTime now)
     {
         var nowDate = now.Date;

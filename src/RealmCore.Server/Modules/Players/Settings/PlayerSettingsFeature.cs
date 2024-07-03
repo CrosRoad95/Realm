@@ -20,7 +20,7 @@ public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettin
     bool TryRemove(int settingId);
 }
 
-internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserPersistentData, IDisposable
+internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<UserSettingData> _settings = [];
@@ -54,11 +54,6 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
         }
         lock (_lock)
             _settings = userData.Settings;
-    }
-
-    public void LogOut()
-    {
-        Reset();
     }
 
     public void Reset()
@@ -158,10 +153,4 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserP
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Dispose()
-    {
-        lock (_lock)
-            _settings = [];
-    }
 }

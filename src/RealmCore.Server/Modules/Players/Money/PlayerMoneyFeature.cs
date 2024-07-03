@@ -19,10 +19,9 @@ public interface IPlayerMoneyFeature : IPlayerFeature
     Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false, CancellationToken cancellationToken = default);
     void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false);
     void SetLimitAndPrecision(decimal moneyLimit, byte precision);
-    void Clean();
 }
 
-internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData, IDisposable
+internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData
 {
     private readonly ReaderWriterLockSlimScopedAsync _lock = new();
     private decimal _money = 0;
@@ -70,17 +69,6 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
     {
         _userData = userData;
         _money = userData.Money;
-    }
-
-    public void Clean()
-    {
-        Amount = 0;
-        SetLimitAndPrecision(0, 0);
-    }
-
-    public void LogOut()
-    {
-        Clean();
     }
 
     public void SetInternal(decimal amount)
@@ -208,10 +196,5 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
         Take(amount, force);
         destination.Give(amount);
-    }
-
-    public void Dispose()
-    {
-        Clean();
     }
 }

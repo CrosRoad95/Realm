@@ -1,4 +1,6 @@
-﻿using Color = System.Drawing.Color;
+﻿using RealmCore.Server.Modules.Players.Fractions;
+using RealmCore.Server.Modules.Players.Sessions;
+using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -144,9 +146,8 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"playtime: {player.PlayTime.PlayTime}, total play time: {player.PlayTime.TotalPlayTime}");
         });
 
-        _commandService.AddCommandHandler("givemoney", (player, args) =>
+        _commandService.Add("givemoney", ([CallingPlayer] RealmPlayer player, decimal amount) =>
         {
-            var amount = args.ReadDecimal();
             player.Money.Give(amount);
             _chatBox.OutputTo(player, $"give money: {amount}, total money: {player.Money.Amount}");
         });
@@ -165,7 +166,7 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"set money: {amount}, total money: {player.Money.Amount}");
         });
 
-        _commandService.AddCommandHandler("money", (player, args) =>
+        _commandService.Add("money", ([CallingPlayer] RealmPlayer player) =>
         {
             _chatBox.OutputTo(player, $"total money: {player.Money.Amount}");
         });
@@ -1995,7 +1996,36 @@ internal sealed class CommandsHostedService : IHostedService
             player.Kick();
         });
 
+        _commandService.Add("test123", ([CallingPlayer] RealmPlayer player) =>
+        {
+            ;
+        });
+        _commandService.Add("startsession", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Sessions.Begin<TestSession>();
+            player.Sessions.Ended += (IPlayerSessionsFeature sessions, Session session) =>
+            {
+                player.Money.Give(100);
+            };
+            _chatBox.OutputTo(player, "Started");
+        });
+
         AddInventoryCommands();
+    }
+
+    internal sealed class TestSession : Session
+    {
+        public override string Name => "Test";
+        public int EndedCount { get; private set; }
+
+        public TestSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
+        {
+        }
+
+        protected override void OnEnded()
+        {
+            EndedCount++;
+        }
     }
 
 

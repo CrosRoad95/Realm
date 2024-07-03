@@ -38,12 +38,6 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
             _licenses = userData.Licenses;
     }
 
-    public void LogOut()
-    {
-        lock(_lock)
-            _licenses = [];
-    }
-
     public bool TryGetById(int licenseId, out PlayerLicenseDto playerLicenseDto)
     {
         lock (_lock)

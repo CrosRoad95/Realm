@@ -43,19 +43,6 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         }
     }
 
-    public void LogOut()
-    {
-        _lock.Wait();
-        try
-        {
-            _userNotificationDataCollection = [];
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
     public void Create(UserNotificationData data)
     {
         _userNotificationDataCollection.Add(data);

@@ -34,12 +34,6 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, 
             _jobStatistics = userData.JobStatistics;
     }
 
-    public void LogOut()
-    {
-        lock (_lock)
-            _jobStatistics = [];
-    }
-
     private JobStatisticsData GetJobStatisticsData(short jobId)
     {
         var today = DateOnly.FromDateTime(_dateTimeProvider.Now);

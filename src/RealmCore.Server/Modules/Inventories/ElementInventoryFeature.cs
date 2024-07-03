@@ -38,11 +38,6 @@ internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerI
     {
         Load(Player, userData.Inventories, _itemsCollection);
     }
-
-    public void LogOut()
-    {
-
-    }
 }
 
 internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature, IUsesVehiclePersistentData

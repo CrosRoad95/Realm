@@ -28,12 +28,6 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IUse
             _discoveries = userData.Discoveries;
     }
 
-    public void LogOut()
-    {
-        lock (_lock)
-            _discoveries = [];
-    }
-
     private bool InternalIsDiscovered(int discoveryId) => _discoveries.Any(x => x.DiscoveryId == discoveryId);
 
     public bool TryDiscover(int discoveryId)

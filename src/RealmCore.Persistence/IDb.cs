@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace RealmCore.Persistence;
 
-public interface IDb : IDisposable
+public interface IDb
 {
     DatabaseFacade Database { get; }
     ChangeTracker ChangeTracker { get; }

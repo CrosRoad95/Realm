@@ -37,12 +37,6 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IU
             _achievements = userData.Achievements;
     }
 
-    public void LogOut()
-    {
-        lock (_lock)
-            _achievements = [];
-    }
-
     private AchievementData GetById(int id)
     {
         var stat = _achievements.FirstOrDefault(x => x.AchievementId == id);

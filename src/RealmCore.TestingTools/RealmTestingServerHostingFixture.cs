@@ -46,7 +46,7 @@ public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetim
     public virtual void CleanPlayer(RealmPlayer player)
     {
         var gameplayOptions = _hosting.GetRequiredService<IOptions<GameplayOptions>>().Value;
-        player.Money.Clean();
+        player.Money.Amount = 0;
 
         player.Money.SetLimitAndPrecision(gameplayOptions.MoneyLimit, gameplayOptions.MoneyPrecision);
     }

@@ -3,7 +3,7 @@ using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
 namespace RealmCore.Server.Modules.Persistence;
 
-public interface IElementSaveService
+public interface IElementSaveService : IAsyncDisposable
 {
     event Action<Element>? ElementSaved;
 
@@ -229,6 +229,11 @@ internal sealed partial class ElementSaveService : IElementSaveService
     {
         var inventoryData = Inventory.CreateData(inventory);
         return await _inventoryRepository.CreateInventoryForVehicleId(vehicleId, inventoryData, cancellationToken);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await Save();
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.SaveService", "1.0.0");

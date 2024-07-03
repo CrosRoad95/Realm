@@ -34,20 +34,6 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature, IUsesUserPersi
         }
     }
 
-    public void LogOut()
-    {
-        _lock.Wait();
-        try
-        {
-            _groupMembers = [];
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
-
     public bool AddGroupMember(GroupMemberData groupMemberData)
     {
         _lock.Wait();

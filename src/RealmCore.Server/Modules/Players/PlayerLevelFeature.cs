@@ -50,18 +50,6 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         ExperienceChanged?.Invoke(this, before, _experience);
     }
 
-    public void LogOut()
-    {
-        using var _ = _writerLockSlim.BeginWrite();
-
-        var before = _experience;
-        _level = 0;
-        _experience = 0;
-        _userData = null;
-        Changed?.Invoke(this, _level, LevelChange.Set);
-        ExperienceChanged?.Invoke(this, before, _experience);
-    }
-
     public uint NextLevelRequiredExperience
     {
         get

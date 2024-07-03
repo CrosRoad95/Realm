@@ -37,14 +37,6 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserP
         }
     }
 
-    public void LogOut()
-    {
-        lock (_lock)
-        {
-            _upgrades = [];
-        }
-    }
-
     internal UserUpgradeData? GetUpgrade(int upgradeId) => _upgrades.FirstOrDefault(x => x.UpgradeId == upgradeId);
     internal bool InternalHasUpgrade(int upgradeId) => _upgrades.Any(x => x.UpgradeId == upgradeId);
 

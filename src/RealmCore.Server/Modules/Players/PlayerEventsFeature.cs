@@ -39,19 +39,6 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentDa
         }
     }
 
-    public void LogOut()
-    {
-        _lock.Wait();
-        try
-        {
-            _userEventData = [];
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
     public async Task<UserEventDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         var last = _userEventData.LastOrDefault();

@@ -3,7 +3,6 @@
 public interface IUsesUserPersistentData
 {
     void LogIn(UserData userData);
-    void LogOut();
     event Action? VersionIncreased;
 }
 
@@ -166,7 +165,6 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                 if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                 {
                     usesPlayerPersistentData.VersionIncreased -= IncreaseVersion;
-                    usesPlayerPersistentData.LogOut();
                 }
             }
         }

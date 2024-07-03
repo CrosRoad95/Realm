@@ -22,7 +22,7 @@ internal sealed class MigrateDatabaseService : IHostedLifecycleService
     public async Task StartingAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        using var db = scope.ServiceProvider.GetRequiredService<IDb>();
+        var db = scope.ServiceProvider.GetRequiredService<IDb>();
         await db.MigrateAsync();
     }
 
