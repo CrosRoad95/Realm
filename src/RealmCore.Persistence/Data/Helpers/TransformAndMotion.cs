@@ -1,5 +1,26 @@
 ﻿namespace RealmCore.Persistence.Data.Helpers;
 
+public sealed class TransformData
+{
+    public Vector3 Position { get; set; }
+    public Vector3 Rotation { get; set; }
+    public byte Interior { get; set; }
+    public ushort Dimension { get; set; }
+
+    public string Serialize()
+    {
+        return JsonConvert.SerializeObject(this, Formatting.None);
+    }
+
+    public static TransformData CreateFromString(string json)
+    {
+        if (string.IsNullOrEmpty(json))
+            return new();
+
+        return JsonConvert.DeserializeObject<TransformData>(json) ?? throw new Exception("Failed to create TransformData from string json");
+    }
+}
+
 public sealed class TransformAndMotion
 {
     public Vector3 Position { get; set; }

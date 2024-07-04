@@ -1,4 +1,6 @@
-﻿namespace RealmCore.BlazorGui.Logic;
+﻿using RealmCore.BlazorGui.Modules.World;
+
+namespace RealmCore.BlazorGui.Logic;
 
 internal sealed partial class PlayerGameplayHostedService : IHostedService
 {
@@ -69,6 +71,12 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
             {
                 switch (interactionHolder.Interaction)
                 {
+                    case SampleNodeInteraction sampleNodeInteraction when keyState == KeyState.Down:
+                        {
+                            await sampleNodeInteraction.SampleNode.HandleSampleInteraction();
+                            _chatBox.OutputTo(player, "Action schedules");
+                        }
+                        break;
                     case LiftableInteraction liftableInteraction when keyState == KeyState.Down:
                         if (player.IsLookingAt(element) && liftableInteraction.TryLift(player))
                         {

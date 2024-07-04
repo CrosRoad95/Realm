@@ -1,5 +1,4 @@
 ﻿namespace RealmCore.Persistence.Repository;
-
 public interface IBanRepository
 {
     Task<BanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);

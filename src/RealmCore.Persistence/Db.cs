@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence;
+﻿using RealmCore.Persistence.Data;
+using System.Security.Cryptography.Xml;
+
+namespace RealmCore.Persistence;
 
 public class DbSynchronizationContex
 {
@@ -93,6 +96,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<FriendData> Friends => Set<FriendData>();
     public DbSet<PendingFriendRequestData> PendingFriendsRequests => Set<PendingFriendRequestData>();
     public DbSet<BlockedUserData> BlockedUsers => Set<BlockedUserData>();
+    public DbSet<WorldNodeData> WorldNodes => Set<WorldNodeData>();
+    public DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData => Set<WorldNodeScheduledActionData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -901,6 +906,36 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         modelBuilder.Entity<BlockedUserData>()
             .ToTable(nameof(BlockedUsers))
             .HasKey(x => new { x.UserId1, x.UserId2 });
+
+
+        modelBuilder.Entity<WorldNodeData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(WorldNodes))
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.TypeName)
+                .HasMaxLength(400);
+
+            entityBuilder.Property(x => x.Transform)
+                .HasMaxLength(400)
+                .HasConversion(x => x.Serialize(), x => TransformData.CreateFromString(x))
+                .HasDefaultValue(new TransformData())
+                .IsRequired();
+
+            entityBuilder.HasMany(x => x.ScheduledActionData)
+                .WithOne(x => x.WorldNode)
+                .HasForeignKey(x => x.WorldNodeId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<WorldNodeScheduledActionData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(WorldNodeScheduledActionsData))
+                .HasKey(x => x.Id);
+        });
+
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

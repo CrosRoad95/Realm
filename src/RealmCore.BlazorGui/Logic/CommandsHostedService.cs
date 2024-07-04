@@ -1,5 +1,7 @@
-﻿using RealmCore.Server.Modules.Players.Fractions;
+﻿using RealmCore.BlazorGui.Modules.World;
+using RealmCore.Server.Modules.Players.Fractions;
 using RealmCore.Server.Modules.Players.Sessions;
+using RealmCore.Server.Modules.World.WorldNodes;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
@@ -27,11 +29,12 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
+    private readonly WorldNodesService _worldNodesService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -47,6 +50,7 @@ internal sealed class CommandsHostedService : IHostedService
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
+        _worldNodesService = worldNodesService;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -432,10 +436,25 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, "removed");
         });
 
-        _commandService.AddCommandHandler("spawnbox", (player, args) =>
+        _commandService.Add("spawnbox", ([CallingPlayer] RealmPlayer player) =>
         {
             var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             worldObject.Interaction = new LiftableInteraction();
+            _chatBox.OutputTo(player, "spawned box");
+        });
+
+        _commandService.Add("spawnnode", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
+            _chatBox.OutputTo(player, "spawned node");
+        });
+        _commandService.Add("spawnnode2", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
+            _chatBox.OutputTo(player, $"temporarly spawned node id: {node.Id}");
+            await Task.Delay(5000);
+            await _worldNodesService.Destroy(node);
+            _chatBox.OutputTo(player, $"destroyed temporarly spawned node id: {node.Id}");
         });
 
         _commandService.AddCommandHandler("spawnscopedbox", (player, args) =>
@@ -576,7 +595,10 @@ internal sealed class CommandsHostedService : IHostedService
             {
                 try
                 {
+                    _chatBox.OutputTo(player, $"Started animation '{animationName}'");
+                    //player.SetAnimation("CARRY", "crry_prtial", TimeSpan.FromMilliseconds(100), true, false);
                     await player.DoAnimationAsync(animation, cancellationToken: token);
+                    _chatBox.OutputTo(player, $"Finished animation '{animationName}'");
                 }
                 catch (NotSupportedException)
                 {
@@ -2000,6 +2022,7 @@ internal sealed class CommandsHostedService : IHostedService
         {
             ;
         });
+
         _commandService.Add("startsession", ([CallingPlayer] RealmPlayer player) =>
         {
             player.Sessions.Begin<TestSession>();
@@ -2008,6 +2031,11 @@ internal sealed class CommandsHostedService : IHostedService
                 player.Money.Give(100);
             };
             _chatBox.OutputTo(player, "Started");
+        });
+        
+        _commandService.Add("currentInteractElement", ([CallingPlayer] RealmPlayer player) =>
+        {
+            _chatBox.OutputTo(player, player.CurrentInteractElement?.ToString() ?? "<none>");
         });
 
         AddInventoryCommands();

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Server.Modules.World.WorldNodes;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -145,6 +147,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IRealmResourcesProvider, RealmResourcesProvider>();
         services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>(), x.GetRequiredService<IRealmResourcesProvider>()));
         services.AddSingleton<IPlayersNotifications, PlayersNotifications>();
+        services.AddSingleton<WorldNodesService>();
         #endregion
 
         #region Player features
@@ -245,6 +248,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<ServerLifecycle>();
         services.AddHostedService<FriendsHostedService>();
         services.AddHostedService<UserLoggedInHostedService>();
+        services.AddHostedService<WorldNodesHostedService>();
 
         services.AddResources();
 

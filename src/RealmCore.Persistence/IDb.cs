@@ -53,6 +53,8 @@ public interface IDb
     DbSet<PendingFriendRequestData> PendingFriendsRequests { get; }
     DbSet<BlockedUserData> BlockedUsers { get; }
     DbSynchronizationContex DbSynchronizationContex { get; }
+    DbSet<WorldNodeData> WorldNodes { get; }
+    DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

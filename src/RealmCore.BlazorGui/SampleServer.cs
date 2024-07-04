@@ -8,6 +8,7 @@ using RealmCore.BlazorGui.Logic;
 using Serilog;
 using RealmCore.BlazorGui.Logging;
 using RealmCore.Server.Modules.Players.Bans;
+using RealmCore.BlazorGui.Modules.World;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -59,6 +60,7 @@ public static class SampleServerExtensions
         services.AddHostedService<TestHostedService>();
         services.AddHostedService<AntiCheatHostedService>();
         services.AddHostedService<LogClientDebugMessagesHostedService>();
+        services.AddHostedService<WorldNodes>();
         return services;
     }
 }
