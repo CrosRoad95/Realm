@@ -6,6 +6,7 @@ namespace RealmCore.Resources.Nametags;
 
 internal class NametagsLogic
 {
+    private readonly INametagsService _nametagsService;
     private readonly ILogger<NametagsLogic> _logger;
     private readonly ILuaEventHub<INametagsEventHub> _luaEventHub;
     private readonly NametagsResource _resource;
@@ -14,6 +15,7 @@ internal class NametagsLogic
 
     public NametagsLogic(MtaServer server, INametagsService nametagsService, ILogger<NametagsLogic> logger, ILuaEventHub<INametagsEventHub> luaEventHub)
     {
+        _nametagsService = nametagsService;
         _logger = logger;
         _luaEventHub = luaEventHub;
         _resource = server.GetAdditionalResource<NametagsResource>();
@@ -24,6 +26,7 @@ internal class NametagsLogic
         nametagsService.RelayRemoveNametag = HandleRemoveNametag;
         nametagsService.RelaySetNametagRenderingEnabled = HandleSetNametagRenderingEnabled;
         nametagsService.RelaySetLocalPlayerRenderingEnabled = HandleSetLocalPlayerRenderingEnabled;
+        nametagsService.RelayResendAllNametagsToPlayer = ResendAllNametagsToPlayer;
     }
 
     private void HandleSetNametagRenderingEnabled(Player player, bool enabled)
@@ -87,7 +90,10 @@ internal class NametagsLogic
         {
             await _resource.StartForAsync(player);
             player.Disconnected += HandleDisconnected;
+            if (player.NametagText != null)
+                _nametagsService.SetNametag(player, player.NametagText);
             ResendAllNametagsToPlayer(player);
+
         }
         catch (Exception ex)
         {

@@ -6,11 +6,13 @@ public interface INametagsService
     internal Action<Ped>? RelayRemoveNametag { get; set; }
     internal Action<Player, bool>? RelaySetNametagRenderingEnabled { get; set; }
     internal Action<Player, bool>? RelaySetLocalPlayerRenderingEnabled { get; set; }
+    internal Action<Player>? RelayResendAllNametagsToPlayer { get; set; }
 
     void RemoveNametag(Ped ped);
     void SetNametag(Ped ped, string text);
     void SetNametagRenderingEnabled(Player player, bool enabled);
     void SetLocalPlayerRenderingEnabled(Player player, bool enabled);
+    void ResendAllNametagsToPlayer(Player player);
 }
 
 internal sealed class NametagsService : INametagsService
@@ -19,6 +21,7 @@ internal sealed class NametagsService : INametagsService
     public Action<Ped>? RelayRemoveNametag { get; set; }
     public Action<Player, bool>? RelaySetNametagRenderingEnabled { get; set; }
     public Action<Player, bool>? RelaySetLocalPlayerRenderingEnabled { get; set; }
+    public Action<Player>? RelayResendAllNametagsToPlayer { get; set; }
 
     public NametagsService()
     {
@@ -28,4 +31,5 @@ internal sealed class NametagsService : INametagsService
     public void SetLocalPlayerRenderingEnabled(Player player, bool enabled) => RelaySetLocalPlayerRenderingEnabled?.Invoke(player, enabled);
     public void RemoveNametag(Ped ped) => RelayRemoveNametag?.Invoke(ped);
     public void SetNametag(Ped ped, string text) => RelaySetNametag?.Invoke(ped, text);
+    public void ResendAllNametagsToPlayer(Player player) => RelayResendAllNametagsToPlayer?.Invoke(player);
 }

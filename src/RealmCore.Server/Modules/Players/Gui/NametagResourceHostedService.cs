@@ -1,5 +1,4 @@
-﻿
-using SlipeServer.Server.Elements;
+﻿using RealmCore.Server.Modules.Elements;
 
 namespace RealmCore.Server.Modules.Players.Gui;
 
@@ -26,9 +25,28 @@ internal sealed class NametagResourceHostedService : PlayerLifecycle, IHostedSer
 
     protected override void PlayerJoined(RealmPlayer player)
     {
-        player.NametagTextChanged += HandlePlayerNametagTextChanged;
-        if(player.NametagText != null)
-            _nametagsService.SetNametag(player, player.NametagText);
+        player.Nametag.TextChanged += HandleTextChanged;
+        player.Nametag.ShowMyNametagChanged += HandleShowMyNametagChanged;
+    }
+
+    private void HandleShowMyNametagChanged(Nametag nametag, bool enabled)
+    {
+        if (nametag.Ped is not Player player)
+            return;
+
+        _nametagsService.SetLocalPlayerRenderingEnabled(player, enabled);
+    }
+
+    private void HandleTextChanged(Nametag nametag, string? text)
+    {
+        if(text == null)
+        {
+            _nametagsService.RemoveNametag(nametag.Ped);
+        }
+        else
+        {
+            _nametagsService.SetNametag(nametag.Ped, text);
+        }
     }
 
     private void HandleElementCreated(IElementFactory elementFactory, Element element)
@@ -36,9 +54,9 @@ internal sealed class NametagResourceHostedService : PlayerLifecycle, IHostedSer
         if (element is not RealmPed ped)
             return;
 
-        ped.NametagTextChanged += HandlePedNametagTextChanged;
-        if (ped.NametagText != null)
-            _nametagsService.SetNametag(ped, ped.NametagText);
+        ped.Nametag.TextChanged += HandleTextChanged;
+        if (ped.Nametag.Text != null)
+            _nametagsService.SetNametag(ped.Nametag.Ped, ped.Nametag.Text);
     }
 
     private void HandlePlayerNametagTextChanged(RealmPlayer player, string? nametagText)
@@ -50,18 +68,6 @@ internal sealed class NametagResourceHostedService : PlayerLifecycle, IHostedSer
         else
         {
             _nametagsService.RemoveNametag(player);
-        }
-    }
-
-    private void HandlePedNametagTextChanged(RealmPed ped, string? nametagText)
-    {
-        if (nametagText != null)
-        {
-            _nametagsService.SetNametag(ped, nametagText);
-        }
-        else
-        {
-            _nametagsService.RemoveNametag(ped);
         }
     }
 }

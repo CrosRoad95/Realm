@@ -24,7 +24,7 @@
 		<PackageReference Include="SlipeServer.Resources.Scoreboard" Version="0.1.0-CI-20240702-151127" />
 		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20240702-151127" />
 		<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20240702-151127" />
-		<PackageReference Include="SlipeServer.Hosting" Version="0.1.0-CI-20240702-110139" />
+		<PackageReference Include="SlipeServer.Hosting" Version="0.1.0-CI-20240705-132120" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -26,7 +26,7 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
         marker.Size = 4;
 
         var ped = _elementFactory.CreatePed(new Location(232.93f, -73.18f, 1.43f), PedModel.Cj);
-        ped.NametagText = "sample nametag";
+        ped.Nametag.Text = "sample nametag";
 
         return Task.CompletedTask;
     }

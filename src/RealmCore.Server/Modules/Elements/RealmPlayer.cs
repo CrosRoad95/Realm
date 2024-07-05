@@ -38,7 +38,6 @@ public class RealmPlayer : Player, IAsyncDisposable
     private Element? _lastClickedElement;
     private readonly object _currentInteractElementLock = new();
     private Element? _currentInteractElement;
-    private string? _nametagText;
     public virtual Vector2 ScreenSize { get; set; }
     private CultureInfo _culture = new("pl-PL");
     private RealmBlip? _blip = null;
@@ -62,7 +61,6 @@ public class RealmPlayer : Player, IAsyncDisposable
     public event Action<RealmPlayer, Element?, Element?>? CurrentInteractElementChanged;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectDetached;
-    public new event Action<RealmPlayer, string?>? NametagTextChanged;
     public event Action<RealmPlayer, bool>? FightEnabled;
     public event Action<RealmPlayer, bool>? EnteredToggleControlScope;
 
@@ -161,16 +159,6 @@ public class RealmPlayer : Player, IAsyncDisposable
         }
     }
 
-    public new string? NametagText
-    {
-        get => _nametagText;
-        set
-        {
-            _nametagText = value;
-            NametagTextChanged?.Invoke(this, _nametagText);
-        }
-    }
-
     public CultureInfo Culture { get => _culture; set => _culture = value; }
     public int UserId => User.Id;
 
@@ -207,6 +195,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
+    public Nametag Nametag { get; init; }
     // For test purpuse
     // TODO: Make it better
     public RealmPlayer() { }
@@ -258,6 +247,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         var maxCalls = 10;
         var timeSpan = TimeSpan.FromSeconds(5);
         _invokePolicy = Policy.RateLimitAsync(maxCalls, timeSpan, maxCalls);
+        Nametag = new(this);
     }
 
     public virtual async Task Invoke(Func<Task> task, CancellationToken cancellationToken = default)

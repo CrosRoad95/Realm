@@ -21,6 +21,7 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsHostedService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly INametagsService _nametagsService;
     private readonly IUsersService _usersService;
     private readonly IVehiclesService _vehiclesService;
     private readonly IElementOutlineService _elementOutlineService;
@@ -42,6 +43,7 @@ internal sealed class CommandsHostedService : IHostedService
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
+        _nametagsService = nametagsService;
         _usersService = usersService;
         _vehiclesService = vehiclesService;
         _elementOutlineService = elementOutlineService;
@@ -2043,6 +2045,21 @@ internal sealed class CommandsHostedService : IHostedService
             player.DailyTasks.TryBeginDailyTask(1);
             player.DailyTasks.TryDoProgress(1, 10);
             _chatBox.OutputTo(player, $"Daily task progressed to: {player.DailyTasks.GetProgress(1)}");
+        });
+
+        _commandService.Add("resendAllNametags", ([CallingPlayer] RealmPlayer player) =>
+        {
+            nametagsService.ResendAllNametagsToPlayer(player);
+        });
+
+        _commandService.Add("togglemynametag", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Nametag.ShowMyNametag = !player.Nametag.ShowMyNametag;
+        });
+        
+        _commandService.Add("setnametag", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Nametag.Text = Guid.NewGuid().ToString();
         });
 
         AddInventoryCommands();
