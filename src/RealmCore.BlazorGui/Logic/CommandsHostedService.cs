@@ -2037,6 +2037,14 @@ internal sealed class CommandsHostedService : IHostedService
         {
             _chatBox.OutputTo(player, player.CurrentInteractElement?.ToString() ?? "<none>");
         });
+        
+        _commandService.Add("dailyTaskProgress", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.DailyTasks.TryBeginDailyTask(1);
+            player.DailyTasks.TryDoProgress(1, 10);
+            _chatBox.OutputTo(player, $"Daily task progressed to: {player.DailyTasks.GetProgress(1)}");
+
+        });
 
         AddInventoryCommands();
     }

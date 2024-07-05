@@ -98,6 +98,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<BlockedUserData> BlockedUsers => Set<BlockedUserData>();
     public DbSet<WorldNodeData> WorldNodes => Set<WorldNodeData>();
     public DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData => Set<WorldNodeScheduledActionData>();
+    public DbSet<UserDailyTaskProgressData> UserDailyTasksProgressData => Set<UserDailyTaskProgressData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -312,6 +313,12 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.BlockedUsers)
                 .WithOne(x => x.User1)
                 .HasForeignKey(x => x.UserId1);
+
+            entityBuilder
+                .HasMany(x => x.DailyTasksProgress)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
 
             entityBuilder
                 .HasMany<BlockedUserData>()
@@ -935,7 +942,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .ToTable(nameof(WorldNodeScheduledActionsData))
                 .HasKey(x => x.Id);
         });
-
+        
+        modelBuilder.Entity<UserDailyTaskProgressData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserDailyTasksProgressData))
+                .HasKey(x => x.Id);
+        });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

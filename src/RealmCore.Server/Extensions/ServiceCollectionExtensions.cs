@@ -178,6 +178,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
         services.AddPlayerScopedFeature<IPlayerSchedulerFeature, PlayerSchedulerFeature>();
         services.AddPlayerScopedFeature<IPlayerFriendsFeature, PlayerFriendsFeature>();
+        services.AddPlayerScopedFeature<IPlayerDailyTasksFeature, PlayerDailyTasksFeature>();
         #endregion
 
         #region Vehicle features

@@ -203,9 +203,13 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IPlayerNotificationsFeature Notifications { get; init; }
     public IPlayerSchedulerFeature Scheduler { get; init; }
     public IPlayerFriendsFeature Friends { get; init; }
+    public IPlayerDailyTasksFeature DailyTasks { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
+    // For test purpuse
+    // TODO: Make it better
+    public RealmPlayer() { }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateAsyncScope();
@@ -243,6 +247,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         Notifications = GetRequiredService<IPlayerNotificationsFeature>();
         Scheduler = GetRequiredService<IPlayerSchedulerFeature>();
         Friends = GetRequiredService<IPlayerFriendsFeature>();
+        DailyTasks = GetRequiredService<IPlayerDailyTasksFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

@@ -126,6 +126,7 @@
 		<Using Include="SlipeServer.Packets.Lua.Camera" />
 		<Using Include="RealmCore.Server.Modules.Search" />
 		<Using Include="RealmCore.TestingTools.Classes" />
+		<Using Include="RealmCore.Server.Modules.Players.DailyVisits" />
 	</ItemGroup>
 
 </Project>
