@@ -37,7 +37,7 @@ internal sealed class JobRepository : IJobRepository
                 Points = (ulong)x.Sum(y => (uint)y.Points),
                 TimePlayed = (ulong)x.Sum(y => (uint)y.TimePlayed)
             })
-            .OrderBy(x => x.Points)
+            .OrderByDescending(x => x.Points)
             .Take(limit);
 
         return await query.ToArrayAsync(cancellationToken);
