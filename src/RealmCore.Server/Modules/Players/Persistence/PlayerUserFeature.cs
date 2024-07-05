@@ -280,18 +280,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         }
     }
 
-    public bool HasAuthorizedPolicies(string[] policies)
-    {
-        lock (_lock)
-        {
-            foreach (var policy in policies)
-            {
-                if (_authorizedPoliciesCache.TryGetValue(policy, out var authorized) && !authorized)
-                    return false;
-            }
-            return true;
-        }
-    }
+    public bool HasAuthorizedPolicies(string[] policies) => policies.All(HasAuthorizedPolicy);
 
     private void ClearAuthorizedPoliciesCache()
     {

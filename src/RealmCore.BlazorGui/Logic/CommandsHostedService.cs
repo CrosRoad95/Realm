@@ -61,6 +61,11 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.Output("Ok");
         }, ["Admin"]);
 
+        _commandService.Add("testpolicy2", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            _chatBox.OutputTo(player, $"authorized: {player.User.HasAuthorizedPolicies(["Admin"])}");
+        });
+
         _commandService.Add("cmdbasic", async ([CallingPlayer] RealmPlayer player, [Range(1, 20)] int a, int b) =>
         {
             await Task.Delay(100);
@@ -1610,12 +1615,6 @@ internal sealed class CommandsHostedService : IHostedService
         //            _chatBox.OutputTo(player, $"Focused player: {focusedPlayer}");
         //        }
         //    }
-        //});
-
-        //_commandService.AddAsyncCommandHandler("testpolicy", async (player, args) =>
-        //{
-        //    bool authorized = await usersService.AuthorizePolicy(player.GetRequiredComponent<UserComponent>(), "Admin");
-        //    _chatBox.OutputTo(player, $"authorized: {authorized}");
         //});
 
         _commandService.AddAsyncCommandHandler("signout", async (player, args, token) =>
