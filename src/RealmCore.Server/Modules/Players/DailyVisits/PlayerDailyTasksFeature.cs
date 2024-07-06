@@ -48,20 +48,8 @@ internal sealed class PlayerDailyTasksFeature : IPlayerDailyTasksFeature, IUsesU
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserDailyTaskProgressData> _dailyTasksProgressData = [];
 
-    public DailyTaskProgressDto[] Today
-    {
-        get
-        {
-            var now = _dateTimeProvider.Now;
-            UserDailyTaskProgressData[] dailyTaskProgressData;
-            lock (_lock)
-            {
-                dailyTaskProgressData = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, now)).ToArray();
-            }
+    public DailyTaskProgressDto[] Today => GetTasks();
 
-            return dailyTaskProgressData.Select(DailyTaskProgressDto.Map).ToArray();
-        }
-    }
     public RealmPlayer Player { get; init; }
     public PlayerDailyTasksFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider)
     {
@@ -105,6 +93,16 @@ internal sealed class PlayerDailyTasksFeature : IPlayerDailyTasksFeature, IUsesU
         {
             var data = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, at.Value) && x.DailyTaskId == taskId).FirstOrDefault();
             return DailyTaskProgressDto.Map(data);
+        }
+    }
+
+    public DailyTaskProgressDto[] GetTasks(DateTime? at = null)
+    {
+        at ??= _dateTimeProvider.Now;
+        lock (_lock)
+        {
+            var data = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, at.Value));
+            return data.Select(DailyTaskProgressDto.Map).ToArray();
         }
     }
 
