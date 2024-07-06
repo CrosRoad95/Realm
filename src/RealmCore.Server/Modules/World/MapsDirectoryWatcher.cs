@@ -18,17 +18,19 @@ internal class MapsDirectoryWatcher : IDisposable
     private readonly string _path;
     private readonly MapsCollection _mapsCollection;
     private readonly IMapsService _mapsService;
+    private readonly MapLoader _mapLoader;
     private readonly List<MapEvent> _mapEvents = [];
     private readonly object _mapEventsLock = new();
     private readonly Debounce _debounce = new(250);
 
     public event Action<string, MapEventType>? MapChanged;
 
-    public MapsDirectoryWatcher(string path, MapsCollection mapsCollection, IMapsService mapsService)
+    public MapsDirectoryWatcher(IMapsService mapsService, MapLoader mapLoader, string path, MapsCollection mapsCollection)
     {
         _path = path;
         _mapsCollection = mapsCollection;
         _mapsService = mapsService;
+        _mapLoader = mapLoader;
         string searchPattern = "*.map";
         _fileSystemWatcher = new FileSystemWatcher
         {
@@ -85,6 +87,9 @@ internal class MapsDirectoryWatcher : IDisposable
         IReadOnlyList<MapEvent> mapEvents;
         lock (_mapEventsLock)
         {
+            if (_mapEvents.Count == 0)
+                return;
+
             mapEvents = new List<MapEvent>(_mapEvents.DistinctBy(x => x.mapName));
             _mapEvents.Clear();
         }
@@ -104,10 +109,14 @@ internal class MapsDirectoryWatcher : IDisposable
         {
             var mapName = GetMapName(mapFile);
 
-            var map = _mapsCollection.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
-            if (_loadedMaps.Contains(mapName))
-                _mapsService.Load(mapName);
-            MapChanged?.Invoke(mapName, MapEventType.Add);
+            var map = _mapLoader.LoadFromFile(Path.Join(_path, mapFile), MapFormat.Xml);
+            if(map != null)
+            {
+                _mapsCollection.AddMap(mapName, map);
+                if (_loadedMaps.Contains(mapName))
+                    _mapsService.Load(mapName);
+                MapChanged?.Invoke(mapName, MapEventType.Add);
+            }
         }
 
         foreach (var mapFile in mapEvents.Where(x => x.mapEventType == MapEventType.Update).Select(x => x.mapName))
@@ -116,9 +125,13 @@ internal class MapsDirectoryWatcher : IDisposable
 
             _mapsService.Unload(mapName);
             _mapsCollection.RemoveMapByName(mapName);
-            var map = _mapsCollection.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
-            _mapsService.Load(mapName);
-            MapChanged?.Invoke(mapName, MapEventType.Update);
+            var map = _mapLoader.LoadFromFile(Path.Join(_path, mapFile), MapFormat.Xml);
+            if (map != null)
+            {
+                _mapsCollection.AddMap(mapName, map);
+                _mapsService.Load(mapName);
+                MapChanged?.Invoke(mapName, MapEventType.Update);
+            }
         }
     }
 

@@ -22,7 +22,7 @@ internal sealed class MapsHostedService : IHostedService
         //});
 
         //mapsService.RegisterMapsPath("C:\\Users\\sebaj\\source\\repos\\RealmCore\\src\\RealmCore.BlazorGui\\bin\\Debug\\net8.0\\Server\\Maps");
-        mapsCollection.RegisterMapsPath("Server/Maps", mapsService);
+        mapsCollection.RegisterMapsPath("Server/Maps");
         //mapsService.RegisterMapFromXml("testmapxml", "Server/Maps/test.map");
     }
 

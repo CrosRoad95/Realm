@@ -1,27 +1,53 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-public sealed class Map : IDisposable
+public readonly record struct RemoveWorldModel(ushort model, Vector3 position, float radius, byte interior = 0);
+
+public abstract class MapBase : IDisposable
 {
-    private readonly List<WorldObject> _worldObjects;
-    private readonly BoundingBox _boundingBox;
+    protected readonly IElementIdGenerator _elementIdGenerator;
     private bool _disposed = false;
 
-    internal IReadOnlyCollection<WorldObject> WorldObjects => _worldObjects.AsReadOnly();
+    public event Action<MapBase>? Disposed;
 
-    public BoundingBox BoundingBox => _boundingBox;
-    public string Name { get; }
-
-    public Map(IElementIdGenerator elementIdGenerator, IEnumerable<WorldObject> worldObjects, string name)
+    public BoundingBox BoundingBox { get; protected set; }
+    public MapBase(IElementIdGenerator elementIdGenerator)
     {
-        if (worldObjects.TryGetNonEnumeratedCount(out int count))
-        {
-            _worldObjects = new(count);
-        }
-        else
-        {
-            _worldObjects = new(worldObjects.Count());
-        }
+        _elementIdGenerator = elementIdGenerator;
+    }
 
+    public virtual bool LoadFor(RealmPlayer player) { return false; }
+
+    public virtual bool UnloadFor(RealmPlayer player) { return false; }
+
+    public virtual bool Load() { return false; }
+
+    public virtual bool Unload() { return false; }
+
+    protected void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().Name);
+    }
+
+    public void Dispose()
+    {
+        ThrowIfDisposed();
+        Disposed?.Invoke(this);
+
+        _disposed = true;
+    }
+}
+
+public sealed class Map : MapBase
+{
+    private readonly MtaServer _mtaServer;
+    private readonly GameWorld _gameWorld;
+    private readonly RemoveWorldModel[] _removeWorldModels;
+    private readonly List<WorldObject> _worldObjects = [];
+    public string? Name { get; set; }
+
+    public Map(IElementIdGenerator elementIdGenerator, MtaServer mtaServer, GameWorld gameWorld, IEnumerable<WorldObject> worldObjects, IEnumerable<RemoveWorldModel> removeWorldModels) : base(elementIdGenerator)
+    {
         Vector3 min = Vector3.Zero;
         Vector3 max = Vector3.Zero;
         foreach (var worldObject in worldObjects)
@@ -37,17 +63,14 @@ public sealed class Map : IDisposable
             _worldObjects.Add(worldObject);
         }
 
-        _boundingBox = new BoundingBox((min + max) * 0.5f, max - min);
-        Name = name;
+        BoundingBox = new BoundingBox((min + max) * 0.5f, max - min);
+        _mtaServer = mtaServer;
+        _gameWorld = gameWorld;
+        _removeWorldModels = removeWorldModels.ToArray();
     }
 
-    private void ThrowIfDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().Name);
-    }
-
-    public bool LoadFor(RealmPlayer player)
+    // TODO: Add check, load for specific player or for all
+    public override bool LoadFor(RealmPlayer player)
     {
         ThrowIfDisposed();
         foreach (var worldObject in _worldObjects)
@@ -55,7 +78,7 @@ public sealed class Map : IDisposable
         return true;
     }
 
-    public bool UnloadFor(RealmPlayer player)
+    public override bool UnloadFor(RealmPlayer player)
     {
         ThrowIfDisposed();
         foreach (var worldObject in _worldObjects)
@@ -64,12 +87,25 @@ public sealed class Map : IDisposable
         return true;
     }
 
-    public event Action<Map>? Disposed;
-    public void Dispose()
+    public override bool Load()
     {
         ThrowIfDisposed();
-        Disposed?.Invoke(this);
+        foreach (var worldObject in _worldObjects)
+            worldObject.AssociateWith(_mtaServer);
+        foreach (var removeWorldModel in _removeWorldModels)
+            _gameWorld.RemoveWorldModel(removeWorldModel.model, removeWorldModel.position, removeWorldModel.radius, removeWorldModel.interior);
 
-        _disposed = true;
+        return true;
+    }
+
+    public override bool Unload()
+    {
+        ThrowIfDisposed();
+        foreach (var worldObject in _worldObjects)
+            worldObject.Destroy();
+        foreach (var removeWorldModel in _removeWorldModels)
+            _gameWorld.RestoreWorldModel(removeWorldModel.model, removeWorldModel.position, removeWorldModel.radius, removeWorldModel.interior);
+
+        return true;
     }
 }

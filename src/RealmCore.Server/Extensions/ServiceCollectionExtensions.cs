@@ -124,7 +124,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IElementSaveService, ElementSaveService>();
         services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
-        services.AddScoped<IPlayerMapsService, PlayerMapsService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
         services.AddSingleton<IPlayerUserService, PlayersUsersService>();
         services.AddSingleton<IUsersService, UsersService>();
@@ -148,6 +147,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>(), x.GetRequiredService<IRealmResourcesProvider>()));
         services.AddSingleton<IPlayersNotifications, PlayersNotifications>();
         services.AddSingleton<WorldNodesService>();
+        services.AddSingleton<MapLoader>();
         #endregion
 
         #region Player features
@@ -238,7 +238,6 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<PlayersHostedService>();
         services.AddHostedService<ServerListHostedService>();
         services.AddHostedService<VehicleAccessControllerLogic>();
-        services.AddHostedService<MapsHostedService>();
         services.AddHostedService<PlayersBindsHostedService>();
         services.AddHostedService<PlayTimeHostedService>();
         services.AddHostedService<PlayerBlipHostedService>();

@@ -42,10 +42,7 @@ internal sealed class MapsService : IMapsService
             if (_loadedMaps.Contains(name))
                 return false;
             _loadedMaps.Add(name);
-            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            {
-                map.LoadFor(player);
-            }
+            map.Load();
             return true;
         }
     }
@@ -74,10 +71,7 @@ internal sealed class MapsService : IMapsService
             if (!_loadedMaps.Contains(name))
                 return false;
             _loadedMaps.Remove(name);
-            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            {
-                map.UnloadFor(player);
-            }
+            map.Unload();
             return true;
         }
     }
