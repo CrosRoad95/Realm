@@ -8,6 +8,7 @@ public interface IPlayerDailyTasksFeature : IPlayerFeature
     float GetProgress(int taskId, DateTime? at = null);
     bool TryBeginDailyTask(int taskId);
     bool TryDoProgress(int taskId, float progress, DateTime? at = null);
+    DailyTaskProgressDto[] GetTasks(DateTime? at = null);
 }
 
 public sealed class DailyTaskProgressDto : IEquatable<DailyTaskProgressDto>
