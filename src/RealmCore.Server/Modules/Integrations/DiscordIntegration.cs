@@ -35,7 +35,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         lock (_lock)
         {
             if (IsIntegrated())
-                throw new IntegrationAlreadyCreatedException();
+                return;
 
             DiscordUserId = discordUserId;
             Name = name;
@@ -62,14 +62,14 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         lock (_lock)
         {
             if (IsIntegrated())
-                throw new IntegrationAlreadyCreatedException();
+                return false;
 
             if (!HasPendingDiscordConnectionCode())
                 return false;
 
             if (_discordConnectionCode == code)
             {
-                Integrate(discordUserId, name);
+                Integrate(discordUserId, name, true);
                 return true;
             }
         }
@@ -99,6 +99,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
             if(DiscordUserId == 0)
             {
                 DiscordUserId = 0;
+                Name = null;
                 Removed?.Invoke(this);
                 return true;
             }
