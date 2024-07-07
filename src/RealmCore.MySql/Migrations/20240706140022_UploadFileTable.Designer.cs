@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealmCore.MySql;
 
@@ -10,9 +11,11 @@ using RealmCore.MySql;
 namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20240706140022_UploadFileTable")]
+    partial class UploadFileTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,11 +232,6 @@ namespace RealmCore.Persistence.MySql.Migrations
 
                     b.Property<ulong>("DiscordUserId")
                         .HasColumnType("bigint unsigned");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
 
                     b.HasKey("UserId");
 

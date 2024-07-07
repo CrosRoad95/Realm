@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INewsRepository, NewsRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IFriendRepository, FriendRepository>();
-        services.AddScoped<IUserDataRepository, UserDataRepository>();
+        services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IWorldNodeRepository, WorldNodeRepository>();
         services.AddScoped<ITransactionContext, TransactionContext>();
 

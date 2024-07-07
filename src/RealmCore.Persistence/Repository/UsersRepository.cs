@@ -1,17 +1,17 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IUserDataRepository
+public interface IUsersRepository
 {
     Task<UserData?> GetBySerial(string serial, CancellationToken cancellationToken = default);
     Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default);
     Task<string[]> GetRoles(int userId, CancellationToken cancellationToken = default);
 }
 
-internal sealed class UserDataRepository : IUserDataRepository
+internal sealed class UsersRepository : IUsersRepository
 {
     private readonly IDb _db;
 
-    public UserDataRepository(IDb db)
+    public UsersRepository(IDb db)
     {
         _db = db;
     }
@@ -20,7 +20,7 @@ internal sealed class UserDataRepository : IUserDataRepository
     {
         var query = _db.Users
             .AsNoTracking()
-            .TagWithSource(nameof(UserDataRepository))
+            .TagWithSource(nameof(UsersRepository))
             .Where(x => x.RegisterSerial == serial);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -29,7 +29,7 @@ internal sealed class UserDataRepository : IUserDataRepository
     {
         var query = _db.Users
             .AsNoTracking()
-            .TagWithSource(nameof(UserDataRepository))
+            .TagWithSource(nameof(UsersRepository))
             .Where(x => x.Id == userId);
         var user = await query.FirstOrDefaultAsync(cancellationToken);
         return user?.Nick;
@@ -39,13 +39,13 @@ internal sealed class UserDataRepository : IUserDataRepository
     {
         var subQuery = _db.UserRoles
             .AsNoTracking()
-            .TagWithSource(nameof(UserDataRepository))
+            .TagWithSource(nameof(UsersRepository))
             .Where(x => x.UserId == userId)
             .Select(x => x.RoleId);
 
         var query = _db.Roles.Where(x => subQuery.Contains(x.Id))
             .AsNoTracking()
-            .TagWithSource(nameof(UserDataRepository))
+            .TagWithSource(nameof(UsersRepository))
             .Select(x => x.Name);
 
         var roles = await query.ToArrayAsync(cancellationToken);

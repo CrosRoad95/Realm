@@ -97,8 +97,12 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<PendingFriendRequestData> PendingFriendsRequests => Set<PendingFriendRequestData>();
     public DbSet<BlockedUserData> BlockedUsers => Set<BlockedUserData>();
     public DbSet<WorldNodeData> WorldNodes => Set<WorldNodeData>();
+    // TODO: Remove "Data" from name
     public DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData => Set<WorldNodeScheduledActionData>();
+    // TODO: Remove "Data" from name
     public DbSet<UserDailyTaskProgressData> UserDailyTasksProgressData => Set<UserDailyTaskProgressData>();
+    public DbSet<UploadFileData> UploadFiles => Set<UploadFileData>();
+    public DbSet<UserUploadFileData> UserUploadFiles => Set<UserUploadFileData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -319,7 +323,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
-
+            
             entityBuilder
                 .HasMany<BlockedUserData>()
                 .WithOne(x => x.User2)
@@ -790,6 +794,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(DiscordIntegrations))
                 .HasKey(x => x.UserId);
+
+            entityBuilder.Property(x => x.Name)
+                .HasMaxLength(128);
         });
 
         modelBuilder.Entity<UserUpgradeData>(entityBuilder =>
@@ -941,6 +948,39 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(WorldNodeScheduledActionsData))
                 .HasKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<UploadFileData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UploadFiles))
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.Name)
+                .HasMaxLength(255);
+
+            entityBuilder.Property(x => x.FileType)
+                .HasMaxLength(255);
+
+            entityBuilder.Property(x => x.Metadata)
+                .HasMaxLength(4000);
+        });
+        
+        modelBuilder.Entity<UserUploadFileData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserUploadFiles))
+                .HasKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.User)
+                .WithMany(x => x.UploadFiles)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.UploadFile)
+                .WithMany(x => x.UserUploadFiles)
+                .HasForeignKey(x => x.UploadFileId)
+                .HasPrincipalKey(x => x.Id);
         });
         
         modelBuilder.Entity<UserDailyTaskProgressData>(entityBuilder =>

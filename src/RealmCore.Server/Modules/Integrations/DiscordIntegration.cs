@@ -3,10 +3,11 @@
 public interface IDiscordIntegration : IIntegration
 {
     ulong DiscordUserId { get; }
+    string? Name { get; }
 
     string GenerateAndGetConnectionCode(TimeSpan? validFor = null);
-    void Integrate(ulong discordUserId);
-    bool TryVerify(string code, ulong discordUserId);
+    void Integrate(ulong discordUserId, string name, bool isNew = false);
+    bool TryVerify(string code, ulong discordUserId, string name);
 }
 
 internal sealed class DiscordIntegration : IDiscordIntegration
@@ -17,6 +18,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public ulong DiscordUserId { get; private set; }
+    public string? Name { get; private set; }
 
     public event Action<IIntegration>? Created;
     public event Action<IIntegration>? Removed;
@@ -28,7 +30,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public void Integrate(ulong discordUserId)
+    public void Integrate(ulong discordUserId, string name, bool isNew = false)
     {
         lock (_lock)
         {
@@ -36,7 +38,9 @@ internal sealed class DiscordIntegration : IDiscordIntegration
                 throw new IntegrationAlreadyCreatedException();
 
             DiscordUserId = discordUserId;
-            Created?.Invoke(this);
+            Name = name;
+            if(isNew)
+                Created?.Invoke(this);
         }
     }
 
@@ -51,7 +55,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         }
     }
 
-    public bool TryVerify(string code, ulong discordUserId)
+    public bool TryVerify(string code, ulong discordUserId, string name)
     {
         ArgumentOutOfRangeException.ThrowIfZero(discordUserId);
 
@@ -65,7 +69,7 @@ internal sealed class DiscordIntegration : IDiscordIntegration
 
             if (_discordConnectionCode == code)
             {
-                Integrate(discordUserId);
+                Integrate(discordUserId, name);
                 return true;
             }
         }

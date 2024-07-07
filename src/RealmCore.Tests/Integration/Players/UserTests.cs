@@ -34,7 +34,7 @@ public class UserTests
             throw new Exception("Failed to login");
         });
 
-        var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+        var userDataRepository = player.GetRequiredService<IUsersRepository>();
         var lastNick = await userDataRepository.GetLastNickName(userId);
         #endregion
 

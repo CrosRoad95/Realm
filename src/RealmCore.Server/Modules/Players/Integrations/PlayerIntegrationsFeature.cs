@@ -30,6 +30,6 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IU
     public void LogIn(UserData userData)
     {
         if (userData.DiscordIntegration != null)
-            Discord.Integrate(userData.DiscordIntegration.DiscordUserId);
+            Discord.Integrate(userData.DiscordIntegration.DiscordUserId, userData.DiscordIntegration.Name);
     }
 }

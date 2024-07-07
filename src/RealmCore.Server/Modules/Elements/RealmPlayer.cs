@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using RealmCore.Server.Modules.Players.Integrations;
+
+namespace RealmCore.Server.Modules.Elements;
 
 internal readonly struct FadeCameraScope : IAsyncDisposable
 {
@@ -192,6 +194,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IPlayerSchedulerFeature Scheduler { get; init; }
     public IPlayerFriendsFeature Friends { get; init; }
     public IPlayerDailyTasksFeature DailyTasks { get; init; }
+    public IPlayerIntegrationsFeature Integrations { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -237,6 +240,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         Scheduler = GetRequiredService<IPlayerSchedulerFeature>();
         Friends = GetRequiredService<IPlayerFriendsFeature>();
         DailyTasks = GetRequiredService<IPlayerDailyTasksFeature>();
+        Integrations = GetRequiredService<IPlayerIntegrationsFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

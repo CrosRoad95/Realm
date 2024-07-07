@@ -68,7 +68,7 @@ internal sealed class UsersService : IUsersService
     public async Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player, bool dontLoadData = false)
     {
         var serial = player.Client.GetSerial();
-        var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+        var userDataRepository = player.GetRequiredService<IUsersRepository>();
         var userData = await userDataRepository.GetBySerial(serial, CancellationToken.None) ?? throw new Exception("No account found.");
         
         if (!userData.QuickLogin)
@@ -115,7 +115,7 @@ internal sealed class UsersService : IUsersService
 
             try
             {
-                var userDataRepository = player.GetRequiredService<IUserDataRepository>();
+                var userDataRepository = player.GetRequiredService<IUsersRepository>();
                 var roles = await userDataRepository.GetRoles(userData.Id, CancellationToken.None);
 
                 var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(userData);

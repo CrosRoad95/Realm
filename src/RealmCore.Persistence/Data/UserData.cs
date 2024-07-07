@@ -48,4 +48,5 @@ public class UserData : IdentityUser<int>
     public ICollection<UserPlayTimeData> PlayTimes { get; set; } = new List<UserPlayTimeData>();
     public ICollection<BlockedUserData> BlockedUsers { get; set; } = new List<BlockedUserData>();
     public ICollection<UserDailyTaskProgressData> DailyTasksProgress { get; set; } = [];
+    public ICollection<UserUploadFileData> UploadFiles { get; set; } = [];
 }

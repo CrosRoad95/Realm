@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.World.WorldNodes;
+﻿using RealmCore.Server.Modules.Players.Integrations;
+using RealmCore.Server.Modules.World.WorldNodes;
 
 namespace RealmCore.Server.Extensions;
 
@@ -179,6 +180,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerSchedulerFeature, PlayerSchedulerFeature>();
         services.AddPlayerScopedFeature<IPlayerFriendsFeature, PlayerFriendsFeature>();
         services.AddPlayerScopedFeature<IPlayerDailyTasksFeature, PlayerDailyTasksFeature>();
+        services.AddPlayerScopedFeature<IPlayerIntegrationsFeature, PlayerIntegrationsFeature>();
         #endregion
 
         #region Vehicle features
