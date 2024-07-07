@@ -120,10 +120,9 @@ internal sealed class PlayerDailyTasksFeature : IPlayerDailyTasksFeature, IUsesU
     public bool TryDoProgress(int taskId, float progress, DateTime? at = null)
     {
         at ??= _dateTimeProvider.Now;
-        var now = _dateTimeProvider.Now;
         lock (_lock)
         {
-            var data = _dailyTasksProgressData.Where(x => AreSameDay(at.Value, now) && x.DailyTaskId == taskId).FirstOrDefault();
+            var data = _dailyTasksProgressData.Where(x => AreSameDay(at.Value, x.CreatedAt) && x.DailyTaskId == taskId).FirstOrDefault();
             if(data == null)
                 return false;
 

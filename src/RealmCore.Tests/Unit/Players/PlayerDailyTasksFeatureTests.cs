@@ -62,4 +62,17 @@ public class PlayerDailyTasksFeatureTests
             Progress = 20
         });
     }
+
+    [Fact]
+    public void ProgressShouldBeMadeOnlyToCurrentTask()
+    {
+        _sut.TryBeginDailyTask(1);
+        _testDateTimeProvider.Add(TimeSpan.FromDays(1));
+        _sut.TryBeginDailyTask(1);
+        _sut.TryDoProgress(1, 10);
+
+        using var _ = new AssertionScope();
+        _sut.GetProgress(1).Should().Be(10);
+        _sut.GetProgress(1, _testDateTimeProvider.Now.AddDays(-1)).Should().Be(0);
+    }
 }
