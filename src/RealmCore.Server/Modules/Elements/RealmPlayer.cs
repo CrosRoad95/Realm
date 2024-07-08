@@ -763,6 +763,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         _blip = GetRequiredService<IElementFactory>().CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
         {
             blip.Color = color;
+            blip.VisibleDistance = 250;
         });
 
         PositionChanged += HandlePositionChanged;
