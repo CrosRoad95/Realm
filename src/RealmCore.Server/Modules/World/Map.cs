@@ -29,7 +29,7 @@ public abstract class MapBase : IDisposable
             throw new ObjectDisposedException(GetType().Name);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         ThrowIfDisposed();
         Disposed?.Invoke(this);
@@ -38,7 +38,7 @@ public abstract class MapBase : IDisposable
     }
 }
 
-public sealed class Map : MapBase
+public class Map : MapBase
 {
     private readonly MtaServer _mtaServer;
     private readonly GameWorld _gameWorld;
