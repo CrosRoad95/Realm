@@ -65,8 +65,11 @@ internal class NametagsLogic
     {
         lock (_lock)
         {
-            var luaValue = new LuaValue(_nametagsCache.ToDictionary(x => new LuaValue(x.Key.Id), y => y.Value.LuaValue));
-            _luaEventHub.Broadcast(x => x.SetPedNametag(luaValue), ped);
+            if(_nametagsCache.TryGetValue(ped, out var nametag))
+            {
+                var luaValue = nametag.LuaValue;
+                _luaEventHub.Broadcast(x => x.SetPedNametag(luaValue), ped);
+            }
         }
     }
 

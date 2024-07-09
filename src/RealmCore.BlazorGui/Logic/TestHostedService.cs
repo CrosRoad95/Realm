@@ -27,6 +27,15 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 
         var ped = _elementFactory.CreatePed(new Location(232.93f, -73.18f, 1.43f), PedModel.Cj);
         ped.Nametag.Text = "sample nametag";
+        var _ = Task.Run(async () =>
+        {
+            int i = 0;
+            while (true)
+            {
+                ped.Nametag.Text = $"sample nametag {i++}";
+                await Task.Delay(1000);
+            }
+        }, CancellationToken.None);
 
         return Task.CompletedTask;
     }
