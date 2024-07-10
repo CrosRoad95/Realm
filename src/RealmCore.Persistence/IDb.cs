@@ -55,6 +55,8 @@ public interface IDb
     DbSynchronizationContex DbSynchronizationContex { get; }
     DbSet<WorldNodeData> WorldNodes { get; }
     DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData { get; }
+    DbSet<UploadFileData> UploadFiles { get; }
+    DbSet<UserUploadFileData> UserUploadFiles { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

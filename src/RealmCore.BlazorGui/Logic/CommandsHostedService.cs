@@ -2085,6 +2085,12 @@ internal sealed class CommandsHostedService : IHostedService
         {
             gameWorld.SetTime(2, 0);
         });
+        
+        _commandService.Add("testupload", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleNone", "txt", 123, "[]", DateTime.Now);
+            await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleUser", "txt", 123, "[]", DateTime.Now, player.UserId);
+        });
 
         AddInventoryCommands();
     }
