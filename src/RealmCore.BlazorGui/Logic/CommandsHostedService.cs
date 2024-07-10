@@ -2091,6 +2091,11 @@ internal sealed class CommandsHostedService : IHostedService
             await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleNone", "txt", 123, "[]", DateTime.Now);
             await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleUser", "txt", 123, "[]", DateTime.Now, player.UserId);
         });
+        
+        _commandService.Add("setskin", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Model = 23;
+        });
 
         AddInventoryCommands();
     }

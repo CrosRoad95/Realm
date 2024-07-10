@@ -337,10 +337,12 @@ public class RealmPlayer : Player, IAsyncDisposable
 
     public bool TrySpawnAtLastPosition()
     {
-        var lastTransformAndMotion = User.UserData.LastTransformAndMotion;
+        var userData = User.UserData;
+        var lastTransformAndMotion = userData.LastTransformAndMotion;
         if (lastTransformAndMotion != null)
         {
             Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
+            Model = (ushort)userData.Skin;
             Interior = lastTransformAndMotion.Interior;
             Dimension = lastTransformAndMotion.Dimension;
             return true;

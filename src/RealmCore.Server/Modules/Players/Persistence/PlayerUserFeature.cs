@@ -66,7 +66,7 @@ public interface IPlayerUserFeature : IPlayerFeature
     internal void SetAuthorizedPolicyState(string policy, bool authorized);
 }
 
-internal sealed class PlayerUserFeature : IPlayerUserFeature
+internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
 {
     private readonly object _lock = new();
     private UserData? _user;
@@ -104,6 +104,8 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         Player = playerContext.Player;
         _dateTimeProvider = dateTimeProvider;
         _userEventRepository = userEventRepository;
+
+        Player.ModelChanged += HandleModelChanged;
     }
 
     public async Task Login(UserData userData, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false)
@@ -416,5 +418,18 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
     public void UpdateLastNewsRead()
     {
         UserData.LastNewsReadDateTime = _dateTimeProvider.Now;
+    }
+
+    private void HandleModelChanged(Ped sender, ElementChangedEventArgs<Ped, ushort> args)
+    {
+        if (_user != null)
+        {
+            _user.Skin = (short)args.NewValue;
+        }
+    }
+
+    public void Dispose()
+    {
+        Player.ModelChanged -= HandleModelChanged;
     }
 }
