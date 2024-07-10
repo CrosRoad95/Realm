@@ -133,7 +133,10 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
             _experience -= NextLevelRequiredExperience;
             _level++;
             if (_userData != null)
+            {
                 _userData.Level = _level;
+                _userData.Experience = _experience;
+            }
 
             Changed?.Invoke(this, _level, LevelChange.Increase);
             CheckForNextLevel();
