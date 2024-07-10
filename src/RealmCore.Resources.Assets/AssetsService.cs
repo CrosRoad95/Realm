@@ -5,23 +5,36 @@ using SlipeServer.Server.Enums;
 
 namespace RealmCore.Resources.Assets;
 
+public record struct ReplacedModel(ushort model, string modelAsset, string collisionAsset, string textureAsset);
+
 public interface IAssetsService
 {
-    internal Action<ObjectModel, string, string>? ModelReplaced { get; set; }
+    IReadOnlyDictionary<ObjectModel, ReplacedModel> ReplacedModels { get; }
+    internal Action<ReplacedModel>? ModelReplaced { get; set; }
     internal Action<Player, ObjectModel, Stream, Stream>? ReplaceModelForPlayer { get; set; }
     internal Action<Player, ObjectModel>? RestoreModelForPlayer { get; set; }
 
     LuaValue Map(IAsset asset);
-    void ReplaceModel(ObjectModel objectModel, string dffName, string colName);
+    void ReplaceModel(ObjectModel objectModel, string modelAsset, string collisionAsset, string texturesAsset);
     void ReplaceModelFor(Player player, Stream dff, Stream col, ObjectModel model);
     void RestoreModelFor(Player player, ObjectModel model);
 }
 
 internal sealed class AssetsService : IAssetsService
 {
-    public Action<ObjectModel, string, string>? ModelReplaced { get; set; }
+    public Action<ReplacedModel>? ModelReplaced { get; set; }
     public Action<Player, ObjectModel, Stream, Stream>? ReplaceModelForPlayer { get; set; }
     public Action<Player, ObjectModel>? RestoreModelForPlayer { get; set; }
+
+    private readonly Dictionary<ObjectModel, ReplacedModel> _replacedModels = [];
+    private readonly IAssetEncryptionProvider _assetEncryptionProvider;
+
+    public IReadOnlyDictionary<ObjectModel, ReplacedModel> ReplacedModels => _replacedModels;
+
+    public AssetsService(IAssetEncryptionProvider assetEncryptionProvider)
+    {
+        _assetEncryptionProvider = assetEncryptionProvider;
+    }
 
     public LuaValue Map(IAsset asset)
     {
@@ -29,15 +42,21 @@ internal sealed class AssetsService : IAssetsService
         {
             FileSystemFont font => new LuaValue(new LuaValue[] { "FileSystemFont", font.Name, font.Path }),
             BuildInFont font => new LuaValue(new LuaValue[] { "MtaFont", font.Name }),
-            AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, dff.Path }),
-            AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, col.Path }),
+            AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, _assetEncryptionProvider.EncryptPath(dff.Path) }),
+            AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, _assetEncryptionProvider.EncryptPath(col.Path) }),
+            AssetTXD txd => new LuaValue(new LuaValue[] { "TXD", txd.Name, _assetEncryptionProvider.EncryptPath(txd.Path) }),
             _ => throw new NotImplementedException()
         };
     }
 
-    public void ReplaceModel(ObjectModel objectModel, string dffName, string colName)
+    public void ReplaceModel(ObjectModel objectModel, string modelAsset, string collisionAsset, string texturesAsset)
     {
-        ModelReplaced?.Invoke(objectModel, dffName, colName);
+        if (_replacedModels.ContainsKey(objectModel))
+            throw new InvalidOperationException("Model already replaced");
+
+        var replacedModel = new ReplacedModel((ushort)objectModel, modelAsset, collisionAsset, texturesAsset);
+        _replacedModels.Add(objectModel, replacedModel);
+        ModelReplaced?.Invoke(replacedModel);
     }
 
     public void ReplaceModelFor(Player player, Stream dff, Stream col, ObjectModel model)

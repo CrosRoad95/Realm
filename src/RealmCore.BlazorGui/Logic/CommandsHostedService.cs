@@ -1,5 +1,4 @@
 ﻿using RealmCore.BlazorGui.Modules.World;
-using RealmCore.Server.Modules.Players.Fractions;
 using RealmCore.Server.Modules.Players.Sessions;
 using RealmCore.Server.Modules.World.WorldNodes;
 using Color = System.Drawing.Color;
@@ -2059,6 +2058,32 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("setnametag", ([CallingPlayer] RealmPlayer player) =>
         {
             player.Nametag.Text = Guid.NewGuid().ToString();
+        });
+        
+        _commandService.Add("listassets", ([CallingPlayer] RealmPlayer player) =>
+        {
+            foreach (var pair in assetsCollection.Assets)
+            {
+                _chatBox.OutputTo(player, $"{pair.Key} - {pair.Value}");
+            }
+        });
+        
+        _commandService.Add("replacedmodels", ([CallingPlayer] RealmPlayer player) =>
+        {
+            foreach (var pair in assetsService.ReplacedModels)
+            {
+                _chatBox.OutputTo(player, $"Model: {(ushort)pair.Key} - {pair.Value.collisionAsset}");
+            }
+        });
+        
+        _commandService.Add("day", ([CallingPlayer] RealmPlayer player) =>
+        {
+            gameWorld.SetTime(12, 0);
+        });
+
+        _commandService.Add("night", ([CallingPlayer] RealmPlayer player) =>
+        {
+            gameWorld.SetTime(2, 0);
         });
 
         AddInventoryCommands();

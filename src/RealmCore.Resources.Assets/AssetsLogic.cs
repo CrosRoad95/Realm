@@ -8,8 +8,6 @@ using Newtonsoft.Json;
 
 namespace RealmCore.Resources.Assets;
 
-internal record struct ReplaceModel(ushort model, string dff, string col);
-
 internal class AssetsLogic
 {
     private readonly MtaServer _mtaServer;
@@ -18,7 +16,7 @@ internal class AssetsLogic
     private readonly LuaEventService _luaEventService;
     private readonly ILogger<AssetsLogic> _logger;
 
-    private readonly List<ReplaceModel> _replaceModels = [];
+    private readonly List<ReplacedModel> _replacedModels = [];
 
     public AssetsLogic(MtaServer mtaServer, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService, ILogger<AssetsLogic> logger)
     {
@@ -51,7 +49,7 @@ internal class AssetsLogic
 
     private void SendAssetsList(Player player)
     {
-        var replacedModels = JsonConvert.SerializeObject(_replaceModels);
+        var replacedModels = JsonConvert.SerializeObject(_replacedModels);
         var luaValue = _assetsCollection.Assets.ToDictionary(x => new LuaValue(x.Key), x => _assetsService.Map(x.Value));
         _luaEventService.TriggerEventFor(player, "internalSetAssetsList", player, new LuaValue(luaValue), replacedModels);
     }
@@ -61,9 +59,9 @@ internal class AssetsLogic
         SendAssetsList(luaEvent.Player);
     }
 
-    private void HandleModelReplaced(ObjectModel objectModel, string dffName, string colName)
+    private void HandleModelReplaced(ReplacedModel replacedModel)
     {
-        _replaceModels.Add(new ReplaceModel((ushort)objectModel, dffName, colName));
+        _replacedModels.Add(replacedModel);
     }
 
     private void HandleReplaceModelForPlayer(Player player, ObjectModel objectModel, Stream dff, Stream col)

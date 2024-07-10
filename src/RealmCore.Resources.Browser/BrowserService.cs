@@ -1,6 +1,4 @@
 ﻿using RealmCore.Resources.Base.Interfaces;
-using SlipeServer.Resources.Base;
-using SlipeServer.Server.Elements;
 using System.Numerics;
 
 namespace RealmCore.Resources.Browser;

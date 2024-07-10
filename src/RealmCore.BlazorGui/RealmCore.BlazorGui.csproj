@@ -110,6 +110,7 @@
 	  <Using Include="SlipeServer.Server.Elements.ColShapes" />
 	  <Using Include="SlipeServer.Server.Elements.Events" />
 	  <Using Include="System.ComponentModel.DataAnnotations" />
+	  <Using Include="RealmCore.Resources.Assets.Factories" />
 	  <Using Include="System.Diagnostics" />
 	</ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SlipeServer.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
@@ -30,12 +29,14 @@ internal sealed class AddAssetsResourceHostedService : IHostedLifecycleService
     private readonly MtaServer _mtaServer;
     private readonly IAssetEncryptionProvider _assetEncryptionProvider;
     private readonly AssetsCollection _assetsCollection;
+    private readonly IHostEnvironment _hostEnvironment;
 
-    public AddAssetsResourceHostedService(MtaServer mtaServer, IAssetEncryptionProvider assetEncryptionProvider, AssetsCollection assetsCollection)
+    public AddAssetsResourceHostedService(MtaServer mtaServer, IAssetEncryptionProvider assetEncryptionProvider, AssetsCollection assetsCollection, IHostEnvironment hostEnvironment)
     {
         _mtaServer = mtaServer;
         _assetEncryptionProvider = assetEncryptionProvider;
         _assetsCollection = assetsCollection;
+        _hostEnvironment = hostEnvironment;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -46,7 +47,7 @@ internal sealed class AddAssetsResourceHostedService : IHostedLifecycleService
     public Task StartedAsync(CancellationToken cancellationToken)
     {
         var resource = new AssetsResource(_mtaServer);
-        resource.AddFiles(_assetEncryptionProvider, _assetsCollection);
+        resource.AddFiles(_assetEncryptionProvider, _assetsCollection, _hostEnvironment);
 
         var additionalFiles = resource.GetAndAddLuaFiles();
         foreach (var item in resource.AdditionalFiles)

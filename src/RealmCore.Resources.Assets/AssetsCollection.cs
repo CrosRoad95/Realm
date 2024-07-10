@@ -1,38 +1,95 @@
 ﻿using RealmCore.Resources.Assets.Classes;
-using SlipeServer.Server.Enums;
+using RenderWareBuilders;
 
 namespace RealmCore.Resources.Assets;
-
-public record struct ReplacedModel(int model, string dffPath, string colPath);
 
 public class AssetsCollection
 {
     private readonly object _lock = new();
     private readonly string _basePath = "Server/Assets";
     private readonly Dictionary<string, IAsset> _assets = [];
-    private readonly Dictionary<ObjectModel, ReplacedModel> _replacedModels = [];
-    public IReadOnlyDictionary<string, IAsset> Assets => _assets;
-    public IReadOnlyDictionary<ObjectModel, ReplacedModel> ReplacedModels => _replacedModels;
 
-    public AssetsCollection()
+    public string BasePath => _basePath;
+
+    public IReadOnlyDictionary<string, IAsset> Assets
     {
-        if (Directory.Exists(_basePath))
+        get
         {
-            foreach (var item in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
-            {
-                var fileName = Path.GetRelativePath(_basePath, item);
-
-                switch (Path.GetDirectoryName(fileName))
-                {
-                    case "Fonts":
-                        AddFont(Path.GetFileNameWithoutExtension(fileName), fileName);
-                        break;
-                }
-            }
+            IReadOnlyDictionary<string, IAsset> view;
+            lock (_lock)
+                view = new Dictionary<string, IAsset>(_assets);
+            return view;
         }
     }
 
-    private void CreateDirectory(string path)
+    public AssetsCollection()
+    {
+        if (!Directory.Exists(_basePath))
+            return;
+
+        TxdBuilder? txdBuilder = null;
+
+        foreach (var fullFileName in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
+        {
+            var fileName = Path.GetRelativePath(_basePath, fullFileName);
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            switch (Path.GetDirectoryName(fileName))
+            {
+                case "Models":
+                    switch (Path.GetExtension(fileName))
+                    {
+                        case ".obj":
+                            var wavefrontLoader = new RenderWareIo.Wavefront.WavefrontLoader(fullFileName);
+                            var groups = wavefrontLoader.GetAllGroups();
+                            var options = new RenderWareIo.Wavefront.WavefrontLoaderOptions
+                            {
+                                DayNightColor = new RenderWareBuilders.DayNightColors
+                                {
+                                    day = System.Drawing.Color.FromArgb(100, 100, 100),
+                                    night = System.Drawing.Color.FromArgb(45, 45, 45),
+                                },
+                                //CollisionMaterials = groups.ToDictionary(wavefrontLoader.GetGroupTextureName, y => MaterialId.WoodBench)
+                            };
+
+                            {
+                                var dff = wavefrontLoader.CreateDff(groups, options);
+                                using var stream = new MemoryStream();
+                                dff.Write(stream);
+                                stream.Position = 0;
+                                AddDFF($"{name}Model", stream);
+                            }
+
+                            {
+                                var col = wavefrontLoader.CreateCol(groups, options);
+                                using var stream = new MemoryStream();
+                                col.Write(stream);
+                                stream.Position = 0;
+                                AddCOL($"{name}Collision", stream);
+                            }
+                            break;
+                    }
+                    break;
+                case "ModelsTextures":
+                    txdBuilder ??= new TxdBuilder();
+                    txdBuilder.AddImage(name, fullFileName);
+                    break;
+                case "Fonts":
+                    AddFont(name, fileName);
+                    break;
+            }
+        }
+
+        if (txdBuilder != null)
+        {
+            using var stream = new MemoryStream();
+            var txd = txdBuilder.Build();
+            txd.Write(stream);
+            stream.Position = 0;
+            AddTXD("ModelsTextures", stream);
+        }
+    }
+
+    private void CreateDirectoryForFile(string path)
     {
         var directory = Path.GetDirectoryName(path);
         if (directory == null || Directory.Exists(directory))
@@ -68,45 +125,81 @@ public class AssetsCollection
             return (IFont)InternalGetAsset(assetName);
     }
 
-    public IAssetDFF AddProceduralDFF(string name, Stream stream)
+    public IAssetDFF AddDFF(string name, Stream stream)
     {
         lock (_lock)
         {
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = Path.Combine(_basePath, $"Models/Procedural/{name}.dff");
+            var fileName = $"Models/{name}.dff";
+            var fullFileName = Path.Combine(_basePath, fileName);
+
+            CreateDirectoryForFile(fullFileName);
 
             var data = stream.ToArray();
             var checksum = data.CalculateChecksum();
 
-            if (File.Exists(fileName))
-                File.Delete(fileName);
+            if (File.Exists(fullFileName))
+                File.Delete(fullFileName);
 
-            File.WriteAllBytes(fileName, data);
+            File.WriteAllBytes(fullFileName, data);
 
-            return new AssetDFF(name, fileName, checksum);
+            var asset = new AssetDFF(name, fileName, checksum);
+            _assets.Add(name, asset);
+            return asset;
         }
     }
 
-    public IAssetCOL AddProceduralCOL(string name, Stream stream)
+    public IAssetCOL AddCOL(string name, Stream stream)
     {
         lock (_lock)
         {
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = Path.Combine(_basePath, $"Models/Procedural/{name}.col");
+            var fileName = $"Models/{name}.col";
+            var fullFileName = Path.Combine(_basePath, fileName);
+
+            CreateDirectoryForFile(fullFileName);
 
             var data = stream.ToArray();
             var checksum = data.CalculateChecksum();
 
-            if (File.Exists(fileName))
-                File.Delete(fileName);
+            if (File.Exists(fullFileName))
+                File.Delete(fullFileName);
 
-            File.WriteAllBytes(fileName, data);
+            File.WriteAllBytes(fullFileName, data);
 
-            return new AssetCOL(name, fileName, checksum);
+            var asset = new AssetCOL(name, fileName, checksum);
+            _assets.Add(name, asset);
+            return asset;
+        }
+    }
+
+    public IAssetTXD AddTXD(string name, Stream stream)
+    {
+        lock (_lock)
+        {
+            if (_assets.ContainsKey(name))
+                throw new Exception($"Name '{name}' already in use");
+
+            var fileName = $"Models/{name}.txd";
+            var fullFileName = Path.Combine(_basePath, fileName);
+
+            CreateDirectoryForFile(fullFileName);
+
+            var data = stream.ToArray();
+            var checksum = data.CalculateChecksum();
+
+            if (File.Exists(fullFileName))
+                File.Delete(fullFileName);
+
+            File.WriteAllBytes(fullFileName, data);
+
+            var asset = new AssetTXD(name, fileName, checksum);
+            _assets.Add(name, asset);
+            return asset;
         }
     }
 
@@ -115,15 +208,9 @@ public class AssetsCollection
         lock (_lock)
         {
             var fullPath = Path.Combine(_basePath, path);
-            CreateDirectory(fullPath);
-            _assets.Add(name, new FileSystemFont(name, fullPath));
+            CreateDirectoryForFile(fullPath);
+            _assets.Add(name, new FileSystemFont(name, path));
         }
-    }
-
-    public void ReplaceModel(ObjectModel objectModel, IAssetDFF dff, IAssetCOL col)
-    {
-        lock (_lock)
-            _replacedModels[objectModel] = new ReplacedModel((int)objectModel, dff.Path, col.Path);
     }
 
     internal IEnumerable<string> GetAllFiles()
@@ -139,6 +226,9 @@ public class AssetsCollection
                         break;
                     case IAssetCOL assetCOL:
                         yield return assetCOL.Path;
+                        break;
+                    case IAssetTXD assetTXD:
+                        yield return assetTXD.Path;
                         break;
                     case IAssetFont font:
                         yield return font.Path;

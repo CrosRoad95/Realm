@@ -1,12 +1,11 @@
-﻿local assetsInfoList = {}
+﻿local assetsList = {}
 local loadedAssets = {}
-local pendingRequestedModels = {}
 local modelsToReplace = {}
 local replacedModels = {}
 
 function requestAsset(name)
-	local assetInfo = assetsInfoList[name];
-	if(not assetsInfoList[name])then
+	local assetInfo = assetsList[name];
+	if(not assetsList[name])then
 		error("Could not find asset: '"..name.."'")
 	end
 	if(not loadedAssets[name])then
@@ -34,12 +33,14 @@ function loadAsset(name, assetInfo)
 end
 
 addEvent("internalSetAssetsList", true)
-addEventHandler("internalSetAssetsList", localPlayer, function(assetsList, newModelsToReplace)
+addEventHandler("internalSetAssetsList", localPlayer, function(newAssetsList, newModelsToReplace)
+	--iprint("assetsList",newAssetsList)
+	--iprint("newModelsToReplace",newModelsToReplace)
 	-- TODO: Unload models
 	for i,v in ipairs({fromJSON(newModelsToReplace)})do
 		modelsToReplace[v.model] = v
 	end
-	assetsInfoList = assetsList;
+	assetsList = newAssetsList;
 	tryReplaceModels();
 end)
 
@@ -51,7 +52,6 @@ addEventHandler("internalReplaceModel", localPlayer, function(dffData, colData, 
 	engineReplaceModel ( dff, model )
 end)
 
-
 addEvent("internalRestoreModel", true)
 addEventHandler("internalRestoreModel", localPlayer, function(model)
 	engineRestoreCOL(model)
@@ -59,12 +59,54 @@ addEventHandler("internalRestoreModel", localPlayer, function(model)
 end)
 
 function tryReplaceModel(modelId)
-	if(replacedModels[modelId] or not modelsToReplace[modelId] or pendingRequestedModels[modelId])then
+	if(replacedModels[modelId] or not modelsToReplace[modelId])then
 		return;
 	end
 
-	pendingRequestedModels[modelId] = true;
+	replacedModels[modelId] = true;
+
 	local modelToReplace = modelsToReplace[modelId];
+	
+	do
+		local colInfo = assetsList[modelToReplace.collisionAsset]
+		if(colInfo)then
+			if(colInfo[4])then
+				engineReplaceCOL(colInfo[4], modelId)
+			else
+				local content = decryptAsset(colInfo[3])
+				local col = engineLoadCOL(content)
+				engineReplaceCOL(col, modelId)
+				colInfo[4] = col
+			end
+		end
+	end
+
+	do
+		local txdInfo = assetsList[modelToReplace.textureAsset]
+		if(txdInfo)then
+			if(txdInfo[4])then
+				engineImportTXD(txdInfo[4], modelId)
+			else
+				local content = decryptAsset(txdInfo[3])
+				local txd = engineLoadTXD(content)
+				engineImportTXD(txd, modelId)
+				txdInfo[4] = dff
+			end
+		end
+	end
+	do
+		local dffInfo = assetsList[modelToReplace.modelAsset]
+		if(dffInfo)then
+			if(dffInfo[4])then
+				engineReplaceModel(dffInfo[4], modelId)
+			else
+				local content = decryptAsset(dffInfo[3])
+				local dff = engineLoadDFF(content)
+				engineReplaceModel(dff, modelId)
+				dffInfo[4] = dff
+			end
+		end
+	end
 end
 
 function tryReplaceModels()

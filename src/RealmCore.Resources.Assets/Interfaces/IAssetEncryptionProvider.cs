@@ -4,6 +4,8 @@ public interface IAssetEncryptionProvider
 {
     byte[] Encrypt(byte[] data);
     bool ShouldEncryptByExtension(string extension);
+    string EncryptPath(string path);
+    bool IsEncryptionEnabled();
 
-    byte[] Key { get; }
+    string Key { get; }
 }

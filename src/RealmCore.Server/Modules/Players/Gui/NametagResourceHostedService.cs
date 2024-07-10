@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Elements;
-
-namespace RealmCore.Server.Modules.Players.Gui;
+﻿namespace RealmCore.Server.Modules.Players.Gui;
 
 internal sealed class NametagResourceHostedService : PlayerLifecycle, IHostedService
 {

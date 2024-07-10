@@ -25,17 +25,15 @@ internal sealed class ProceduralObjectsHostedService : IHostedLifecycleService
 
     public Task StartedAsync(CancellationToken cancellationToken)
     {
-        var modelFactory = new ModelFactory();
-        modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
-        modelFactory.AddTriangle(new Vector3(0, 10, 0), new Vector3(10, 0, 0), new Vector3(10, 10, 0), "Metal1_128");
-        var dffStream = modelFactory.BuildDFF();
-        var colStream = modelFactory.BuildCOL();
+        //var modelFactory = new ModelFactory();
+        //modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 1, 0), new Vector3(1, 0, 0), "brickred");
+        //modelFactory.AddTriangle(new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(1, 10, 0), "brickred");
+        //var dffStream = modelFactory.BuildDFF();
+        //var colStream = modelFactory.BuildCOL();
 
-        var dff = _assetsCollection.AddProceduralDFF("testDFF", dffStream);
-        var col = _assetsCollection.AddProceduralCOL("testCOL", colStream);
-        _assetsService.ReplaceModel((ObjectModel)1338, "testDFF", "testCOL");
-        _assetsService.ReplaceModel((ObjectModel)1339, "testDFF", "testCOL");
-        ;
+        //var dff = _assetsCollection.AddDFF("testDFF", dffStream);
+        //var col = _assetsCollection.AddCOL("testCOL", colStream);
+        //_assetsService.ReplaceModel((ObjectModel)1338, "testDFF", "testCOL", "ModelsTextures");
 
         return Task.CompletedTask;
     }

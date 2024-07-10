@@ -1,7 +1,7 @@
 <map>
-    <object id="id1" model="1337" interior="0" dimension="0" name="name1" posX="333.14453" posY="-96.899414" posZ="2" rotX="0" rotY="0" rotZ="0" />
-    <object id="id2" model="1337" interior="0" dimension="0" name="name2" posX="333.14453" posY="-96.899414" posZ="4" rotX="0" rotY="0" rotZ="0" />
-    <object id="id3" model="1337" interior="0" dimension="0" name="name3" posX="333.14453" posY="-96.899414" posZ="6" rotX="0" rotY="0" rotZ="0" />
+    <object id="id1" model="1337" interior="0" dimension="0" name="name1" posX="233.14453" posY="-96.899414" posZ="1.7" rotX="0" rotY="0" rotZ="0" />
+    <object id="id2" model="1338" interior="0" dimension="0" name="name2" posX="235.14453" posY="-96.899414" posZ="1.7" rotX="0" rotY="0" rotZ="0" />
+    <object id="id3" model="1339" interior="0" dimension="0" name="name3" posX="237.14453" posY="-96.899414" posZ="1.7" rotX="0" rotY="0" rotZ="0" />
     <removeWorldObject id="id4" radius="1000" interior="0" model="16617" posX="-300" posY="1556" posZ="75"></removeWorldObject>
     <removeWorldObject id="id4" radius="1000" interior="0" model="16616" posX="-300" posY="1556" posZ="75"></removeWorldObject>
     <removeWorldObject id="id4" radius="1000" interior="0" model="16615" posX="-300" posY="1556" posZ="75"></removeWorldObject>

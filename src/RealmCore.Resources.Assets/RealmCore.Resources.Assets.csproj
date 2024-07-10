@@ -16,8 +16,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-		<PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
-		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
+		<PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20240709-161331" />
+		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20240709-161331" />
+		<PackageReference Include="RenderWareIo.Wavefront" Version="0.1.0-CI-20240709-161331" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,5 +28,6 @@
 	  <Using Include="System.Runtime.CompilerServices" />
 	  <Using Include="System.Text" />
 	  <Using Include="System.Security.Cryptography" />
+	  <Using Include="Microsoft.Extensions.Hosting" />
 	</ItemGroup>
 </Project>
