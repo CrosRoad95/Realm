@@ -1851,10 +1851,14 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("toggleAllControlsScope", async ([CallingPlayer] RealmPlayer player) =>
         {
-            using var _ = new ToggleControlsScope(player);
+            _chatBox.OutputTo(player, $"start {player.Controls.ForwardsEnabled}");
+            {
+                using var _ = new ToggleControlsScope(player);
 
-            await Task.Delay(2500);
-            _chatBox.OutputTo(player, "done");
+                await Task.Delay(2500);
+            }
+
+            _chatBox.OutputTo(player, $"done {player.Controls.ForwardsEnabled}");
         });
 
         _commandService.AddCommandHandler("mapnameadd", (player, args) =>

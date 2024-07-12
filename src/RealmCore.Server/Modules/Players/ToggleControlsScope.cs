@@ -108,5 +108,6 @@ public class ToggleControlsScope : IDisposable
         controls.BrakeReverseEnabled = _brakeReverseEnabled;
         controls.HornEnabled = _hornEnabled;
         controls.EnterPassengerEnabled = _enterPassengerEnabled;
+        _player.ToggleAllControls(true, true, false);
     }
 }
