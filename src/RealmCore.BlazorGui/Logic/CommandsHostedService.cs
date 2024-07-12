@@ -193,9 +193,9 @@ internal sealed class CommandsHostedService : IHostedService
                 _chatBox.OutputTo(player, $"License 10 added");
         });
 
-        _commandService.AddCommandHandler("cv", (player, args) =>
+        _commandService.Add("cv", ([CallingPlayer] RealmPlayer player, ushort vehicleModel) =>
         {
-            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)args.ReadUShort());
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)vehicleModel);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.TryAddPart(1, 1337);
             vehicle.AccessController = new VehicleExclusiveAccessController(player);
@@ -230,14 +230,14 @@ internal sealed class CommandsHostedService : IHostedService
             player.Vehicle!.Access.TryRemoveAccess(player);
         });
 
-        _commandService.AddAsyncCommandHandler("converttopersistent", async (player, args, token) =>
+        _commandService.Add("converttopersistent", async ([CallingPlayer] RealmPlayer player) =>
         {
             if (player.Vehicle == null)
             {
                 _chatBox.OutputTo(player, "Wejdź do pojazdu.");
                 return;
             }
-            var vehicle = await _vehiclesService.ConvertToPersistantVehicle(player.Vehicle, token);
+            var vehicle = await _vehiclesService.ConvertToPersistantVehicle(player.Vehicle);
             if (vehicle == null)
                 return;
 
@@ -2106,6 +2106,11 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("setskin", ([CallingPlayer] RealmPlayer player) =>
         {
             player.Model = 23;
+        });
+        
+        _commandService.Add("readstring", ([CallingPlayer] RealmPlayer player, [ReadRestAsString] string str) =>
+        {
+            _chatBox.OutputTo(player, str);
         });
 
         AddInventoryCommands();

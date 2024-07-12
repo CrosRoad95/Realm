@@ -62,7 +62,7 @@ public class ElementFactory : IElementFactory
         return vehicle;
     }
     
-    public async Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
+    public async Task<RealmVehicle>CreateVehicle (Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
     {
         var vehicle = new RealmVehicle(_serviceProvider, (ushort)model, location.Position)
         {

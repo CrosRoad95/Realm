@@ -131,6 +131,7 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
                     if (attribute is ReadRestAsStringAttribute)
                     {
                         value = arguments.ReadAllAsString();
+                        readAll = true;
                         break;
                     }
                 }

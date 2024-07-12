@@ -18,14 +18,16 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IUsersInUse _activeUsers;
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly ILogger<VehiclesService> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
-    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger)
+    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger, IServiceProvider serviceProvider)
     {
         _elementFactory = elementFactory;
         _dateTimeProvider = dateTimeProvider;
         _activeUsers = activeUsers;
         _vehiclesInUse = vehiclesInUse;
         _logger = logger;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<RealmVehicle?> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
@@ -106,7 +108,9 @@ internal sealed class VehiclesService : IVehiclesService
 
         var occupants = vehicle.Occupants.ToArray();
         await vehicleService.Destroy(cancellationToken);
-        var vehicleLoader = vehicle.GetRequiredService<IVehicleLoader>();
+
+        using var scope = _serviceProvider.CreateScope();
+        var vehicleLoader = scope.ServiceProvider.GetRequiredService<IVehicleLoader>();
         var persistentVehicle = await vehicleLoader.LoadVehicleById(vehicleData.Id, cancellationToken);
         persistentVehicle.SetLocation(location);
         foreach (var pair in occupants)
