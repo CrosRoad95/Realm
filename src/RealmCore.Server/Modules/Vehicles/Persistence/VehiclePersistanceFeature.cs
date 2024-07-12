@@ -30,7 +30,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
     private VehicleData? _vehicleData;
     private readonly IDateTimeProvider _dateTimeProvider;
     private int _version = 0;
-    public VehicleData VehicleData => _vehicleData ?? throw new Exception("Vehicle not loaded yet");
+    public VehicleData VehicleData => _vehicleData ?? throw new Exception("Vehicle not loaded");
 
     public bool IsLoaded => _vehicleData != null;
     public int Id => VehicleData.Id;
@@ -175,8 +175,6 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
                         usesVehiclePersistentData.VersionIncreased -= IncreaseVersion;
                     }
                 }
-
-                _vehicleData = null;
             }
         }
     }

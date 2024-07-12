@@ -61,7 +61,15 @@ internal sealed class VehicleLoader : IVehicleLoader
         {
             _logger.LogError(ex, "Failed to spawn vehicle: {vehicleId}", id);
             activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
-            await _vehicleRepository.SetSpawned(id, false, cancellationToken);
+            try
+            {
+                // TODO: Replace with "TrySetSpawned"
+                await _vehicleRepository.SetSpawned(id, false, cancellationToken);
+            }
+            catch(Exception _)
+            {
+                // Ignore,
+            }
             throw;
         }
     }

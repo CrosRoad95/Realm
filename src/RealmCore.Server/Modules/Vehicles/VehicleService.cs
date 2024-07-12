@@ -44,6 +44,6 @@ internal sealed class VehicleService : IVehicleService
         {
             occupants.RemoveFromVehicle();
         }
-        _vehicle.Destroy();
+        await _vehicle.DisposeAsync();
     }
 }

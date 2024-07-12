@@ -245,16 +245,23 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.VehicleId}");
         });
 
-        _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
+        _commandService.Add("spawnvehhere", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
         {
             var vehicleLoader = player.GetRequiredService<IVehicleLoader>();
-            var vehicle = await vehicleLoader.LoadVehicleById(args.ReadInt(), token);
+            var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
             var location = player.GetLocation(player.GetPointFromDistanceRotationOffset(3));
             vehicle.SetLocation(location);
             _chatBox.OutputTo(player, $"Załadowano pojazd na pozycji: {location}");
         });
 
-        _commandService.AddAsyncCommandHandler("despawn", async (player, args, token) =>
+        _commandService.Add("spawnveh", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
+        {
+            var vehicleLoader = player.GetRequiredService<IVehicleLoader>();
+            var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
+            _chatBox.OutputTo(player, $"Załadowano pojazd na pozycji: {vehicle.GetLocation()}");
+        });
+
+        _commandService.Add("despawn", async ([CallingPlayer] RealmPlayer player) =>
         {
             if (player.Vehicle == null)
             {

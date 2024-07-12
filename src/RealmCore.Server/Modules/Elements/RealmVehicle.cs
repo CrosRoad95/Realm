@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmVehicle : Vehicle, IFocusableElement
+public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
 {
     private readonly object _focuseLock = new();
     private readonly List<RealmPlayer> _focusedPlayers = [];
     private readonly IServiceProvider _serviceProvider;
-    private readonly IServiceScope _serviceScope;
+    private readonly AsyncServiceScope _serviceScope;
     private VehicleAccessController _accessController = VehicleDefaultAccessController.Instance;
 
     public event Action<Element, RealmPlayer>? PlayerFocused;
@@ -36,6 +36,7 @@ public class RealmVehicle : Vehicle, IFocusableElement
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int VehicleId => Persistence.Id;
 
+    public IElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public IVehicleAccessFeature Access { get; init; }
     public IVehiclePersistenceFeature Persistence { get; init; }
@@ -67,10 +68,12 @@ public class RealmVehicle : Vehicle, IFocusableElement
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
-        _serviceScope = serviceProvider.CreateScope();
+        _serviceScope = serviceProvider.CreateAsyncScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         GetRequiredService<VehicleContext>().Vehicle = this;
         GetRequiredService<ElementContext>().Element = this;
+
+        Saving = GetRequiredService<IElementSaveService>();
 
         #region Initialize scope services
         Access = GetRequiredService<IVehicleAccessFeature>();
@@ -129,13 +132,15 @@ public class RealmVehicle : Vehicle, IFocusableElement
             }
         }
     }
-    public override bool Destroy()
+
+    public event Action<RealmVehicle>? Disposed;
+
+    public async ValueTask DisposeAsync()
     {
-        if (base.Destroy())
+        if (Destroy())
         {
-            _serviceScope.Dispose();
-            return true;
+            await _serviceScope.DisposeAsync();
+            Disposed?.Invoke(this);
         }
-        return false;
     }
 }
