@@ -167,7 +167,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         player.Spawned -= HandleSpawned;
     }
 
-    protected override async void PlayerJoined(RealmPlayer player)
+    private async Task PlayerJoinedCore(RealmPlayer player)
     {
         using var _ = _logger.BeginElement(player);
         using var handlePlayerJoinedActivity = Activity.StartActivity("PlayerJoined");
@@ -191,11 +191,11 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
                 return;
             }
             string what = "Wystąpił nieznany błąd";
-            if(ex is BrowserLoadingTimeoutException)
+            if (ex is BrowserLoadingTimeoutException)
             {
                 what = "Gui przeglądarki ładowało się zbyt długo";
             }
-            
+
             var traceId = handlePlayerJoinedActivity?.Id ?? "<nieznany>";
             var message = $"{what}. Jeżeli błąd się powtórzy zgłoś się do administracji.\n\nTrace id: {traceId}";
             if (_hostEnvironment.IsDevelopment())
@@ -207,6 +207,21 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             _clientConsole.OutputTo(player, message);
             player.Kick(message);
         }
+    }
+
+    protected override void PlayerJoined(RealmPlayer player)
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                await PlayerJoinedCore(player);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogHandleError(ex);
+            }
+        });
     }
 
     private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)

@@ -123,6 +123,30 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
             {
                 value = cancellationToken;
             }
+            else if (parameterInfo.ParameterType == typeof(bool))
+            {
+                string? argument;
+
+                argument = parameterInfo.HasDefaultValue
+                    ? arguments.TryReadArgument(out argument) ? argument : null
+                    : arguments.ReadArgument();
+
+                if (argument == null)
+                {
+                    value = (bool)parameterInfo.DefaultValue;
+                }
+                else
+                {
+                    if (argument == "1" || argument == "true")
+                    {
+                        value = true;
+                    }
+                    else
+                    {
+                        value = false;
+                    }
+                }
+            }
             else if (parameterInfo.ParameterType == typeof(string))
             {
                 bool readAll = false;

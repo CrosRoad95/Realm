@@ -215,14 +215,25 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.VehicleId}");
         });
 
-        _commandService.AddCommandHandler("cvveh", (player, args) =>
+        _commandService.Add("cvveh", ([CallingPlayer] RealmPlayer player) =>
         {
             var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.TryAddPart(1, 1337);
             vehicle.Access.AddAsOwner(player);
+            vehicle.AddPassenger(0, player);
             _chatBox.OutputTo(player, "Stworzono pojazd.");
+            Task.Run(async () =>
+            {
+                await Task.Delay(2000);
+                while (player.Vehicle != null)
+                {
+                    await Task.Delay(2000);
+
+                    _chatBox.OutputTo(player, $"Paliwo {vehicle.Fuel.Active!.Amount}");
+                }
+            });
         });
 
         _commandService.AddCommandHandler("removeowner", (player, args) =>
@@ -2111,6 +2122,11 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("readstring", ([CallingPlayer] RealmPlayer player, [ReadRestAsString] string str) =>
         {
             _chatBox.OutputTo(player, str);
+        });
+        
+        _commandService.Add("readbool", ([CallingPlayer] RealmPlayer player, bool boolean1, bool boolean2 = true) =>
+        {
+            _chatBox.OutputTo(player, $"{boolean1}, {boolean2}");
         });
 
         AddInventoryCommands();
