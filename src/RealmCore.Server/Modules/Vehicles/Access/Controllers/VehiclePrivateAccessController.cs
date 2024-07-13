@@ -2,6 +2,7 @@
 
 public class VehiclePrivateAccessController : VehicleAccessController
 {
+    private VehiclePrivateAccessController() { }
     protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat)
     {
         if (ped is not RealmPlayer player)
@@ -9,4 +10,6 @@ public class VehiclePrivateAccessController : VehicleAccessController
 
         return vehicle.Access.HasAccess(player);
     }
+
+    public static VehiclePrivateAccessController Instance { get; } = new();
 }

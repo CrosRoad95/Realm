@@ -52,6 +52,8 @@ internal sealed class VehicleLoader : IVehicleLoader
                 await vehicle.GetRequiredService<IVehicleService>().SetVehicleSpawned(true, cancellationToken);
 
                 vehicle.Upgrades.ForceRebuild();
+
+                vehicle.AccessController = VehiclePrivateAccessController.Instance;
             });
 
             activity?.SetStatus(ActivityStatusCode.Ok);
