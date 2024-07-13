@@ -1,4 +1,5 @@
-﻿using RealmCore.BlazorGui.Modules.World;
+﻿using RealmCore.BlazorGui.Concepts;
+using RealmCore.BlazorGui.Modules.World;
 using RealmCore.Server.Modules.Players.Sessions;
 using RealmCore.Server.Modules.World.WorldNodes;
 using Color = System.Drawing.Color;
@@ -481,6 +482,12 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"destroyed temporarly spawned node id: {node.Id}");
         });
 
+        _commandService.Add("durationinteractionbox", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
+            worldObject.Interaction = new DurationBasedHoldWithRingEffectInteraction(overlayService);
+        });
+        
         _commandService.AddCommandHandler("spawnscopedbox", (player, args) =>
         {
             var worldObject = player.ElementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);

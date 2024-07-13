@@ -1,4 +1,5 @@
 ﻿using RealmCore.BlazorGui.Modules.World;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -92,11 +93,22 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
                         _logger.LogInformation("Interaction begin {keyState}", keyState);
                         if (keyState == KeyState.Down)
                         {
-                            var token = new CancellationTokenSource();
-                            player.CurrentInteractElement.Destroyed += e =>
+                            using var token = new CancellationTokenSource();
+
+                            void handleDestroyed(Element element)
                             {
                                 token.Cancel();
-                            };
+                            }
+
+                            void handleCurrentInteractElementChanged(RealmPlayer player, Element? fromElement, Element? toElement)
+                            {
+                                token.Cancel();
+                            }
+
+                            var currentInteractElement = player.CurrentInteractElement;
+                            player.CurrentInteractElement.Destroyed += handleDestroyed;
+                            player.CurrentInteractElementChanged += handleCurrentInteractElementChanged;
+
                             try
                             {
                                 if (await duractionBasedHoldInteraction.BeginInteraction(player, token.Token))
@@ -112,6 +124,12 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
                             catch (OperationCanceledException)
                             {
                                 _logger.LogInformation("Interaction failed ( not focused )");
+                            }
+                            finally
+                            {
+                                currentInteractElement.Destroyed -= handleDestroyed;
+                                player.CurrentInteractElementChanged -= handleCurrentInteractElementChanged;
+                                await token.CancelAsync();
                             }
                         }
                         else

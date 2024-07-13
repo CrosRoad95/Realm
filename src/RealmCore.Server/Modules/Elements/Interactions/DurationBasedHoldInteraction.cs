@@ -7,7 +7,7 @@ public abstract class DurationBasedHoldInteraction : Interaction
     private TaskCompletionSource? _interactionTaskCompletionSource;
     private Task? _interactionTask;
 
-    public event Action<DurationBasedHoldInteraction, RealmPlayer, TimeSpan>? InteractionStarted;
+    public event Action<DurationBasedHoldInteraction, RealmPlayer, TimeSpan, CancellationToken>? InteractionStarted;
     public event Action<DurationBasedHoldInteraction, RealmPlayer, bool>? InteractionCompleted;
 
     public abstract TimeSpan Time { get; }
@@ -41,14 +41,12 @@ public abstract class DurationBasedHoldInteraction : Interaction
             _semaphore.Release();
         }
 
-        InteractionStarted?.Invoke(this, owningPlayer, Time);
+        InteractionStarted?.Invoke(this, owningPlayer, Time, cancellationToken);
         try
         {
             var finishedTask = await Task.WhenAny(_interactionTaskCompletionSource.Task, _interactionTask);
             if (finishedTask == _interactionTask)
             {
-                Owner.Destroyed -= HandleDestroyed;
-                Owner = null;
                 cancellationToken.ThrowIfCancellationRequested();
                 return true;
             }
@@ -56,6 +54,11 @@ public abstract class DurationBasedHoldInteraction : Interaction
         }
         finally
         {
+            if(Owner != null)
+            {
+                Owner.Destroyed -= HandleDestroyed;
+                Owner = null;
+            }
             InteractionCompleted?.Invoke(this, owningPlayer, false);
         }
     }
@@ -91,8 +94,11 @@ public abstract class DurationBasedHoldInteraction : Interaction
             if (Owner != owningPlayer)
                 return false;
 
-            Owner.Destroyed -= HandleDestroyed;
-            Owner = null;
+            if (Owner != null)
+            {
+                Owner.Destroyed -= HandleDestroyed;
+                Owner = null;
+            }
 
             if (_interactionTaskCompletionSource != null)
             {

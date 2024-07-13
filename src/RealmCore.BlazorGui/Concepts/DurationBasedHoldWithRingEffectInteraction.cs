@@ -2,11 +2,9 @@
 
 internal class DurationBasedHoldWithRingEffectInteraction : DurationBasedHoldInteraction
 {
-    public override TimeSpan Time => TimeSpan.FromSeconds(5);
+    public override TimeSpan Time => TimeSpan.FromSeconds(3);
 
-    private readonly object _lock = new();
     private readonly IOverlayService _overlayService;
-    private string? _ringId = null;
     public DurationBasedHoldWithRingEffectInteraction(IOverlayService overlayService)
     {
         InteractionStarted += HandleInteractionStarted;
@@ -14,23 +12,19 @@ internal class DurationBasedHoldWithRingEffectInteraction : DurationBasedHoldInt
         _overlayService = overlayService;
     }
 
-    private void HandleInteractionStarted(DurationBasedHoldInteraction durationBasedHoldInteraction, RealmPlayer player, TimeSpan time)
+    private void HandleInteractionStarted(DurationBasedHoldInteraction durationBasedHoldInteraction, RealmPlayer player, TimeSpan time, CancellationToken cancellationToken)
     {
-        lock (_lock)
+        if (Owner == null)
+            return;
+
+        var ringId = _overlayService.AddRing3dDisplay(Owner, Owner.Position, time);
+        cancellationToken.Register(() =>
         {
-            if (Owner == null)
-                return;
-            _ringId = _overlayService.AddRing3dDisplay(Owner, Owner.Position, time);
-        }
+            _overlayService.RemoveRing3dDisplay(player, ringId);
+        });
     }
 
     private void HandleInteractionCompleted(DurationBasedHoldInteraction durationBasedHoldInteractionComponent, RealmPlayer player, bool succeed)
     {
-        lock (_lock)
-            if (_ringId != null)
-            {
-                _overlayService.RemoveRing3dDisplay(player, _ringId);
-                _ringId = null;
-            }
     }
 }
