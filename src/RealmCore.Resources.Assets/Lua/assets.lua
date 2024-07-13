@@ -110,8 +110,12 @@ function tryReplaceModel(modelId)
 end
 
 function tryReplaceModels()
-	for i,v in ipairs(getElementsByType("object", root, true))do
-		tryReplaceModel(getElementModel(v));
+	--for i,v in ipairs(getElementsByType("object", root, true))do
+	--	tryReplaceModel(getElementModel(v));
+	--end
+
+	for model,v in pairs(modelsToReplace)do
+		tryReplaceModel(model)
 	end
 end
 
@@ -120,7 +124,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 		tryReplaceModel(getElementModel(v));
 	end
 	
-	addEventHandler( "onClientElementStreamIn", root, function()
-		tryReplaceModel(getElementModel(source))
-	end)
+	--addEventHandler( "onClientElementStreamIn", root, function()
+	--	tryReplaceModel(getElementModel(source))
+	--end)
 end)
