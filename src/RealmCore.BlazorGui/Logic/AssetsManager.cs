@@ -10,7 +10,8 @@ internal sealed class AssetsManager : BackgroundService
         _assetsCollection = assetsCollection;
         _assetsService = assetsService;
 
-        _assetsService.ReplaceModel((ObjectModel)1337, "ConeModel", "ConeCollision", "ModelsTextures");
+        _assetsService.ReplaceModel((ObjectModel)1337, "ConeModel", "ModelsTextures");
+        //_assetsService.ReplaceModel((ObjectModel)1337, "ConeModel", "ConeCollision", "ModelsTextures");
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

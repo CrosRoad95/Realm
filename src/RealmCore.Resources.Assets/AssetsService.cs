@@ -5,7 +5,7 @@ using SlipeServer.Server.Enums;
 
 namespace RealmCore.Resources.Assets;
 
-public record struct ReplacedModel(ushort model, string modelAsset, string collisionAsset, string textureAsset);
+public record struct ReplacedModel(ushort model, string modelAsset, string? collisionAsset, string textureAsset);
 
 public interface IAssetsService
 {
@@ -16,6 +16,7 @@ public interface IAssetsService
 
     LuaValue Map(IAsset asset);
     void ReplaceModel(ObjectModel objectModel, string modelAsset, string collisionAsset, string texturesAsset);
+    void ReplaceModel(ObjectModel objectModel, string modelAsset, string texturesAsset);
     void ReplaceModelFor(Player player, Stream dff, Stream col, ObjectModel model);
     void RestoreModelFor(Player player, ObjectModel model);
 }
@@ -55,6 +56,16 @@ internal sealed class AssetsService : IAssetsService
             throw new InvalidOperationException("Model already replaced");
 
         var replacedModel = new ReplacedModel((ushort)objectModel, modelAsset, collisionAsset, texturesAsset);
+        _replacedModels.Add(objectModel, replacedModel);
+        ModelReplaced?.Invoke(replacedModel);
+    }
+
+    public void ReplaceModel(ObjectModel objectModel, string modelAsset, string texturesAsset)
+    {
+        if (_replacedModels.ContainsKey(objectModel))
+            throw new InvalidOperationException("Model already replaced");
+
+        var replacedModel = new ReplacedModel((ushort)objectModel, modelAsset, null, texturesAsset);
         _replacedModels.Add(objectModel, replacedModel);
         ModelReplaced?.Invoke(replacedModel);
     }
