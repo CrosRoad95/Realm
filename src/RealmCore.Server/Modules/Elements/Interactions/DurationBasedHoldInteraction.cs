@@ -47,9 +47,13 @@ public abstract class DurationBasedHoldInteraction : Interaction
             var finishedTask = await Task.WhenAny(_interactionTaskCompletionSource.Task, _interactionTask);
             if (finishedTask == _interactionTask)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                if(!cancellationToken.IsCancellationRequested && _interactionTask.IsCompleted)
+                    InteractionCompleted?.Invoke(this, owningPlayer, true);
+                else
+                    InteractionCompleted?.Invoke(this, owningPlayer, false);
                 return true;
             }
+            InteractionCompleted?.Invoke(this, owningPlayer, false);
             return false;
         }
         finally
@@ -59,7 +63,6 @@ public abstract class DurationBasedHoldInteraction : Interaction
                 Owner.Destroyed -= HandleDestroyed;
                 Owner = null;
             }
-            InteractionCompleted?.Invoke(this, owningPlayer, false);
         }
     }
 
@@ -110,7 +113,6 @@ public abstract class DurationBasedHoldInteraction : Interaction
         }
         finally
         {
-            InteractionCompleted?.Invoke(this, owningPlayer, true);
             _semaphore.Release();
         }
     }

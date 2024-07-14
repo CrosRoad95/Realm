@@ -485,7 +485,15 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("durationinteractionbox", ([CallingPlayer] RealmPlayer player) =>
         {
             var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
-            worldObject.Interaction = new DurationBasedHoldWithRingEffectInteraction(overlayService);
+            var interaction = new DurationBasedHoldWithRingEffectInteraction(overlayService);
+
+            void handleInteractionCompleted(DurationBasedHoldInteraction durationBasedHoldInteractionComponent, RealmPlayer player, bool succeed)
+            {
+                _chatBox.OutputTo(player, $"Succeed: {succeed}");
+            }
+
+            interaction.InteractionCompleted += handleInteractionCompleted;
+            worldObject.Interaction = interaction;
         });
         
         _commandService.AddCommandHandler("spawnscopedbox", (player, args) =>

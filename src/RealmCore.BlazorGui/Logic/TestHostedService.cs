@@ -51,7 +51,7 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 
     void HandleFocusedElementChanged(RealmPlayer arg1, Element? previous, Element? current)
     {
-        _chatBox.Output($"Changed focused element to: {current?.ToString() ?? "<brak>"}");
+        //_chatBox.Output($"Changed focused element to: {current?.ToString() ?? "<brak>"}");
     }
 
     private void HandleFocusedVehiclePartChanged(RealmPlayer player, string? arg2, string? arg3)
