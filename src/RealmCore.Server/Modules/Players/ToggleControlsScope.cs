@@ -80,6 +80,7 @@ public class ToggleControlsScope : IDisposable
         if (!_player.ExitToggleControlScope())
             throw new InvalidOperationException("Scope already exited");
 
+        _player.ToggleAllControls(true, true, false);
         var controls = _player.Controls;
         controls.FireEnabled = _fireEnabled;
         controls.AimWeaponEnabled = _aimWeaponEnabled;
@@ -108,6 +109,5 @@ public class ToggleControlsScope : IDisposable
         controls.BrakeReverseEnabled = _brakeReverseEnabled;
         controls.HornEnabled = _hornEnabled;
         controls.EnterPassengerEnabled = _enterPassengerEnabled;
-        _player.ToggleAllControls(true, true, false);
     }
 }
