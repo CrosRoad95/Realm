@@ -7,33 +7,31 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
     private readonly byte[] _key;
     private readonly AESCrypto _aesCrypto;
 
-    public string Key => Convert.ToBase64String(_key);
+    public string Key { get; }
 
-    private readonly IReadOnlySet<string> _excludeExtensions = new HashSet<string> { "otf", "ttf" };
+    private readonly IReadOnlySet<string> _excludeExtensions = new HashSet<string> { ".otf", ".ttf", ".txd" };
 
     public AssetEncryptionProvider(IOptions<AssetsOptions> assetsOptions, IHostEnvironment hostEnvironment)
     {
         _assetsOptions = assetsOptions;
         _hostEnvironment = hostEnvironment;
+        Key = assetsOptions.Value.Base64Key;
         _key = Convert.FromBase64String(assetsOptions.Value.Base64Key);
         _aesCrypto = new AESCrypto(_key, _key, true);
     }
 
-    public bool ShouldEncryptByExtension(string extension) => _excludeExtensions.Contains(extension);
+    public bool ShouldEncryptByExtension(string extension) => !_excludeExtensions.Contains(extension);
 
     public bool IsEncryptionEnabled() => _hostEnvironment.IsProduction() || _assetsOptions.Value.AlwaysEncryptModels;
 
-    public byte[] Encrypt(byte[] data)
-    {
-        if(IsEncryptionEnabled())
-            return _aesCrypto.PerformAES(data);
-        return data;
-    }
+    public byte[] Encrypt(byte[] data) => _aesCrypto.PerformAES(data);
 
-    public string EncryptPath(string path)
+    public string TryEncryptPath(string path)
     {
-        if(IsEncryptionEnabled())
+        if (ShouldEncryptByExtension(Path.GetExtension(path)))
+        {
             return path.CalculateChecksum();
+        }
         return path;
     }
 }

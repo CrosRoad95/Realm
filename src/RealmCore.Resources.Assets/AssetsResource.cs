@@ -12,6 +12,11 @@ do
         local file = fileOpen(fileName);
         local content = fileRead(file, fileGetSize(file));
         fileClose(file)
+        -- TODO: Improve
+        if(string.find(fileName, ".txd"))then
+            return content;
+        end
+
 	    local decryptedContent = decodeString("aes128", content, {1}
 		    key = key,
 		    iv = key,
@@ -40,40 +45,29 @@ end
 
     public void AddFiles(IAssetEncryptionProvider assetEncryptionProvider, AssetsCollection assetsCollection, IHostEnvironment hostEnvironment)
     {
+        var isEncryptionEnabled = assetEncryptionProvider.IsEncryptionEnabled();
+
         var basePath = assetsCollection.BasePath;
         foreach (var filePath in assetsCollection.GetAllFiles())
         {
             var fullFilePath = System.IO.Path.Combine(basePath, filePath);
             var extension = System.IO.Path.GetExtension(filePath);
-            switch (extension)
-            {
-                case ".otf":
-                case ".ttf":
-                    {
-                        var content = File.ReadAllBytes(fullFilePath);
-                        Files.Add(ResourceFileFactory.FromBytes(content, filePath));
-                        AdditionalFiles.Add(filePath, content);
-                        ContentSize += content.Length;
-                    }
-                    break;
-                default:
-                    {
-                        using var content = File.OpenRead(fullFilePath);
-                        var checksum = content.CalculateChecksum();
-                        var encryptedPath = assetEncryptionProvider.EncryptPath(filePath);
-                        var contentBytes = content.ToArray();
-                        var encrypted = assetEncryptionProvider.Encrypt(contentBytes);
 
-                        Files.Add(ResourceFileFactory.FromBytes(encrypted, encryptedPath));
-                        AdditionalFiles.Add(encryptedPath, encrypted);
-                        ContentSize += content.Length;
-                    }
-                    break;
+            var path = filePath;
+            var content = File.ReadAllBytes(fullFilePath);
+            if (isEncryptionEnabled && assetEncryptionProvider.ShouldEncryptByExtension(extension))
+            {
+                path = assetEncryptionProvider.TryEncryptPath(path);
+                content = assetEncryptionProvider.Encrypt(content);
             }
+
+            Files.Add(ResourceFileFactory.FromBytes(content, path));
+            AdditionalFiles.Add(path, content);
+            ContentSize += content.Length;
         }
 
         string decryptScript;
-        if (assetEncryptionProvider.IsEncryptionEnabled())
+        if (isEncryptionEnabled)
         {
             decryptScript = string.Format(_decryptScriptProd, assetEncryptionProvider.Key, "{", "}");
         }

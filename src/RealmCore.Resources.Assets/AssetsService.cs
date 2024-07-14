@@ -43,9 +43,9 @@ internal sealed class AssetsService : IAssetsService
         {
             FileSystemFont font => new LuaValue(new LuaValue[] { "FileSystemFont", font.Name, font.Path }),
             BuildInFont font => new LuaValue(new LuaValue[] { "MtaFont", font.Name }),
-            AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, _assetEncryptionProvider.EncryptPath(dff.Path) }),
-            AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, _assetEncryptionProvider.EncryptPath(col.Path) }),
-            AssetTXD txd => new LuaValue(new LuaValue[] { "TXD", txd.Name, _assetEncryptionProvider.EncryptPath(txd.Path) }),
+            AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, _assetEncryptionProvider.TryEncryptPath(dff.Path) }),
+            AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, _assetEncryptionProvider.TryEncryptPath(col.Path) }),
+            AssetTXD txd => new LuaValue(new LuaValue[] { "TXD", txd.Name, _assetEncryptionProvider.TryEncryptPath(txd.Path) }),
             _ => throw new NotImplementedException()
         };
     }

@@ -94,6 +94,7 @@ function tryReplaceModel(modelId)
 			end
 		end
 	end
+
 	do
 		local dffInfo = assetsList[modelToReplace.modelAsset]
 		if(dffInfo)then
