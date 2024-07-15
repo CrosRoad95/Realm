@@ -100,6 +100,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserDailyTaskProgressData> UserDailyTasksProgressData => Set<UserDailyTaskProgressData>();
     public DbSet<UploadFileData> UploadFiles => Set<UploadFileData>();
     public DbSet<UserUploadFileData> UserUploadFiles => Set<UserUploadFileData>();
+    public DbSet<UserBoostData> Boosts => Set<UserBoostData>();
+    public DbSet<UserActiveBoostData> ActiveBoosts => Set<UserActiveBoostData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -325,6 +327,17 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany<BlockedUserData>()
                 .WithOne(x => x.User2)
                 .HasForeignKey(x => x.UserId2);
+
+            entityBuilder
+                .HasMany(x => x.Boosts)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.ActiveBoosts)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -984,6 +997,21 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         {
             entityBuilder
                 .ToTable(nameof(UserDailyTasksProgressData))
+                .HasKey(x => x.Id);
+        });
+
+
+        modelBuilder.Entity<UserBoostData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Boosts))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<UserActiveBoostData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(ActiveBoosts))
                 .HasKey(x => x.Id);
         });
     }

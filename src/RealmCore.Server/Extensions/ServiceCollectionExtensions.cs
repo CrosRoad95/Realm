@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         where T2: class, T1
     {
         services.AddScoped<T1, T2>();
-        services.AddScoped<IPlayerFeature>(x => x.GetRequiredService<T1>()); 
+        services.AddTransient<IPlayerFeature>(x => x.GetRequiredService<T1>()); 
         return services;
     }
     
@@ -181,6 +181,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerFriendsFeature, PlayerFriendsFeature>();
         services.AddPlayerScopedFeature<IPlayerDailyTasksFeature, PlayerDailyTasksFeature>();
         services.AddPlayerScopedFeature<IPlayerIntegrationsFeature, PlayerIntegrationsFeature>();
+        services.AddPlayerScopedFeature<IPlayerBoostsFeature, PlayerBoostsFeature>();
         #endregion
 
         #region Vehicle features

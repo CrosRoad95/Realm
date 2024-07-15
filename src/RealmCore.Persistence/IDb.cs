@@ -57,6 +57,8 @@ public interface IDb
     DbSet<WorldNodeScheduledActionData> WorldNodeScheduledActionsData { get; }
     DbSet<UploadFileData> UploadFiles { get; }
     DbSet<UserUploadFileData> UserUploadFiles { get; }
+    DbSet<UserBoostData> Boosts { get; }
+    DbSet<UserActiveBoostData> ActiveBoosts { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

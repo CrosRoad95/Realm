@@ -41,6 +41,8 @@ public static class QueryableExtensions
             .Include(x => x.PlayTimes)
             .Include(x => x.BlockedUsers)
             .Include(x => x.DailyTasksProgress)
+            .Include(x => x.Boosts)
+            .Include(x => x.ActiveBoosts)
             .AsSplitQuery();
     }
 

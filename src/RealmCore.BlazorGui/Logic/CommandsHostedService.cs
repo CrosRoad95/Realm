@@ -2145,6 +2145,7 @@ internal sealed class CommandsHostedService : IHostedService
         });
 
         AddInventoryCommands();
+        AddBoostCommands();
     }
 
     internal sealed class TestSession : Session
@@ -2171,6 +2172,47 @@ internal sealed class CommandsHostedService : IHostedService
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    private void AddBoostCommands()
+    {
+        _commandService.Add("boostslist", ([CallingPlayer] RealmPlayer player) =>
+        {
+            _chatBox.OutputTo(player, "Boosts");
+            foreach (var boostId in player.Boosts.AllBoosts)
+            {
+                _chatBox.OutputTo(player, $"Boost: {boostId}");
+            }
+
+            _chatBox.OutputTo(player, "Active boosts");
+            foreach (var activeBoost in player.Boosts.ActiveBoosts)
+            {
+                _chatBox.OutputTo(player, $"Boost: {activeBoost.BoostId} remaining time: {activeBoost.RemainingTime}");
+            }
+        });
+
+        _commandService.Add("giveboost", ([CallingPlayer] RealmPlayer player, int id) =>
+        {
+            player.Boosts.AddBoost(id);
+            _chatBox.OutputTo(player, "Added");
+        });
+
+        _commandService.Add("activateboost", ([CallingPlayer] RealmPlayer player, int id) =>
+        {
+            var activated = player.Boosts.TryActivateBoost(id, TimeSpan.FromMinutes(5));
+            _chatBox.OutputTo(player, $"Boost activated: {activated}");
+        });
+
+        _commandService.Add("activateboost2", ([CallingPlayer] RealmPlayer player, int id) =>
+        {
+            var activated = player.Boosts.TryActivateBoost(id, TimeSpan.FromSeconds(5));
+            _chatBox.OutputTo(player, $"Boost activated: {activated}");
+        });
+
+        _commandService.Add("isboostactive", ([CallingPlayer] RealmPlayer player, int id) =>
+        {
+            _chatBox.OutputTo(player, $"Is boost active: {player.Boosts.IsActive(id)}");
+        });
     }
 
     private void AddInventoryCommands()
