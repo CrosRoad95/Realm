@@ -73,7 +73,8 @@ internal sealed class PlayerBoostsFeature : IPlayerBoostsFeature, IUsesUserPersi
                         elapsedTime = sessionElapsedTime;
                     }
                     var remainingTime = activeBoostData.RemainingTime - elapsedTime;
-                    yield return ActiveBoostDto.Map(activeBoostData, remainingTime);
+                    if(remainingTime > 0)
+                        yield return ActiveBoostDto.Map(activeBoostData, remainingTime);
                 }
             }
         }
