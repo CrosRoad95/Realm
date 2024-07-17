@@ -4,6 +4,8 @@ public interface IVehiclesAccessService
 {
     event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
     event Func<Ped, RealmVehicle, byte, bool>? CanExit;
+    event Func<Ped, RealmVehicle, byte, bool>? CanNotEnter;
+    event Func<Ped, RealmVehicle, byte, bool>? CanNotExit;
     event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToEnter;
     event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToExit;
 
@@ -17,6 +19,8 @@ internal sealed class VehiclesAccessService : IVehiclesAccessService
 
     public event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
     public event Func<Ped, RealmVehicle, byte, bool>? CanExit;
+    public event Func<Ped, RealmVehicle, byte, bool>? CanNotEnter;
+    public event Func<Ped, RealmVehicle, byte, bool>? CanNotExit;
     public event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToEnter;
     public event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToExit;
 
@@ -34,6 +38,17 @@ internal sealed class VehiclesAccessService : IVehiclesAccessService
                 if (handler.Invoke(ped, vehicle, seat))
                 {
                     return true;
+                }
+            }
+        }
+        
+        if (CanNotEnter != null)
+        {
+            foreach (Func<Ped, RealmVehicle, byte, bool> handler in CanNotEnter.GetInvocationList().Cast<Func<Ped, RealmVehicle, byte, bool>>())
+            {
+                if (handler.Invoke(ped, vehicle, seat))
+                {
+                    return false;
                 }
             }
         }
@@ -58,6 +73,17 @@ internal sealed class VehiclesAccessService : IVehiclesAccessService
                 if (handler.Invoke(ped, vehicle, seat))
                 {
                     return true;
+                }
+            }
+        }
+        
+        if (CanNotExit != null)
+        {
+            foreach (Func<Ped, RealmVehicle, byte, bool> handler in CanNotExit.GetInvocationList().Cast<Func<Ped, RealmVehicle, byte, bool>>())
+            {
+                if (handler.Invoke(ped, vehicle, seat))
+                {
+                    return false;
                 }
             }
         }

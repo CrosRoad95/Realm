@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.World.WorldNodes;
+﻿using RealmCore.Server.Modules.Server;
+using RealmCore.Server.Modules.World.WorldNodes;
 
 namespace RealmCore.BlazorGui.Modules.World;
 
@@ -69,6 +70,40 @@ public class SampleNode : WorldNode
     protected override void Dispose()
     {
         _worldObject?.Destroy();
+    }
+}
+
+public class SampleNode2 : WorldNode
+{
+    private readonly IDateTimeProvider _dateTimeProvider;
+
+    public SampleNode2(IDateTimeProvider dateTimeProvider)
+    {
+        _dateTimeProvider = dateTimeProvider;
+    }
+
+    protected override async Task Initialized()
+    {
+        var state = GetMetadata<SampleState>();
+        Console.WriteLine("SampleNode2 Initialized {0}", state.SampleValue);
+        await ScheduleAction(_dateTimeProvider.Now.AddSeconds(2), new SampleAction());
+    }
+
+    protected override async Task ProcessAction(object? data)
+    {
+        switch (data)
+        {
+            case SampleAction sampleAction:
+                var state = GetMetadata<SampleState>();
+                Console.WriteLine("SampleNode2 ProcessAction {0}", state.SampleValue);
+                await UpdateMetadata<SampleState>(x =>
+                {
+                    x.SampleValue = state.SampleValue + 1;
+                    return x;
+                });
+                await ScheduleAction(_dateTimeProvider.Now.AddSeconds(2), new SampleAction());
+                break;
+        }
     }
 }
 

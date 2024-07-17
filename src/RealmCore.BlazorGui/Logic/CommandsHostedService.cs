@@ -468,20 +468,6 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, "spawned box");
         });
 
-        _commandService.Add("spawnnode", async ([CallingPlayer] RealmPlayer player) =>
-        {
-            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
-            _chatBox.OutputTo(player, "spawned node");
-        });
-        _commandService.Add("spawnnode2", async ([CallingPlayer] RealmPlayer player) =>
-        {
-            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
-            _chatBox.OutputTo(player, $"temporarly spawned node id: {node.Id}");
-            await Task.Delay(5000);
-            await _worldNodesService.Destroy(node);
-            _chatBox.OutputTo(player, $"destroyed temporarly spawned node id: {node.Id}");
-        });
-
         _commandService.Add("durationinteractionbox", ([CallingPlayer] RealmPlayer player) =>
         {
             var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
@@ -2146,6 +2132,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         AddInventoryCommands();
         AddBoostCommands();
+        AddNodesCommands();
     }
 
     internal sealed class TestSession : Session
@@ -2172,6 +2159,31 @@ internal sealed class CommandsHostedService : IHostedService
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    private void AddNodesCommands()
+    {
+        _commandService.Add("spawnnode", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
+            _chatBox.OutputTo(player, "spawned node");
+        });
+
+        _commandService.Add("spawnnode2", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var node = await _worldNodesService.Create<SampleNode2>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(0));
+            _chatBox.OutputTo(player, "spawned node counter");
+        });
+
+        _commandService.Add("spawnnode3", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var node = await _worldNodesService.Create<SampleNode>(new Location(player.Position + new Vector3(4, 0, 0)), new SampleState(1337));
+            _chatBox.OutputTo(player, $"temporarly spawned node id: {node.Id}");
+            await Task.Delay(5000);
+            await _worldNodesService.Destroy(node);
+            _chatBox.OutputTo(player, $"destroyed temporarly spawned node id: {node.Id}");
+        });
+
     }
 
     private void AddBoostCommands()

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.BlazorGui.Logic;
+﻿using RealmCore.Server.Modules.Vehicles.Access;
+
+namespace RealmCore.BlazorGui.Logic;
 
 internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 {
@@ -7,15 +9,26 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
     private readonly ILogger<TestHostedService> _logger;
     private readonly ChatBox _chatBox;
     private readonly INametagsService _nametagsService;
+    private readonly IVehiclesAccessService _vehiclesAccessService;
 
-    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox, INametagsService nametagsService) : base(playersEventManager)
+    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox, INametagsService nametagsService, IVehiclesAccessService vehiclesAccessService) : base(playersEventManager)
     {
         _elementFactory = elementFactory;
         _schedulerService = schedulerService;
         _logger = logger;
         _chatBox = chatBox;
         _nametagsService = nametagsService;
+        _vehiclesAccessService = vehiclesAccessService;
+
+        //_vehiclesAccessService.CanNotEnter += HandleCanNotEnter;
         //SchedulerTests();
+    }
+
+    private bool HandleCanNotEnter(Ped ped, RealmVehicle vehicle, byte seat)
+    {
+        if (seat == 0)
+            return true;
+        return false;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
