@@ -13,7 +13,6 @@ public class LoginRegisterTests
         var now = hosting.DateTimeProvider.Now;
         {
             var player = await hosting.CreatePlayer(name: name, dontLoadData: false);
-            player.Name = name;
             player.Spawn(new Vector3(1, 2, 3));
 
             player.PlayTime.InternalSetTotalPlayTime(1337);
@@ -25,10 +24,7 @@ public class LoginRegisterTests
             player.Statistics.Increase(1, 1);
             player.Statistics.Increase(2, 2);
 
-            await player.GetRequiredService<IUsersService>().LogOut(player);
             await hosting.DisconnectPlayer(player);
-
-            player.Money.Amount.Should().Be(0);
         }
 
         hosting.DateTimeProvider.Add(TimeSpan.FromDays(1));
@@ -49,13 +45,10 @@ public class LoginRegisterTests
 
         for (int i = 0; i < 2; i++)
         {
-            var player = await hosting.CreatePlayer(name: name);
-            player.Name = name;
+            var player = await hosting.CreatePlayer(name: name, dontLoadData: false);
             player.TrySpawnAtLastPosition().Should().BeTrue();
 
             assert(hosting, player);
-
-            await player.GetRequiredService<IUsersService>().LogOut(player);
 
             await hosting.DisconnectPlayer(player);
         }

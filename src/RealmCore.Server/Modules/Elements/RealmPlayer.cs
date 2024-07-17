@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Modules.Players.Integrations;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Server.Modules.Elements;
 
@@ -254,6 +255,15 @@ public class RealmPlayer : Player, IAsyncDisposable
         var timeSpan = TimeSpan.FromSeconds(5);
         _invokePolicy = Policy.RateLimitAsync(maxCalls, timeSpan, maxCalls);
         Nametag = new(this);
+
+        ResourceStarted += HandleResourceStarted;
+    }
+
+    internal HashSet<int> StartedResources { get; } = [];
+
+    private void HandleResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
+    {
+        StartedResources.Add(e.NetId);
     }
 
     public virtual async Task Invoke(Func<Task> task, CancellationToken cancellationToken = default)
@@ -809,6 +819,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         Wasted -= HandleWasted;
+        ResourceStarted -= HandleResourceStarted;
         TryRemoveBlip();
         await _serviceScope.DisposeAsync();
         IsSpawned = false;

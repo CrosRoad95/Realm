@@ -123,8 +123,9 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         if (_realmResourcesProvider.Count == 0)
             throw new InvalidOperationException("No resources found");
 
-        _playerResources[player] = new Latch(_realmResourcesProvider.Count, TimeSpan.FromSeconds(60));
+        _playerResources[player] = new Latch(_realmResourcesProvider.Count - player.StartedResources.Count, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
+
         player.Destroyed += HandlePlayerDestroyed;
 
         if (player.ScreenSize.X == 0)

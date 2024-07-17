@@ -105,6 +105,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
         return player;
     }
 
+    private int _counter = 0;
     public async Task<TPlayer> CreatePlayer(bool notLoggedIn = false, string? name = null, bool dontLoadData = true)
     {
         var tcs = new TaskCompletionSource();
@@ -113,7 +114,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
         playersEventManager.Loaded += HandlePlayersEventManagerLoaded;
 
         player = Server.AddFakePlayer();
-        player.Name = "TestPlayer";
+        player.Name = name ?? $"TestPlayer{++_counter}";
         player.Client.FetchSerial();
 
         void HandlePlayersEventManagerLoaded(Player plr)
@@ -121,9 +122,6 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
             if (plr == player)
                 tcs.SetResult();
         }
-
-        if (name != null)
-            player.Name = name;
 
         var realmResourcesProvider = Server.GetRequiredService<IRealmResourcesProvider>();
 

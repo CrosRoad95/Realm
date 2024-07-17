@@ -2,6 +2,7 @@
 
 public interface ICommandThrottlingPolicy
 {
+    bool Enabled { get; set; }
     void Execute(Action callback);
     Task ExecuteAsync(Func<CancellationToken, Task> callback, CancellationToken cancellationToken);
 }
@@ -10,6 +11,8 @@ internal sealed class CommandThrottlingPolicy : ICommandThrottlingPolicy
 {
     private readonly RateLimitPolicy _policy;
     private readonly AsyncRateLimitPolicy _policyAsync;
+
+    public bool Enabled { get; set; } = true;
 
     public CommandThrottlingPolicy()
     {
@@ -22,17 +25,31 @@ internal sealed class CommandThrottlingPolicy : ICommandThrottlingPolicy
 
     public void Execute(Action callback)
     {
-        _policy.Execute(() =>
+        if (Enabled)
+        {
+            _policy.Execute(() =>
+            {
+                callback();
+            });
+        }
+        else
         {
             callback();
-        });
+        }
     }
 
     public async Task ExecuteAsync(Func<CancellationToken, Task> callback, CancellationToken cancellationToken)
     {
-        await _policyAsync.ExecuteAsync(async (cancellationToken) =>
+        if (Enabled)
+        {
+            await _policyAsync.ExecuteAsync(async (cancellationToken) =>
+            {
+                await callback(cancellationToken);
+            }, cancellationToken);
+        }
+        else
         {
             await callback(cancellationToken);
-        }, cancellationToken);
+        }
     }
 }

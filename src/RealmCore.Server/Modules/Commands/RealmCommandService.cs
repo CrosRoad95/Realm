@@ -274,7 +274,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         catch (RateLimitRejectedException ex)
         {
             _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            _logger.LogError(ex, "Rate limit exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
+            //_logger.LogError(ex, "Rate limit exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
         }
         catch (CommandArgumentException ex)
         {

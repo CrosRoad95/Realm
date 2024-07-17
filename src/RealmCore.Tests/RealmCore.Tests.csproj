@@ -7,6 +7,7 @@
 		<LangVersion>preview</LangVersion>
 		<IsPackable>false</IsPackable>
 		<Platforms>AnyCPU;x64</Platforms>
+		<UserSecretsId>ce6166c4-d00e-404d-b06b-8388cf691f4d</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

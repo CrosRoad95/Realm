@@ -268,7 +268,7 @@ public class PlayersTests
     }
 
 
-    [InlineData("TestPlayer", true)]
+    [InlineData("TestPlayer1", true)]
     [InlineData("FooPlayer", false)]
     [Theory]
     public async Task TryGetPlayerByNameTests(string nick, bool shouldExists)
