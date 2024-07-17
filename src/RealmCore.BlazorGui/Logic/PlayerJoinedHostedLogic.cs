@@ -8,9 +8,8 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     private readonly Text3dService _text3DService;
     private readonly PlayersEventManager _playersEventManager;
     private readonly IUsersService _usersService;
-    private readonly ScoreboardService _scoreboardService;
 
-    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService, ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService, ScoreboardService scoreboardService)
+    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService, ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -18,7 +17,6 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         _text3DService = text3DService;
         _playersEventManager = playersEventManager;
         _usersService = usersService;
-        _scoreboardService = scoreboardService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -71,7 +69,6 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         _text3DService.SetRenderingEnabled(player, true);
 
         _nametagsService.SetNametagRenderingEnabled(player, true);
-        _scoreboardService.SetEnabledTo(player, true);
 
         if (player.Settings.TryGet(69, out var name))
         {
@@ -87,7 +84,6 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
 
     private void ShowLoginSequence(RealmPlayer player)
     {
-        _scoreboardService.SetEnabledTo(player, false);
         _text3DService.SetRenderingEnabled(player, false);
         _chatBox.SetVisibleFor(player, false);
         _chatBox.ClearFor(player);

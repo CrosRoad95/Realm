@@ -75,7 +75,6 @@
 	  <Using Include="RealmCore.Resources.Overlay" />
 	  <Using Include="RealmCore.Server.Modules.Vehicles.Tuning" />
 	  <Using Include="SlipeServer.Resources.Text3d" />
-	  <Using Include="SlipeServer.Resources.Scoreboard" />
 	  <Using Include="RealmCore.Resources.Nametags" />
 	  <Using Include="SlipeServer.Packets.Lua.Camera" />
 	  <Using Include="RealmCore.Server.Extensions" />

@@ -26,7 +26,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddText3dResource();
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
-        serverBuilder.AddScoreboard();
         serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
         return serverBuilder;
     }
@@ -46,7 +45,6 @@ public static class ServerBuilderExtensions
         services.AddText3dServices();
         services.AddNametagsServices();
         services.AddWatermarkServices();
-        services.AddScoreboardServices();
         services.AddBoneAttachServices();
         return services;
     }
