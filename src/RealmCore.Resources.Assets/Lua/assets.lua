@@ -68,15 +68,17 @@ function tryReplaceModel(modelId)
 	local modelToReplace = modelsToReplace[modelId];
 	
 	do
-		local colInfo = assetsList[modelToReplace.collisionAsset]
-		if(colInfo)then
-			if(colInfo[4])then
-				engineReplaceCOL(colInfo[4], modelId)
-			else
-				local content = decryptAsset(colInfo[3])
-				local col = engineLoadCOL(content)
-				engineReplaceCOL(col, modelId)
-				colInfo[4] = col
+		if(modelToReplace.collisionAsset)then
+			local colInfo = assetsList[modelToReplace.collisionAsset]
+			if(colInfo)then
+				if(colInfo[4])then
+					engineReplaceCOL(colInfo[4], modelId)
+				else
+					local content = decryptAsset(colInfo[3])
+					local col = engineLoadCOL(content)
+					engineReplaceCOL(col, modelId)
+					colInfo[4] = col
+				end
 			end
 		end
 	end
