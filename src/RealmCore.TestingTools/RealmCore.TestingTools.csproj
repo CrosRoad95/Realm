@@ -92,7 +92,6 @@
 		<Using Include="RealmCore.Server.Modules.Elements.Interactions" />
 		<Using Include="RealmCore.Persistence.Data" />
 		<Using Include="RealmCore.Persistence.Repository" />
-		<Using Include="RealmCore.Interfaces.Extend" />
 		<Using Include="RealmCore.Server.Json.Converters" />
 		<Using Include="RealmCore.Resources.Admin.Data" />
 		<Using Include="RealmCore.Resources.Admin.Enums" />
