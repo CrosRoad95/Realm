@@ -8,7 +8,7 @@ public interface IWorldNodeRepository
     Task<WorldNodeScheduledActionData[]> GetAllScheduledActions(CancellationToken cancellationToken);
     Task Remove(WorldNodeData worldNodeData);
     Task<bool> RemoveScheduledAction(int worldNodeScheduledActionId);
-    Task UpdateMetadata(int worldNodeId, object? metadata);
+    Task UpdateMetadata(int worldNodeId, object? metadata, DateTime now);
 }
 
 internal sealed class WorldNodeRepository : IWorldNodeRepository
@@ -105,7 +105,7 @@ internal sealed class WorldNodeRepository : IWorldNodeRepository
         }
     }
 
-    public async Task UpdateMetadata(int worldNodeId, object? metadata)
+    public async Task UpdateMetadata(int worldNodeId, object? metadata, DateTime now)
     {
         await _semaphoreSlim.WaitAsync();
         try
@@ -118,7 +118,7 @@ internal sealed class WorldNodeRepository : IWorldNodeRepository
 
             var serializedMetadata = Serialize(metadata);
             await _db.WorldNodes.Where(x => x.Id == worldNodeId)
-                .ExecuteUpdateAsync(x => x.SetProperty(y => y.MetaData, serializedMetadata));
+                .ExecuteUpdateAsync(x => x.SetProperty(y => y.MetaData, serializedMetadata).SetProperty(y => y.LastUpdatedAt, now));
         }
         finally
         {

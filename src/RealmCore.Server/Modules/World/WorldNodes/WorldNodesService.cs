@@ -151,7 +151,7 @@ public sealed class WorldNodesService
 
     private async Task UpdateMetadata(int worldNodeId, object? metadata)
     {
-        await _worldNodeRepository.UpdateMetadata(worldNodeId, metadata);
+        await _worldNodeRepository.UpdateMetadata(worldNodeId, metadata, _dateTimeProvider.Now);
     }
 
     internal async Task ScheduleAction(int worldNodeId, DateTime at, object? actionData, int? existingActionId = null)
