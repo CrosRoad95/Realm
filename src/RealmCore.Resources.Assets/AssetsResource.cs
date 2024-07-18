@@ -8,19 +8,21 @@ internal class AssetsResource : Resource
     private readonly string _decryptScriptProd = """
 do
     local key = base64Decode("{0}");
+    local excludedExtensions = {{ {1} }}
     function decryptAsset(fileName)
         local file = fileOpen(fileName);
         local content = fileRead(file, fileGetSize(file));
         fileClose(file)
-        -- TODO: Improve
-        if(string.find(fileName, ".txd"))then
-            return content;
+        for i,v in ipairs(excludedExtensions)do
+            if(string.find(fileName, v))then
+                return content;
+            end
         end
 
-	    local decryptedContent = decodeString("aes128", content, {1}
+	    local decryptedContent = decodeString("aes128", content, {2}
 		    key = key,
 		    iv = key,
-	    {2})
+	    {3})
         return decryptedContent
     end
 end
@@ -69,7 +71,8 @@ end
         string decryptScript;
         if (isEncryptionEnabled)
         {
-            decryptScript = string.Format(_decryptScriptProd, assetEncryptionProvider.Key, "{", "}");
+            var excludedExtensions = string.Join(", ", assetEncryptionProvider.ExcludedExceptions.Select(x => $"\"{x}\""));
+            decryptScript = string.Format(_decryptScriptProd, assetEncryptionProvider.Key, excludedExtensions, "{", "}");
         }
         else
         {

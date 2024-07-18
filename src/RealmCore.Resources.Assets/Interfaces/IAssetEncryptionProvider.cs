@@ -8,4 +8,5 @@ public interface IAssetEncryptionProvider
     bool IsEncryptionEnabled();
 
     string Key { get; }
+    string[] ExcludedExceptions { get; }
 }

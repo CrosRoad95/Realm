@@ -6,8 +6,9 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
     private readonly IHostEnvironment _hostEnvironment;
     private readonly byte[] _key;
     private readonly AESCrypto _aesCrypto;
-    private readonly IReadOnlySet<string> _excludeExtensions;
+    private readonly IReadOnlySet<string> _excludedExtensions;
 
+    public string[] ExcludedExceptions => [.. _excludedExtensions];
     public string Key { get; }
 
     public AssetEncryptionProvider(IOptions<AssetsOptions> assetsOptions, IHostEnvironment hostEnvironment)
@@ -17,10 +18,10 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
         Key = assetsOptions.Value.Base64Key;
         _key = Convert.FromBase64String(assetsOptions.Value.Base64Key);
         _aesCrypto = new AESCrypto(_key, _key, true);
-        _excludeExtensions = assetsOptions.Value.ExcludeExtensions.ToHashSet();
+        _excludedExtensions = assetsOptions.Value.ExcludeExtensions.ToHashSet();
     }
 
-    public bool ShouldEncryptByExtension(string extension) => IsEncryptionEnabled() && !_excludeExtensions.Contains(extension);
+    public bool ShouldEncryptByExtension(string extension) => IsEncryptionEnabled() && !_excludedExtensions.Contains(extension);
 
     public bool IsEncryptionEnabled() => _hostEnvironment.IsProduction() || _assetsOptions.Value.AlwaysEncryptModels;
 

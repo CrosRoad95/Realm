@@ -34,9 +34,6 @@ end
 
 addEvent("internalSetAssetsList", true)
 addEventHandler("internalSetAssetsList", localPlayer, function(newAssetsList, newModelsToReplace)
-	--iprint("assetsList",newAssetsList)
-	--iprint("newModelsToReplace",newModelsToReplace)
-	-- TODO: Unload models
 	for i,v in ipairs({fromJSON(newModelsToReplace)})do
 		modelsToReplace[v.model] = v
 	end
@@ -71,14 +68,12 @@ function tryReplaceModel(modelId)
 		if(modelToReplace.collisionAsset)then
 			local colInfo = assetsList[modelToReplace.collisionAsset]
 			if(colInfo)then
-				if(colInfo[4])then
-					engineReplaceCOL(colInfo[4], modelId)
-				else
+				if(not colInfo.data)then
 					local content = decryptAsset(colInfo[3])
 					local col = engineLoadCOL(content)
-					engineReplaceCOL(col, modelId)
-					colInfo[4] = col
+					colInfo.data = col
 				end
+				engineReplaceCOL(colInfo.data, modelId)
 			end
 		end
 	end
@@ -86,28 +81,24 @@ function tryReplaceModel(modelId)
 	do
 		local txdInfo = assetsList[modelToReplace.textureAsset]
 		if(txdInfo)then
-			if(txdInfo[4])then
-				engineImportTXD(txdInfo[4], modelId)
-			else
+			if(not txdInfo.data)then
 				local content = decryptAsset(txdInfo[3])
 				local txd = engineLoadTXD(content)
-				engineImportTXD(txd, modelId)
-				txdInfo[4] = dff
+				txdInfo.data = txd
 			end
+			engineImportTXD(txdInfo.data, modelId)
 		end
 	end
 
 	do
 		local dffInfo = assetsList[modelToReplace.modelAsset]
 		if(dffInfo)then
-			if(dffInfo[4])then
-				engineReplaceModel(dffInfo[4], modelId)
-			else
+			if(not dffInfo.data)then
 				local content = decryptAsset(dffInfo[3])
 				local dff = engineLoadDFF(content)
-				engineReplaceModel(dff, modelId)
-				dffInfo[4] = dff
+				dffInfo.data = dff
 			end
+			engineReplaceModel(dffInfo.data, modelId)
 		end
 	end
 end
