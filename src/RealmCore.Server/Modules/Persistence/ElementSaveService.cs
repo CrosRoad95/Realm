@@ -85,16 +85,6 @@ internal sealed partial class ElementSaveService : IElementSaveService
         vehicleData.TaxiLightState = vehicle.IsTaxiLightOn;
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
-        vehicleData.UserAccesses = vehicle.Access.Select(x => new VehicleUserAccessData
-        {
-            Id = x.Id,
-            UserId = x.UserId,
-            VehicleId = vehicleData.Id,
-            Vehicle = vehicleData,
-            AccessType = x.AccessType,
-            CustomValue = x.CustomValue
-        }).ToList();
-
         vehicleData.Paintjob = vehicle.PaintJob;
 
         if (vehicle.Inventory.TryGetPrimary(out var inventory))

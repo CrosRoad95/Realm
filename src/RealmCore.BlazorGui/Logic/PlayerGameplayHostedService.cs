@@ -85,7 +85,7 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
 #pragma warning disable CA1849 // Call async methods when in an async method
                             player.DoAnimation(Animation.StartCarry);
 #pragma warning restore CA1849 // Call async methods when in an async method
-                            player.Attach(interactWorldObject, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0));
+                            player.Attach(interactWorldObject, BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0));
                             interactWorldObject.TrySetOwner(player);
                         }
                         break;
