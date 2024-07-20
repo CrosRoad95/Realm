@@ -126,7 +126,7 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUse
         }
     }
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         _vehiclePartDamages = vehicleData.PartDamages;
     }

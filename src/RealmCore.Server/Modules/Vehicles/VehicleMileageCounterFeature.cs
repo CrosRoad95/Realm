@@ -83,9 +83,16 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
         Vehicle.PositionChanged -= HandlePositionChanged;
     }
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
-        _mileage = vehicleData.Mileage;
+        if (preserveData)
+        {
+            vehicleData.Mileage = _mileage;
+        }
+        else
+        {
+            _mileage = vehicleData.Mileage;
+        }
     }
 
     public void Unloaded()

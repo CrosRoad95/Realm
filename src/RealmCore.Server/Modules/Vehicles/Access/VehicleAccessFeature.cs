@@ -164,7 +164,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehicle
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         _userAccesses = vehicleData.UserAccesses;
         VehicleId = vehicleData.Id;

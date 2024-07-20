@@ -143,7 +143,7 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature, IUsesVeh
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         _upgrades = vehicleData.Upgrades;
     }

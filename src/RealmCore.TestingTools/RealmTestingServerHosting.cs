@@ -27,7 +27,10 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
             ["Database:ConnectionString"] = Environment.GetEnvironmentVariable("RealmCoreTestingDatabaseConnectionString"),
             ["Browser:BaseRemoteUrl"] = "https://localhost:7149",
             ["Assets:Base64Key"] = "ehFQcEzbNPfHt+CKpDJ41Q==",
-            ["VehicleLoading:SkipVehicleLoading"] = "true"
+            ["VehicleLoading:SkipVehicleLoading"] = "true",
+            ["Assets:ExcludeExtensions:0"] = ".otf",
+            ["Assets:ExcludeExtensions:1"] = ".ttf",
+            ["Assets:ExcludeExtensions:2"] = ".txd",
         });
 
         hostBuilder.Services.AddRealmServerCore(hostBuilder.Configuration);

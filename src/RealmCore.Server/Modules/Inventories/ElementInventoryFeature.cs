@@ -54,7 +54,7 @@ internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicl
 
     public event Action? VersionIncreased;
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         Load(Vehicle, vehicleData.Inventories, _itemsCollection);
     }

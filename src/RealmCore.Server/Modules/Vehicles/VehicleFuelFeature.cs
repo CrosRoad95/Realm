@@ -98,7 +98,7 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void Loaded(VehicleData vehicleData)
+    public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         _vehicleFuelData = vehicleData.Fuels;
         FuelContainer? active = null;

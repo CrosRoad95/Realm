@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Pickups;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 
@@ -93,6 +94,27 @@ public class VehiclesPersistence
             return x;
         });
     }
+
+    [Fact]
+    public async Task ConvertVehicleToPersistantShouldWork()
+    {
+        using var hosting = new RealmTestingServerHosting(hostBuilder =>
+        {
+            hostBuilder.Services.AddScoped<IElementFactory, TestElementFactory>();
+        });
+
+        var factory = hosting.GetRequiredService<IElementFactory>();
+        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
+        var loadService = hosting.GetRequiredService<IVehicleLoader>();
+
+        var vehicle = factory.CreateVehicle(new Location(), (VehicleModel)404);
+        vehicle.MileageCounter.Mileage = 1000;
+
+        vehicle = await vehiclesService.ConvertToPersistantVehicle(vehicle) ?? throw new NullReferenceException();
+
+        vehicle.MileageCounter.Mileage.Should().Be(1000);
+    }
+
 }
 
 internal class TestRealmVehicle : RealmVehicle
