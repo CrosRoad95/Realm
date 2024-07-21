@@ -40,7 +40,8 @@ internal sealed class PlayerSecretsFeature : IPlayerSecretsFeature, IUsesUserPer
             _secrets.Add(new UserSecretsData
             {
                 GroupId = groupId,
-                SecretId = secretId
+                SecretId = secretId,
+                CreatedAt = _dateTimeProvider.Now
             });
         }
 
