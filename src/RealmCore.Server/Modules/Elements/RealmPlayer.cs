@@ -197,6 +197,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IPlayerDailyTasksFeature DailyTasks { get; init; }
     public IPlayerIntegrationsFeature Integrations { get; init; }
     public IPlayerBoostsFeature Boosts { get; init; }
+    public IPlayerSecretsFeature Secrets { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -244,6 +245,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         DailyTasks = GetRequiredService<IPlayerDailyTasksFeature>();
         Boosts = GetRequiredService<IPlayerBoostsFeature>();
         Integrations = GetRequiredService<IPlayerIntegrationsFeature>();
+        Secrets = GetRequiredService<IPlayerSecretsFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

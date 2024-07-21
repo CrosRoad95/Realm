@@ -102,6 +102,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserUploadFileData> UserUploadFiles => Set<UserUploadFileData>();
     public DbSet<UserBoostData> Boosts => Set<UserBoostData>();
     public DbSet<UserActiveBoostData> ActiveBoosts => Set<UserActiveBoostData>();
+    public DbSet<UserSecretsData> UserSecrets => Set<UserSecretsData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -188,6 +189,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder
                 .HasMany(x => x.Settings)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Secrets)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
 
@@ -1012,6 +1018,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         {
             entityBuilder
                 .ToTable(nameof(ActiveBoosts))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<UserSecretsData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserSecrets))
                 .HasKey(x => x.Id);
         });
     }

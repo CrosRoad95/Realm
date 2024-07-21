@@ -59,6 +59,7 @@ public interface IDb
     DbSet<UserUploadFileData> UserUploadFiles { get; }
     DbSet<UserBoostData> Boosts { get; }
     DbSet<UserActiveBoostData> ActiveBoosts { get; }
+    DbSet<UserSecretsData> UserSecrets { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

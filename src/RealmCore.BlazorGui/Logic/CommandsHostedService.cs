@@ -1090,6 +1090,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         AddInventoryCommands();
         AddBoostCommands();
+        AddSecretsCommands();
         AddNodesCommands();
     }
 
@@ -1182,6 +1183,21 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("isboostactive", ([CallingPlayer] RealmPlayer player, int id) =>
         {
             _chatBox.OutputTo(player, $"Is boost active: {player.Boosts.IsActive(id)}");
+        });
+    }
+
+    private void AddSecretsCommands()
+    {
+        _commandService.Add("secretsreveal", ([CallingPlayer] RealmPlayer player, int groupId, int secretId) =>
+        {
+            var revealed = player.Secrets.TryReveal(groupId, secretId);
+            _chatBox.OutputTo(player, $"Result: {revealed}");
+        });
+        
+        _commandService.Add("secretsgetbygroupid", ([CallingPlayer] RealmPlayer player, int groupId) =>
+        {
+            var secretIds = player.Secrets.GetByGroupId(groupId);
+            _chatBox.OutputTo(player, $"Result: {string.Join(", ", secretIds)}");
         });
     }
 

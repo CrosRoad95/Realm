@@ -43,6 +43,7 @@ public static class QueryableExtensions
             .Include(x => x.DailyTasksProgress)
             .Include(x => x.Boosts)
             .Include(x => x.ActiveBoosts)
+            .Include(x => x.Secrets)
             .AsSplitQuery();
     }
 
