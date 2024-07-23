@@ -268,48 +268,74 @@ public class RealmPlayer : Player, IAsyncDisposable
         StartedResources.Add(e.NetId);
     }
 
+    private AsyncLocal<bool> _invoking = new();
     public virtual async Task Invoke(Func<Task> task, CancellationToken cancellationToken = default)
     {
-        if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
-            throw new TimeoutException();
+        if (_invoking.Value)
+        {
+            await task();
+            return;
+        }
 
+        _invoking.Value = true;
         try
         {
-            if (User.HasClaim("invokeNoLimit"))
-            {
-                await task();
-                return;
-            }
+            if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
+                throw new TimeoutException();
 
-            await _invokePolicy.ExecuteAsync(async () =>
+            try
             {
-                await task();
-            });
+                if (User.HasClaim("invokeNoLimit"))
+                {
+                    await task();
+                    return;
+                }
+
+                await _invokePolicy.ExecuteAsync(async () =>
+                {
+                    await task();
+                });
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _invoking.Value = false;
         }
     }
 
     public virtual async Task<T> Invoke<T>(Func<Task<T>> task, CancellationToken cancellationToken = default)
     {
-        if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
-            throw new TimeoutException();
+        if (_invoking.Value)
+            return await task();
 
+        _invoking.Value = true;
         try
         {
-            if (User.HasClaim("invokeNoLimit"))
-                return await task();
+            if (!await _semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken))
+                throw new TimeoutException();
 
-            return await _invokePolicy.ExecuteAsync(async () =>
+            try
             {
-                return await task();
-            });
+                if (User.HasClaim("invokeNoLimit"))
+                    return await task();
+
+                return await _invokePolicy.ExecuteAsync(async () =>
+                {
+                    return await task();
+                });
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _invoking.Value = false;
         }
     }
 

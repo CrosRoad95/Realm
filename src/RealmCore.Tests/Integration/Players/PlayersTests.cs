@@ -75,4 +75,23 @@ public class PlayersTests
 
         invokedTimes.Should().Be(2);
     }
+
+    [Fact]
+    public async Task RecursiveInvokeShouldNotBlock()
+    {
+        using var hosting = new RealmTestingServerHosting();
+        var player = await hosting.CreatePlayer();
+
+        bool invoked = false;
+        await player.Invoke(async () =>
+        {
+            await player.Invoke(() =>
+            {
+                invoked = true;
+                return Task.CompletedTask;
+            });
+        });
+
+        invoked.Should().BeTrue();
+    }
 }
