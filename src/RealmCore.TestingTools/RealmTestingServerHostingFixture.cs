@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using RealmCore.Server.Modules.Inventories;
 
 namespace RealmCore.TestingTools;
 
@@ -35,6 +36,9 @@ public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetim
     public async Task InitializeAsync()
     {
         _player = await _hosting.CreatePlayer();
+        _player.Inventory.CreatePrimary(100);
+        var itemsCollection = _hosting.GetRequiredService<ItemsCollection>();
+        Seed(itemsCollection);
     }
 
     public Task DisposeAsync()
@@ -50,6 +54,47 @@ public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetim
 
         player.Money.SetLimitAndPrecision(gameplayOptions.MoneyLimit, gameplayOptions.MoneyPrecision);
     }
+
+    private void Seed(ItemsCollection itemsCollection)
+    {
+        itemsCollection.Add(1, new ItemsCollectionItem
+        {
+            Size = 1,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use,
+        });
+        itemsCollection.Add(2, new ItemsCollectionItem
+        {
+            Size = 2,
+            StackSize = 1,
+            AvailableActions = ItemAction.Use,
+        });
+        itemsCollection.Add(3, new ItemsCollectionItem
+        {
+            Size = 1,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
+        });
+        itemsCollection.Add(4, new ItemsCollectionItem
+        {
+            Size = 100,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use,
+        });
+        itemsCollection.Add(5, new ItemsCollectionItem
+        {
+            Size = 101,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use,
+        });
+        itemsCollection.Add(6, new ItemsCollectionItem
+        {
+            Size = 1,
+            StackSize = 1,
+            AvailableActions = ItemAction.Use,
+        });
+    }
+
 }
 
 public class RealmTestingServerHostingFixtureWithPlayer : RealmTestingServerHostingFixtureWithPlayer<RealmTestingPlayer>

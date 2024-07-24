@@ -60,7 +60,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 
     public InventoryItem(InventoryItem item)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = item.Id;
         ItemId = item.ItemId;
         Size = item.Size;
         _number = item.Number;
@@ -230,7 +230,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
 
             foreach (var key in _metadata.Keys)
             {
-                if (!_metadata[key].Equals(other[key]))
+                if(!_metadata.TryGetValue(key, out var value1) || !other.TryGetValue(key, out var value2) || !value1.Equals(value2))
                 {
                     return false;
                 }

@@ -1,563 +1,394 @@
 ﻿namespace RealmCore.Tests.Unit.Elements;
 
-public class InventoryTests
+public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
-    private void Seed(RealmTestingServerHosting server)
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingPlayer _player;
+    private readonly Inventory _inventory;
+    private readonly ItemsCollection _itemsCollection;
+
+    public InventoryTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        var itemsCollection = server.GetRequiredService<ItemsCollection>();
-        itemsCollection.Add(1, new ItemsCollectionItem
-        {
-            Size = 1,
-            StackSize = 8,
-            AvailableActions = ItemAction.Use,
-        });
-        itemsCollection.Add(2, new ItemsCollectionItem
-        {
-            Size = 2,
-            StackSize = 1,
-            AvailableActions = ItemAction.Use,
-        });
-        itemsCollection.Add(3, new ItemsCollectionItem
-        {
-            Size = 1,
-            StackSize = 8,
-            AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
-        });
-        itemsCollection.Add(4, new ItemsCollectionItem
-        {
-            Size = 100,
-            StackSize = 8,
-            AvailableActions = ItemAction.Use,
-        });
-        itemsCollection.Add(5, new ItemsCollectionItem
-        {
-            Size = 101,
-            StackSize = 8,
-            AvailableActions = ItemAction.Use,
-        });
-        itemsCollection.Add(6, new ItemsCollectionItem
-        {
-            Size = 1,
-            StackSize = 1,
-            AvailableActions = ItemAction.Use,
-        });
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _inventory = _player.Inventory.Primary;
+        _itemsCollection = _fixture.Hosting.GetRequiredService<ItemsCollection>();
     }
 
-    [InlineData(1, 1, 1)]
-    [InlineData(2, 4, 8)]
+    [InlineData(1, 1, 1, 1, new string[] {"ItemAdded" })]
+    [InlineData(1, 2, 2, 1, new string[] { "ItemAdded" })]
+    [InlineData(2, 2, 4, 2, new string[] { "ItemAdded", "ItemAdded" })]
     [Theory]
-    public async Task AddItemShouldWork(uint itemId, uint number, uint expectedNumber)
+    public void AddItemShouldWork(uint itemId, uint number, uint expectedNumber, int expectedNumberOfItems, string[] expectedEvents)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        using var monitor = _inventory.Monitor();
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-
-        var inventory = player.Inventory.CreatePrimary(100);
-        inventory.AddItem(itemsCollection, itemId, number);
-
-        inventory.Number.Should().Be(expectedNumber);
+        _inventory.AddItems(itemId, number);
+        _inventory.Number.Should().Be(expectedNumber);
+        _inventory.Items.Should().HaveCount(expectedNumberOfItems);
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(expectedEvents);
     }
 
     [Fact]
-    public async Task ItemsShouldBeAppropriatelyStackedWhenAddedOneStack()
+    public void ItemsShouldBeAppropriatelyStackedWhenAddedOneStack()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        using var monitor = _inventory.Monitor();
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
+        _inventory.AddItems(3, 2, null, true);
+        _inventory.AddItems(3, 3, null, true);
+        _inventory.AddItems(3, 2, null, true);
+        _inventory.AddItems(3, 1, null, true);
 
-        var inventory = player.Inventory.CreatePrimary(100);
-        inventory.AddItem(itemsCollection, 3, 2, null, true);
-        inventory.AddItem(itemsCollection, 3, 3, null, true);
-        inventory.AddItem(itemsCollection, 3, 2, null, true);
-        inventory.AddItem(itemsCollection, 3, 1, null, true);
+        _inventory.Items.Should().HaveCount(1);
+        _inventory.Items[0].Number.Should().Be(8);
 
-        inventory.Items.Should().HaveCount(1);
-        inventory.Items[0].Number.Should().Be(8);
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(["ItemAdded", "ItemChanged", "ItemChanged", "ItemChanged"]);
     }
 
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public async Task ItemsShouldBeAppropriatelyStackedWhenAddedMultipleStacks(bool tryStack)
+    public void ItemsShouldBeAppropriatelyStackedWhenAddedMultipleStacks(bool tryStack)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        using var monitor = _inventory.Monitor();
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 3, 2, null, tryStack);
-        inventory.AddItem(itemsCollection, 3, 22, null, tryStack);
+        _inventory.AddItems(3, 2, null, tryStack);
+        _inventory.AddItems(3, 22, null, tryStack);
 
         if (tryStack)
         {
-            inventory.Items.Should().HaveCount(3); // 8 + 8 + 8
+            _inventory.Items.Should().HaveCount(3); // 8 + 8 + 8
         }
         else
         {
-            inventory.Items.Should().HaveCount(4); // 2 + 8 + 8 + 6
+            _inventory.Items.Should().HaveCount(4); // 2 + 8 + 8 + 6
         }
-        inventory.Items.Sum(x => x.Number).Should().Be(24);
+        _inventory.Items.Sum(x => x.Number).Should().Be(24);
+
+        if (tryStack)
+        {
+            monitor.GetOccurredEvents().Should().BeEquivalentTo(["ItemAdded", "ItemChanged", "ItemAdded", "ItemAdded"]);
+        }
+        else
+        {
+            monitor.GetOccurredEvents().Should().BeEquivalentTo(["ItemAdded", "ItemAdded", "ItemAdded", "ItemAdded"]);
+        }
     }
 
     [Fact]
-    public async Task ItemsShouldNotBeStackedWhenHaveDifferentMetadata()
+    public void ItemsShouldNotBeStackedWhenHaveDifferentMetadata()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1,
         };
 
-        inventory.AddItem(itemsCollection, 3, 2, null);
-        inventory.AddItem(itemsCollection, 3, 2, null);
-        inventory.AddItem(itemsCollection, 3, 2, metaData);
-        inventory.AddItem(itemsCollection, 3, 2, metaData);
+        _inventory.AddItems(3, 2, null);
+        _inventory.AddItems(3, 2, null);
+        _inventory.AddItems(3, 2, metaData);
+        _inventory.AddItems(3, 2, metaData);
 
-        inventory.Items.Should().HaveCount(2);
-        inventory.Items.Sum(x => x.Number).Should().Be(8);
+        _inventory.Items.Should().HaveCount(2);
+        _inventory.Items.Sum(x => x.Number).Should().Be(8);
     }
 
     [Fact]
-    public async Task HasItemByIdShouldWork()
+    public void HasItemByIdShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _inventory.AddItems(1, 1);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 1, 1);
-
-        inventory.HasItemById(1).Should().BeTrue();
+        _inventory.HasItemById(1).Should().BeTrue();
     }
 
     [Fact]
-    public async Task SumItemsByIdShouldWork()
+    public void SumItemsByIdShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _inventory.AddItems(2, 1);
+        _inventory.AddItems(2, 1);
+        _inventory.AddItems(6, 1);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 2, 1);
-        inventory.AddItem(itemsCollection, 2, 1);
-        inventory.AddItem(itemsCollection, 6, 1);
-
-        inventory.SumItemsById(2).Should().Be(2);
+        _inventory.SumItemsById(2).Should().Be(2);
     }
 
     [Fact]
-    public async Task SumItemsNumberByIdShouldWork()
+    public void SumItemsNumberByIdShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _inventory.AddItems(2, 4);
+        _inventory.AddItems(2, 3);
+        _inventory.AddItems(6, 5);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 2, 4);
-        inventory.AddItem(itemsCollection, 2, 3);
-        inventory.AddItem(itemsCollection, 6, 5);
-
-        inventory.SumItemsById(2).Should().Be(7);
+        _inventory.SumItemsById(2).Should().Be(7);
     }
 
     [Fact]
-    public async Task GetItemsByIdShouldWork()
+    public void GetItemsByIdShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var item1 = _inventory.AddItems(2, 1).First();
+        var item2 = _inventory.AddItems(2, 1).First();
+        _inventory.AddItems(6, 1);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item1 = inventory.AddItem(itemsCollection, 2, 1).First();
-        var item2 = inventory.AddItem(itemsCollection, 2, 1).First();
-        inventory.AddItem(itemsCollection, 6, 1);
-
-        inventory.GetItemsById(2).Should().BeEquivalentTo(new List<InventoryItem>
+        _inventory.GetItemsById(2).Should().BeEquivalentTo(new List<InventoryItem>
         {
             item1, item2
         });
     }
 
     [Fact]
-    public async Task GetItemsByIdWithMetadataShouldWork()
+    public void GetItemsByIdWithMetadataShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var item = _inventory.AddItems(1, 1, new ItemMetadata { ["foo"] = 1 }).First();
+        _inventory.AddItems(1, 1, new ItemMetadata { ["foo"] = 2 });
+        _inventory.AddItems(1, 1, new ItemMetadata { ["foo"] = 3 });
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item = inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 1 }).First();
-        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 2 });
-        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 3 });
-
-        inventory.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<InventoryItem>
+        _inventory.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<InventoryItem>
         {
             item
         });
     }
 
     [Fact]
-    public async Task GetItemsByIdWithMetadataAsDictionaryShouldWork()
+    public void GetItemsByIdWithMetadataAsDictionaryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var item = _inventory.AddItem(1, new ItemMetadata { ["foo"] = 1 });
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
-
-        inventory.GetSingleItemByIdWithMetadata(1, new ItemMetadata
+        _inventory.GetSingleItemByIdWithMetadata(1, new ItemMetadata
         {
             ["foo"] = 1
         }).Should().BeEquivalentTo(item);
     }
 
     [Fact]
-    public async Task HasItemWithMetadataShouldWork()
+    public void HasItemWithMetadataShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _inventory.AddItem(1, new ItemMetadata { ["foo"] = 1 });
+        _inventory.AddItems(1, 1, new ItemMetadata { ["foo"] = 2 });
+        _inventory.AddItems(1, 1, new ItemMetadata { ["foo"] = 3 });
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
-        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 2 });
-        inventory.AddItem(itemsCollection, 1, 1, new ItemMetadata { ["foo"] = 3 });
-
-        inventory.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
-        inventory.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
+        _inventory.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
+        _inventory.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
     }
 
     [Fact]
-    public async Task YouShouldBeAbleToAddAndGetItemByMetadata()
+    public void YouShouldBeAbleToAddAndGetItemByMetadata()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["foo"] = 1 });
-        var found = inventory.TryGetByIdAndMetadata(1, new ItemMetadata { ["foo"] = 1 }, out InventoryItem foundItem);
+        var item = _inventory.AddItem(1, new ItemMetadata { ["foo"] = 1 });
+        var found = _inventory.TryGetByIdAndMetadata(1, new ItemMetadata { ["foo"] = 1 }, out InventoryItem foundItem);
 
         found.Should().BeTrue();
         item.Should().Be(foundItem);
     }
 
     [Fact]
-    public async Task YouShouldNotBeAbleToAddItemWithLessThanOneNumber()
+    public void YouShouldNotBeAbleToAddItemWithLessThanOneNumber()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var act = () => inventory.AddItem(itemsCollection, 1, 0);
+        var act = () => _inventory.AddItems(1, 0);
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Fact]
-    public async Task InventoryShouldBeResizable()
+    public void InventoryShouldBeResizable()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.HasSpace(200).Should().BeFalse();
-        inventory.Size = 500;
-        inventory.HasSpace(200).Should().BeTrue();
+        _inventory.HasSpace(200).Should().BeFalse();
+        _inventory.Size = 500;
+        _inventory.HasSpace(200).Should().BeTrue();
     }
 
     [Fact]
-    public async Task YouShouldBeAbleToCheckIfItemWillFitIntoInventory()
+    public void YouShouldBeAbleToCheckIfItemWillFitIntoInventory()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 100;
-        inventory.HasSpaceForItem(itemsCollection, 1).Should().BeTrue();
-        inventory.HasSpaceForItem(itemsCollection, 4).Should().BeTrue();
-        inventory.HasSpaceForItem(itemsCollection, 5).Should().BeFalse();
-        inventory.HasSpaceForItem(itemsCollection, 1, 100).Should().BeTrue();
-        inventory.HasSpaceForItem(itemsCollection, 1, 101).Should().BeFalse();
+        _inventory.HasSpaceForItem(1).Should().BeTrue();
+        _inventory.HasSpaceForItem(4).Should().BeTrue();
+        _inventory.HasSpaceForItem(5).Should().BeFalse();
+        _inventory.HasSpaceForItem(1, 100).Should().BeTrue();
+        _inventory.HasSpaceForItem(1, 101).Should().BeFalse();
     }
 
     [Fact]
-    public async Task HasSpaceForEdgeCase()
+    public void HasSpaceForEdgeCase()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 10;
-        inventory.HasSpaceForItem(itemsCollection, 1, 10).Should().BeTrue();
-        inventory.HasSpaceForItem(itemsCollection, 1, 11).Should().BeFalse();
-    }
-
-    private void HandleItemUsed(Inventory inventory, InventoryItem usedItem, ItemAction flags)
-    {
-        usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
+        _inventory.Size = 10;
+        _inventory.HasSpaceForItem(1, 10).Should().BeTrue();
+        _inventory.HasSpaceForItem(1, 11).Should().BeFalse();
     }
 
     [Fact]
-    public async Task YouShouldBeAbleToUseItem()
+    public void YouShouldBeAbleToUseItem()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        void handleItemUsed(Inventory _inventory, InventoryItem usedItem, ItemAction flags)
+        {
+            usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
+        }
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
+        _inventory.ItemUsed += handleItemUsed;
+        var item = _inventory.AddItem(1, new ItemMetadata { ["counter"] = 10 });
 
-        inventory.ItemUsed += HandleItemUsed;
-        inventory.Size = 100;
-        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata { ["counter"] = 10 });
-
-        inventory.TryUseItem(item, ItemAction.Use).Should().BeTrue();
+        _inventory.TryUseItem(item, ItemAction.Use).Should().BeTrue();
         item.GetMetadata("counter").Should().Be(9);
     }
 
     [Fact]
-    public async Task YouCanNotUseItemIfItDoesNotSupportIt()
+    public void YouCanNotUseItemIfItDoesNotSupportIt()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 100;
-        var item = inventory.AddSingleItem(itemsCollection, 1);
-        inventory.TryUseItem(item, ItemAction.Close).Should().BeFalse();
+        _inventory.Size = 100;
+        var item = _inventory.AddItem(1);
+        _inventory.TryUseItem(item, ItemAction.Close).Should().BeFalse();
     }
 
     [Fact]
-    public async Task RemoveItemShouldWork()
+    public void RemoveItemShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item = inventory.AddSingleItem(itemsCollection, 1);
-        inventory.RemoveItem(item);
-        inventory.Items.Should().BeEmpty();
+        var item = _inventory.AddItem(1);
+        _inventory.RemoveItem(item.LocalId);
+        _inventory.Items.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task RemoveItemRemoveMultipleStacks()
+    public void RemoveItemRemoveMultipleStacks()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 1, 20);
-        inventory.RemoveItem(1, 20);
-        inventory.Number.Should().Be(0);
-        inventory.Items.Should().BeEmpty();
+        var items = _inventory.AddItems(1, 20);
+        foreach (var item in items)
+        {
+            _inventory.RemoveItem(item.LocalId, item.Number);
+        }
+        _inventory.Number.Should().Be(0);
+        _inventory.Items.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task RemoveItemByIdShouldWork()
+    public void RemoveItemShouldRemoveSingleItemWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var createdItems = _inventory.AddItems(1, 4);
+        _inventory.RemoveItem(createdItems.First().LocalId);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddSingleItem(itemsCollection, 1);
-        inventory.RemoveItem(1);
-        inventory.Items.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task RemoveItemByIdShouldNotRemoveAnyStackIfThereIsNotEnough()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, 1, 20);
-        inventory.RemoveItem(30);
-        inventory.Number.Should().Be(20);
-    }
-
-    [Fact]
-    public async Task RemoveItemShouldRemoveSingleItemWork()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 100;
-        inventory.AddItem(itemsCollection, 1, 4);
-        inventory.RemoveItem(1);
-
-        var items = inventory.Items;
+        var items = _inventory.Items;
         items.Should().HaveCount(1);
         items[0].Number.Should().Be(3);
     }
 
     [Fact]
-    public async Task RemoveItemStackShouldRemoveEntireStack()
+    public void RemoveItemStackShouldRemoveEntireStack()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var items = _inventory.AddItems(1, 4);
+        _inventory.RemoveItem(items.First().LocalId, 4);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 100;
-        inventory.AddItem(itemsCollection, 1, 4);
-        inventory.RemoveItemStack(1);
-
-        inventory.Items.Should().BeEmpty();
+        _inventory.Items.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task AddItemShouldThrowAppropriateException()
+    public void AddItemShouldThrowAppropriateException()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.Size = 5;
-        var act = () => inventory.AddItem(itemsCollection, 1, 4);
+        _inventory.Size = 5;
+        var act = () => _inventory.AddItems(1, 4);
 
         act.Should().NotThrow();
-        act.Should().Throw<InventoryNotEnoughSpaceException>().Where(x => x.InventorySize == 5 && x.RequiredSpace == 8);
+        act.Should().Throw<InventoryNotEnoughSpaceException>();
     }
 
     [Fact]
-    public async Task Clear()
+    public void ClearShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         #region Arrange
-        inventory.AddItem(itemsCollection, 1, 2);
-        inventory.AddItem(itemsCollection, 2, 3);
-        inventory.AddItem(itemsCollection, 3, 4);
+        _inventory.AddItems(1, 2);
+        _inventory.AddItems(2, 3);
+        _inventory.AddItems(3, 4);
         #endregion
 
         #region Act
-        inventory.Clear();
+        _inventory.Clear();
         #endregion
 
         #region Assert
-        inventory.Number.Should().Be(0);
-        inventory.Items.Should().BeEmpty();
+        _inventory.Number.Should().Be(0);
+        _inventory.Items.Should().BeEmpty();
         #endregion
     }
 
-    [InlineData(1, true, 9, 1)]
-    [InlineData(10, true, 0, 10)]
-    [InlineData(11, false, 10, 0)]
-    [Theory]
-    public async Task TransferItemTest(uint numberOfItemsToTransfer, bool success, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory)
+    [Fact]
+    public void SimpleTransferItemTest1()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var destinationInventory = new Inventory(_player, 8, _itemsCollection);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
+        _inventory.AddItems(1, 8, new ItemMetadata
+        {
+            ["foo"] = 1
+        });
 
-        #region Arrange
-        inventory.Clear();
-        var destinationInventory = new Inventory(player, 10);
+        _inventory.TryGetByItemId(1, out var inventoryItem);
+
+        using var monitorSource = _inventory.Monitor();
+        using var monitorDestination = destinationInventory.Monitor();
+        var isSuccess = _inventory.TransferItem(destinationInventory, inventoryItem.LocalId, 8);
+
+        using var _ = new AssertionScope();
+        _inventory.Number.Should().Be(0);
+        destinationInventory.Number.Should().Be(8);
+        monitorSource.GetOccurredEvents().Should().BeEquivalentTo(["ItemRemoved"]);
+        monitorDestination.GetOccurredEvents().Should().BeEquivalentTo(["ItemAdded"]);
+    }
+    
+    [Fact]
+    public void SimpleTransferItemTest2()
+    {
+        var destinationInventory = new Inventory(_player, 8, _itemsCollection);
+
+        _inventory.AddItems(1, 8, new ItemMetadata
+        {
+            ["foo"] = 1
+        });
+
+        _inventory.TryGetByItemId(1, out var inventoryItem);
+
+        using var monitorSource = _inventory.Monitor();
+        using var monitorDestination = destinationInventory.Monitor();
+        var isSuccess = _inventory.TransferItem(destinationInventory, inventoryItem.LocalId, 1);
+
+        using var _ = new AssertionScope();
+        _inventory.Number.Should().Be(7);
+        destinationInventory.Number.Should().Be(1);
+        monitorSource.GetOccurredEvents().Should().BeEquivalentTo(["ItemChanged"]);
+        monitorDestination.GetOccurredEvents().Should().BeEquivalentTo(["ItemAdded"]);
+    }
+    
+    [InlineData(0, 1, true, 7, 1, new string[] { "ItemChanged" }, new string[] { "ItemAdded" })]
+    [InlineData(0, 8, true, 0, 8, new string[] { "ItemRemoved" }, new string[] { "ItemAdded" })]
+    [InlineData(0, 9, false, 8, 0, new string[] { }, new string[] { })]
+    [InlineData(1, 1, true, 7, 2, new string[] { "ItemChanged" }, new string[] { "ItemAdded" })]
+    [InlineData(1, 7, true, 1, 8, new string[] { "ItemChanged" }, new string[] { "ItemAdded" })]
+    [InlineData(1, 8, false, 8, 1, new string[] { }, new string[] { })]
+    [Theory]
+    public void TransferItemTest1(uint initialNumberOfItems, uint numberOfItemsToTransfer, bool shouldSuccess, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory, string[] sourceExpectedEvents, string[] destinationExpectedEvents)
+    {
+        var destinationInventory = new Inventory(_player, 8, _itemsCollection);
+
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
-        inventory.AddItem(itemsCollection, 1, 10, metaData);
-        #endregion
+        _inventory.AddItems(1, 8, metaData);
+        if(initialNumberOfItems > 0)
+            destinationInventory.AddItems(1, initialNumberOfItems, metaData);
 
-        #region Act
-        var isSuccess = inventory.TransferItem(destinationInventory, itemsCollection, 1, numberOfItemsToTransfer, false);
-        #endregion
+        _inventory.TryGetByItemId(1, out var inventoryItem);
 
-        #region Assert
-        isSuccess.Should().Be(success);
-        inventory.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
+        using var monitorSource = _inventory.Monitor();
+        using var monitorDestination = destinationInventory.Monitor();
+        var isSuccess = _inventory.TransferItem(destinationInventory, inventoryItem.LocalId, numberOfItemsToTransfer, false);
+
+        using var _ = new AssertionScope();
+        isSuccess.Should().Be(shouldSuccess);
+        _inventory.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
         destinationInventory.Number.Should().Be(expectedNumberOfItemsInDestinationInventory);
         destinationInventory.Items.Select(x => x.MetaData).Should().AllBeEquivalentTo(metaData);
-        #endregion
+
+        monitorSource.GetOccurredEvents().Should().BeEquivalentTo(sourceExpectedEvents);
+        monitorDestination.GetOccurredEvents().Should().BeEquivalentTo(destinationExpectedEvents);
     }
-
+    
     [Fact]
-    public async Task TryGetMetaDataShouldWork()
+    public void TryGetMetaDataShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var item = inventory.AddSingleItem(itemsCollection, 1, new ItemMetadata
+        var item = _inventory.AddItem(1, new ItemMetadata
         {
             ["number"] = 123,
             ["string"] = "123",
@@ -575,90 +406,56 @@ public class InventoryTests
     [Theory]
     [InlineData(1, true)]
     [InlineData(2, false)]
-    public async Task TestHasItemWithCallback(uint itemId, bool has)
+    public void TestHasItemWithCallback(uint itemId, bool has)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddSingleItem(itemsCollection, 1);
-        inventory.HasItem(x => x.ItemId == itemId).Should().Be(has);
+        _inventory.AddItem(1);
+        _inventory.HasItem(x => x.ItemId == itemId).Should().Be(has);
     }
 
     [Fact]
-    public async Task ItShouldBePossibleToCreateNewInventoryWithItems()
+    public void ItShouldBePossibleToCreateNewInventoryWithItems()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-
-        var inventory = new Inventory(player, 10, 0, [
-            new(itemsCollection, 1, 1)
-        ]);
-        inventory.Number.Should().Be(1);
+        var _inventory = new Inventory(_player, 10, 0, [
+            new(_itemsCollection, 1, 1)
+        ], _itemsCollection);
+        _inventory.Number.Should().Be(1);
     }
 
     [Fact]
-    public async Task ItemMetaDataPropertyShouldReturnCopyOfMetaData()
+    public void ItemMetaDataPropertyShouldReturnCopyOfMetaData()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
+        var item = _inventory.AddItem(1, metaData);
 
         item.MetaData.Should().BeEquivalentTo(metaData);
     }
 
     [Fact]
-    public async Task ItemMetaDataKeysPropertyShouldReturnCopyOfMetaDataKeys()
+    public void ItemMetaDataKeysPropertyShouldReturnCopyOfMetaDataKeys()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
+        var item = _inventory.AddItem(1, metaData);
 
         item.MetadataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
     }
 
     [Fact]
-    public async Task YouShouldBeAbleToRemoveMetaData()
+    public void YouShouldBeAbleToRemoveMetaData()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
+        var item = _inventory.AddItem(1, metaData);
         using var monitoredItem = item.Monitor();
 
         item.RemoveMetadata("foo");
@@ -668,21 +465,14 @@ public class InventoryTests
     }
 
     [Fact]
-    public async Task YouShouldBeAbleToChangeMetaData()
+    public void YouShouldBeAbleToChangeMetaData()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
+        var item = _inventory.AddItem(1, metaData);
         using var monitoredItem = item.Monitor();
 
         item.ChangeMetadata<int>("foo", x => x + 1);
@@ -696,193 +486,75 @@ public class InventoryTests
     }
 
     [Fact]
-    public async Task HasMetadataShouldWork()
+    public void HasMetadataShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
         var metaData = new ItemMetadata
         {
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
+        var item = _inventory.AddItem(1, metaData);
 
         item.HasMetadata("foo").Should().BeTrue();
     }
 
     [Fact]
-    public async Task TransferItemShouldBeThreadSafe()
+    public void YouShouldBeAbleToModifyInventoryInInventoryChangedEventCallback()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        #region Arrange
-        inventory.Clear();
-        var destinationInventory = new Inventory(player, 800);
-        inventory.AddItem(itemsCollection, 1, 800, null, true, true);
-        #endregion
-
-        #region Act
-        await ParallelHelpers.Run(() =>
-        {
-            var isSuccess = inventory.TransferItem(destinationInventory, itemsCollection, 1, 1, false);
-        });
-        #endregion
-
-        #region Assert
-        inventory.Number.Should().Be(0);
-        destinationInventory.IsFull.Should().BeTrue();
-        #endregion
-    }
-
-    [Fact]
-    public async Task RemoveAndGetItemByIdShouldWork()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var metaData = new ItemMetadata
-        {
-            ["foo"] = 1
-        };
-
-        var addedItem = inventory.AddSingleItem(itemsCollection, 1, metaData);
-        var removedItem = inventory.RemoveAndGetItemById(1).First();
-
-        addedItem.Should().BeEquivalentTo(removedItem);
-    }
-
-    [Fact]
-    public async Task RemoveAndGetItemByIdShouldWorkForManyItems()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var metaData = new ItemMetadata
-        {
-            ["foo"] = 1
-        };
-
-        var addedItem = inventory.AddItem(itemsCollection, 1, 20, metaData);
-        var removedItem = inventory.RemoveAndGetItemById(1, 20);
-
-        addedItem.Should().BeEquivalentTo(removedItem);
-    }
-
-    [Fact]
-    public async Task RemovingOneItemAndGetItemByIdShouldWorkForManyItems()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        var metaData = new ItemMetadata
-        {
-            ["foo"] = 1
-        };
-
-        inventory.AddItem(itemsCollection, 1, 20, metaData);
-        var removedItem = inventory.RemoveAndGetItemById(1, 1);
-        inventory.Number.Should().Be(19);
-        removedItem.Should().HaveCount(1);
-        removedItem.First().MetaData.Should().BeEquivalentTo(metaData);
-    }
-
-    [Fact]
-    public async Task YouShouldBeAbleToModifyInventoryInInventoryChangedEventCallback()
-    {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-
-        var inventory = player.Inventory.CreatePrimary(100);
-
         void handleItemAdded(Inventory that, InventoryItem addedItem)
         {
-            if(that.Number < 5)
+            if (that.Number < 5)
             {
-                that.AddSingleItem(itemsCollection, 1);
+                that.AddItem(1);
             }
         }
 
-        inventory.ItemChanged += handleItemAdded;
+        _inventory.ItemAdded += handleItemAdded;
+        _inventory.ItemChanged += handleItemAdded;
 
-        inventory.AddSingleItem(itemsCollection, 1);
-        inventory.Number.Should().Be(5);
+        _inventory.AddItem(1);
+        _inventory.Number.Should().Be(5);
     }
 
     [Fact]
-    public async Task AddingItemObjectsToInventoryShouldWork()
+    public void AddingItemObjectsToInventoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _inventory.AddItem(1);
+        _inventory.AddItem(1);
+        _inventory.AddItem(1);
+        _inventory.AddItem(1);
 
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-
-        var item1 = new InventoryItem(itemsCollection, 1, 2);
-        var item2 = new InventoryItem(itemsCollection, 1, 2);
-
-        var inventory = player.Inventory.CreatePrimary(100);
-
-        inventory.AddItem(itemsCollection, item1);
-        inventory.AddItem(itemsCollection, item2);
-        inventory.AddItem(itemsCollection, item1);
-        inventory.AddItem(itemsCollection, item2);
-
-        var items = inventory.GetItemsById(1);
+        var items = _inventory.GetItemsById(1);
         items.Should().HaveCount(1);
 
-        items.First().Number.Should().Be(8);
+        items.First().Number.Should().Be(4);
     }
 
     [Fact]
-    public async Task ItemsOfDifferentMetadataShouldNotStack()
+    public void ItemsOfDifferentMetadataShouldNotStack()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
-        Seed(hosting);
-
-        var item1 = new InventoryItem(itemsCollection, 1, 2, new(){
-            ["a"] = 1
+        _inventory.AddItems(1, 4, new ItemMetadata
+        {
+            ["foo"] = 1
         });
-        var item2 = new InventoryItem(itemsCollection, 1, 2);
+        _inventory.AddItems(1, 4, new ItemMetadata
+        {
+            ["bar"] = 1
+        });
 
-        var inventory = player.Inventory.CreatePrimary(100);
+        var items = _inventory.GetItemsById(1);
 
-        inventory.AddItem(itemsCollection, item1);
-        inventory.AddItem(itemsCollection, item2);
-        inventory.AddItem(itemsCollection, item1);
-        inventory.AddItem(itemsCollection, item2);
-
-        var items = inventory.GetItemsById(1);
+        using var _ = new AssertionScope();
         items.Should().HaveCount(2);
 
         items.First().Number.Should().Be(4);
         items.Last().Number.Should().Be(4);
+    }
+
+    public void Dispose()
+    {
+        _inventory.Clear();
+        _inventory.Number.Should().Be(0);
+        _inventory.Size = 100;
     }
 }

@@ -19,7 +19,7 @@ public sealed class TakeItemCommand : IInGameCommand
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventory.RemoveItem(itemId);
+            inventory.RemoveItemByItemId(itemId);
             _chatBox.OutputTo(player, $"Item removed, {inventory.Number}/{inventory.Size}");
         }
 

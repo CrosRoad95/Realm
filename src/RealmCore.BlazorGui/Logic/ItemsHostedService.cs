@@ -111,7 +111,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
                 if (inventory.Owner is RealmPlayer player)
                 {
                     _chatBox.OutputTo(player, $"Item used: {item.ItemId}");
-                    inventory.RemoveItem(item);
+                    inventory.RemoveItem(item.LocalId);
                 }
                 break;
         }

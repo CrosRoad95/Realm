@@ -112,16 +112,16 @@ public class LoginRegisterTests
             inventory1 = player1.Inventory.CreatePrimary(20);
         }
         inventory1.Number.Should().Be(0);
-        inventory1.AddItem(itemsCollection, 1);
-        inventory1.AddItem(itemsCollection, 1);
-        inventory1.AddItem(itemsCollection, 1);
+        inventory1.AddItem(1);
+        inventory1.AddItem(1);
+        var item = inventory1.AddItem(1);
         inventory1.Number.Should().Be(3);
 
         await hosting.DisconnectPlayer(player1);
 
         var player2 = await hosting.CreatePlayer(name: playerName, dontLoadData: false);
         var inventory2 = player2.Inventory.Primary!;
-        inventory2.RemoveItem(1, 1);
+        inventory2.RemoveItem(item.LocalId, 1);
         player2.Inventory.Primary!.Number.Should().Be(2);
         await hosting.DisconnectPlayer(player2);
 

@@ -412,7 +412,7 @@ internal sealed class CommandsHostedService : IHostedService
 
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsCollection, 1);
+                inventory.AddItem(1);
                 _chatBox.OutputTo(player, $"Test item added");
             }
 
@@ -1207,7 +1207,7 @@ internal sealed class CommandsHostedService : IHostedService
         {
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsCollection, 1);
+                inventory.AddItem(1);
                 _chatBox.OutputTo(player, $"Test item added");
             }
         });
@@ -1216,7 +1216,7 @@ internal sealed class CommandsHostedService : IHostedService
         {
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsCollection, 2);
+                inventory.AddItem(2);
                 _chatBox.OutputTo(player, "Test item added");
             }
             else
@@ -1250,7 +1250,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("removeitem1", ([CallingPlayer] RealmPlayer player) =>
         {
-            player.Inventory.Primary!.RemoveItem(1);
+            player.Inventory.Primary!.RemoveItemByItemId(1);
             _chatBox.OutputTo(player, "Item removed");
         });
     }

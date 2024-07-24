@@ -21,17 +21,14 @@ public interface IVehicleInventoryFeature : IVehicleFeature, IElementInventoryFe
 
 internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature, IUsesUserPersistentData
 {
-    private readonly ItemsCollection _itemsCollection;
-
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; }
     protected override Element Element => Player;
 
-    public PlayerInventoryFeature(PlayerContext playerContext, ItemsCollection itemsCollection)
+    public PlayerInventoryFeature(PlayerContext playerContext, ItemsCollection itemsCollection) : base(itemsCollection)
     {
         Player = playerContext.Player;
-        _itemsCollection = itemsCollection;
     }
 
     public void LogIn(UserData userData)
@@ -42,14 +39,11 @@ internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerI
 
 internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature, IUsesVehiclePersistentData
 {
-    private readonly ItemsCollection _itemsCollection;
-
     public RealmVehicle Vehicle { get; }
     protected override Element Element => Vehicle;
-    public VehicleInventoryFeature(VehicleContext vehicleContext, ItemsCollection itemsCollection) : base()
+    public VehicleInventoryFeature(VehicleContext vehicleContext, ItemsCollection itemsCollection) : base(itemsCollection)
     {
         Vehicle = vehicleContext.Vehicle;
-        _itemsCollection = itemsCollection;
     }
 
     public event Action? VersionIncreased;
@@ -67,10 +61,17 @@ internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicl
 
 internal abstract class ElementInventoryFeature : IElementInventoryFeature
 {
+    protected readonly ItemsCollection _itemsCollection;
+
     public Inventory? Primary { get; private set; }
     protected abstract Element Element { get; }
 
     public event Action<IElementInventoryFeature, Inventory>? PrimarySet;
+
+    public ElementInventoryFeature(ItemsCollection itemsCollection)
+    {
+        _itemsCollection = itemsCollection;
+    }
 
     public bool TryGetPrimary(out Inventory inventory)
     {
@@ -95,7 +96,7 @@ internal abstract class ElementInventoryFeature : IElementInventoryFeature
     {
         if (Primary == null)
         {
-            Primary = new Inventory(Element, inventorySize);
+            Primary = new Inventory(Element, inventorySize, _itemsCollection);
             PrimarySet?.Invoke(this, Primary);
         }
         return Primary;

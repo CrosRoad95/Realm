@@ -11,8 +11,9 @@ public class Inventory
     public event Action<Inventory, decimal>? SizeChanged;
 
     private decimal _size;
+    private readonly ItemsCollection _itemsCollection;
 
-    public Element Owner { get; }
+    public Element? Owner { get; }
     internal int Id { get; set; }
 
     public decimal Size
@@ -48,17 +49,19 @@ public class Inventory
         }
     }
 
-    public Inventory(Element owner, decimal size)
+    public Inventory(Element? owner, decimal size, ItemsCollection itemsCollection)
     {
         Owner = owner;
         _size = size;
+        _itemsCollection = itemsCollection;
     }
 
-    internal Inventory(Element owner, decimal size, int id, IEnumerable<InventoryItem> items)
+    internal Inventory(Element? owner, decimal size, int id, IEnumerable<InventoryItem> items, ItemsCollection itemsCollection)
     {
         Owner = owner;
         _size = size;
         Id = id;
+        _itemsCollection = itemsCollection;
         _items = items.ToList();
     }
 
@@ -77,7 +80,7 @@ public class Inventory
     public bool HasItem(InventoryItem item)
     {
         using var _ = _lock.BeginRead();
-        return _items.Contains(item);
+        return _items.Any(x => item.Id == x.Id);
     }
 
     public int SumItemsById(uint itemId)
@@ -116,18 +119,18 @@ public class Inventory
         return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
     }
 
-    public bool TryGetByLocalId(string localId, out InventoryItem item)
+    public bool TryGetByLocalId(string localId, out InventoryItem inventoryItem)
     {
         using var _ = _lock.BeginRead();
-        item = _items.FirstOrDefault(x => x.LocalId == localId)!;
-        return item != null;
+        inventoryItem = _items.FirstOrDefault(x => x.LocalId == localId)!;
+        return inventoryItem != null;
     }
 
-    public bool TryGetByItemId(uint itemId, out InventoryItem item)
+    public bool TryGetByItemId(uint itemId, out InventoryItem inventoryItem)
     {
         using var _ = _lock.BeginRead();
-        item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
-        return item != null;
+        inventoryItem = _items.FirstOrDefault(x => x.ItemId == itemId)!;
+        return inventoryItem != null;
     }
 
     public bool TryGetByIdAndMetadata(uint itemId, ItemMetadata metadata, out InventoryItem item)
@@ -137,24 +140,24 @@ public class Inventory
         return item != null;
     }
 
-    public InventoryItem AddSingleItem(ItemsCollection itemsCollection, uint itemId, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
+    public InventoryItem AddItem(uint itemId, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
     {
         using var _ = _lock.BeginWrite();
-        var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
+        var item = AddItems(itemId, 1, metadata, tryStack, force);
         if (item.Any())
             return item.First();
         return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
     }
 
-    public IEnumerable<InventoryItem> AddItem(ItemsCollection itemsCollection, uint itemId, uint number = 1, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
+    public IEnumerable<InventoryItem> AddItems(uint itemId, uint number, ItemMetadata? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
         metadata ??= [];
 
-        var itemsCollectionItem = itemsCollection.Get(itemId);
-        var requiredSpace = Number + itemsCollection.CalculateSize(itemId, number);
+        var itemsCollectionItem = _itemsCollection.Get(itemId);
+        var requiredSpace = Number + _itemsCollection.CalculateSize(itemId, number);
         if (requiredSpace > Size && !force)
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
@@ -177,7 +180,7 @@ public class Inventory
         {
             var thisItemNumber = Math.Min(number, itemsCollectionItem.StackSize);
             number -= thisItemNumber;
-            var item = new InventoryItem(itemsCollection, itemId, number, metadata)
+            var item = new InventoryItem(_itemsCollection, itemId, number, metadata)
             {
                 Number = thisItemNumber
             };
@@ -190,40 +193,9 @@ public class Inventory
             newItem.NumberChanged += HandleItemNumberChanged;
             _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
-            ItemChanged?.Invoke(this, newItem);
         }
 
         return newItems.AsReadOnly();
-    }
-
-    public void AddItem(ItemsCollection itemsCollection, InventoryItem newItem, bool tryStack = true, bool force = false)
-    {
-        AddItem(itemsCollection, newItem.ItemId, newItem.Number, newItem.MetaData, tryStack, force);
-    }
-
-    public void AddItems(ItemsCollection itemsCollection, IEnumerable<InventoryItem> newItems, bool force = false)
-    {
-        using var _ = _lock.BeginWrite();
-
-        if (!force)
-        {
-            decimal requiredSpace = 0;
-            foreach (var newItem in newItems)
-            {
-                requiredSpace += Number + itemsCollection.CalculateSize(newItem.ItemId, newItem.Number);
-            }
-
-            if (requiredSpace > Size)
-                throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
-        }
-
-        foreach (var newItem in newItems)
-        {
-            newItem.MetadataChanged += HandleItemMetadataChanged;
-            newItem.NumberChanged += HandleItemNumberChanged;
-            _items.Add(newItem);
-            ItemAdded?.Invoke(this, newItem);
-        }
     }
 
     private void HandleItemMetadataChanged(InventoryItem item, string key)
@@ -236,100 +208,42 @@ public class Inventory
         ItemChanged?.Invoke(this, item);
     }
 
-    public bool RemoveItemStack(InventoryItem item) => RemoveItem(item, item.Number);
-    public bool RemoveItemStack(uint id)
+    public bool RemoveItemByItemId(uint id, uint number = 1)
     {
-        using var _ = _lock.BeginWrite();
         if (TryGetByItemId(id, out var item))
-            return RemoveItemStack(item);
+            return RemoveItem(item.LocalId, number);
         return false;
     }
 
-    public bool RemoveItem(InventoryItem item, uint number = 1)
-    {
-        using var _ = _lock.BeginWrite();
-        return RemoveItem(item, out var _, out var _, number);
-    }
-
-    public bool RemoveItem(InventoryItem item, out uint removedNumber, out bool stackRemoved, uint number = 1)
+    public bool RemoveItem(string localId, uint number = 1)
     {
         if (number <= 0)
-            throw new ArgumentOutOfRangeException(nameof(number));
+            return false;
 
         using var _ = _lock.BeginWrite();
-        if (!HasItem(item))
+        if (!TryGetByLocalId(localId, out var inventoryItem))
         {
-            removedNumber = 0;
-            stackRemoved = false;
             return false;
         }
 
-        if (item.Number > number)
+        if (inventoryItem.Number > number)
         {
-            item.Number -= number;
-            removedNumber = number;
-            stackRemoved = false;
-            ItemChanged?.Invoke(this, item);
+            inventoryItem.Number -= number;
+        }
+        else if (inventoryItem.Number == number)
+        {
+            if (!_items.Remove(inventoryItem))
+                throw new InvalidOperationException();
+
+            inventoryItem.MetadataChanged -= HandleItemMetadataChanged;
+            inventoryItem.NumberChanged -= HandleItemNumberChanged;
+            ItemRemoved?.Invoke(this, inventoryItem);
         }
         else
         {
-            if (!_items.Remove(item))
-                throw new InvalidOperationException();
-
-            item.MetadataChanged -= HandleItemMetadataChanged;
-            item.NumberChanged -= HandleItemNumberChanged;
-            removedNumber = item.Number;
-            stackRemoved = true;
-            ItemRemoved?.Invoke(this, item);
+            return false;
         }
         return true;
-    }
-
-    public bool RemoveItem(uint id, uint number = 1)
-    {
-        using var _ = _lock.BeginWrite();
-
-        if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
-        {
-            var success = RemoveItem(item, out var removedNumber, out var _, number);
-            var left = number - removedNumber;
-            if (left > 0)
-                success = RemoveItem(id, left);
-            return success;
-        }
-        return false;
-    }
-
-    public InventoryItem[] RemoveAndGetItemById(uint id, uint number = 1)
-    {
-        return RemoveAndGetItemByIdInternal(id, number).ToArray();
-    }
-
-    private IEnumerable<InventoryItem> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
-    {
-        using var _ = _lock.BeginWrite();
-
-        if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
-        {
-            var success = RemoveItem(item, out var removedNumber, out bool stackRemoved, number);
-            if (item.Number > 0 && !stackRemoved)
-            {
-                item = new InventoryItem(item)
-                {
-                    Number = removedNumber
-                };
-            }
-            Debug.Assert(success == true);
-            var left = number - removedNumber;
-            if (left > 0)
-            {
-                foreach (var removedItem in RemoveAndGetItemByIdInternal(id, left))
-                {
-                    yield return removedItem;
-                }
-            }
-            yield return item;
-        }
     }
 
     public bool TryUseItem(InventoryItem item, ItemAction flags)
@@ -350,40 +264,39 @@ public class Inventory
         return Number + space <= Size;
     }
 
-    public bool HasSpaceForItem(ItemsCollection itemsCollection, uint itemId, uint number = 1)
+    public bool HasSpaceForItem(uint itemId, uint number = 1)
     {
-        return Number + itemsCollection.CalculateSize(itemId, number) <= Size;
+        return Number + _itemsCollection.CalculateSize(itemId, number) <= Size;
     }
     
-    public bool HasSpaceForItems(ItemsCollection itemsCollection, Dictionary<uint, uint> items)
+    public bool HasSpaceForItems(Dictionary<uint, uint> items)
     {
-        return Number + itemsCollection.CalculateSize(items) <= Size;
+        return Number + _itemsCollection.CalculateSize(items) <= Size;
     }
 
-    public bool TransferItem(Inventory destination, ItemsCollection itemsCollection, uint itemId, uint number, bool force)
+    public bool TransferItem(Inventory destination, string localId, uint number, bool tryStack = true, bool force = false)
     {
-        if (SumItemsNumberById(itemId) >= number || force)
-        {
-            var removedItems = RemoveAndGetItemById(itemId, number);
-            try
-            {
-                destination.AddItems(itemsCollection, removedItems, force: force);
-                return true;
-            }
-            catch (InventoryNotEnoughSpaceException)
-            {
-                AddItems(itemsCollection, removedItems);
-                return false;
-            }
-        }
-        return false;
+        if (!TryGetByLocalId(localId, out var inventoryItem))
+            return false;
+
+        var itemId = inventoryItem.ItemId;
+
+        if (!force && !destination.HasSpaceForItem(itemId, number))
+            return false;
+
+        if (!RemoveItem(localId, number))
+            return false;
+
+        destination.AddItems(inventoryItem.ItemId, number, inventoryItem.MetaData, tryStack, force);
+
+        return true;
     }
 
     public void Clear()
     {
-        var items = Items.ToList();
-        foreach (var item in items)
-            RemoveItem(item, item.Number);
+        var view = Items.ToArray();
+        foreach (var item in view)
+            RemoveItem(item.LocalId, item.Number);
     }
 
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
@@ -391,14 +304,14 @@ public class Inventory
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
     };
 
-    public static Inventory CreateFromData(Element element, InventoryData inventory, ItemsCollection itemsCollection)
+    public static Inventory CreateFromData(Element? element, InventoryData inventory, ItemsCollection itemsCollection)
     {
         var items = inventory.InventoryItems
             .Select(x =>
                 new InventoryItem(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<ItemMetadata>(x.MetaData, _jsonSerializerSettings), x.Id)
             )
             .ToList();
-        return new Inventory(element, inventory.Size, inventory.Id, items);
+        return new Inventory(element, inventory.Size, inventory.Id, items, itemsCollection);
     }
 
     public static InventoryData CreateData(Inventory inventory)
@@ -418,5 +331,4 @@ public class Inventory
 
         return itemsData;
     }
-
 }
