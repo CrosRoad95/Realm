@@ -149,6 +149,7 @@ public sealed class WorldNodesService
             _worldNodesById.Add(worldNode.Id, worldNode);
         }
 
+        NodeCreated?.Invoke(worldNode);
         return worldNode;
     }
 
