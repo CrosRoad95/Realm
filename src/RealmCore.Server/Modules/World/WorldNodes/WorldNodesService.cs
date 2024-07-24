@@ -82,6 +82,9 @@ public sealed class WorldNodesService
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
 
+    public event Action<WorldNode>? NodeCreated;
+    public event Action<WorldNode>? NodeDestroyed;
+
     public WorldNodesService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, ISchedulerService schedulerService)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -194,13 +197,15 @@ public sealed class WorldNodesService
             }, at);
         }
     }
-    
+
     private async Task<WorldNode> Create(Type nodeType, Location location, object? metadata)
     {
         var nodeTypeName = $"{nodeType.FullName}, {nodeType.Assembly.GetName().Name}";
         var worldNodeData = await _worldNodeRepository.Create(location.Position, location.Rotation, location.GetInteriorOrDefault(), location.GetDimensionOrDefault(), _dateTimeProvider.Now, _dateTimeProvider.Now, nodeTypeName, metadata);
 
-        return await CreateFromData(nodeType, worldNodeData);
+        var worldNode = await CreateFromData(nodeType, worldNodeData);
+        NodeCreated?.Invoke(worldNode);
+        return worldNode;
     }
 
     public async Task<T> Create<T>(Location location, object? metadata) where T: WorldNode
@@ -226,6 +231,7 @@ public sealed class WorldNodesService
         {
             await _worldNodeRepository.Remove(worldNode.WorldNodeData);
             worldNode.DisposeInternal();
+            NodeDestroyed?.Invoke(worldNode);
             return true;
         }
 
