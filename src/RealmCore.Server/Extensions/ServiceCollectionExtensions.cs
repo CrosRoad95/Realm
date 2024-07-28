@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Integrations;
+﻿using RealmCore.Server.Modules.Players.Discord;
+using RealmCore.Server.Modules.Players.Integrations;
 using RealmCore.Server.Modules.World.WorldNodes;
 
 namespace RealmCore.Server.Extensions;
@@ -183,6 +184,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerIntegrationsFeature, PlayerIntegrationsFeature>();
         services.AddPlayerScopedFeature<IPlayerBoostsFeature, PlayerBoostsFeature>();
         services.AddPlayerScopedFeature<IPlayerSecretsFeature, PlayerSecretsFeature>();
+        services.AddPlayerScopedFeature<IDiscordRichPresenceFeature, DiscordRichPresenceFeature>();
         #endregion
 
         #region Vehicle features

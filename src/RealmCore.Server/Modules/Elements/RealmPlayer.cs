@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Integrations;
+﻿using RealmCore.Server.Modules.Players.Discord;
+using RealmCore.Server.Modules.Players.Integrations;
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Server.Modules.Elements;
@@ -198,6 +199,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IPlayerIntegrationsFeature Integrations { get; init; }
     public IPlayerBoostsFeature Boosts { get; init; }
     public IPlayerSecretsFeature Secrets { get; init; }
+    public IDiscordRichPresenceFeature DiscordRichPresence { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -246,6 +248,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         Boosts = GetRequiredService<IPlayerBoostsFeature>();
         Integrations = GetRequiredService<IPlayerIntegrationsFeature>();
         Secrets = GetRequiredService<IPlayerSecretsFeature>();
+        DiscordRichPresence = GetRequiredService<IDiscordRichPresenceFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

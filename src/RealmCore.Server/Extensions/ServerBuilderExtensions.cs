@@ -1,4 +1,6 @@
-﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+﻿using SlipeServer.Resources.DiscordRichPresence;
+
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
@@ -27,6 +29,10 @@ public static class ServerBuilderExtensions
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        serverBuilder.AddDiscordRichPresenceResource(new DiscordRichPresenceOptions
+        {
+            ApplicationId = 997855189132398613
+        });
         return serverBuilder;
     }
     
@@ -46,6 +52,7 @@ public static class ServerBuilderExtensions
         services.AddNametagsServices();
         services.AddWatermarkServices();
         services.AddBoneAttachServices();
+        services.AddDiscordRichPresenceServices();
         return services;
     }
 }

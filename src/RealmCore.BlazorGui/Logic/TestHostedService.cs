@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Vehicles.Access;
+﻿using RealmCore.Server.Modules.Players.Discord;
+using RealmCore.Server.Modules.Vehicles.Access;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -60,6 +61,12 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
     {
         player.FocusedElementChanged += HandleFocusedElementChanged;
         player.FocusedVehiclePartChanged += HandleFocusedVehiclePartChanged;
+        player.DiscordRichPresence.Ready += HandleDiscordRichPresenceReady;
+    }
+
+    private void HandleDiscordRichPresenceReady(IDiscordRichPresenceFeature discordRichPresence)
+    {
+        _logger.LogInformation("Discord ready: {discordUserId}", discordRichPresence.UserId);
     }
 
     void HandleFocusedElementChanged(RealmPlayer arg1, Element? previous, Element? current)
