@@ -3,6 +3,7 @@
 public interface IUploadedFilesRepository
 {
     Task<UploadFileData> Add(string name, string fileType, ulong size, string metadata, DateTime uploadedAt, int? userId = null, CancellationToken cancellationToken = default);
+    Task<bool> Delete(int id, CancellationToken cancellationToken = default);
     Task<UploadFileData[]> GetById(int id, CancellationToken cancellationToken = default);
     Task<UploadFileData?> GetByName(string name, CancellationToken cancellationToken = default);
     Task<UploadFileData[]> GetByUserId(int userId, CancellationToken cancellationToken = default);
