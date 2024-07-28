@@ -102,5 +102,14 @@ internal sealed class UploadedFilesRepository : IUploadedFilesRepository
         }
     }
 
+    public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(Delete));
+
+        var query = _db.UploadFiles.Where(x => x.Id == id);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) == 1;
+    }
+
     public static readonly ActivitySource Activity = new("RealmCore.UploadedFilesRepository", "1.0.0");
 }
