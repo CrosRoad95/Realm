@@ -979,7 +979,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMaxLength(255);
 
             entityBuilder.Property(x => x.Metadata)
-                .HasMaxLength(4000);
+                .HasMaxLength(10000);
         });
         
         modelBuilder.Entity<UserUploadFileData>(entityBuilder =>

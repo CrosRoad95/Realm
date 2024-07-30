@@ -4,7 +4,7 @@ public interface IUploadedFilesRepository
 {
     Task<UploadFileData> Add(string name, string fileType, ulong size, string metadata, DateTime uploadedAt, int? userId = null, CancellationToken cancellationToken = default);
     Task<bool> Delete(int id, CancellationToken cancellationToken = default);
-    Task<UploadFileData[]> GetById(int id, CancellationToken cancellationToken = default);
+    Task<UploadFileData?> GetById(int id, CancellationToken cancellationToken = default);
     Task<UploadFileData?> GetByName(string name, CancellationToken cancellationToken = default);
     Task<UploadFileData[]> GetByUserId(int userId, CancellationToken cancellationToken = default);
 }
@@ -18,17 +18,19 @@ internal sealed class UploadedFilesRepository : IUploadedFilesRepository
         _db = db;
     }
 
-    public async Task<UploadFileData[]> GetById(int id, CancellationToken cancellationToken = default)
+    public async Task<UploadFileData?> GetById(int id, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetByName));
+        using var activity = Activity.StartActivity(nameof(GetById));
         if (activity != null)
         {
             activity.AddTag("Id", id);
         }
 
-        var query = _db.UploadFiles.Where(x => x.Id == id);
+        var query = _db.UploadFiles
+            .Include(x => x.UserUploadFiles)
+            .Where(x => x.Id == id);
 
-        return await query.ToArrayAsync(cancellationToken);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
     
     public async Task<UploadFileData[]> GetByUserId(int userId, CancellationToken cancellationToken = default)
@@ -54,7 +56,9 @@ internal sealed class UploadedFilesRepository : IUploadedFilesRepository
             activity.AddTag("Name", name);
         }
 
-        var query = _db.UploadFiles.Where(x => x.Name == name);
+        var query = _db.UploadFiles
+            .Include(x => x.UserUploadFiles)
+            .Where(x => x.Name == name);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -110,6 +114,15 @@ internal sealed class UploadedFilesRepository : IUploadedFilesRepository
         var query = _db.UploadFiles.Where(x => x.Id == id);
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
+    }
+
+    public async Task<bool> UpdateMetadata(int id, string metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(UpdateMetadata));
+
+        var query = _db.UploadFiles.Where(x => x.Id == id);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UploadedFilesRepository", "1.0.0");
