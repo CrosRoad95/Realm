@@ -7,6 +7,7 @@ public interface IUploadedFilesRepository
     Task<UploadFileData?> GetById(int id, CancellationToken cancellationToken = default);
     Task<UploadFileData?> GetByName(string name, CancellationToken cancellationToken = default);
     Task<UploadFileData[]> GetByUserId(int userId, CancellationToken cancellationToken = default);
+    Task<bool> UpdateMetadata(int id, string metadata, CancellationToken cancellationToken = default);
 }
 
 internal sealed class UploadedFilesRepository : IUploadedFilesRepository
