@@ -4,7 +4,11 @@ local huds3d = {}
 local assets = {}
 local hud3dResolution = 128; -- 128 pixels per 1m
 local visibleCounter = 0;
-local renderHuds;
+local handleRenderHuds;
+local fps = 0;
+local counter = 0;
+local startTick;
+local currentTick;
 
 local function isHudVisible(hudId)
 	return visibleHuds[hudId] and true or false
@@ -25,16 +29,16 @@ local function setHudVisibleCore(hudId, visible)
 
 	if(visible)then
 		if(visibleCounter == 1)then
-			addEventHandler("onClientRender", root, renderHuds);
+			addEventHandler("onClientRender", root, handleRenderHuds);
 		end
 	else
 		if(visibleCounter == 0)then
-			removeEventHandler("onClientRender", root, renderHuds);
+			removeEventHandler("onClientRender", root, handleRenderHuds);
 		end
 	end
 end
 
-function getElementSpeed(theElement, unit)
+local function getElementSpeed(theElement, unit)
     local elementType = getElementType(theElement)
     unit = unit == nil and 0 or ((not tonumber(unit)) and unit or tonumber(unit))
     local mult = (unit == 0 or unit == "m/s") and 50 or ((unit == 1 or unit == "km/h") and 180 or 111.84681456)
@@ -56,16 +60,23 @@ local function renderHud(position, elements)
 	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
 			local content = v[3];
+			local text = nil;
 			if(content[1] == "constant")then
-				dxDrawText(content[2], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+				text = content[2];
 			elseif(content[1] == "computed")then
 				if(content[2] == "vehicleSpeed")then
-					local vehicle = getPedOccupiedVehicle(localPlayer)
+					local vehicle = getPedOccupiedVehicle(localPlayer);
 					if(vehicle and getVehicleController(vehicle) == localPlayer)then
-						local speed = getElementSpeed(vehicle, "km/s")
-						dxDrawText(string.format("%ikm/h", speed), v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+						local speed = getElementSpeed(vehicle, "km/s");
+						text = string.format("%ikm/h", speed);
 					end
+				elseif(content[2] == "fps")then
+					text = string.format("FPS: %i", fps);
 				end
+			end
+
+			if(text)then
+				dxDrawText(text, v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
 			end
 		elseif(v[1] == "rectangle")then
 			dxDrawRectangle(v[3] + x, v[4] + y, v[5], v[6], v[7])
@@ -117,7 +128,7 @@ local function renderHud3d(elements, oldrt)
 	return rt, sx, sy;
 end
 
-function renderHuds()
+function handleRenderHuds()
 	if(isPlayerMapVisible())then
 		return;
 	end
@@ -239,6 +250,19 @@ local function handleRemoveHud3d(hudId)
 		outputDebugString("Failed to removeHud3d, hud of id: '"..tostring(hudId).."' not found.", 1);
 	end
 end
+
+addEventHandler("onClientPreRender", root, function()
+        if not startTick then
+            startTick = getTickCount()
+        end
+        counter = counter + 1;
+        currentTick = getTickCount();
+        if currentTick - startTick >= 1000 then 
+			fps = counter;
+            counter = 0;
+            startTick = false;
+        end 
+end);
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification)

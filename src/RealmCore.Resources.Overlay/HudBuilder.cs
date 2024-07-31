@@ -65,6 +65,11 @@ public struct CurrentVehicleSpeedTextHudElementContent : ITextHudElementContent
     public LuaValue CreateLuaValue(object state) => new LuaValue(["computed", "vehicleSpeed"]);
 }
 
+public struct CurrentFPSTextHudElementContent : ITextHudElementContent
+{
+    public LuaValue CreateLuaValue(object state) => new LuaValue(["computed", "fps"]);
+}
+
 internal class PropertyExpressionVisitor : ExpressionVisitor
 {
     public List<PropertyInfo> Properties { get; private set; } = [];
