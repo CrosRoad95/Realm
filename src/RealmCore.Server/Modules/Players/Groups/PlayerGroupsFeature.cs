@@ -1,14 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Groups;
 
-public interface IPlayerGroupsFeature : IPlayerFeature
-{
-    internal bool AddGroupMember(GroupMemberData groupMemberData);
-    internal bool RemoveGroupMember(int groupId);
-    bool IsMember(int groupId);
-    GroupMemberData? GetMemberOrDefault(int groupId);
-}
-
-internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature, IUsesUserPersistentData
+public sealed class PlayerGroupsFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
     private ICollection<GroupMemberData> _groupMembers = [];

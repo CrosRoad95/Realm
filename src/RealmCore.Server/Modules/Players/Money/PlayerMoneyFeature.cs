@@ -1,27 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Money;
 
-public interface IPlayerMoneyFeature : IPlayerFeature
-{
-    decimal Amount { get; set; }
-    decimal Limit { get; }
-    byte Precision { get; }
-
-    event Action<IPlayerMoneyFeature, decimal>? Set;
-    event Action<IPlayerMoneyFeature, decimal>? Added;
-    event Action<IPlayerMoneyFeature, decimal>? Taken;
-
-    internal void SetInternal(decimal amount);
-    void Give(decimal amount);
-    bool Has(decimal amount, bool force = false);
-    void Take(decimal amount, bool force = false);
-    bool TryTake(decimal amount, bool force = false);
-    bool TryTake(decimal amount, Func<bool> action, bool force = false);
-    Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false, CancellationToken cancellationToken = default);
-    void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false);
-    void SetLimitAndPrecision(decimal moneyLimit, byte precision);
-}
-
-internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData
+public sealed class PlayerMoneyFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly ReaderWriterLockSlimScopedAsync _lock = new();
     private decimal _money = 0;
@@ -31,9 +10,9 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public RealmPlayer Player { get; init; }
 
-    public event Action<IPlayerMoneyFeature, decimal>? Set;
-    public event Action<IPlayerMoneyFeature, decimal>? Added;
-    public event Action<IPlayerMoneyFeature, decimal>? Taken;
+    public event Action<PlayerMoneyFeature, decimal>? Set;
+    public event Action<PlayerMoneyFeature, decimal>? Added;
+    public event Action<PlayerMoneyFeature, decimal>? Taken;
     public event Action? VersionIncreased;
 
     public decimal Limit => _moneyLimit;
@@ -189,7 +168,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         return false;
     }
 
-    public void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false)
+    public void Transfer(PlayerMoneyFeature destination, decimal amount, bool force = false)
     {
         if (amount <= 0)
             throw new GameplayException("Unable to transfer money, amount can smaller or equal to zero.");

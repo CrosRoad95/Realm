@@ -1,28 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
-public interface IPlayerAchievementsFeature : IPlayerFeature, IEnumerable<AchievementDto>
-{
-    event Action<IPlayerAchievementsFeature, int>? Unlocked;
-    event Action<IPlayerAchievementsFeature, int, float>? Progressed;
-
-    T? GetValue<T>(int achievementId);
-    AchievementDto Get(int achievementId);
-    bool HasReachedProgressThreshold(int achievementId, float progress);
-    bool SetProgress(int achievementId, float progress, float maximumProgress);
-    void SetValue(int achievementId, object value);
-    bool TryReceiveReward(int achievementId, float requiredProgress, DateTime now);
-    bool UpdateProgress(int achievementId, float progress, float maximumProgress);
-    bool IsRewardReceived(int achievementId);
-    float GetProgress(int achievementId);
-}
-
-internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature, IUsesUserPersistentData
+public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<AchievementDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<AchievementData> _achievements = [];
 
-    public event Action<IPlayerAchievementsFeature, int>? Unlocked;
-    public event Action<IPlayerAchievementsFeature, int, float>? Progressed;
+    public event Action<PlayerAchievementsFeature, int>? Unlocked;
+    public event Action<PlayerAchievementsFeature, int, float>? Progressed;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

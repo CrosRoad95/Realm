@@ -1,23 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
-public interface IPlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgradeDto>
-{
-    event Action<IPlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
-    event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
-
-    JobUpgradeDto[] GetAllByJobId(short jobId);
-    bool Has(short jobId, int upgradeId);
-    bool TryAdd(short jobId, int upgradeId);
-    bool TryRemove(short jobId, int upgradeId);
-}
-
-internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IUsesUserPersistentData
+public sealed class PlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgradeDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<JobUpgradeData> _jobUpgrades = [];
 
-    public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
-    public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
+    public event Action<PlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
+    public event Action<PlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

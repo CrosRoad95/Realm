@@ -168,38 +168,38 @@ public class RealmPlayer : Player, IAsyncDisposable
 
     public IElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
-    public new IPlayerMoneyFeature Money { get; init; }
-    public IPlayerBrowserFeature Browser { get; init; }
-    public IPlayerAFKFeature AFK { get; init; }
-    public IPlayerUserFeature User { get; init; }
-    public IPlayerDailyVisitsFeature DailyVisits { get; init; }
-    public IPlayerSettingsFeature Settings { get; init; }
-    public IPlayerBansFeature Bans { get; init; }
-    public IPlayerUpgradesFeature Upgrades { get; init; }
-    public IPlayerPlayTimeFeature PlayTime { get; init; }
-    public IPlayerLevelFeature Level { get; init; }
-    public IPlayerLicensesFeature Licenses { get; init; }
-    public IPlayerStatisticsFeature Statistics { get; init; }
-    public IPlayerAchievementsFeature Achievements { get; init; }
-    public IPlayerJobUpgradesFeature JobUpgrades { get; init; }
-    public IPlayerDiscoveriesFeature Discoveries { get; init; }
-    public IPlayerJobStatisticsFeature JobStatistics { get; init; }
-    public IPlayerEventsFeature Events { get; init; }
-    public IPlayerSessionsFeature Sessions { get; init; }
-    public IPlayerAdminFeature Admin { get; init; }
-    public IPlayerGroupsFeature Groups { get; init; }
-    public IPlayerFractionsFeature Fractions { get; init; }
-    public IPlayerGuiFeature Gui { get; init; }
-    public IPlayerHudFeature Hud { get; init; }
-    public IPlayerInventoryFeature Inventory { get; init; }
-    public IPlayerNotificationsFeature Notifications { get; init; }
-    public IPlayerSchedulerFeature Scheduler { get; init; }
-    public IPlayerFriendsFeature Friends { get; init; }
-    public IPlayerDailyTasksFeature DailyTasks { get; init; }
-    public IPlayerIntegrationsFeature Integrations { get; init; }
-    public IPlayerBoostsFeature Boosts { get; init; }
-    public IPlayerSecretsFeature Secrets { get; init; }
-    public IDiscordRichPresenceFeature DiscordRichPresence { get; init; }
+    public new PlayerMoneyFeature Money { get; init; }
+    public PlayerBrowserFeature Browser { get; init; }
+    public PlayerAFKFeature AFK { get; init; }
+    public PlayerUserFeature User { get; init; }
+    public PlayerDailyVisitsFeature DailyVisits { get; init; }
+    public PlayerSettingsFeature Settings { get; init; }
+    public PlayerBansFeature Bans { get; init; }
+    public PlayerUpgradesFeature Upgrades { get; init; }
+    public PlayerPlayTimeFeature PlayTime { get; init; }
+    public PlayerLevelFeature Level { get; init; }
+    public PlayerLicensesFeature Licenses { get; init; }
+    public PlayerStatisticsFeature Statistics { get; init; }
+    public PlayerAchievementsFeature Achievements { get; init; }
+    public PlayerJobUpgradesFeature JobUpgrades { get; init; }
+    public PlayerDiscoveriesFeature Discoveries { get; init; }
+    public PlayerJobStatisticsFeature JobStatistics { get; init; }
+    public PlayerEventsFeature Events { get; init; }
+    public PlayerSessionsFeature Sessions { get; init; }
+    public PlayerAdminFeature Admin { get; init; }
+    public PlayerGroupsFeature Groups { get; init; }
+    public PlayerFractionsFeature Fractions { get; init; }
+    public PlayerGuiFeature Gui { get; init; }
+    public PlayerHudFeature Hud { get; init; }
+    public PlayerInventoryFeature Inventory { get; init; }
+    public PlayerNotificationsFeature Notifications { get; init; }
+    public PlayerSchedulerFeature Scheduler { get; init; }
+    public PlayerFriendsFeature Friends { get; init; }
+    public PlayerDailyTasksFeature DailyTasks { get; init; }
+    public PlayerIntegrationsFeature Integrations { get; init; }
+    public PlayerBoostsFeature Boosts { get; init; }
+    public PlayerSecretsFeature Secrets { get; init; }
+    public DiscordRichPresenceFeature DiscordRichPresence { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -217,38 +217,38 @@ public class RealmPlayer : Player, IAsyncDisposable
         Saving = GetRequiredService<IElementSaveService>();
 
         #region Initialize scope services
-        Money = GetRequiredService<IPlayerMoneyFeature>();
-        AFK = GetRequiredService<IPlayerAFKFeature>();
-        Browser = GetRequiredService<IPlayerBrowserFeature>();
-        User = GetRequiredService<IPlayerUserFeature>();
-        DailyVisits = GetRequiredService<IPlayerDailyVisitsFeature>();
-        Settings = GetRequiredService<IPlayerSettingsFeature>();
-        Bans = GetRequiredService<IPlayerBansFeature>();
-        Upgrades = GetRequiredService<IPlayerUpgradesFeature>();
-        PlayTime = GetRequiredService<IPlayerPlayTimeFeature>();
-        Level = GetRequiredService<IPlayerLevelFeature>();
-        Licenses = GetRequiredService<IPlayerLicensesFeature>();
-        Statistics = GetRequiredService<IPlayerStatisticsFeature>();
-        Achievements = GetRequiredService<IPlayerAchievementsFeature>();
-        JobUpgrades = GetRequiredService<IPlayerJobUpgradesFeature>();
-        Discoveries = GetRequiredService<IPlayerDiscoveriesFeature>();
-        JobStatistics = GetRequiredService<IPlayerJobStatisticsFeature>();
-        Events = GetRequiredService<IPlayerEventsFeature>();
-        Sessions = GetRequiredService<IPlayerSessionsFeature>();
-        Admin = GetRequiredService<IPlayerAdminFeature>();
-        Groups = GetRequiredService<IPlayerGroupsFeature>();
-        Fractions = GetRequiredService<IPlayerFractionsFeature>();
-        Gui = GetRequiredService<IPlayerGuiFeature>();
-        Hud = GetRequiredService<IPlayerHudFeature>();
-        Inventory = GetRequiredService<IPlayerInventoryFeature>();
-        Notifications = GetRequiredService<IPlayerNotificationsFeature>();
-        Scheduler = GetRequiredService<IPlayerSchedulerFeature>();
-        Friends = GetRequiredService<IPlayerFriendsFeature>();
-        DailyTasks = GetRequiredService<IPlayerDailyTasksFeature>();
-        Boosts = GetRequiredService<IPlayerBoostsFeature>();
-        Integrations = GetRequiredService<IPlayerIntegrationsFeature>();
-        Secrets = GetRequiredService<IPlayerSecretsFeature>();
-        DiscordRichPresence = GetRequiredService<IDiscordRichPresenceFeature>();
+        Money = GetRequiredService<PlayerMoneyFeature>();
+        AFK = GetRequiredService<PlayerAFKFeature>();
+        Browser = GetRequiredService<PlayerBrowserFeature>();
+        User = GetRequiredService<PlayerUserFeature>();
+        DailyVisits = GetRequiredService<PlayerDailyVisitsFeature>();
+        Settings = GetRequiredService<PlayerSettingsFeature>();
+        Bans = GetRequiredService<PlayerBansFeature>();
+        Upgrades = GetRequiredService<PlayerUpgradesFeature>();
+        PlayTime = GetRequiredService<PlayerPlayTimeFeature>();
+        Level = GetRequiredService<PlayerLevelFeature>();
+        Licenses = GetRequiredService<PlayerLicensesFeature>();
+        Statistics = GetRequiredService<PlayerStatisticsFeature>();
+        Achievements = GetRequiredService<PlayerAchievementsFeature>();
+        JobUpgrades = GetRequiredService<PlayerJobUpgradesFeature>();
+        Discoveries = GetRequiredService<PlayerDiscoveriesFeature>();
+        JobStatistics = GetRequiredService<PlayerJobStatisticsFeature>();
+        Events = GetRequiredService<PlayerEventsFeature>();
+        Sessions = GetRequiredService<PlayerSessionsFeature>();
+        Admin = GetRequiredService<PlayerAdminFeature>();
+        Groups = GetRequiredService<PlayerGroupsFeature>();
+        Fractions = GetRequiredService<PlayerFractionsFeature>();
+        Gui = GetRequiredService<PlayerGuiFeature>();
+        Hud = GetRequiredService<PlayerHudFeature>();
+        Inventory = GetRequiredService<PlayerInventoryFeature>();
+        Notifications = GetRequiredService<PlayerNotificationsFeature>();
+        Scheduler = GetRequiredService<PlayerSchedulerFeature>();
+        Friends = GetRequiredService<PlayerFriendsFeature>();
+        DailyTasks = GetRequiredService<PlayerDailyTasksFeature>();
+        Boosts = GetRequiredService<PlayerBoostsFeature>();
+        Integrations = GetRequiredService<PlayerIntegrationsFeature>();
+        Secrets = GetRequiredService<PlayerSecretsFeature>();
+        DiscordRichPresence = GetRequiredService<DiscordRichPresenceFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

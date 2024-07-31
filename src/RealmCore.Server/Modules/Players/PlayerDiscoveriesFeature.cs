@@ -1,19 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerDiscoveriesFeature : IPlayerFeature, IEnumerable<int>
-{
-    event Action<IPlayerDiscoveriesFeature, int>? Discovered;
-
-    bool IsDiscovered(int discoveryId);
-    bool TryDiscover(int discoveryId);
-}
-
-internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IUsesUserPersistentData
+public sealed class PlayerDiscoveriesFeature : IPlayerFeature, IEnumerable<int>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<DiscoveryData> _discoveries = [];
 
-    public event Action<IPlayerDiscoveriesFeature, int>? Discovered;
+    public event Action<PlayerDiscoveriesFeature, int>? Discovered;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

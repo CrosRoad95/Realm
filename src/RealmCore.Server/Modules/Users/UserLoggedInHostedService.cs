@@ -17,7 +17,7 @@ internal sealed class UserLoggedInHostedService : PlayerLifecycle, IHostedServic
         _dateTimeProvider = dateTimeProvider;
     }
 
-    protected override async Task PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
+    protected override async Task PlayerLoggedIn(PlayerUserFeature user, RealmPlayer player)
     {
         var serial = player.Client.GetSerial();
         await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);

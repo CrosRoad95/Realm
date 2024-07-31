@@ -1,19 +1,9 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>
+public sealed class PlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>, IUsesUserPersistentData
 {
-    event Action<IPlayerUpgradesFeature, int, bool>? Added;
-    event Action<IPlayerUpgradesFeature, int>? Removed;
-
-    bool Has(int upgradeId);
-    bool TryAdd(int upgradeId);
-    bool TryRemove(int upgradeId);
-}
-
-internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserPersistentData
-{
-    public event Action<IPlayerUpgradesFeature, int, bool>? Added;
-    public event Action<IPlayerUpgradesFeature, int>? Removed;
+    public event Action<PlayerUpgradesFeature, int, bool>? Added;
+    public event Action<PlayerUpgradesFeature, int>? Removed;
     public event Action? VersionIncreased;
 
     private ICollection<UserUpgradeData> _upgrades = [];

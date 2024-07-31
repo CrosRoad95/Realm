@@ -32,11 +32,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddPlayerScopedFeature<T1, T2>(this IServiceCollection services)
+    public static IServiceCollection AddPlayerScopedFeature<T1>(this IServiceCollection services)
         where T1 : class, IPlayerFeature
-        where T2: class, T1
     {
-        services.AddScoped<T1, T2>();
+        services.AddScoped<T1>();
         services.AddTransient<IPlayerFeature>(x => x.GetRequiredService<T1>()); 
         return services;
     }
@@ -153,38 +152,38 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Player features
-        services.AddPlayerScopedFeature<IPlayerBrowserFeature, PlayerBrowserFeature>();
-        services.AddPlayerScopedFeature<IPlayerAFKFeature, PlayerAFKFeature>();
-        services.AddPlayerScopedFeature<IPlayerMoneyFeature, PlayerMoneyFeature>();
-        services.AddPlayerScopedFeature<IPlayerUserFeature, PlayerUserFeature>();
-        services.AddPlayerScopedFeature<IPlayerDailyVisitsFeature, PlayerDailyVisitsFeature>();
-        services.AddPlayerScopedFeature<IPlayerSettingsFeature, PlayerSettingsFeature>();
-        services.AddPlayerScopedFeature<IPlayerBansFeature, PlayerBansFeature>();
-        services.AddPlayerScopedFeature<IPlayerUpgradesFeature, PlayerUpgradesFeature>();
-        services.AddPlayerScopedFeature<IPlayerPlayTimeFeature, PlayerPlayTimeFeature>();
-        services.AddPlayerScopedFeature<IPlayerLevelFeature, PlayerLevelFeature>();
-        services.AddPlayerScopedFeature<IPlayerLicensesFeature, PlayerLicensesFeature>();
-        services.AddPlayerScopedFeature<IPlayerStatisticsFeature, PlayerStatisticsFeature>();
-        services.AddPlayerScopedFeature<IPlayerAchievementsFeature, PlayerAchievementsFeature>();
-        services.AddPlayerScopedFeature<IPlayerDiscoveriesFeature, PlayerDiscoveriesFeature>();
-        services.AddPlayerScopedFeature<IPlayerJobUpgradesFeature, PlayerJobUpgradesFeature>();
-        services.AddPlayerScopedFeature<IPlayerJobStatisticsFeature, PlayerJobStatisticsFeature>();
-        services.AddPlayerScopedFeature<IPlayerEventsFeature, PlayerEventsFeature>();
-        services.AddPlayerScopedFeature<IPlayerSessionsFeature, PlayerSessionsFeature>();
-        services.AddPlayerScopedFeature<IPlayerAdminFeature, PlayerAdminFeature>();
-        services.AddPlayerScopedFeature<IPlayerGroupsFeature, PlayerGroupsFeature>();
-        services.AddPlayerScopedFeature<IPlayerFractionsFeature, PlayerFractionsFeature>();
-        services.AddPlayerScopedFeature<IPlayerGuiFeature, PlayerGuiFeature>();
-        services.AddPlayerScopedFeature<IPlayerHudFeature, PlayerHudFeature>();
-        services.AddPlayerScopedFeature<IPlayerInventoryFeature, PlayerInventoryFeature>();
-        services.AddPlayerScopedFeature<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
-        services.AddPlayerScopedFeature<IPlayerSchedulerFeature, PlayerSchedulerFeature>();
-        services.AddPlayerScopedFeature<IPlayerFriendsFeature, PlayerFriendsFeature>();
-        services.AddPlayerScopedFeature<IPlayerDailyTasksFeature, PlayerDailyTasksFeature>();
-        services.AddPlayerScopedFeature<IPlayerIntegrationsFeature, PlayerIntegrationsFeature>();
-        services.AddPlayerScopedFeature<IPlayerBoostsFeature, PlayerBoostsFeature>();
-        services.AddPlayerScopedFeature<IPlayerSecretsFeature, PlayerSecretsFeature>();
-        services.AddPlayerScopedFeature<IDiscordRichPresenceFeature, DiscordRichPresenceFeature>();
+        services.AddPlayerScopedFeature<PlayerBrowserFeature>();
+        services.AddPlayerScopedFeature<PlayerAFKFeature>();
+        services.AddPlayerScopedFeature<PlayerMoneyFeature>();
+        services.AddPlayerScopedFeature<PlayerUserFeature>();
+        services.AddPlayerScopedFeature<PlayerDailyVisitsFeature>();
+        services.AddPlayerScopedFeature<PlayerSettingsFeature>();
+        services.AddPlayerScopedFeature<PlayerBansFeature>();
+        services.AddPlayerScopedFeature<PlayerUpgradesFeature>();
+        services.AddPlayerScopedFeature<PlayerPlayTimeFeature>();
+        services.AddPlayerScopedFeature<PlayerLevelFeature>();
+        services.AddPlayerScopedFeature<PlayerLicensesFeature>();
+        services.AddPlayerScopedFeature<PlayerStatisticsFeature>();
+        services.AddPlayerScopedFeature<PlayerAchievementsFeature>();
+        services.AddPlayerScopedFeature<PlayerDiscoveriesFeature>();
+        services.AddPlayerScopedFeature<PlayerJobUpgradesFeature>();
+        services.AddPlayerScopedFeature<PlayerJobStatisticsFeature>();
+        services.AddPlayerScopedFeature<PlayerEventsFeature>();
+        services.AddPlayerScopedFeature<PlayerSessionsFeature>();
+        services.AddPlayerScopedFeature<PlayerAdminFeature>();
+        services.AddPlayerScopedFeature<PlayerGroupsFeature>();
+        services.AddPlayerScopedFeature<PlayerFractionsFeature>();
+        services.AddPlayerScopedFeature<PlayerGuiFeature>();
+        services.AddPlayerScopedFeature<PlayerHudFeature>();
+        services.AddPlayerScopedFeature<PlayerInventoryFeature>();
+        services.AddPlayerScopedFeature<PlayerNotificationsFeature>();
+        services.AddPlayerScopedFeature<PlayerSchedulerFeature>();
+        services.AddPlayerScopedFeature<PlayerFriendsFeature>();
+        services.AddPlayerScopedFeature<PlayerDailyTasksFeature>();
+        services.AddPlayerScopedFeature<PlayerIntegrationsFeature>();
+        services.AddPlayerScopedFeature<PlayerBoostsFeature>();
+        services.AddPlayerScopedFeature<PlayerSecretsFeature>();
+        services.AddPlayerScopedFeature<DiscordRichPresenceFeature>();
         #endregion
 
         #region Vehicle features

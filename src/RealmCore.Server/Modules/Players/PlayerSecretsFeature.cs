@@ -1,12 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerSecretsFeature : IPlayerFeature
-{
-    int[] GetByGroupId(int groupId);
-    bool TryReveal(int groupId, int secretId);
-}
-
-internal sealed class PlayerSecretsFeature : IPlayerSecretsFeature, IUsesUserPersistentData
+public sealed class PlayerSecretsFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;

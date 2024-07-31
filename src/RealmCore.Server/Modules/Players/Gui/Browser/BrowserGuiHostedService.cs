@@ -39,7 +39,7 @@ internal sealed class BrowserGuiHostedService : PlayerLifecycle, IHostedService
         }
     }
 
-    private void HandleGuiChanged(IPlayerGuiFeature guiService, RealmPlayer player, IPlayerGui? previousGui, IPlayerGui? currentGui)
+    private void HandleGuiChanged(PlayerGuiFeature guiService, RealmPlayer player, IPlayerGui? previousGui, IPlayerGui? currentGui)
     {
         using var _ = _logger.BeginElement(player);
         if (previousGui is BrowserGui previousBrowserGui)

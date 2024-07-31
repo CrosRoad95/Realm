@@ -1,28 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Players.Licenses;
 
-public interface IPlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLicenseDto>
-{
-    event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Added;
-    event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Suspended;
-    event Action<IPlayerLicensesFeature, PlayerLicenseDto>? UnSuspended;
-
-    bool TryGetById(int licenseId, out PlayerLicenseDto playerLicenseDto);
-    bool Has(int licenseId, bool includeSuspended = false);
-    bool IsSuspended(int licenseId);
-    void Suspend(int licenseId, TimeSpan timeSpan, string? reason = null);
-    bool TryAdd(int licenseId);
-    void UnSuspend(int licenseId);
-}
-
-internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserPersistentData
+public sealed class PlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLicenseDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserLicenseData> _licenses = [];
 
-    public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Added;
-    public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Suspended;
-    public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? UnSuspended;
+    public event Action<PlayerLicensesFeature, PlayerLicenseDto>? Added;
+    public event Action<PlayerLicensesFeature, PlayerLicenseDto>? Suspended;
+    public event Action<PlayerLicensesFeature, PlayerLicenseDto>? UnSuspended;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

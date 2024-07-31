@@ -1007,7 +1007,7 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("startsession", ([CallingPlayer] RealmPlayer player) =>
         {
             player.Sessions.Begin<TestSession>();
-            player.Sessions.Ended += (IPlayerSessionsFeature sessions, Session session) =>
+            player.Sessions.Ended += (PlayerSessionsFeature sessions, Session session) =>
             {
                 player.Money.Give(100);
             };

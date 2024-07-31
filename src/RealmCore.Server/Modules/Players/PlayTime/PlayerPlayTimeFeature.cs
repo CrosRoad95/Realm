@@ -1,23 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.PlayTime;
 
-public interface IPlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPlayTimeDto>
-{
-    TimeSpan PlayTime { get; }
-    TimeSpan TotalPlayTime { get; }
-    int? Category { get; set; }
-
-    event Action<IPlayerPlayTimeFeature>? MinutePlayed;
-    event Action<IPlayerPlayTimeFeature>? MinuteTotalPlayed;
-    event Action<IPlayerPlayTimeFeature, int?, int?>? CategoryChanged;
-
-    void InternalSetTotalPlayTime(ulong time);
-    void Reset();
-    internal void UpdateCategoryPlayTime(int? category);
-    internal void Update();
-    TimeSpan GetByCategory(int category);
-}
-
-internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserPersistentData
+public sealed class PlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPlayTimeDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private DateTime _startDateTime;
@@ -27,8 +10,8 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
     private int _lastMinuteTotal = -1;
     private DateTime? _lastCategoryPlayTime;
 
-    public event Action<IPlayerPlayTimeFeature>? MinutePlayed;
-    public event Action<IPlayerPlayTimeFeature>? MinuteTotalPlayed;
+    public event Action<PlayerPlayTimeFeature>? MinutePlayed;
+    public event Action<PlayerPlayTimeFeature>? MinuteTotalPlayed;
     public event Action? VersionIncreased;
 
     public TimeSpan PlayTime => _dateTimeProvider.Now - _startDateTime;
@@ -36,7 +19,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
     private ICollection<UserPlayTimeData> _playTimes = [];
     private int? _category;
 
-    public event Action<IPlayerPlayTimeFeature, int?, int?>? CategoryChanged;
+    public event Action<PlayerPlayTimeFeature, int?, int?>? CategoryChanged;
     public int? Category
     {
         get => _category; set

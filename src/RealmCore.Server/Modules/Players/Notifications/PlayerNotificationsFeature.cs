@@ -1,24 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Players.Notifications;
 
-public interface IPlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserNotificationDto>
-{
-    event Action<IPlayerNotificationsFeature, UserNotificationDto>? Created;
-    event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
-
-    Task<UserNotificationDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default);
-    internal void Create(UserNotificationData userNotificationData);
-    internal void Update(UserNotificationData userNotificationData);
-}
-
-internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, IUsesUserPersistentData
+public sealed class PlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserNotificationDto>, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
     private readonly IUserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserNotificationData> _userNotificationDataCollection = [];
 
-    public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Created;
-    public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
+    public event Action<PlayerNotificationsFeature, UserNotificationDto>? Created;
+    public event Action<PlayerNotificationsFeature, UserNotificationDto>? Read;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; }

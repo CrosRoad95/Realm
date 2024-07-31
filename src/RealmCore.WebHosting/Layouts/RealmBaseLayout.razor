@@ -38,7 +38,7 @@ else
         _player.Browser.RelayReady();
     }
 
-    private void HandlePathChanged(IPlayerBrowserFeature playerBrowser, string path)
+    private void HandlePathChanged(PlayerBrowserFeature playerBrowser, string path)
     {
         _navigationManager.NavigateTo(path ?? "/");
     }

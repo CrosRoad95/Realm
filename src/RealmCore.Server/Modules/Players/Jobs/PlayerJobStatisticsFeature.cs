@@ -2,22 +2,14 @@
 
 public record struct JobStatisticsSummary(ulong points, ulong timePlayed);
 
-public interface IPlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJobStatisticsDto>
-{
-    void AddPoints(short jobId, ulong points);
-    void AddPointsAndTimePlayed(short jobId, ulong points, ulong timePlayed);
-    void AddTimePlayed(short jobId, ulong timePlayed);
-    JobStatisticsSummary GetSummary(short jobId);
-}
-
-internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, IUsesUserPersistentData
+public sealed class PlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJobStatisticsDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<JobStatisticsData> _jobStatistics = [];
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public event Action<IPlayerJobStatisticsFeature, short, ulong>? PointsAdded;
-    public event Action<IPlayerJobStatisticsFeature, short, ulong>? TimePlayedAdded;
+    public event Action<PlayerJobStatisticsFeature, short, ulong>? PointsAdded;
+    public event Action<PlayerJobStatisticsFeature, short, ulong>? TimePlayedAdded;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

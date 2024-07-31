@@ -47,27 +47,27 @@ internal sealed class AdministrationHostedService : PlayerLifecycle, IHostedServ
         admin.AdminModeChanged -= HandleAdminModeChanged;
     }
 
-    private void HandleNoClipStateChanged(IPlayerAdminFeature admin, bool enabled)
+    private void HandleNoClipStateChanged(PlayerAdminFeature admin, bool enabled)
     {
         _noClipService.SetEnabledTo(admin.Player, enabled);
     }
 
-    private void HandleDebugViewStateChanged(IPlayerAdminFeature admin, bool enabled)
+    private void HandleDebugViewStateChanged(PlayerAdminFeature admin, bool enabled)
     {
         _debugLog.SetVisibleTo(admin.Player, enabled);
     }
 
-    private void HandleDevelopmentModeStateChanged(IPlayerAdminFeature admin, bool enabled)
+    private void HandleDevelopmentModeStateChanged(PlayerAdminFeature admin, bool enabled)
     {
         _clientInterfaceService.SetDevelopmentModeEnabled(admin.Player, enabled);
     }
 
-    private void HandleInteractionDebugRenderingStateChanged(IPlayerAdminFeature admin, bool enabled)
+    private void HandleInteractionDebugRenderingStateChanged(PlayerAdminFeature admin, bool enabled)
     {
         _clientInterfaceService.SetFocusableRenderingEnabled(admin.Player, enabled);
     }
 
-    private void HandleAdminModeChanged(IPlayerAdminFeature admin, bool enabled)
+    private void HandleAdminModeChanged(PlayerAdminFeature admin, bool enabled)
     {
         _adminService.SetAdminModeEnabledForPlayer(admin.Player, enabled);
         if (enabled)

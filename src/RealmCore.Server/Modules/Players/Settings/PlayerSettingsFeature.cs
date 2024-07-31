@@ -1,33 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players.Settings;
 
-public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettingDto>
-{
-    event Action<IPlayerSettingsFeature, UserSettingDto>? Added;
-    event Action<IPlayerSettingsFeature, UserSettingDto>? Changed;
-    event Action<IPlayerSettingsFeature, UserSettingDto>? Removed;
-
-    /// <summary>
-    /// Return an array of all settings ids
-    /// </summary>
-    int[] SettingsIds { get; }
-    void Set(int settingId, string value);
-    bool TryGet(int settingId, out string? value);
-    bool Has(int settingId);
-    /// <summary>
-    /// Removes all settings
-    /// </summary>
-    void Reset();
-    bool TryRemove(int settingId);
-}
-
-internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserPersistentData
+public sealed class PlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettingDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<UserSettingData> _settings = [];
 
-    public event Action<IPlayerSettingsFeature, UserSettingDto>? Added;
-    public event Action<IPlayerSettingsFeature, UserSettingDto>? Changed;
-    public event Action<IPlayerSettingsFeature, UserSettingDto>? Removed;
+    public event Action<PlayerSettingsFeature, UserSettingDto>? Added;
+    public event Action<PlayerSettingsFeature, UserSettingDto>? Changed;
+    public event Action<PlayerSettingsFeature, UserSettingDto>? Removed;
     public event Action? VersionIncreased;
 
     public int[] SettingsIds

@@ -1,21 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto>
-{
-    event Action<IPlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
-
-    void Add(int eventType, string? metadata = null);
-    Task<UserEventDto[]> FetchMore(int count = 10, CancellationToken cancellationToken = default);
-    UserEventData[] Get(IEnumerable<int>? events = null, int limit = 10);
-}
-
-internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentData
+public class PlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto>, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
     private ICollection<UserEventData> _userEventData = [];
-    public event Action<IPlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
+    public event Action<PlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

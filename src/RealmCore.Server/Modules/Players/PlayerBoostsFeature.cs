@@ -19,18 +19,7 @@ public sealed class ActiveBoostDto
     }
 }
 
-public interface IPlayerBoostsFeature : IPlayerFeature
-{
-    int[] AllBoosts { get; }
-    IEnumerable<ActiveBoostDto> ActiveBoosts { get; }
-
-    void AddBoost(int boostId);
-    bool IsActive(int boostId);
-    bool TryActivateBoost(int boostId, TimeSpan activeFor, bool force = false);
-    bool TryRemoveBoost(int boostId);
-}
-
-internal sealed class PlayerBoostsFeature : IPlayerBoostsFeature, IUsesUserPersistentData, IDisposable
+public sealed class PlayerBoostsFeature : IPlayerFeature, IUsesUserPersistentData, IDisposable
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;

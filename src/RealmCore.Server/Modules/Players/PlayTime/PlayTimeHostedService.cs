@@ -54,7 +54,7 @@ internal sealed class PlayTimeHostedService : PlayerLifecycle, IHostedService
         player.PlayTime.CategoryChanged -= HandleCategoryChanged;
     }
 
-    private void HandleCategoryChanged(IPlayerPlayTimeFeature playerPlayTime, int? previous, int? current)
+    private void HandleCategoryChanged(PlayerPlayTimeFeature playerPlayTime, int? previous, int? current)
     {
         playerPlayTime.Player.PlayTime.UpdateCategoryPlayTime(previous);
     }

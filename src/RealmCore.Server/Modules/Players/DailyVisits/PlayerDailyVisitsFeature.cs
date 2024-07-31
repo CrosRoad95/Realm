@@ -1,18 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.DailyVisits;
 
-public interface IPlayerDailyVisitsFeature : IPlayerFeature
-{
-    DateTime LastVisit { get; set; }
-    int VisitsInRow { get; set; }
-    int VisitsInRowRecord { get; set; }
-
-    event Action<IPlayerDailyVisitsFeature, int, bool>? Visited;
-    event Action<IPlayerDailyVisitsFeature, int>? VisitsRecord;
-
-    internal void Update(DateTime now);
-}
-
-internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUsesUserPersistentData
+public sealed class PlayerDailyVisitsFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private DailyVisitsData? _dailyVisitsData;
@@ -44,8 +32,8 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
         }
     }
 
-    public event Action<IPlayerDailyVisitsFeature, int, bool>? Visited;
-    public event Action<IPlayerDailyVisitsFeature, int>? VisitsRecord;
+    public event Action<PlayerDailyVisitsFeature, int, bool>? Visited;
+    public event Action<PlayerDailyVisitsFeature, int>? VisitsRecord;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

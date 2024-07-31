@@ -1,30 +1,11 @@
-﻿
-namespace RealmCore.Server.Modules.Players.Jobs;
+﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
-public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
-{
-    int Count { get; }
-
-    event Action<IPlayerSessionsFeature, Session>? Started;
-    event Action<IPlayerSessionsFeature, Session>? Ended;
-
-    TSession Begin<TSession>(params object[] parameters) where TSession : Session;
-    Session Begin(Type sessionType, params object[] parameters);
-    TSession Get<TSession>();
-    bool IsDuring<TSession>();
-    bool IsDuring<TSession>(TSession session) where TSession : Session;
-    bool IsDuring(Type type);
-    bool TryEnd<TSession>() where TSession : Session;
-    bool TryEnd<TSession>(TSession session) where TSession : Session;
-    bool TryGet<TSession>(out TSession session);
-}
-
-internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposable
+public sealed class PlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>, IDisposable
 {
     private readonly object _lock = new();
     private readonly List<Session> _sessions = [];
-    public event Action<IPlayerSessionsFeature, Session>? Started;
-    public event Action<IPlayerSessionsFeature, Session>? Ended;
+    public event Action<PlayerSessionsFeature, Session>? Started;
+    public event Action<PlayerSessionsFeature, Session>? Ended;
 
     public RealmPlayer Player { get; init; }
 

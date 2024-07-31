@@ -2,24 +2,7 @@
 
 namespace RealmCore.Server.Modules.Friends;
 
-public interface IPlayerFriendsFeature : IPlayerFeature, IEnumerable<int>
-{
-    Task<bool> AcceptRequest(int userId);
-    int[] GetPendingIncomingRequests();
-    int[] GetPendingOutgoingRequests();
-    List<RealmPlayer> GetOnline();
-    Task<bool> RejectRequest(int userId);
-    Task<bool> Remove(int userId);
-    Task<bool> SendRequest(int userId);
-
-    internal void InternalAddFriend(int userId);
-    internal void InternalAddIncomingFriendRequest(int userId);
-    internal void InternalRemoveFriend(int userId);
-    internal void InternalRemoveReceivedFriendRequest(int userId);
-    internal void InternalRemoveSentFriendRequest(int userId);
-}
-
-internal sealed class PlayerFriendsFeature : IPlayerFriendsFeature
+public sealed class PlayerFriendsFeature : IPlayerFeature, IEnumerable<int>
 {
     private readonly object _lock = new();
 
@@ -36,11 +19,11 @@ internal sealed class PlayerFriendsFeature : IPlayerFriendsFeature
     public event Action<int>? SentFriendRequest;
     public event Action<int>? RemovedSentFriendRequest;
 
-    private readonly IPlayerUserFeature _playerUserFeature;
+    private readonly PlayerUserFeature _playerUserFeature;
     private readonly FriendsService _friendsService;
     private readonly IUsersInUse _usersInUse;
 
-    public PlayerFriendsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, FriendsService friendsService, IUsersInUse usersInUse)
+    public PlayerFriendsFeature(PlayerContext playerContext, PlayerUserFeature playerUserFeature, FriendsService friendsService, IUsersInUse usersInUse)
     {
         Player = playerContext.Player;
         _playerUserFeature = playerUserFeature;

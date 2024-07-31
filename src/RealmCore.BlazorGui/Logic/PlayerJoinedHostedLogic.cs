@@ -45,7 +45,7 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         }
     }
 
-    private void HandleReady(IPlayerBrowserFeature playerBrowser)
+    private void HandleReady(PlayerBrowserFeature playerBrowser)
     {
         _chatBox.OutputTo(playerBrowser.Player, "Browser ready");
         //playerBrowser.DevTools = true;
@@ -113,7 +113,7 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
         }
     }
 
-    private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, LevelChange levelChange)
+    private void HandleLevelChanged(PlayerLevelFeature levelService, uint level, LevelChange levelChange)
     {
         _logger.LogInformation("Player level changed to: {level}, change: {levelChange}", level, levelChange);
     }

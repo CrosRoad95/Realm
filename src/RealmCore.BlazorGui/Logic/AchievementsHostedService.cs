@@ -29,7 +29,7 @@ internal sealed class AchievementsHostedService : PlayerLifecycle, IHostedServic
         player.Achievements.Unlocked -= HandleUnlocked;
     }
 
-    private void HandleUnlocked(IPlayerAchievementsFeature achievementService, int achievementId)
+    private void HandleUnlocked(PlayerAchievementsFeature achievementService, int achievementId)
     {
         _overlayService.AddNotification(achievementService.Player, $"Odblokowałeś osiągnięcie '{achievementId}'");
     }

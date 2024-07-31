@@ -47,7 +47,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 
     protected virtual void PlayerJoined(TPlayer player) { }
     protected virtual void PlayerLeft(TPlayer player) { }
-    protected virtual Task PlayerLoggedIn(IPlayerUserFeature user, TPlayer player) { return Task.CompletedTask; }
+    protected virtual Task PlayerLoggedIn(PlayerUserFeature user, TPlayer player) { return Task.CompletedTask; }
     protected virtual void PlayerSpawned(TPlayer player) { }
     protected virtual void PlayerLoaded(TPlayer player) { }
 }

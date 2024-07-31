@@ -1,30 +1,9 @@
 ﻿namespace RealmCore.Server.Modules.Players.Administration;
 
-public interface IPlayerAdminFeature : IPlayerFeature
-{
-    AdminTool[] Tools { get; }
-    bool DevelopmentMode { get; set; }
-    bool DebugView { get; set; }
-    bool AdminMode { get; set; }
-    bool NoClip { get; set; }
-    bool InteractionDebugRenderingEnabled { get; set; }
-
-    event Action<IPlayerAdminFeature, bool>? DebugViewStateChanged;
-    event Action<IPlayerAdminFeature, bool>? AdminModeChanged;
-    event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
-    event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
-    event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
-    event Action<IPlayerAdminFeature, AdminTool[]>? ToolsChanged;
-
-    bool HasTool(AdminTool adminTool);
-    void SetTools(IEnumerable<AdminTool> adminTools);
-    void Reset();
-}
-
-internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
+public sealed class PlayerAdminFeature : IPlayerFeature, IDisposable
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserFeature;
+    private readonly PlayerUserFeature _playerUserFeature;
     private bool _debugView = false;
     private bool _adminMode = false;
     private bool _noClip = false;
@@ -32,12 +11,12 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
     private bool _interactionDebugRenderingEnabled = false;
     private List<AdminTool> _tools = [];
 
-    public event Action<IPlayerAdminFeature, AdminTool[]>? ToolsChanged;
-    public event Action<IPlayerAdminFeature, bool>? DebugViewStateChanged;
-    public event Action<IPlayerAdminFeature, bool>? AdminModeChanged;
-    public event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
-    public event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
-    public event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
+    public event Action<PlayerAdminFeature, AdminTool[]>? ToolsChanged;
+    public event Action<PlayerAdminFeature, bool>? DebugViewStateChanged;
+    public event Action<PlayerAdminFeature, bool>? AdminModeChanged;
+    public event Action<PlayerAdminFeature, bool>? NoClipStateChanged;
+    public event Action<PlayerAdminFeature, bool>? DevelopmentModeStateChanged;
+    public event Action<PlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
 
     public AdminTool[] Tools
     {
@@ -133,7 +112,7 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerAdminFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerAdminFeature(PlayerContext playerContext, PlayerUserFeature playerUserFeature)
     {
         _playerUserFeature = playerUserFeature;
         Player = playerContext.Player;

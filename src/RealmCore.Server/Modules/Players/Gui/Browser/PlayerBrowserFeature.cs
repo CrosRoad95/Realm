@@ -1,28 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
-public interface IPlayerBrowserFeature : IPlayerFeature
+public sealed class PlayerBrowserFeature : IPlayerFeature, IDisposable
 {
-    bool Visible { get; set; }
-    bool DevTools { get; set; }
-    string Key { get; init; }
-    bool IsReady { get; }
-
-    event Action<IPlayerBrowserFeature, string>? PathChanged;
-    event Action<IPlayerBrowserFeature, bool>? DevToolsStateChanged;
-    event Action<IPlayerBrowserFeature, bool>? VisibleChanged;
-    event Action<IPlayerBrowserFeature>? Ready;
-
-    bool TryClose();
-    void Open(string path, IReadOnlyDictionary<string, string?>? queryParameters = null);
-    void RelayReady();
-}
-
-internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
-{
-    public event Action<IPlayerBrowserFeature, string>? PathChanged;
-    public event Action<IPlayerBrowserFeature, bool>? DevToolsStateChanged;
-    public event Action<IPlayerBrowserFeature, bool>? VisibleChanged;
-    public event Action<IPlayerBrowserFeature>? Ready;
+    public event Action<PlayerBrowserFeature, string>? PathChanged;
+    public event Action<PlayerBrowserFeature, bool>? DevToolsStateChanged;
+    public event Action<PlayerBrowserFeature, bool>? VisibleChanged;
+    public event Action<PlayerBrowserFeature>? Ready;
 
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IBrowserService _browserService;

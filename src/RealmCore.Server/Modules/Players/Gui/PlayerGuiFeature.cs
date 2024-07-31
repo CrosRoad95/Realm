@@ -5,21 +5,10 @@ public interface IPlayerGui : IDisposable
     RealmPlayer Player { get; }
 }
 
-public interface IPlayerGuiFeature : IPlayerFeature
-{
-    IPlayerGui? Current { get; set; }
-
-    event Action<IPlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
-
-    bool TryClose<TGui>() where TGui : IPlayerGui;
-    bool TryClose();
-    TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui;
-}
-
-internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
+public sealed class PlayerGuiFeature : IPlayerFeature, IDisposable
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _userFeature;
+    private readonly PlayerUserFeature _userFeature;
     private IPlayerGui? _current;
 
     public IPlayerGui? Current
@@ -45,8 +34,8 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
 
     public RealmPlayer Player { get; init; }
 
-    public event Action<IPlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
-    public PlayerGuiFeature(PlayerContext playerContext, IPlayerUserFeature userFeature)
+    public event Action<PlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
+    public PlayerGuiFeature(PlayerContext playerContext, PlayerUserFeature userFeature)
     {
         _userFeature = userFeature;
         Player = playerContext.Player;

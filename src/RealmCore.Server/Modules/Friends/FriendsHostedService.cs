@@ -11,7 +11,7 @@ internal sealed class FriendsHostedService : PlayerLifecycle, IHostedService
         _logger = logger;
     }
 
-    protected override async Task PlayerLoggedIn(IPlayerUserFeature user, RealmPlayer player)
+    protected override async Task PlayerLoggedIn(PlayerUserFeature user, RealmPlayer player)
     {
         var friends = await _friendsService.GetAllFriends(user.Id);
         // TODO:

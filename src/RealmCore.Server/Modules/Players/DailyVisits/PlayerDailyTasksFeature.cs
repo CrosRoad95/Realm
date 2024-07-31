@@ -1,16 +1,5 @@
 ﻿namespace RealmCore.Server.Modules.Players.DailyVisits;
 
-public interface IPlayerDailyTasksFeature : IPlayerFeature
-{
-    DailyTaskProgressDto[] Today { get; }
-
-    DailyTaskProgressDto? GetTask(int taskId, DateTime? at);
-    float GetProgress(int taskId, DateTime? at = null);
-    bool TryBeginDailyTask(int taskId);
-    bool TryDoProgress(int taskId, float progress, DateTime? at = null);
-    DailyTaskProgressDto[] GetTasks(DateTime? at = null);
-}
-
 public sealed class DailyTaskProgressDto : IEquatable<DailyTaskProgressDto>
 {
     public required int Id { get; init; }
@@ -42,8 +31,7 @@ public sealed class DailyTaskProgressDto : IEquatable<DailyTaskProgressDto>
     }
 }
 
-
-internal sealed class PlayerDailyTasksFeature : IPlayerDailyTasksFeature, IUsesUserPersistentData
+public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;

@@ -1,29 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
-public interface IPlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>
-{
-    IHudLayer[] VisibleLayers { get; }
-
-    event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
-    event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
-
-    bool AddLayer(IHudLayer hudLayer);
-    THudLayer? AddLayer<THudLayer>(params object[] parameters) where THudLayer : IHudLayer;
-    void RemoveLayer(IHudLayer hudLayer);
-    void RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
-    bool TryRemoveLayer(IHudLayer hudLayer);
-    bool TryRemoveLayer<THudLayer>() where THudLayer : IHudLayer;
-    bool TryGetLayer<THudLayer>(out THudLayer layer) where THudLayer : IHudLayer;
-}
-
-internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
+public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, IDisposable
 {
     private readonly object _lock = new();
 
     private readonly List<IHudLayer> _hudLayers = [];
 
-    public event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
-    public event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
+    public event Action<PlayerHudFeature, IHudLayer>? LayerAdded;
+    public event Action<PlayerHudFeature, IHudLayer>? LayerRemoved;
 
     public IHudLayer[] VisibleLayers
     {

@@ -18,7 +18,7 @@ public interface IDiscordRichPresenceFeature : IPlayerFeature
     void SetState(string state);
 }
 
-internal sealed class DiscordRichPresenceFeature : IDiscordRichPresenceFeature
+public sealed class DiscordRichPresenceFeature : IDiscordRichPresenceFeature
 {
     private readonly object _lock = new();
     private readonly DiscordRichPresenceService _discordRichPresenceService;

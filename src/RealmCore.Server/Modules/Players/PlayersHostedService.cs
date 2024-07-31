@@ -92,7 +92,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
             return;
 
         var waitForBrowser = new TaskCompletionSource();
-        void handleBrowserReady(IPlayerBrowserFeature playerBrowser)
+        void handleBrowserReady(PlayerBrowserFeature playerBrowser)
         {
             if (waitForBrowser.TrySetResult())
                 player.Browser.Ready -= handleBrowserReady;

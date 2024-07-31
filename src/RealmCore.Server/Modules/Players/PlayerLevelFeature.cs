@@ -7,19 +7,7 @@ public enum LevelChange
     Decrease
 }
 
-public interface IPlayerLevelFeature : IPlayerFeature
-{
-    uint NextLevelRequiredExperience { get; }
-    uint Current { get; set; }
-    uint Experience { get; set; }
-
-    event Action<IPlayerLevelFeature, uint, LevelChange>? Changed;
-    event Action<IPlayerLevelFeature, uint, uint>? ExperienceChanged;
-
-    void GiveExperience(uint amount);
-}
-
-internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersistentData
+public sealed class PlayerLevelFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly ReaderWriterLockSlimScoped _writerLockSlim = new();
     private readonly LevelsCollection? _levelsCollection;
@@ -27,8 +15,8 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
     private uint _experience;
     private UserData? _userData;
 
-    public event Action<IPlayerLevelFeature, uint, LevelChange>? Changed;
-    public event Action<IPlayerLevelFeature, uint, uint>? ExperienceChanged;
+    public event Action<PlayerLevelFeature, uint, LevelChange>? Changed;
+    public event Action<PlayerLevelFeature, uint, uint>? ExperienceChanged;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

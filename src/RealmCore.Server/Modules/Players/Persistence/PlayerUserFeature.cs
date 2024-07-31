@@ -8,10 +8,10 @@ public interface IUsesUserPersistentData
 
 public class PlayerLoggedInEventArgs : EventArgs
 {
-    public IPlayerUserFeature PlayerUserFeature { get; }
+    public PlayerUserFeature PlayerUserFeature { get; }
     public RealmPlayer Player { get; }
 
-    public PlayerLoggedInEventArgs(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    public PlayerLoggedInEventArgs(PlayerUserFeature playerUserFeature, RealmPlayer player)
     {
         PlayerUserFeature = playerUserFeature;
         Player = player;
@@ -20,53 +20,17 @@ public class PlayerLoggedInEventArgs : EventArgs
 
 public class PlayerLoggedOutEventArgs : EventArgs
 {
-    public IPlayerUserFeature PlayerUserFeature { get; }
+    public PlayerUserFeature PlayerUserFeature { get; }
     public RealmPlayer Player { get; }
 
-    public PlayerLoggedOutEventArgs(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    public PlayerLoggedOutEventArgs(PlayerUserFeature playerUserFeature, RealmPlayer player)
     {
         PlayerUserFeature = playerUserFeature;
         Player = player;
     }
 }
 
-public interface IPlayerUserFeature : IPlayerFeature
-{
-    internal UserData UserData { get; }
-    ClaimsPrincipal ClaimsPrincipal { get; }
-    int Id { get; }
-    string Nick { get; }
-    string UserName { get; }
-    DateTime? LastNewsReadDateTime { get; }
-    bool IsLoggedIn { get; }
-    DateTime? RegisteredDateTime { get; }
-    string[] AuthorizedPolicies { get; }
-    AsyncEvent<PlayerLoggedInEventArgs> LoggedIn { get; set; }
-    AsyncEvent<PlayerLoggedOutEventArgs> LoggedOut { get; set; }
-
-    string[] GetClaims();
-    string[] GetRoles();
-    string? GetClaimValue(string type);
-    bool HasAuthorizedPolicies(string[] policies);
-    bool HasAuthorizedPolicy(string policy);
-    bool HasClaim(string type, string? value = null);
-    bool IsInRole(string role);
-    Task Login(UserData user, ClaimsPrincipal claimsPrincipal, bool dontLoadData = false);
-    Task LogOut();
-    bool TryRemoveClaim(string type, string? value = null);
-    bool TryRemoveRole(string role);
-    void UpdateLastNewsRead();
-    void IncreaseVersion();
-    int GetVersion();
-    bool TryFlushVersion(int minimalVersion);
-    internal bool AddClaim(string type, string value);
-    internal bool AddClaims(Dictionary<string, string> claims);
-    internal bool AddRole(string role);
-    internal bool AddRoles(IEnumerable<string> roles);
-    internal void SetAuthorizedPolicyState(string policy, bool authorized);
-}
-
-internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
+public sealed class PlayerUserFeature : IPlayerFeature, IDisposable
 {
     private readonly object _lock = new();
     private UserData? _user;

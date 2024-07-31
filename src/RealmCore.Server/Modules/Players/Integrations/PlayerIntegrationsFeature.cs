@@ -1,18 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Integrations;
 
-public interface IPlayerIntegrationsFeature : IPlayerFeature
-{
-    /// <summary>
-    /// Integration with discord
-    /// </summary>
-    IDiscordIntegration Discord { get; }
-    /// <summary>
-    /// Array of all possible integrations
-    /// </summary>
-    IIntegration[] Integrations { get; }
-}
-
-internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IUsesUserPersistentData, IDisposable
+public sealed class PlayerIntegrationsFeature : IPlayerFeature, IUsesUserPersistentData, IDisposable
 {
     private UserData? _userData;
     public IDiscordIntegration Discord { get; private set; }

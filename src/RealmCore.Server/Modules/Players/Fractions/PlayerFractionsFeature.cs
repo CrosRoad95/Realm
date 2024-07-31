@@ -1,21 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Players.Fractions;
 
-public interface IPlayerFractionsFeature : IPlayerFeature
-{
-    bool IsMember(int fractionId);
-    FractionMemberDto GetById(int fractionId);
-
-    internal void AddMember(FractionMemberData fractionMemberData);
-    internal bool RemoveMember(int fractionId);
-}
-
-internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature, IUsesUserPersistentData
+public sealed class PlayerFractionsFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<FractionMemberData> _fractionMembers = [];
 
-    public event Action<IPlayerFractionsFeature, FractionMemberDto>? Added;
-    public event Action<IPlayerFractionsFeature, FractionMemberDto>? Removed;
+    public event Action<PlayerFractionsFeature, FractionMemberDto>? Added;
+    public event Action<PlayerFractionsFeature, FractionMemberDto>? Removed;
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }

@@ -31,12 +31,12 @@ internal sealed class PlayerHudHostedService : PlayerLifecycle, IHostedService
         player.Hud.LayerRemoved -= HandleLayerRemoved;
     }
 
-    private void HandleLayerCreated(IPlayerHudFeature hudService, IHudLayer hudLayer)
+    private void HandleLayerCreated(PlayerHudFeature hudService, IHudLayer hudLayer)
     {
         hudLayer.BuildHud(_overlayService, hudService.Player);
     }
 
-    private void HandleLayerRemoved(IPlayerHudFeature hudService, IHudLayer hudLayer)
+    private void HandleLayerRemoved(PlayerHudFeature hudService, IHudLayer hudLayer)
     {
         _overlayService.RemoveHudLayer(hudService.Player, hudLayer.Id);
     }

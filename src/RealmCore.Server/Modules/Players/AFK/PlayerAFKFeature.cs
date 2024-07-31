@@ -1,24 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Players.AFK;
 
-public interface IPlayerAFKFeature : IPlayerFeature
-{
-    DateTime? LastAFK { get; }
-    bool IsAFK { get; }
-
-    event Action<IPlayerAFKFeature, bool, TimeSpan>? StateChanged;
-
-    CancellationToken CreateCancellationToken(bool? expectedAfkState = null);
-    void SetCooldown(int afkCooldown);
-    internal void HandleAFKStarted();
-    internal void HandleAFKStopped();
-}
-
-internal sealed class PlayerAFKFeature : IPlayerAFKFeature
+public sealed class PlayerAFKFeature : IPlayerFeature
 {
     private readonly object _lock = new();
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
-    public event Action<IPlayerAFKFeature, bool, TimeSpan>? StateChanged;
+    public event Action<PlayerAFKFeature, bool, TimeSpan>? StateChanged;
     private event Action<bool>? InternalStateChanged;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDebounce _debounce;

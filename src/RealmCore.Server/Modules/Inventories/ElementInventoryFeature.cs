@@ -19,7 +19,7 @@ public interface IVehicleInventoryFeature : IVehicleFeature, IElementInventoryFe
 
 }
 
-internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature, IUsesUserPersistentData
+public sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature, IUsesUserPersistentData
 {
     public event Action? VersionIncreased;
 
@@ -59,7 +59,7 @@ internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicl
     }
 }
 
-internal abstract class ElementInventoryFeature : IElementInventoryFeature
+public abstract class ElementInventoryFeature : IElementInventoryFeature
 {
     protected readonly ItemsCollection _itemsCollection;
 

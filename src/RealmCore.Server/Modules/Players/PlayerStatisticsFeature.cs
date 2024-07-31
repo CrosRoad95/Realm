@@ -1,29 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>
-{
-    int[] StatsIds { get; }
-    int[] GtaSaStatsIds { get; }
-
-    event Action<IPlayerStatisticsFeature, int, float>? Decreased;
-    event Action<IPlayerStatisticsFeature, int, float>? Increased;
-
-    void Increase(int statId, float value = 1);
-    void Decrease(int statId, float value = 1);
-    void Set(int statId, float value);
-    float Get(int statId);
-    void SetGtaSa(PedStat statId, float value);
-    float GetGtaSa(PedStat statId);
-}
-
-internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IUsesUserPersistentData
+public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<UserStatData> _stats = [];
     private ICollection<UserGtaStatData> _gtaSaStats = [];
 
-    public event Action<IPlayerStatisticsFeature, int, float>? Decreased;
-    public event Action<IPlayerStatisticsFeature, int, float>? Increased;
+    public event Action<PlayerStatisticsFeature, int, float>? Decreased;
+    public event Action<PlayerStatisticsFeature, int, float>? Increased;
     public event Action? VersionIncreased;
 
     public int[] StatsIds

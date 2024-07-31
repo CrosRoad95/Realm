@@ -1,11 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerSchedulerFeature : IPlayerFeature, ISchedulerService
-{
-
-}
-
-internal sealed class PlayerSchedulerFeature : IPlayerSchedulerFeature, IDisposable
+public sealed class PlayerSchedulerFeature : IPlayerFeature, ISchedulerService, IDisposable
 {
     private readonly ISchedulerService _schedulerService;
     private readonly CancellationTokenSource _cts = new();

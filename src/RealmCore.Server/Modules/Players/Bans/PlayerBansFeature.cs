@@ -2,44 +2,15 @@
 
 namespace RealmCore.Server.Modules.Players.Bans;
 
-public interface IPlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>
-{
-    /// <summary>
-    /// Return all active bans
-    /// </summary>
-    BanDto[] ActiveBans { get; }
-
-    event Action<IPlayerBansFeature, BanDto>? Added;
-    event Action<IPlayerBansFeature, BanDto>? Deactivated;
-
-    bool Add(int type, DateTime? until = null, string? reason = null, string? responsible = null);
-    /// <summary>
-    /// Fetches X more bans from database, returning empty list when all bans were fetched.
-    /// </summary>
-    Task<OneOf<BanDto[], NoBans>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
-    /// <summary>
-    /// Return true if ban of given type is currently active
-    /// </summary>
-    bool IsBanned(int type);
-    /// <summary>
-    /// Deactivates ban by id
-    /// </summary>
-    bool DeactivateBanById(int banId);
-    /// <summary>
-    /// Return active ban or default by given type
-    /// </summary>
-    OneOf<BanDto, BanOfGivenTypeNotFound> GetBanByType(int type);
-}
-
-internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersistentData
+public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
     private ICollection<BanData> _bans = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
 
-    public event Action<IPlayerBansFeature, BanDto>? Added;
-    public event Action<IPlayerBansFeature, BanDto>? Deactivated;
+    public event Action<PlayerBansFeature, BanDto>? Added;
+    public event Action<PlayerBansFeature, BanDto>? Deactivated;
     public event Action? VersionIncreased;
 
     public BanDto[] ActiveBans
