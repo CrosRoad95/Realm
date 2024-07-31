@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Resources.ClientInterface;
+﻿using SlipeServer.Server.Elements;
+using System.Numerics;
+
+namespace RealmCore.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {
@@ -30,6 +33,18 @@ internal class ClientInterfaceLogic
         _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
         _clientInterfaceService.FocusableForAdded += HandleFocusableForAdded;
         _clientInterfaceService.FocusableForRemoved += HandleFocusableForRemoved;
+        _clientInterfaceService.ClipboardChanged += HandleClipboardChanged;
+        _clientInterfaceService.DevelopmentModeChanged += HandleDevelopmentModeChanged;
+    }
+
+    private void HandleClipboardChanged(Player player, string content)
+    {
+        _luaEventHub.Invoke(player, x => x.SetClipboard(content));
+    }
+
+    private void HandleDevelopmentModeChanged(Player player, bool enabled)
+    {
+        _luaEventHub.Invoke(player, x => x.SetDevelopmentModeEnabled(enabled));
     }
 
     private void HandleFocusableForRemoved(Element element, Player player)

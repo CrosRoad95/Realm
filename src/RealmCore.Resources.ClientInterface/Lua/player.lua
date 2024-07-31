@@ -1,23 +1,16 @@
 ﻿local sx,sy = guiGetScreenSize()
 --local hoveredElement = nil;
-setElementData(localPlayer, "translations", {}, false)
+
 triggerServerEventWithId("sendLocalizationCode", getLocalization().code)
 triggerServerEventWithId("sendScreenSize", guiGetScreenSize())
 
-addEvent("updateTranslation", true)
-addEventHandler("updateTranslation", localPlayer, function(translations)
-	setElementData(localPlayer, "translations", translations[1], false)
-end)
-
-addEvent("internalSetClipboard", true)
-addEventHandler("internalSetClipboard", localPlayer, function(content)
+function handleSetClipboard(content)
 	setClipboard(content)
-end)
+end
 
-addEvent("internalSetDevelopmentModeEnabled", true)
-addEventHandler("internalSetDevelopmentModeEnabled", localPlayer, function(enabled)
+function handleSetDevelopmentModeEnabled(enabled)
 	setDevelopmentMode(enabled, enabled)
-end)
+end
 
 --[[
 addEventHandler( "onClientCursorMove", root,
@@ -35,12 +28,7 @@ addEventHandler ( "onClientClick", root, function(button, state, absoluteX, abso
     triggerServerEventWithId("clickedElementChanged", clickedElement)
 end)
 
-addCommandHandler("boom", function()
-    outputChatBox("boom")
-    local x,y,z = getElementPosition(localPlayer)
-    createExplosion (x,y + 20,z, 1)
-end)
-addCommandHandler("boomfar", function()
-    outputChatBox("boom")
-    createExplosion (1000, 1000, 1000, 1)
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	hubBind("SetClipboard", handleSetClipboard);
+	hubBind("SetDevelopmentModeEnabled", handleSetDevelopmentModeEnabled);
 end)

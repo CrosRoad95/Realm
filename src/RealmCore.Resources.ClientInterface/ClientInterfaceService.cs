@@ -17,13 +17,14 @@ public interface IClientInterfaceService
     internal event Action<Player, bool>? FocusableRenderingChanged;
     internal event Action<Element, Player>? FocusableForAdded;
     internal event Action<Element, Player>? FocusableForRemoved;
+    internal event Action<Player, string>? ClipboardChanged;
+    internal event Action<Player, bool>? DevelopmentModeChanged;
 
     void AddFocusable(Element element);
     void RemoveFocusable(Element element);
     void SetClipboard(Player player, string content);
     void SetDevelopmentModeEnabled(Player player, bool enabled);
     void SetFocusableRenderingEnabled(Player player, bool enabled);
-    void SetWorldDebuggingEnabled(Player player, bool active);
 
     internal void RelayClienDebugMessages(Player player, ClientDebugMessage[] debugMessages);
     internal void RelayPlayerLocalizationCode(Player player, string code);
@@ -46,11 +47,8 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
     public event Action<Element, Player>? FocusableForAdded;
     public event Action<Element, Player>? FocusableForRemoved;
     public event Action<Player, bool>? FocusableRenderingChanged;
-
-    public ClientInterfaceService()
-    {
-
-    }
+    public event Action<Player, string>? ClipboardChanged;
+    public event Action<Player, bool>? DevelopmentModeChanged;
 
     public void RelayClienDebugMessages(Player player, ClientDebugMessage[] debugMessages)
     {
@@ -77,19 +75,14 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
         ClickedElementChanged?.Invoke(player, clickedElement);
     }
 
-    public void SetWorldDebuggingEnabled(Player player, bool active)
-    {
-        player.TriggerLuaEvent("internalSetWorldDebuggingEnabled", player, active);
-    }
-
     public void SetClipboard(Player player, string content)
     {
-        player.TriggerLuaEvent("internalSetClipboard", player, content);
+        ClipboardChanged?.Invoke(player, content);
     }
 
     public void SetDevelopmentModeEnabled(Player player, bool enabled)
     {
-        player.TriggerLuaEvent("internalSetDevelopmentModeEnabled", player, enabled);
+        DevelopmentModeChanged?.Invoke(player, enabled);
     }
 
     public void AddFocusable(Element element)

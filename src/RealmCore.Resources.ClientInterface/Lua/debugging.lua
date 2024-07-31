@@ -1,11 +1,6 @@
 ﻿local debugMessagesBuffer = {};
 local flushDebugMessagesBufferTimer = nil;
 
-addEvent("internalSetWorldDebuggingEnabled", true)
-addEventHandler("internalSetWorldDebuggingEnabled", localPlayer, function(enabled)
-	setElementData(localPlayer, "_worldDebugging", enabled, false);
-end)
-
 local function flushDebugMessagesBuffer()
 	flushDebugMessagesBufferTimer = nil;
 	triggerServerEventWithId("sendDebugMessagesBuffer", debugMessagesBuffer);
