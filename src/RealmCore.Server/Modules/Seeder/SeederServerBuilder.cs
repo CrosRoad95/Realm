@@ -7,12 +7,7 @@ internal sealed class SeederServerBuilder : IDisposable
     private const string _basePath = "Seed";
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
-    private readonly IGroupsService _groupService;
-    private readonly IElementFactory _elementFactory;
     private readonly IFractionsService _fractionService;
-    private readonly IGroupRepository _groupRepository;
-    private readonly Text3dService _text3dService;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPlayerUserService _playerUserService;
     private readonly IServiceScope _serviceScope;
@@ -23,19 +18,12 @@ internal sealed class SeederServerBuilder : IDisposable
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
-        IGroupsService groupService, IElementFactory elementFactory, IFractionsService fractionService, IEnumerable<ISeederProvider> seederProviders,
-        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider, IPlayerUserService playerUserService)
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IFractionsService fractionService, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, IServiceProvider serviceProvider, IPlayerUserService playerUserService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
-        _groupService = groupService;
-        _elementFactory = elementFactory;
         _fractionService = fractionService;
-        _groupRepository = groupRepository;
-        _text3dService = text3dService;
-        _dateTimeProvider = dateTimeProvider;
         _serviceProvider = serviceProvider;
         _playerUserService = playerUserService;
         _serviceScope = serviceProvider.CreateScope();
@@ -49,77 +37,6 @@ internal sealed class SeederServerBuilder : IDisposable
         {
             _asyncSeederProviders[seederProvider.SeedKey] = seederProvider;
             logger.LogInformation("Using async {seederProvider} for seed key {seedKey}", seederProvider, seederProvider.SeedKey);
-        }
-    }
-
-    private void BuildBlips(Dictionary<string, BlipSeedData> blips)
-    {
-        foreach (var pair in blips)
-        {
-            if (Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
-            {
-
-                var blip = _elementFactory.CreateBlip(new(pair.Value.Position), (BlipIcon)pair.Value.Icon, elementBuilder: e => e.ElementName = pair.Key);
-                _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
-            }
-            else
-            {
-                _logger.LogError("Seeder: Failed to create blip of id {id} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
-            }
-        }
-    }
-
-    private void BuildPickups(Dictionary<string, PickupSeedData> pickups)
-    {
-        foreach (var pair in pickups)
-        {
-            var pickup = _elementFactory.CreatePickup(new(pair.Value.Position), pair.Value.Model, elementBuilder: e => e.ElementName = pair.Key);
-            if (pair.Value.Text3d != null)
-            {
-                _text3dService.CreateText3d(pickup.Position + new Vector3(0, 0, 0.75f), pair.Value.Text3d);
-            }
-            _logger.LogInformation("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
-        }
-    }
-
-    private void BuildMarkers(Dictionary<string, MarkerSeedData> markers)
-    {
-        foreach (var pair in markers)
-        {
-            if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
-            {
-                var marker = _elementFactory.CreateMarker(new(pair.Value.Position), pair.Value.MarkerType, 1, pair.Value.Color, elementBuilder: e => e.ElementName = pair.Key);
-                _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
-            }
-            else
-                _logger.LogInformation("Seeder: Failed to create type {markerType} at {position}", pair.Value.MarkerType, pair.Value.Position);
-        }
-    }
-
-    private async Task BuildGroups(Dictionary<string, GroupSeedData> groups)
-    {
-        foreach (var pair in groups)
-        {
-            Group group;
-            if (!await _groupService.GroupExistsByNameOrShorCut(pair.Key, pair.Value.Shortcut))
-            {
-                group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
-                _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
-            }
-            else
-            {
-                group = await _groupService.GetGroupByNameOrShortCut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
-            }
-
-            foreach (var item in pair.Value.Members)
-            {
-                if (!await _groupRepository.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
-                {
-                    await _groupRepository.TryAddMember(group.id, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
-                    _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
-                    _isUpToDate = false;
-                }
-            }
         }
     }
 
@@ -337,10 +254,6 @@ internal sealed class SeederServerBuilder : IDisposable
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityUsers(seedData.Users);
         await BuildFractions(seedData.Fractions);
-        BuildBlips(seedData.Blips);
-        BuildPickups(seedData.Pickups);
-        BuildMarkers(seedData.Markers);
-        await BuildGroups(seedData.Groups);
         _createdUsers.Clear();
         if (_isUpToDate)
         {

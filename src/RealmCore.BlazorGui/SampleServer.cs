@@ -44,7 +44,6 @@ public static class SampleServerExtensions
         services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
 
         services.AddHostedService<PlayerJoinedHostedLogic>();
-        services.AddHostedService<SamplePickupsHostedService>();
         services.AddHostedService<PlayerBindsHostedService>();
         services.AddHostedService<ItemsHostedService>();
         services.AddHostedService<VehicleUpgradesHostedService>();
