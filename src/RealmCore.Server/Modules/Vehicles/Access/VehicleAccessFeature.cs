@@ -1,23 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUserAccessDto>
-{
-    VehicleUserAccessDto[] Owners { get; }
-
-    VehicleUserAccessDto AddAccess(int userId, byte accessType, string? customValue = null);
-    VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null);
-    VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null);
-    VehicleUserAccessDto AddAsOwner(int userId, string? customValue = null);
-    bool HasAccess(RealmPlayer player);
-    bool HasAccess(int userId);
-    bool IsOwner(int userId);
-    bool IsOwner(RealmPlayer player);
-    bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess);
-    bool TryRemoveAccess(int userId, byte? accessType = null);
-    bool TryRemoveAccess(RealmPlayer player, byte? accessType = null);
-}
-
-internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehiclePersistentData
+public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUserAccessDto>, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleUserAccessData> _userAccesses = [];

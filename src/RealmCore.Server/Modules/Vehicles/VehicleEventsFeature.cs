@@ -1,11 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehicleEventsFeature : IVehicleFeature, IEnumerable<VehicleEventDto>
-{
-    void AddEvent(int eventType, string? metadata = null);
-}
-
-internal sealed class VehicleEventsFeature : IVehicleEventsFeature, IUsesVehiclePersistentData
+public sealed class VehicleEventsFeature : IVehicleFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleEventData> _vehicleEvents = [];
@@ -46,8 +41,6 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature, IUsesVehicle
             yield return VehicleEventDto.Map(notificationData);
         }
     }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {

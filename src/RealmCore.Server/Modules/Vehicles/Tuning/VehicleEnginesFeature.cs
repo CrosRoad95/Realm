@@ -1,27 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
-public interface IVehicleEnginesFeature : IVehicleFeature
-{
-    short ActiveEngineId { get; set; }
-    short[] EnginesIds { get; }
-
-    event Action<IVehicleEnginesFeature, short>? ActiveEngineChanged;
-    event Action<IVehicleEnginesFeature, short>? EngineAdded;
-    event Action<IVehicleEnginesFeature, short>? EngineRemoved;
-
-    bool TryAdd(short engineId);
-    bool Has(short engineId);
-    bool TryRemove(short engineId);
-}
-
-internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature, IUsesVehiclePersistentData
+public sealed class VehicleEnginesFeature : IVehicleFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleEngineData> _vehicleEngine = [];
 
-    public event Action<IVehicleEnginesFeature, short>? ActiveEngineChanged;
-    public event Action<IVehicleEnginesFeature, short>? EngineAdded;
-    public event Action<IVehicleEnginesFeature, short>? EngineRemoved;
+    public event Action<VehicleEnginesFeature, short>? ActiveEngineChanged;
+    public event Action<VehicleEnginesFeature, short>? EngineAdded;
+    public event Action<VehicleEnginesFeature, short>? EngineRemoved;
     public event Action? VersionIncreased;
 
     public short ActiveEngineId

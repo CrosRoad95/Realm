@@ -1,16 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>
-{
-    FuelContainer? Active { get; }
-
-    event Action<IVehicleFuelFeature, FuelContainer?>? ActiveChanged;
-
-    FuelContainer AddFuelContainer(short fuelType, float initialAmount, float maxCapacity, float fuelConsumptionPerOneKm, float minimumDistanceThreshold, bool makeActive = false);
-    void Update(bool forceUpdate = false);
-}
-
-internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePersistentData
+public sealed class VehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleFuelData> _vehicleFuelData = [];
@@ -18,7 +8,7 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
     private FuelContainer? _active;
 
     public RealmVehicle Vehicle { get; init; }
-    public event Action<IVehicleFuelFeature, FuelContainer?>? ActiveChanged;
+    public event Action<VehicleFuelFeature, FuelContainer?>? ActiveChanged;
     public event Action? VersionIncreased;
 
     public FuelContainer? Active

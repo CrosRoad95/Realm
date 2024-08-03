@@ -37,7 +37,7 @@ public sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInv
     }
 }
 
-internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature, IUsesVehiclePersistentData
+public sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature, IUsesVehiclePersistentData
 {
     public RealmVehicle Vehicle { get; }
     protected override Element Element => Vehicle;

@@ -1,27 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehiclePartDamageFeature : IVehicleFeature
-{
-    short[] Parts { get; }
-
-    /// <summary>
-    /// Triggered when part damage drop to zero.
-    /// </summary>
-    event Action<IVehiclePartDamageFeature, short>? PartDestroyed;
-
-    bool TryAddPart(short partId, float state);
-    float GetState(short partId);
-    bool HasPart(short partId);
-    void Modify(short partId, float difference);
-    bool TryRemovePart(short partId);
-    bool TryGetState(short partId, out float state);
-}
-
-internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUsesVehiclePersistentData
+public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehiclePartDamageData> _vehiclePartDamages = [];
-    public event Action<IVehiclePartDamageFeature, short>? PartDestroyed;
+    public event Action<VehiclePartDamageFeature, short>? PartDestroyed;
     public event Action? VersionIncreased;
 
     public short[] Parts

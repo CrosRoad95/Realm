@@ -19,7 +19,7 @@ internal sealed class VehiclesInUseHostedService : VehicleLifecycle, IHostedServ
         return Task.CompletedTask;
     }
 
-    protected override void VehicleLoaded(IVehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
+    protected override void VehicleLoaded(VehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
     {
         _vehiclesInUse.TrySetActive(persistatnce.Id, vehicle);
     }

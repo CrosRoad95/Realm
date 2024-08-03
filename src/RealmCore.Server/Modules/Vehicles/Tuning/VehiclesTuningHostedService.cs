@@ -29,7 +29,7 @@ internal sealed class VehiclesTuningHostedService : IHostedService
             vehicle.Upgrades.Rebuild += HandleRebuild;
     }
 
-    private void HandleRebuild(IVehicleUpgradesFeature upgrades)
+    private void HandleRebuild(VehicleUpgradesFeature upgrades)
     {
         var vehicle = upgrades.Vehicle;
 

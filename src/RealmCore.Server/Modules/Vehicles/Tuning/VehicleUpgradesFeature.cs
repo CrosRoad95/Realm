@@ -1,29 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
-public interface IVehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>
-{
-    event Action<IVehicleUpgradesFeature, int>? UpgradeAdded;
-    event Action<IVehicleUpgradesFeature, int>? UpgradeRemoved;
-    internal event Action<IVehicleUpgradesFeature>? Rebuild;
-
-    bool AddUniqueUpgrade(int upgradeId, bool rebuild = true);
-    bool AddUpgrade(int upgradeId, bool rebuild = true);
-    bool AddUpgrades(IEnumerable<int> upgradeIds, bool rebuild = true);
-    void ForceRebuild();
-    bool HasUpgrade(int upgradeId);
-    void RemoveAllUpgrades(bool rebuild = true);
-    bool RemoveUpgrade(int upgradeId, bool rebuild = true);
-}
-
-internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature, IUsesVehiclePersistentData
+public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleUpgradeData> _upgrades = [];
 
 
-    public event Action<IVehicleUpgradesFeature, int>? UpgradeAdded;
-    public event Action<IVehicleUpgradesFeature, int>? UpgradeRemoved;
-    public event Action<IVehicleUpgradesFeature>? Rebuild;
+    public event Action<VehicleUpgradesFeature, int>? UpgradeAdded;
+    public event Action<VehicleUpgradesFeature, int>? UpgradeRemoved;
+    public event Action<VehicleUpgradesFeature>? Rebuild;
     public event Action? VersionIncreased;
 
     public RealmVehicle Vehicle { get; init; }

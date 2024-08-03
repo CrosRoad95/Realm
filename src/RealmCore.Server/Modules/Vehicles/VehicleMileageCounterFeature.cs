@@ -1,20 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehicleMileageCounterFeature : IVehicleFeature
-{
-    float Mileage { get; set; }
-    float MinimumDistanceThreshold { get; set; }
-
-    event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
-}
-
-internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeature, IUsesVehiclePersistentData, IDisposable
+public sealed class VehicleMileageCounterFeature : IVehicleFeature, IUsesVehiclePersistentData, IDisposable
 {
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
 
-    public event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
+    public event Action<VehicleMileageCounterFeature, float, float>? Traveled;
     public event Action? VersionIncreased;
 
     public float Mileage

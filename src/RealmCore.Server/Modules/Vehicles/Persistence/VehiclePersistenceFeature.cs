@@ -7,24 +7,7 @@ public interface IUsesVehiclePersistentData
     event Action? VersionIncreased;
 }
 
-public interface IVehiclePersistenceFeature : IVehicleFeature
-{
-    int Id { get; }
-    byte Kind { get; }
-    DateTime? LastUsed { get; }
-    bool IsLoaded { get; }
-    internal VehicleData VehicleData { get; }
-
-    event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
-
-    int GetVersion();
-    void IncreaseVersion();
-    void Load(VehicleData vehicleData, bool preserveLocation = false);
-    bool TryFlushVersion(int minimalVersion);
-    void Unload();
-}
-
-internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
+public sealed class VehiclePersistenceFeature : IVehicleFeature
 {
     private readonly object _lock = new();
     private VehicleData? _vehicleData;
@@ -52,11 +35,11 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
         }
     }
 
-    public event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
+    public event Action<VehiclePersistenceFeature, RealmVehicle>? Loaded;
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehiclePersistanceFeature(VehicleContext vehicleContext, IDateTimeProvider dateTimeProvider)
+    public VehiclePersistenceFeature(VehicleContext vehicleContext, IDateTimeProvider dateTimeProvider)
     {
         Vehicle = vehicleContext.Vehicle;
         _dateTimeProvider = dateTimeProvider;

@@ -40,11 +40,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    public static IServiceCollection AddVehicleScopedFeature<T1, T2>(this IServiceCollection services)
+    public static IServiceCollection AddVehicleScopedFeature<T1>(this IServiceCollection services)
         where T1 : class, IVehicleFeature
-        where T2: class, T1
     {
-        services.AddScoped<T1, T2>();
+        services.AddScoped<T1>();
         services.AddScoped<IVehicleFeature>(x => x.GetRequiredService<T1>()); 
         return services;
     }
@@ -188,15 +187,15 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Vehicle features
-        services.AddVehicleScopedFeature<IVehicleAccessFeature, VehicleAccessFeature>();
-        services.AddVehicleScopedFeature<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
-        services.AddVehicleScopedFeature<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
-        services.AddVehicleScopedFeature<IVehicleUpgradesFeature, VehicleUpgradesFeature>();
-        services.AddVehicleScopedFeature<IVehiclePartDamageFeature, VehiclePartDamageFeature>();
-        services.AddVehicleScopedFeature<IVehicleEnginesFeature, VehicleEnginesFeature>();
-        services.AddVehicleScopedFeature<IVehicleEventsFeature, VehicleEventsFeature>();
-        services.AddVehicleScopedFeature<IVehicleFuelFeature, VehicleFuelFeature>();
-        services.AddVehicleScopedFeature<IVehicleInventoryFeature, VehicleInventoryFeature>();
+        services.AddVehicleScopedFeature<VehicleAccessFeature>();
+        services.AddVehicleScopedFeature<VehiclePersistenceFeature>();
+        services.AddVehicleScopedFeature<VehicleMileageCounterFeature>();
+        services.AddVehicleScopedFeature<VehicleUpgradesFeature>();
+        services.AddVehicleScopedFeature<VehiclePartDamageFeature>();
+        services.AddVehicleScopedFeature<VehicleEnginesFeature>();
+        services.AddVehicleScopedFeature<VehicleEventsFeature>();
+        services.AddVehicleScopedFeature<VehicleFuelFeature>();
+        services.AddVehicleScopedFeature<VehicleInventoryFeature>();
         #endregion
 
         #region Elements features

@@ -38,14 +38,14 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
 
     public IElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
-    public IVehicleAccessFeature Access { get; init; }
-    public IVehiclePersistenceFeature Persistence { get; init; }
-    public IVehicleMileageCounterFeature MileageCounter { get; init; }
-    public new IVehicleUpgradesFeature Upgrades { get; init; }
-    public IVehiclePartDamageFeature PartDamage { get; init; }
-    public IVehicleEnginesFeature Engines { get; init; }
-    public IVehicleEventsFeature Events { get; init; }
-    public IVehicleFuelFeature Fuel { get; init; }
+    public VehicleAccessFeature Access { get; init; }
+    public VehiclePersistenceFeature Persistence { get; init; }
+    public VehicleMileageCounterFeature MileageCounter { get; init; }
+    public new VehicleUpgradesFeature Upgrades { get; init; }
+    public VehiclePartDamageFeature PartDamage { get; init; }
+    public VehicleEnginesFeature Engines { get; init; }
+    public VehicleEventsFeature Events { get; init; }
+    public VehicleFuelFeature Fuel { get; init; }
     public IVehicleInventoryFeature Inventory { get; init; }
 
     public VehicleAccessController AccessController
@@ -76,14 +76,14 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
         Saving = GetRequiredService<IElementSaveService>();
 
         #region Initialize scope services
-        Access = GetRequiredService<IVehicleAccessFeature>();
-        Persistence = GetRequiredService<IVehiclePersistenceFeature>();
-        MileageCounter = GetRequiredService<IVehicleMileageCounterFeature>();
-        Upgrades = GetRequiredService<IVehicleUpgradesFeature>();
-        PartDamage = GetRequiredService<IVehiclePartDamageFeature>();
-        Engines = GetRequiredService<IVehicleEnginesFeature>();
-        Events = GetRequiredService<IVehicleEventsFeature>();
-        Fuel = GetRequiredService<IVehicleFuelFeature>();
+        Access = GetRequiredService<VehicleAccessFeature>();
+        Persistence = GetRequiredService<VehiclePersistenceFeature>();
+        MileageCounter = GetRequiredService<VehicleMileageCounterFeature>();
+        Upgrades = GetRequiredService<VehicleUpgradesFeature>();
+        PartDamage = GetRequiredService<VehiclePartDamageFeature>();
+        Engines = GetRequiredService<VehicleEnginesFeature>();
+        Events = GetRequiredService<VehicleEventsFeature>();
+        Fuel = GetRequiredService<VehicleFuelFeature>();
         Inventory = GetRequiredService<IVehicleInventoryFeature>();
         #endregion
     }

@@ -17,7 +17,7 @@ public abstract class VehicleLifecycle<TVehicle> where TVehicle : RealmVehicle
         }
     }
 
-    private void HandleLoaded(IVehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
+    private void HandleLoaded(VehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
     {
         VehicleLoaded(persistatnce, (TVehicle)vehicle);
     }
@@ -34,7 +34,7 @@ public abstract class VehicleLifecycle<TVehicle> where TVehicle : RealmVehicle
 
     protected virtual void VehicleCreated(TVehicle vehicle) { }
     protected virtual void VehicleDestroyed(TVehicle vehicle) { }
-    protected virtual void VehicleLoaded(IVehiclePersistenceFeature persistatnce, TVehicle vehicle) { }
+    protected virtual void VehicleLoaded(VehiclePersistenceFeature persistatnce, TVehicle vehicle) { }
 }
 
 public abstract class VehicleLifecycle : VehicleLifecycle<RealmVehicle>
