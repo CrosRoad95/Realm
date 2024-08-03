@@ -1,27 +1,30 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-internal sealed class ServerListHostedService : IHostedService
+public sealed class ServerListOptions
+{
+    public string GameType { get; set; } = "New-Realm";
+    public string MapName { get; set; } = "N/A";
+}
+
+internal sealed class ServerListHostedService : IHostedLifecycleService
 {
     private readonly MtaServer _server;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IOptionsMonitor<ServerListOptions> _serverListOptions;
     private readonly ILogger<ServerListHostedService> _logger;
-    private readonly Debounce _debounce = new(500);
+    private readonly IDebounce _debounce;
 
-    public ServerListHostedService(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerListHostedService> logger)
+    public ServerListHostedService(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerListHostedService> logger, IDebounceFactory debounceFactory)
     {
         _server = server;
         _gameplayOptions = gameplayOptions;
         _serverListOptions = serverListOptions;
         _logger = logger;
+        _debounce = debounceFactory.Create(500);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        UpdateGameplayOptions(true);
-        UpdateServerListOptions(true);
-        _gameplayOptions.OnChange(GameplayOptionsChanged);
-        _serverListOptions.OnChange(ServerListOptionsChanged);
         return Task.CompletedTask;
     }
 
@@ -30,7 +33,31 @@ internal sealed class ServerListHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private void UpdateGameplayOptions(bool firstUpdate = false)
+    public Task StartedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        GameplayOptionsChanged(_gameplayOptions.CurrentValue);
+        ServerListOptionsChanged(_serverListOptions.CurrentValue);
+        _gameplayOptions.OnChange(GameplayOptionsChanged);
+        _serverListOptions.OnChange(ServerListOptionsChanged);
+        return Task.CompletedTask;
+    }
+
+    public Task StoppedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    private void UpdateGameplayOptions(GameplayOptions gameplayOptions)
     {
         if (_gameplayOptions.CurrentValue.Password == _server.Password)
             return;
@@ -40,28 +67,25 @@ internal sealed class ServerListHostedService : IHostedService
         else
             _server.Password = null;
 
-        if (!firstUpdate)
-            _logger.LogInformation("Gameplay options updated. Password={serverPassword}", _server.Password);
+        _logger.LogInformation("Gameplay options updated. Password={serverPassword}", _server.Password);
     }
 
-    private void UpdateServerListOptions(bool firstUpdate = false)
+    private void UpdateServerListOptions(ServerListOptions serverListOptions)
     {
-        var value = _serverListOptions.CurrentValue;
-        if (value.GameType == _server.GameType && value.MapName == _server.MapName)
+        if (serverListOptions.GameType == _server.GameType && serverListOptions.MapName == _server.MapName)
             return;
 
         _server.GameType = _serverListOptions.CurrentValue.GameType;
         _server.MapName = _serverListOptions.CurrentValue.MapName;
 
-        if (!firstUpdate)
-            _logger.LogInformation("Server list options updated. GameType={gameType}, MapName={mapName}", _server.GameType, _server.MapName);
+        _logger.LogInformation("Server list options updated. GameType={gameType}, MapName={mapName}", _server.GameType, _server.MapName);
     }
 
     private void GameplayOptionsChanged(GameplayOptions gameplayOptions)
     {
         _debounce.Invoke(() =>
         {
-            UpdateGameplayOptions();
+            UpdateGameplayOptions(gameplayOptions);
         });
     }
 
@@ -69,7 +93,7 @@ internal sealed class ServerListHostedService : IHostedService
     {
         _debounce.Invoke(() =>
         {
-            UpdateServerListOptions();
+            UpdateServerListOptions(serverListOptions);
         });
     }
 }
