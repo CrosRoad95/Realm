@@ -1,13 +1,12 @@
-﻿
-namespace RealmCore.Server.Modules.Persistence;
+﻿namespace RealmCore.Server.Modules.Persistence;
 
 internal sealed class VehiclesInUseHostedService : VehicleLifecycle, IHostedService
 {
-    private readonly IVehiclesInUse _activeVehicles;
+    private readonly VehiclesInUse _vehiclesInUse;
 
-    public VehiclesInUseHostedService(IElementFactory elementFactory, IVehiclesInUse activeVehicles) : base(elementFactory)
+    public VehiclesInUseHostedService(IElementFactory elementFactory, VehiclesInUse vehiclesInUse) : base(elementFactory)
     {
-        _activeVehicles = activeVehicles;
+        _vehiclesInUse = vehiclesInUse;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -22,6 +21,6 @@ internal sealed class VehiclesInUseHostedService : VehicleLifecycle, IHostedServ
 
     protected override void VehicleLoaded(IVehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
     {
-        _activeVehicles.TrySetActive(persistatnce.Id, vehicle);
+        _vehiclesInUse.TrySetActive(persistatnce.Id, vehicle);
     }
 }

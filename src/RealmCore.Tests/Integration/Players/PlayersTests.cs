@@ -11,7 +11,7 @@ public class PlayersTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var usersService = player.GetRequiredService<IUsersService>();
+        var usersService = player.GetRequiredService<UsersService>();
         foreach (var roleName in roles)
         {
             var roleManager = player.GetRequiredService<RoleManager<RoleData>>();

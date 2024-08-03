@@ -4,9 +4,9 @@ public sealed class PlayerBanPipeline : IPlayerJoinedPipeline
 {
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IBansService _bansService;
+    private readonly BansService _bansService;
 
-    public PlayerBanPipeline(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, IBansService bansService)
+    public PlayerBanPipeline(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, BansService bansService)
     {
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;

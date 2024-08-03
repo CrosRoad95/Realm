@@ -5,6 +5,8 @@ public interface IUsersRepository
     Task<UserData?> GetBySerial(string serial, CancellationToken cancellationToken = default);
     Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default);
     Task<string[]> GetRoles(int userId, CancellationToken cancellationToken = default);
+    Task<UserData?> GetUserByUserName(string userName, DateTime dateTime, CancellationToken cancellationToken = default);
+    Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default);
 }
 
 internal sealed class UsersRepository : IUsersRepository
@@ -18,18 +20,30 @@ internal sealed class UsersRepository : IUsersRepository
 
     public async Task<UserData?> GetBySerial(string serial, CancellationToken cancellationToken = default)
     {
-        var query = _db.Users
+        using var activity = Activity.StartActivity(nameof(GetBySerial));
+
+        if (activity != null)
+        {
+            activity.SetTag("serial", serial);
+        }
+
+        var query = CreateQueryBase()
             .AsNoTracking()
-            .TagWithSource(nameof(UsersRepository))
             .Where(x => x.RegisterSerial == serial);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default)
     {
-        var query = _db.Users
+        using var activity = Activity.StartActivity(nameof(GetLastNickName));
+
+        if (activity != null)
+        {
+            activity.SetTag("userId", userId);
+        }
+
+        var query = CreateQueryBase()
             .AsNoTracking()
-            .TagWithSource(nameof(UsersRepository))
             .Where(x => x.Id == userId);
         var user = await query.FirstOrDefaultAsync(cancellationToken);
         return user?.Nick;
@@ -37,6 +51,13 @@ internal sealed class UsersRepository : IUsersRepository
 
     public async Task<string[]> GetRoles(int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetRoles));
+
+        if (activity != null)
+        {
+            activity.SetTag("userId", userId);
+        }
+
         var subQuery = _db.UserRoles
             .AsNoTracking()
             .TagWithSource(nameof(UsersRepository))
@@ -51,4 +72,43 @@ internal sealed class UsersRepository : IUsersRepository
         var roles = await query.ToArrayAsync(cancellationToken);
         return roles;
     }
+
+    public async Task<UserData?> GetUserByUserName(string userName, DateTime dateTime, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetUserByUserName));
+
+        if (activity != null)
+        {
+            activity.SetTag("userName", userName);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .IncludeAll(dateTime)
+            .Where(u => u.UserName == userName);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(TryUpdateLastNickname));
+
+        if(activity != null)
+        {
+            activity.SetTag("userId", userId);
+            activity.SetTag("nick", nick);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(u => u.Id == userId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken) == 1;
+    }
+
+    private IQueryable<UserData> CreateQueryBase() => _db.Users
+        .TagWithSource(nameof(UsersRepository));
+
+    public static readonly ActivitySource Activity = new("RealmCore.UsersRepository", "1.0.0");
 }

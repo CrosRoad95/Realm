@@ -9,7 +9,7 @@ public class UserTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer(true);
 
-        var usersService = player.GetRequiredService<IUsersService>();
+        var usersService = player.GetRequiredService<UsersService>();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var login = Guid.NewGuid().ToString()[..8];
         var password = "asdASD123!@#";
@@ -17,7 +17,7 @@ public class UserTests
 
         #region Act
         var registerResult = await usersService.Register(login, password);
-        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(login) ?? throw new Exception("User not found");
+        var user = await player.GetRequiredService<PlayersUsersService>().GetUserByUserName(login) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
         var logIn = async () => await usersService.LogIn(player, user);

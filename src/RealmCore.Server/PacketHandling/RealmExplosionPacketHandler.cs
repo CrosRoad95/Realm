@@ -4,11 +4,11 @@ public class RealmExplosionPacketHandler : IPacketHandler<ExplosionPacket>
 {
     private readonly ISyncHandlerMiddleware<ExplosionPacket> _middleware;
     private readonly IElementCollection _elementCollection;
-    private readonly IAntiCheat _antiCheat;
+    private readonly AntiCheat _antiCheat;
 
     public PacketId PacketId => PacketId.PACKET_ID_EXPLOSION;
 
-    public RealmExplosionPacketHandler(ISyncHandlerMiddleware<ExplosionPacket> middleware, IElementCollection elementCollection, IAntiCheat antiCheat
+    public RealmExplosionPacketHandler(ISyncHandlerMiddleware<ExplosionPacket> middleware, IElementCollection elementCollection, AntiCheat antiCheat
     )
     {
         _middleware = middleware;
@@ -24,7 +24,7 @@ public class RealmExplosionPacketHandler : IPacketHandler<ExplosionPacket>
         var distance = (player.Position - packet.Position).LengthSquared();
         if(distance > 500 * 500)
         {
-            _antiCheat.ReportViolation(player, KnownAntiCheatViolation.ExplosionOutsideRange);
+            _antiCheat.ReportViolation(player, (int)KnownAntiCheatViolation.ExplosionOutsideRange);
             return;
         }
 

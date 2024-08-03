@@ -6,11 +6,11 @@ namespace RealmCore.BlazorGui.Commands;
 public sealed class CreateGroupCommand : IInGameCommand
 {
     private readonly ILogger<CreateGroupCommand> _logger;
-    private readonly IGroupsService _groupService;
+    private readonly GroupsService _groupService;
     private readonly ChatBox _chatBox;
 
     public string[] RequiredPolicies { get; } = [];
-    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, IGroupsService groupService, ChatBox chatBox)
+    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, GroupsService groupService, ChatBox chatBox)
     {
         _logger = logger;
         _groupService = groupService;

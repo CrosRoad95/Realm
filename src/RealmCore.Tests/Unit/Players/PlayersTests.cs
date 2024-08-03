@@ -277,7 +277,7 @@ public class PlayersTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var elementSearchService = player.GetRequiredService<IElementSearchService>();
+        var elementSearchService = player.GetRequiredService<PlayerSearchService>();
         #endregion
 
         #region Act
@@ -307,7 +307,7 @@ public class PlayersTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var searchService = player.GetRequiredService<IElementSearchService>();
+        var searchService = player.GetRequiredService<PlayerSearchService>();
         #endregion
 
         #region Act

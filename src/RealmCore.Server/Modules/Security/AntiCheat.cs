@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Modules.Security;
+﻿namespace RealmCore.Server.Modules.Security;
 
 public enum KnownAntiCheatViolation
 {
@@ -9,14 +8,7 @@ public enum KnownAntiCheatViolation
 
 public record AntiCheatViolationDetails();
 
-public interface IAntiCheat
-{
-    event Action<RealmPlayer, int, AntiCheatViolationDetails?>? ViolationReported;
-
-    void ReportViolation(RealmPlayer player, KnownAntiCheatViolation violation, AntiCheatViolationDetails? details = null);
-}
-
-internal sealed class AntiCheat : IAntiCheat
+public sealed class AntiCheat
 {
     private readonly ILogger<AntiCheat> _logger;
 

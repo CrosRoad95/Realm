@@ -9,7 +9,7 @@ public class VehicleAccessTests
         var player = await hosting.CreatePlayer();
         var vehicle = hosting.CreateVehicle();
 
-        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<VehiclesAccessService>();
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0);
         canEnter.Should().BeTrue();
     }
@@ -23,7 +23,7 @@ public class VehicleAccessTests
         var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = new VehicleExclusiveAccessController(player1);
-        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<VehiclesAccessService>();
 
         var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, vehicle.AccessController);
         var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, vehicle.AccessController);
@@ -39,7 +39,7 @@ public class VehicleAccessTests
         var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<VehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeFalse();
@@ -53,7 +53,7 @@ public class VehicleAccessTests
         var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleDefaultAccessController.Instance;
-        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<VehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeTrue();
@@ -68,7 +68,7 @@ public class VehicleAccessTests
         var vehicle = hosting.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = hosting.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = hosting.GetRequiredService<VehiclesAccessService>();
 
         vehicleAccessService.CanEnter += (ped, vehicle, seat) => ped == player1;
 

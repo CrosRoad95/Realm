@@ -7,9 +7,9 @@ internal sealed class PlayerJoinedHostedLogic : IHostedService
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
     private readonly PlayersEventManager _playersEventManager;
-    private readonly IUsersService _usersService;
+    private readonly UsersService _usersService;
 
-    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService, ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService)
+    public PlayerJoinedHostedLogic(ILogger<PlayerJoinedHostedLogic> logger, INametagsService nametagsService, ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, UsersService usersService)
     {
         _logger = logger;
         _nametagsService = nametagsService;

@@ -75,12 +75,12 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
 
     public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
-        var userService = player.GetRequiredService<IPlayerUserService>();
+        var userService = player.GetRequiredService<PlayersUsersService>();
         var user = await userService.GetUserByUserName(player.Name);
 
         if (user == null)
         {
-            await Host.Services.GetRequiredService<IUsersService>().Register(player.Name, "asdASD123!@#");
+            await Host.Services.GetRequiredService<UsersService>().Register(player.Name, "asdASD123!@#");
 
             user = await userService.GetUserByUserName(player.Name);
             ;
@@ -89,7 +89,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
         if (user == null)
             throw new InvalidOperationException();
 
-        var success = await player.GetRequiredService<IUsersService>().LogIn(player, user, dontLoadData);
+        var success = await player.GetRequiredService<UsersService>().LogIn(player, user, dontLoadData);
 
         success.Switch(loggedIn =>
         {
@@ -162,7 +162,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
 
     public async Task<RealmVehicle> CreatePersistentVehicle()
     {
-        var vehiclesService = GetRequiredService<IVehiclesService>();
+        var vehiclesService = GetRequiredService<VehiclesService>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         if (vehicle == null)
             throw new NullReferenceException("Vehicle is null");
@@ -182,12 +182,13 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
         player.Disposed += handlePlayerDisposed;
         player.TriggerDisconnected(QuitReason.Quit);
 
-        await tcs.Task;
+        if (!await tcs.WaitWithTimeout(TimeSpan.FromSeconds(5)))
+            throw new TimeoutException();
     }
 
     public async Task LogOutPlayer(RealmPlayer player)
     {
-        await player.GetRequiredService<IUsersService>().LogOut(player);
+        await player.GetRequiredService<UsersService>().LogOut(player);
     }
 }
 

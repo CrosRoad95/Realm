@@ -4,28 +4,6 @@
 
 internal class SeedData
 {
-    public class BlipSeedData
-    {
-        public int Icon { get; set; }
-        public Vector3 Position { get; set; }
-    }
-
-    public class PickupSeedData
-    {
-        public ushort Model { get; set; }
-        public Vector3 Position { get; set; }
-        public string? Text3d { get; set; }
-        public string? Gui { get; set; }
-    }
-
-    public class MarkerSeedData
-    {
-        public Vector3 Position { get; set; }
-        public float Size { get; set; } = 1;
-        public Color Color { get; set; }
-        public MarkerType MarkerType { get; set; } = MarkerType.Cylinder;
-    }
-
     public class FractionMemberSeedData
     {
         public int Rank { get; set; }
@@ -69,13 +47,6 @@ internal class SeedData
     {
         public int Rank { get; set; }
         public string RankName { get; set; }
-    }
-
-    public class GroupSeedData
-    {
-        public string Shortcut { get; set; }
-        public GroupKind GroupKind { get; set; }
-        public Dictionary<string, GroupMemberSeedData> Members { get; set; }
     }
 
     public Dictionary<string, FractionSeedData> Fractions = [];

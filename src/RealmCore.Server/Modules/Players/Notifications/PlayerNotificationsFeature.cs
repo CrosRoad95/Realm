@@ -13,7 +13,7 @@ public sealed class PlayerNotificationsFeature : IPlayerFeature, IEnumerable<Use
 
     public RealmPlayer Player { get; }
 
-    public PlayerNotificationsFeature(PlayerContext playerContext, IUserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider, IPlayersNotifications playersNotifications)
+    public PlayerNotificationsFeature(PlayerContext playerContext, IUserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider, NotificationsService notificationsService)
     {
         Player = playerContext.Player;
         _userNotificationRepository = userNotificationRepository;

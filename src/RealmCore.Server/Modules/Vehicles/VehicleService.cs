@@ -3,20 +3,14 @@
 /// <summary>
 /// Vehicle scoped set of methods
 /// </summary>
-public interface IVehicleService
-{
-    Task Destroy(CancellationToken cancellationToken = default);
-    Task<bool> SetVehicleSpawned(bool spawned = true, CancellationToken cancellationToken = default);
-}
-
-internal sealed class VehicleService : IVehicleService
+public sealed class VehicleService
 {
     private readonly RealmVehicle _vehicle;
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly IVehiclesInUse _vehiclesInUse;
+    private readonly VehiclesInUse _vehiclesInUse;
     private readonly IElementSaveService _saveService;
 
-    public VehicleService(VehicleContext vehicleContext, IVehicleRepository vehicleRepository, IDateTimeProvider dateTimeProvider, IVehiclesInUse vehiclesInUse, IElementSaveService saveService)
+    public VehicleService(VehicleContext vehicleContext, IVehicleRepository vehicleRepository, IDateTimeProvider dateTimeProvider, VehiclesInUse vehiclesInUse, IElementSaveService saveService)
     {
         _vehicle = vehicleContext.Vehicle;
         _vehicleRepository = vehicleRepository;

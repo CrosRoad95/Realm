@@ -8,14 +8,14 @@ internal class ReloadElementsCommand : IInGameCommand
     private readonly IElementCollection _elementCollection;
     private readonly IElementSaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
-    private readonly IVehicleLoader _loadService;
+    private readonly VehicleLoader _vehicleLoader;
 
-    public ReloadElementsCommand(IElementCollection elementCollection, IElementSaveService saveService, ILogger<SaveCommand> logger, IVehicleLoader loadService)
+    public ReloadElementsCommand(IElementCollection elementCollection, IElementSaveService saveService, ILogger<SaveCommand> logger, VehicleLoader vehicleLoader)
     {
         _elementCollection = elementCollection;
         _saveService = saveService;
         _logger = logger;
-        _loadService = loadService;
+        _vehicleLoader = vehicleLoader;
     }
 
     public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
@@ -38,6 +38,6 @@ internal class ReloadElementsCommand : IInGameCommand
             }
         }
 
-        await _loadService.LoadAll(cancellationToken);
+        await _vehicleLoader.LoadAll(cancellationToken);
     }
 }

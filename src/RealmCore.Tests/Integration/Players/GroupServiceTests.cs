@@ -8,11 +8,11 @@ public class GroupServiceTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var groupService = hosting.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<GroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
 
-        await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
+        await groupService.CreateGroup(groupName, groupName[..8], 0);
 
         var group = await groupService.GetGroupByName(groupName);
 
@@ -25,9 +25,9 @@ public class GroupServiceTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var groupService = hosting.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<GroupsService>();
 
-        var createGroup = async () => await groupService.CreateGroup("foo", "TG2", GroupKind.Regular);
+        var createGroup = async () => await groupService.CreateGroup("foo", "TG2", 0);
 
         await createGroup.Should().NotThrowAsync();
         (await createGroup.Should().ThrowAsync<GroupNameInUseException>())
@@ -40,10 +40,10 @@ public class GroupServiceTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var groupService = hosting.GetRequiredService<IGroupsService>();
+        var groupService = hosting.GetRequiredService<GroupsService>();
 
         var groupName = Guid.NewGuid().ToString();
-        var group = await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
+        var group = await groupService.CreateGroup(groupName, groupName[..8], 0);
 
         await groupService.TryAddMember(player, group.id, 1, "Leader");
 
@@ -62,8 +62,8 @@ public class GroupServiceTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer();
 
-        var groupService = hosting.GetRequiredService<IGroupsService>();
-        var group = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
+        var groupService = hosting.GetRequiredService<GroupsService>();
+        var group = await groupService.CreateGroup("Test group4", "TG4", 0);
 
         await groupService.TryAddMember(player, group.id, 100, "Leader");
         var removed = await groupService.RemoveMember(player, player.UserId);

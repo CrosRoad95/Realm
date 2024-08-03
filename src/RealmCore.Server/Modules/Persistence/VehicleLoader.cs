@@ -1,19 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Persistence;
 
-public interface IVehicleLoader
-{
-    Task LoadAll(CancellationToken cancellationToken = default);
-    Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default);
-}
-
-internal sealed class VehicleLoader : IVehicleLoader
+public sealed class VehicleLoader
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly ILogger<VehicleLoader> _logger;
     private readonly IElementFactory _elementFactory;
-    private readonly IVehiclesInUse _vehiclesInUse;
+    private readonly VehiclesInUse _vehiclesInUse;
 
-    public VehicleLoader(IVehicleRepository vehicleRepository, ILogger<VehicleLoader> logger, IElementFactory elementFactory, IVehiclesInUse vehiclesInUse)
+    public VehicleLoader(IVehicleRepository vehicleRepository, ILogger<VehicleLoader> logger, IElementFactory elementFactory, VehiclesInUse vehiclesInUse)
     {
         _vehicleRepository = vehicleRepository;
         _logger = logger;
@@ -49,7 +43,7 @@ internal sealed class VehicleLoader : IVehicleLoader
 
                 vehicle.Persistence.Load(vehicleData);
 
-                await vehicle.GetRequiredService<IVehicleService>().SetVehicleSpawned(true, cancellationToken);
+                await vehicle.GetRequiredService<VehicleService>().SetVehicleSpawned(true, cancellationToken);
 
                 vehicle.Upgrades.ForceRebuild();
 

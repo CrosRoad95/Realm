@@ -22,10 +22,10 @@ internal sealed class PlayerBindsHostedService : IHostedService
         public List<Type>? allowToOpenWithGui;
     }
 
-    private readonly IUsersService _usersService;
+    private readonly UsersService _usersService;
     private readonly IServiceProvider _serviceProvider;
 
-    public PlayerBindsHostedService(IUsersService usersService, IServiceProvider serviceProvider)
+    public PlayerBindsHostedService(UsersService usersService, IServiceProvider serviceProvider)
     {
         _usersService = usersService;
         _serviceProvider = serviceProvider;

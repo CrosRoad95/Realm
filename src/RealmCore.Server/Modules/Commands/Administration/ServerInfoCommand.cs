@@ -9,9 +9,9 @@ internal class ServerInfoCommand : IInGameCommand
     private readonly MtaServer _server;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IElementCollection _elementCollection;
-    private readonly IMapsService _mapsService;
+    private readonly MapsService _mapsService;
 
-    public ServerInfoCommand(ILogger<HelpCommand> logger, MtaServer server, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, IMapsService mapsService)
+    public ServerInfoCommand(ILogger<HelpCommand> logger, MtaServer server, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, MapsService mapsService)
     {
         _logger = logger;
         _server = server;

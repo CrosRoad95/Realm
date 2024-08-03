@@ -10,9 +10,9 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
     private readonly ILogger<TestHostedService> _logger;
     private readonly ChatBox _chatBox;
     private readonly INametagsService _nametagsService;
-    private readonly IVehiclesAccessService _vehiclesAccessService;
+    private readonly VehiclesAccessService _vehiclesAccessService;
 
-    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox, INametagsService nametagsService, IVehiclesAccessService vehiclesAccessService) : base(playersEventManager)
+    public TestHostedService(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestHostedService> logger, ChatBox chatBox, INametagsService nametagsService, VehiclesAccessService vehiclesAccessService) : base(playersEventManager)
     {
         _elementFactory = elementFactory;
         _schedulerService = schedulerService;

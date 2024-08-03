@@ -1,16 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehiclesInUse
-{
-    IEnumerable<int> ActiveVehiclesIds { get; }
-
-    bool IsActive(int vehicleId);
-    bool TryGetVehicleById(int vehicleId, out RealmVehicle? vehicle);
-    bool TrySetActive(int vehicleId, RealmVehicle vehicle);
-    bool TrySetInactive(int vehicleId);
-}
-
-internal sealed class VehiclesInUse : IVehiclesInUse
+public sealed class VehiclesInUse
 {
     private readonly ConcurrentDictionary<int, RealmVehicle> _activeVehicles = new();
 

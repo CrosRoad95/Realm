@@ -3,7 +3,7 @@
 @inject MtaServer _server
 @inject NavigationManager _navigationManager
 @inject AuthenticationStateProvider _authenticationState
-@inject IBrowserGuiService _realmBrowserService
+@inject BrowserGuiService _realmBrowserService
 @implements IDisposable
 
 @if (_player == null)
@@ -55,7 +55,7 @@ else
     {
         var authenticationState = await _authenticationState.GetAuthenticationStateAsync();
 
-        var browserGuiService = _server.GetRequiredService<IBrowserGuiService>();
+        var browserGuiService = _server.GetRequiredService<BrowserGuiService>();
 
         if (HttpContext == null && BrowserKey != null)
         {
@@ -63,10 +63,6 @@ else
             {
                 _player = player;
                 Ready();
-            }
-            else
-            {
-                ;
             }
             return;
         }

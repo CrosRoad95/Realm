@@ -1,15 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
-public interface IBrowserGuiService
-{
-    string GenerateKey();
-    bool AuthorizePlayer(string key, RealmPlayer player);
-    bool UnauthorizePlayer(RealmPlayer player);
-    bool TryGetPlayerByKey(string key, out RealmPlayer? player);
-    bool IsAuthorized(RealmPlayer player);
-}
-
-internal class BrowserGuiService : IBrowserGuiService
+public sealed class BrowserGuiService
 {
     private readonly object _lock = new();
     private readonly Dictionary<string, RealmPlayer> _playerByKey = new();

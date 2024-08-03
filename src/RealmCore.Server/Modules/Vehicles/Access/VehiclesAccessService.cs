@@ -1,19 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-public interface IVehiclesAccessService
-{
-    event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
-    event Func<Ped, RealmVehicle, byte, bool>? CanExit;
-    event Func<Ped, RealmVehicle, byte, bool>? CanNotEnter;
-    event Func<Ped, RealmVehicle, byte, bool>? CanNotExit;
-    event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToEnter;
-    event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToExit;
-
-    bool InternalCanExit(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessController? vehicleAccessController = null);
-    internal bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessController? vehicleAccessController = null);
-}
-
-internal sealed class VehiclesAccessService : IVehiclesAccessService
+public sealed class VehiclesAccessService
 {
     private readonly ILogger<VehiclesAccessService> _logger;
 

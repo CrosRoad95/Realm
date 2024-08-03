@@ -1,13 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.World.Spawning;
 
-public interface ISpawnMarkersService
-{
-    IReadOnlyList<SpawnMarker> SpawnMarkers { get; }
-
-    void AddSpawnMarker(SpawnMarker spawnMarker);
-}
-
-internal sealed class SpawnMarkersService : ISpawnMarkersService
+public sealed class SpawnMarkersService
 {
     private readonly object _lock = new();
     private readonly List<SpawnMarker> _spawnMarkers = [];

@@ -9,11 +9,11 @@ internal sealed partial class PlayerGameplayHostedService : IHostedService
     private readonly ChatBox _chatBox;
     private readonly VehicleUpgradesCollection _vehicleUpgradeCollection;
     private readonly VehicleEnginesCollection _vehicleEnginesCollection;
-    private readonly IUsersService _usersService;
-    private readonly IVehiclesService _vehiclesService;
+    private readonly UsersService _usersService;
+    private readonly VehiclesService _vehiclesService;
     private readonly ILogger<PlayerGameplayHostedService> _logger;
 
-    public PlayerGameplayHostedService(ILogger<PlayerGameplayHostedService> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService, IVehiclesService vehiclesService)
+    public PlayerGameplayHostedService(ILogger<PlayerGameplayHostedService> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, UsersService usersService, VehiclesService vehiclesService)
     {
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;

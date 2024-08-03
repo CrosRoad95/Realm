@@ -1,15 +1,14 @@
 ﻿namespace RealmCore.BlazorGui.Commands;
 
-
 [CommandName("givereward")]
 public sealed class GiveRewardCommand : IInGameCommand
 {
     private readonly ILogger<GiveRewardCommand> _logger;
-    private readonly IRewardsService _rewardService;
+    private readonly RewardsService _rewardService;
     private readonly ChatBox _chatBox;
 
     public string[] RequiredPolicies { get; } = [];
-    public GiveRewardCommand(ILogger<GiveRewardCommand> logger, IRewardsService rewardService, ChatBox chatBox)
+    public GiveRewardCommand(ILogger<GiveRewardCommand> logger, RewardsService rewardService, ChatBox chatBox)
     {
         _logger = logger;
         _rewardService = rewardService;

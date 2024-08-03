@@ -1,25 +1,15 @@
 ﻿namespace RealmCore.Server.Modules.Search;
 
-public interface IElementSearchService
-{
-    RealmPlayer? FindPlayer(string pattern, PlayerSearchOptions options = default);
-    RealmVehicle? FindVehicle(string pattern, VehicleSearchOptions options = default);
-    IEnumerable<RealmPlayer> SearchPlayers(string pattern, PlayerSearchOptions options = default);
-    IEnumerable<RealmVehicle> SearchVehicles(string pattern, VehicleSearchOptions options = default);
-    bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All);
-    bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignored = null);
-}
-
 public record struct VehicleSearchOptions(VehicleSearchOption searchOptions = VehicleSearchOption.All, RealmVehicle? ignore = null);
 
 public record struct PlayerSearchOptions(PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null);
 
-public sealed class ElementSearchService : IElementSearchService
+public sealed class PlayerSearchService
 {
     private readonly IElementCollection _elementCollection;
     private readonly RealmPlayer _player;
 
-    public ElementSearchService(PlayerContext playerContext, IElementCollection elementCollection)
+    public PlayerSearchService(PlayerContext playerContext, IElementCollection elementCollection)
     {
         _player = playerContext.Player;
         _elementCollection = elementCollection;

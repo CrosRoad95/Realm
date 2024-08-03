@@ -17,7 +17,7 @@ internal class MapsDirectoryWatcher : IDisposable
     private readonly FileSystemWatcher _fileSystemWatcher;
     private readonly string _path;
     private readonly MapsCollection _mapsCollection;
-    private readonly IMapsService _mapsService;
+    private readonly MapsService _mapsService;
     private readonly MapLoader _mapLoader;
     private readonly List<MapEvent> _mapEvents = [];
     private readonly object _mapEventsLock = new();
@@ -25,7 +25,7 @@ internal class MapsDirectoryWatcher : IDisposable
 
     public event Action<string, MapEventType>? MapChanged;
 
-    public MapsDirectoryWatcher(IMapsService mapsService, MapLoader mapLoader, string path, MapsCollection mapsCollection)
+    public MapsDirectoryWatcher(MapsService mapsService, MapLoader mapLoader, string path, MapsCollection mapsCollection)
     {
         _path = path;
         _mapsCollection = mapsCollection;

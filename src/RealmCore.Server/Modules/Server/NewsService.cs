@@ -1,12 +1,8 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-public interface INewsService
+public sealed class NewsService
 {
-    Task<NewsDto[]> Get(int limit = 10, CancellationToken cancellationToken = default);
-}
-
-internal sealed class NewsService : INewsService
-{
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly INewsRepository _newsRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceScope _serviceScope;
@@ -20,7 +16,15 @@ internal sealed class NewsService : INewsService
 
     public async Task<NewsDto[]> Get(int limit = 10, CancellationToken cancellationToken = default)
     {
-        var newsDataList = await _newsRepository.Get(_dateTimeProvider.Now, limit, cancellationToken);
-        return [.. newsDataList.Select(NewsDto.Map)];
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var newsDataList = await _newsRepository.Get(_dateTimeProvider.Now, limit, cancellationToken);
+            return [.. newsDataList.Select(NewsDto.Map)];
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

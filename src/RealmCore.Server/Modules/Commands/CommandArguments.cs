@@ -4,13 +4,13 @@ public class CommandArguments
 {
     private readonly string[] _args;
     private readonly RealmPlayer _player;
-    private readonly IElementSearchService _searchService;
+    private readonly PlayerSearchService _searchService;
     private int _index;
 
     public int Index => _index;
     public int CurrentArgument => _index - 1;
 
-    public CommandArguments(RealmPlayer player, IElementSearchService searchService, string[] args)
+    public CommandArguments(RealmPlayer player, PlayerSearchService searchService, string[] args)
     {
         _args = args;
         _player = player;

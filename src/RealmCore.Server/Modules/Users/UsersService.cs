@@ -2,27 +2,14 @@
 
 namespace RealmCore.Server.Modules.Users;
 
-public interface IUsersService
-{
-    event Func<RealmPlayer, Task>? LoggedIn;
-    event Func<RealmPlayer, Task>? LoggedOut;
-
-    Task<bool> AddToRole(RealmPlayer player, string role);
-    ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
-    Task<OneOf<LoggedIn, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> LogIn(RealmPlayer player, UserData user, bool dontLoadData = false);
-    Task<OneOf<LoggedOut, PlayerNotLoggedIn>> LogOut(RealmPlayer player, CancellationToken cancellationToken = default);
-    Task<OneOf<LoggedIn, QuickLoginDisabled, UserDisabled, PlayerAlreadyLoggedIn, UserAlreadyInUse>> QuickLogin(RealmPlayer player, bool dontLoadData = false);
-    Task<OneOf<Registered, FailedToRegister>> Register(string username, string password);
-}
-
-internal sealed class UsersService : IUsersService
+public sealed class UsersService
 {
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
     private readonly IServiceScope _serviceScope;
     private readonly ILogger<UsersService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService? _authorizationService;
-    private readonly IUsersInUse _activeUsers;
+    private readonly UsersInUse _activeUsers;
     private readonly IServiceProvider _serviceProvider;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private readonly SignInManager<UserData> _signInManager;
@@ -31,7 +18,7 @@ internal sealed class UsersService : IUsersService
     public event Func<RealmPlayer, Task>? LoggedOut;
 
     public UsersService(ILogger<UsersService> logger,
-        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
+        IDateTimeProvider dateTimeProvider, UsersInUse activeUsers, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
     {
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
@@ -127,7 +114,7 @@ internal sealed class UsersService : IUsersService
                 await AuthorizePolicies(player);
                 UpdateLastData(player);
 
-                await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(userData.Id, player.Name);
+                await player.GetRequiredService<PlayersUsersService>().TryUpdateLastNickname(userData.Id, player.Name);
                 if (LoggedIn != null)
                 {
                     foreach (Func<RealmPlayer, Task> item in LoggedIn.GetInvocationList())

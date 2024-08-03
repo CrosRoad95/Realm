@@ -7,7 +7,7 @@ public sealed class PlayerBrowserFeature : IPlayerFeature, IDisposable
     public event Action<PlayerBrowserFeature, bool>? VisibleChanged;
     public event Action<PlayerBrowserFeature>? Ready;
 
-    private readonly IBrowserGuiService _browserGuiService;
+    private readonly BrowserGuiService _browserGuiService;
     private readonly IBrowserService _browserService;
 
     public bool IsReady { get; private set; }
@@ -61,7 +61,7 @@ public sealed class PlayerBrowserFeature : IPlayerFeature, IDisposable
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerBrowserFeature(PlayerContext playerContext, IBrowserGuiService browserGuiService, IBrowserService browserService)
+    public PlayerBrowserFeature(PlayerContext playerContext, BrowserGuiService browserGuiService, IBrowserService browserService)
     {
         Key = browserGuiService.GenerateKey();
         _browserGuiService = browserGuiService;

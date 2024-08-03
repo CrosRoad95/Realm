@@ -9,7 +9,7 @@ public class PlayerNotificationsTests
         var player = await hosting.CreatePlayer();
         var userId = player.UserId;
         var sut = player.Notifications;
-        var playersNotifications = hosting.Host.Services.GetRequiredService<IPlayersNotifications>();
+        var playersNotifications = hosting.Host.Services.GetRequiredService<NotificationsService>();
 
         var notificationDto = await playersNotifications.Create(userId, "test title", "test desc", "excerpt content");
 

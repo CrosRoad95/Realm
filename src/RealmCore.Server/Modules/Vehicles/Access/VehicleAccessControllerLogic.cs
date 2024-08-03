@@ -3,10 +3,10 @@
 internal sealed class VehicleAccessControllerLogic : IHostedService
 {
     private readonly IElementFactory _elementFactory;
-    private readonly IVehiclesAccessService _vehicleAccessService;
+    private readonly VehiclesAccessService _vehicleAccessService;
     private readonly ILogger<VehicleAccessControllerLogic> _logger;
 
-    public VehicleAccessControllerLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerLogic> logger)
+    public VehicleAccessControllerLogic(IElementFactory elementFactory, VehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerLogic> logger)
     {
         _elementFactory = elementFactory;
         _vehicleAccessService = vehicleAccessService;

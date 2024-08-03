@@ -2,10 +2,10 @@
 
 internal sealed class AntiCheatHostedService : IHostedService
 {
-    private readonly IAntiCheat _antiCheat;
+    private readonly AntiCheat _antiCheat;
     private readonly ILogger<AntiCheatHostedService> _logger;
 
-    public AntiCheatHostedService(IAntiCheat antiCheat, ILogger<AntiCheatHostedService> logger)
+    public AntiCheatHostedService(AntiCheat antiCheat, ILogger<AntiCheatHostedService> logger)
     {
         _antiCheat = antiCheat;
         _logger = logger;

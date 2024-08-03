@@ -2,9 +2,16 @@
 
 public struct Group
 {
-    public int id;
-    public string name;
-    public string? shortcut;
-    public GroupKind kind;
-    public GroupMember[] members;
+    public required int id;
+    public required string name;
+    public required string? shortcut;
+    public required int kind;
+    public required GroupMember[] members;
+}
+
+public struct GroupMember
+{
+    public required int userId;
+    public required int rank;
+    public required string rankName;
 }

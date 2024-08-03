@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-internal sealed class MapsService : IMapsService
+public sealed class MapsService
 {
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;

@@ -15,8 +15,8 @@ public class VehiclesPersistence
         });
 
         var factory = hosting.GetRequiredService<IElementFactory>();
-        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
-        var loadService = hosting.GetRequiredService<IVehicleLoader>();
+        var vehiclesService = hosting.GetRequiredService<VehiclesService>();
+        var loadService = hosting.GetRequiredService<VehicleLoader>();
 
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         if (vehicle == null)
@@ -37,9 +37,9 @@ public class VehiclesPersistence
     {
         using var hosting = new RealmTestingServerHosting();
 
-        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
-        var loadService = hosting.GetRequiredService<IVehicleLoader>();
-        var activeVehicles = hosting.GetRequiredService<IVehiclesInUse>();
+        var vehiclesService = hosting.GetRequiredService<VehiclesService>();
+        var loadService = hosting.GetRequiredService<VehicleLoader>();
+        var activeVehicles = hosting.GetRequiredService<VehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         if (vehicle == null)
             throw new NullReferenceException();
@@ -64,8 +64,8 @@ public class VehiclesPersistence
 
         hosting.GetRequiredService<VehicleUpgradesCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
 
-        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
-        var loadService = hosting.GetRequiredService<IVehicleLoader>();
+        var vehiclesService = hosting.GetRequiredService<VehiclesService>();
+        var loadService = hosting.GetRequiredService<VehicleLoader>();
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         if (vehicle1 == null)
             throw new NullReferenceException();
@@ -104,8 +104,8 @@ public class VehiclesPersistence
         });
 
         var factory = hosting.GetRequiredService<IElementFactory>();
-        var vehiclesService = hosting.GetRequiredService<IVehiclesService>();
-        var loadService = hosting.GetRequiredService<IVehicleLoader>();
+        var vehiclesService = hosting.GetRequiredService<VehiclesService>();
+        var loadService = hosting.GetRequiredService<VehicleLoader>();
 
         var vehicle = factory.CreateVehicle(new Location(), (VehicleModel)404);
         vehicle.MileageCounter.Mileage = 1000;

@@ -1,20 +1,29 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IRewardsService
+public sealed class RewardsService
 {
-    Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default);
-}
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly IServiceScope _serviceScope;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IUserRewardRepository _userRewardRepository;
 
-internal sealed class RewardsService : IRewardsService
-{
-    public RewardsService()
+    public RewardsService(IServiceProvider serviceProvider)
     {
-
+        _serviceScope = serviceProvider.CreateScope();
+        _serviceProvider = _serviceScope.ServiceProvider;
+        _userRewardRepository = _serviceProvider.GetRequiredService<IUserRewardRepository>();
     }
 
     public async Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default)
     {
-        var userRewardRepository = player.GetRequiredService<IUserRewardRepository>();
-        return await userRewardRepository.TryAddReward(player.UserId, rewardId, cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _userRewardRepository.TryAddReward(player.UserId, rewardId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

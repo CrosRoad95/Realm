@@ -4,10 +4,10 @@ internal sealed class BrowserGuiHostedService : PlayerLifecycle, IHostedService
 {
     private readonly ILogger<BrowserGuiHostedService> _logger;
     private readonly IBrowserService _browserService;
-    private readonly IBrowserGuiService _browserGuiService;
+    private readonly BrowserGuiService _browserGuiService;
     private readonly IOptions<BrowserOptions> _browserOptions;
 
-    public BrowserGuiHostedService(PlayersEventManager playersEventManager, ILogger<BrowserGuiHostedService> logger, IBrowserService browserService, IBrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(playersEventManager)
+    public BrowserGuiHostedService(PlayersEventManager playersEventManager, ILogger<BrowserGuiHostedService> logger, IBrowserService browserService, BrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(playersEventManager)
     {
         _logger = logger;
         _browserService = browserService;

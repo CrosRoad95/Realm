@@ -205,7 +205,7 @@ public sealed class RealmCommandService : PlayerLifecycle
         _logger.LogInformation("{playerName} executed command {command} with arguments {commandArguments}.", player.Name, command, arguments);
         try
         {
-            var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<IElementSearchService>(), arguments);
+            var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<PlayerSearchService>(), arguments);
 
             if (commandInfo is SyncCommandInfo syncCommandInfo)
             {

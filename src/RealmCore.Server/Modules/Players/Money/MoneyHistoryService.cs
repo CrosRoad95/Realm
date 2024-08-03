@@ -1,18 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Players.Money;
 
-public interface IMoneyHistoryService
+public sealed class MoneyHistoryService
 {
-    Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
-    Task Add(RealmPlayer player, decimal amount, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
-    Task<UserMoneyHistoryDto[]> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
-}
-
-internal sealed class MoneyHistoryService : IMoneyHistoryService
-{
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceScope _serviceScope;
     private readonly IUserMoneyHistoryRepository _userMoneyHistoryRepository;
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     public MoneyHistoryService(IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
     {

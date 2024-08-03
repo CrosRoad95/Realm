@@ -1,4 +1,5 @@
-﻿using static RealmCore.Server.Modules.Seeder.SeedData;
+﻿using RealmCore.Server.Modules.Users;
+using static RealmCore.Server.Modules.Seeder.SeedData;
 
 namespace RealmCore.Server.Modules.Seeder;
 
@@ -7,9 +8,9 @@ internal sealed class SeederServerBuilder : IDisposable
     private const string _basePath = "Seed";
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
-    private readonly IFractionsService _fractionService;
+    private readonly FractionsService _fractionService;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IPlayerUserService _playerUserService;
+    private readonly PlayersUsersService _playersUsersService;
     private readonly IServiceScope _serviceScope;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
@@ -18,14 +19,14 @@ internal sealed class SeederServerBuilder : IDisposable
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IFractionsService fractionService, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, IServiceProvider serviceProvider, IPlayerUserService playerUserService)
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, FractionsService fractionService, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, IServiceProvider serviceProvider, PlayersUsersService playersUsersService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
         _fractionService = fractionService;
         _serviceProvider = serviceProvider;
-        _playerUserService = playerUserService;
+        _playersUsersService = playersUsersService;
         _serviceScope = serviceProvider.CreateScope();
         foreach (var seederProvider in seederProviders)
         {
@@ -64,7 +65,7 @@ internal sealed class SeederServerBuilder : IDisposable
         foreach (var pair in users)
         {
             var userSeedData = pair.Value;
-            var user = await _playerUserService.GetUserByUserName(pair.Key);
+            var user = await _playersUsersService.GetUserByUserName(pair.Key);
 
             if (user == null)
             {

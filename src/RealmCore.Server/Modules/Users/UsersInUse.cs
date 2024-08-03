@@ -1,16 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Users;
 
-public interface IUsersInUse
-{
-    IEnumerable<int> ActiveUsersIds { get; }
-
-    bool IsActive(int userId);
-    bool TryGetPlayerByUserId(int userId, out RealmPlayer player);
-    bool TrySetActive(int userId, RealmPlayer player);
-    bool TrySetInactive(int userId);
-}
-
-internal sealed class UsersInUse : IUsersInUse
+public sealed class UsersInUse
 {
     private readonly ConcurrentDictionary<int, RealmPlayer> _activeUsers = new();
 

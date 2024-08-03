@@ -27,7 +27,7 @@ internal sealed class LoadVehicleService : IHostedLifecycleService
             return;
 
         using var scope = _serviceProvider.CreateScope();
-        var vehicleLoader = scope.ServiceProvider.GetRequiredService<IVehicleLoader>();
+        var vehicleLoader = scope.ServiceProvider.GetRequiredService<VehicleLoader>();
         await vehicleLoader.LoadAll(cancellationToken);
     }
 

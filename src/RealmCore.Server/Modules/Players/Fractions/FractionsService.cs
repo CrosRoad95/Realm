@@ -1,26 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Players.Fractions;
 
-public interface IFractionsService
-{
-    internal Task LoadFractions(CancellationToken cancellationToken = default);
-    bool Exists(int fractionId);
-    bool HasMember(int fractionId, int userId);
-    Task AddMember(int fractionId, int userId, int rank, string rankName, CancellationToken cancellationToken = default);
-    Task AddMember(int fractionId, RealmPlayer player, int rank, string rankName, CancellationToken cancellationToken = default);
-    internal Task<bool> TryCreateFraction(int id, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default);
-}
-
-internal sealed class FractionsService : IFractionsService
+public sealed class FractionsService
 {
     private readonly Dictionary<int, FractionDto> _fractions = [];
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
     private readonly IFractionRepository _fractionRepository;
     private readonly IServiceScope _serviceScope;
-    private readonly IUsersInUse _usersInUse;
+    private readonly UsersInUse _usersInUse;
 
-    public event Action<IFractionsService, FractionDto>? Created;
-
-    public FractionsService(IServiceProvider serviceProvider, IUsersInUse usersInUse)
+    public FractionsService(IServiceProvider serviceProvider, UsersInUse usersInUse)
     {
         _serviceScope = serviceProvider.CreateScope();
         _fractionRepository = _serviceScope.ServiceProvider.GetRequiredService<IFractionRepository>();
@@ -37,7 +25,6 @@ internal sealed class FractionsService : IFractionsService
             {
                 var fractionDto = FractionDto.Map(fractionData);
                 _fractions[fractionData.Id] = fractionDto;
-                Created?.Invoke(this, fractionDto);
             }
         }
         finally
@@ -132,7 +119,6 @@ internal sealed class FractionsService : IFractionsService
 
             var fractionDto = FractionDto.Map(fractionData);
             _fractions[fractionData.Id] = fractionDto;
-            Created?.Invoke(this, fractionDto);
             return true;
         }
         finally

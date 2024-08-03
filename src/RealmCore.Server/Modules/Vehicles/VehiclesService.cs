@@ -1,26 +1,15 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IVehiclesService
-{
-    Task<RealmVehicle?> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default);
-    Task<RealmVehicle?> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default);
-    Task Destroy(RealmVehicle vehicle);
-    Task<LightInfoVehicleDto[]> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
-    Task<VehicleData[]> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
-    IEnumerable<RealmPlayer> GetOnlineOwners(RealmVehicle vehicle);
-    Task<bool> Save(RealmVehicle vehicle);
-}
-
-internal sealed class VehiclesService : IVehiclesService
+public sealed class VehiclesService
 {
     private readonly IElementFactory _elementFactory;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IUsersInUse _activeUsers;
-    private readonly IVehiclesInUse _vehiclesInUse;
+    private readonly UsersInUse _activeUsers;
+    private readonly VehiclesInUse _vehiclesInUse;
     private readonly ILogger<VehiclesService> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger, IServiceProvider serviceProvider)
+    public VehiclesService(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider, UsersInUse activeUsers, VehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger, IServiceProvider serviceProvider)
     {
         _elementFactory = elementFactory;
         _dateTimeProvider = dateTimeProvider;
@@ -78,7 +67,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public Task Destroy(RealmVehicle vehicle)
     {
-        return vehicle.GetRequiredService<IVehicleService>().Destroy();
+        return vehicle.GetRequiredService<VehicleService>().Destroy();
     }
 
     public async Task<bool> Save(RealmVehicle vehicle)
@@ -95,7 +84,7 @@ internal sealed class VehiclesService : IVehiclesService
             throw new InvalidOperationException();
 
         var vehicleRepository = vehicle.GetRequiredService<IVehicleRepository>();
-        var vehicleService = vehicle.GetRequiredService<IVehicleService>();
+        var vehicleService = vehicle.GetRequiredService<VehicleService>();
         var location = vehicle.GetLocation();
 
         var vehicleData = await vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now, cancellationToken);
@@ -110,7 +99,7 @@ internal sealed class VehiclesService : IVehiclesService
         await vehicleService.Destroy(cancellationToken);
 
         using var scope = _serviceProvider.CreateScope();
-        var vehicleLoader = scope.ServiceProvider.GetRequiredService<IVehicleLoader>();
+        var vehicleLoader = scope.ServiceProvider.GetRequiredService<VehicleLoader>();
         var persistentVehicle = await vehicleLoader.LoadVehicleById(vehicleData.Id, cancellationToken);
         persistentVehicle.SetLocation(location);
         foreach (var pair in occupants)

@@ -21,9 +21,9 @@ public sealed class PlayerFriendsFeature : IPlayerFeature, IEnumerable<int>
 
     private readonly PlayerUserFeature _playerUserFeature;
     private readonly FriendsService _friendsService;
-    private readonly IUsersInUse _usersInUse;
+    private readonly UsersInUse _usersInUse;
 
-    public PlayerFriendsFeature(PlayerContext playerContext, PlayerUserFeature playerUserFeature, FriendsService friendsService, IUsersInUse usersInUse)
+    public PlayerFriendsFeature(PlayerContext playerContext, PlayerUserFeature playerUserFeature, FriendsService friendsService, UsersInUse usersInUse)
     {
         Player = playerContext.Player;
         _playerUserFeature = playerUserFeature;

@@ -115,40 +115,41 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Security
-        services.AddSingleton<IUsersInUse, UsersInUse>();
-        services.AddSingleton<IVehiclesInUse, VehiclesInUse>();
-        services.AddSingleton<IAntiCheat, AntiCheat>();
+        services.AddSingleton<UsersInUse>();
+        services.AddSingleton<VehiclesInUse>();
+        services.AddSingleton<AntiCheat>();
         services.AddHostedService<AntiCheatService>();
         #endregion
 
         #region Services
         services.AddScoped<IElementSaveService, ElementSaveService>();
-        services.AddScoped<IVehicleLoader, VehicleLoader>();
-        services.AddScoped<IVehicleService, VehicleService>();
-        services.AddScoped<IElementSearchService, ElementSearchService>();
-        services.AddSingleton<IPlayerUserService, PlayersUsersService>();
-        services.AddSingleton<IUsersService, UsersService>();
-        services.AddSingleton<IGroupsService, GroupsService>();
-        services.AddSingleton<IFractionsService, FractionsService>();
-        services.AddSingleton<IBansService, BansService>();
-        services.AddSingleton<IRewardsService, RewardsService>();
-        services.AddSingleton<IFeedbackService, PlayerFeedbackService>();
-        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddSingleton<INewsService, NewsService>();
-        services.AddSingleton<IMoneyHistoryService, MoneyHistoryService>();
-        services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
-        services.AddSingleton<IMapsService, MapsService>();
+        services.AddScoped<VehicleLoader>();
+        services.AddScoped<VehicleService>();
+        services.AddScoped<PlayerSearchService>();
+        services.AddSingleton<PlayersUsersService>();
+        services.AddSingleton<UsersService>();
+        services.AddSingleton<GroupsService>();
+        services.AddSingleton<FractionsService>();
+        services.AddSingleton<BansService>();
+        services.AddSingleton<RewardsService>();
+        services.AddSingleton<FeedbackService>();
+        services.AddSingleton<SpawnMarkersService>();
+        services.AddSingleton<NewsService>();
+        services.AddSingleton<MoneyHistoryService>();
+        services.AddSingleton<BrowserGuiService>();
+        services.AddSingleton<MapsService>();
         services.AddSingleton<PlayersEventManager>();
         services.AddSingleton<ISchedulerService, SchedulerService>();
-        services.AddSingleton<IVehiclesService, VehiclesService>();
+        services.AddSingleton<VehiclesService>();
         services.AddSingleton<CollisionShapeBehaviour>();
         services.AddSingleton<ScopedCollisionShapeBehaviour>();
         services.AddSingleton<FriendsService>();
         services.AddSingleton<IRealmResourcesProvider, RealmResourcesProvider>();
         services.AddSingleton<IResourceServer>(x => new RealmResourceServer(x.GetRequiredService<BasicHttpServer>(), x.GetRequiredService<IRealmResourcesProvider>()));
-        services.AddSingleton<IPlayersNotifications, PlayersNotifications>();
+        services.AddSingleton<NotificationsService>();
         services.AddSingleton<WorldNodesService>();
         services.AddSingleton<MapLoader>();
+        services.AddSingleton<VehiclesAccessService>();
         #endregion
 
         #region Player features
@@ -206,7 +207,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommandThrottlingPolicy, CommandThrottlingPolicy>();
         #endregion
 
-        services.AddSingleton<IVehiclesAccessService, VehiclesAccessService>();
         services.AddKeyedSingleton<IElementFactory, ElementFactory>("ElementFactory");
         services.AddSingleton(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
         services.AddScoped<IScopedElementFactory, ScopedElementFactory>();
@@ -259,72 +259,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-}
-
-internal sealed class ServerLifecycle : IHostedService
-{
-    private readonly ILogger<ServerLifecycle> _logger;
-    private readonly IOptions<GameplayOptions> _gameplayOptions;
-    private readonly RealmCommandService _realmCommandService;
-    private readonly IElementCollection _elementCollection;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly MtaServer _mtaServer;
-    private readonly ScopedCollisionShapeBehaviour _scopedCollisionShapeBehaviour;
-    private readonly IRealmResourcesProvider _realmResourcesProvider;
-
-    public ServerLifecycle(ILogger<ServerLifecycle> logger, IOptions<GameplayOptions> gameplayOptions, RealmCommandService realmCommandService, IElementCollection elementCollection, IServiceProvider serviceProvider, MtaServer mtaServer, CollisionShapeBehaviour collisionShapeBehaviour, ScopedCollisionShapeBehaviour scopedCollisionShapeBehaviour, IResourceServer resourceServer, IRealmResourcesProvider realmResourcesProvider)
-    {
-        _logger = logger;
-        _gameplayOptions = gameplayOptions;
-        _realmCommandService = realmCommandService;
-        _elementCollection = elementCollection;
-        _serviceProvider = serviceProvider;
-        _mtaServer = mtaServer;
-        _scopedCollisionShapeBehaviour = scopedCollisionShapeBehaviour;
-        _realmResourcesProvider = realmResourcesProvider;
-        _mtaServer.AddResourceServer(resourceServer);
-    }
-
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        CultureInfo.CurrentCulture = _gameplayOptions.Value.Culture;
-        CultureInfo.CurrentUICulture = _gameplayOptions.Value.Culture;
-
-        _logger.LogInformation("Server started.");
-        _logger.LogInformation("Found resources: {resourcesCount}", _realmResourcesProvider.Count);
-        _logger.LogInformation("Created commands: {commandsCount}", _realmCommandService.Count);
-        return Task.CompletedTask;
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Server stopping.");
-        int i = 0;
-
-        foreach (var element in _elementCollection.GetAll())
-        {
-            try
-            {
-                if (element is RealmVehicle vehicle)
-                {
-                    await vehicle.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
-                    i++;
-                }
-                else if (element is RealmPlayer player)
-                {
-                    await player.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
-                    i++;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to save element.");
-            }
-        }
-
-        _logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
-        await Task.Delay(500, CancellationToken.None);
-    }
-
-    public static readonly ActivitySource Activity = new("RealmCore.RealmServer", "1.0.0");
 }

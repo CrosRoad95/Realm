@@ -5,14 +5,14 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersHostedService> _logger;
     private readonly IResourceProvider _resourceProvider;
-    private readonly IUsersInUse _activeUsers;
+    private readonly UsersInUse _activeUsers;
     private readonly ClientConsole _clientConsole;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IRealmResourcesProvider _realmResourcesProvider;
     private readonly IBrowserService _browserService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment, IRealmResourcesProvider realmResourcesProvider, IBrowserService browserService) : base(playersEventManager)
+    public PlayersHostedService(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersHostedService> logger, IResourceProvider resourceProvider, UsersInUse activeUsers, ClientConsole clientConsole, IHostEnvironment hostEnvironment, IRealmResourcesProvider realmResourcesProvider, IBrowserService browserService) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -115,7 +115,7 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
     private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
     {
-        var elementSearchService = player.GetRequiredService<IElementSearchService>();
+        var elementSearchService = player.GetRequiredService<PlayerSearchService>();
         if (elementSearchService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
             throw new UserNameInUseException(player.Name);
 

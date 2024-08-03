@@ -1,44 +1,45 @@
 ﻿namespace RealmCore.Server.Modules.Users;
 
-public interface IPlayerUserService
+public sealed class PlayersUsersService
 {
-    Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default);
-    Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default);
-}
-
-internal sealed class PlayersUsersService : IPlayerUserService
-{
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUsersRepository _usersRepository;
+
 
     public PlayersUsersService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceProvider = serviceProvider;
         _dateTimeProvider = dateTimeProvider;
+        _serviceScope = _serviceProvider.CreateAsyncScope();
+        _usersRepository = _serviceScope.ServiceProvider.GetRequiredService<IUsersRepository>();
     }
 
     public async Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default)
     {
-        await using var serviceScope = _serviceProvider.CreateAsyncScope();
-        var db = serviceScope.ServiceProvider.GetRequiredService<IDb>();
-
-        var query = db.Users
-            .TagWithSource(nameof(PlayersUsersService))
-            .IncludeAll(_dateTimeProvider.Now)
-            .Where(u => u.UserName == userName);
-
-        return await query.FirstOrDefaultAsync(cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetUserByUserName(userName, _dateTimeProvider.Now, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public async Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default)
     {
-        await using var serviceScope = _serviceProvider.CreateAsyncScope();
-        var db = serviceScope.ServiceProvider.GetRequiredService<IDb>();
-
-        var query = db.Users
-            .TagWithSource(nameof(PlayersUsersService))
-            .Where(u => u.Id == userId);
-
-        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken) == 1;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.TryUpdateLastNickname(userId, nick, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

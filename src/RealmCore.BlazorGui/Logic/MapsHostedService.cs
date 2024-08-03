@@ -2,11 +2,11 @@
 
 internal sealed class MapsHostedService : IHostedService
 {
-    private readonly IMapsService _mapsService;
+    private readonly MapsService _mapsService;
     private readonly MapsCollection _mapsCollection;
     private readonly ILogger<MapsHostedService> _logger;
 
-    public MapsHostedService(IMapsService mapsService, MapsCollection mapsCollection, ILogger<MapsHostedService> logger)
+    public MapsHostedService(MapsService mapsService, MapsCollection mapsCollection, ILogger<MapsHostedService> logger)
     {
         _mapsService = mapsService;
         _mapsCollection = mapsCollection;

@@ -22,20 +22,20 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly ILogger<CommandsHostedService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly INametagsService _nametagsService;
-    private readonly IUsersService _usersService;
-    private readonly IVehiclesService _vehiclesService;
+    private readonly UsersService _usersService;
+    private readonly VehiclesService _vehiclesService;
     private readonly IElementOutlineService _elementOutlineService;
-    private readonly IMoneyHistoryService _userMoneyHistoryService;
+    private readonly MoneyHistoryService _userMoneyHistoryService;
     private readonly IMapNamesService _mapNamesService;
-    private readonly IVehiclesInUse _vehiclesInUse;
+    private readonly VehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
     private readonly WorldNodesService _worldNodesService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
-        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService)
+        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -257,7 +257,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("spawnvehhere", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
         {
-            var vehicleLoader = player.GetRequiredService<IVehicleLoader>();
+            var vehicleLoader = player.GetRequiredService<VehicleLoader>();
             var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
             var location = player.GetLocation(player.GetPointFromDistanceRotationOffset(3));
             vehicle.SetLocation(location);
@@ -266,7 +266,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("spawnveh", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
         {
-            var vehicleLoader = player.GetRequiredService<IVehicleLoader>();
+            var vehicleLoader = player.GetRequiredService<VehicleLoader>();
             var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
             _chatBox.OutputTo(player, $"Załadowano pojazd na pozycji: {vehicle.GetLocation()}");
         });

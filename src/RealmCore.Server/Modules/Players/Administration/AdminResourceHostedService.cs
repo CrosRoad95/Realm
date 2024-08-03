@@ -6,10 +6,10 @@ internal sealed class AdminResourceHostedService : IHostedService
     private readonly IElementFactory _elementFactory;
     private readonly IAdminService _adminService;
     private readonly ILogger<AdminResourceHostedService> _logger;
-    private readonly ISpawnMarkersService _spawnMarkersService;
+    private readonly SpawnMarkersService _spawnMarkersService;
     private readonly IElementCollection _elementCollection;
 
-    public AdminResourceHostedService(IElementFactory elementFactory, IAdminService adminService, ILogger<AdminResourceHostedService> logger, ISpawnMarkersService spawnMarkersService, IElementCollection elementCollection)
+    public AdminResourceHostedService(IElementFactory elementFactory, IAdminService adminService, ILogger<AdminResourceHostedService> logger, SpawnMarkersService spawnMarkersService, IElementCollection elementCollection)
     {
         _elementFactory = elementFactory;
         _adminService = adminService;

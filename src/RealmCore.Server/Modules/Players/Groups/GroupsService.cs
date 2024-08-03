@@ -1,16 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Groups;
 
-public interface IGroupsService
-{
-    Task<bool> TryAddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
-    Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular, CancellationToken cancellationToken = default);
-    Task<Group?> GetGroupByName(string groupName, CancellationToken cancellationToken = default);
-    Task<Group?> GetGroupByNameOrShortCut(string groupName, string shortcut, CancellationToken cancellationToken = default);
-    Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut, CancellationToken cancellationToken = default);
-    Task<bool> RemoveMember(RealmPlayer player, int groupId, CancellationToken cancellationToken = default);
-}
-
-internal sealed class GroupsService : IGroupsService
+public sealed class GroupsService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
@@ -28,7 +18,7 @@ internal sealed class GroupsService : IGroupsService
             id = groupData.Id,
             name = groupData.Name,
             shortcut = groupData.Shortcut,
-            kind = (GroupKind)(groupData.Kind ?? 0),
+            kind = groupData.Kind ?? 0,
             members = groupData.Members.Select(x => new GroupMember
             {
                 userId = x.UserId,
@@ -64,7 +54,7 @@ internal sealed class GroupsService : IGroupsService
         return await groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
     }
 
-    public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular, CancellationToken cancellationToken = default)
+    public async Task<Group> CreateGroup(string groupName, string shortcut, int groupKind = 0, CancellationToken cancellationToken = default)
     {
         var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
         if (await groupRepository.ExistsByName(groupName, cancellationToken))

@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Modules.Chat;
+﻿namespace RealmCore.Server.Modules.Chat;
 
 public class DefaultChatHostedService : PlayerLifecycle, IHostedService
 {
