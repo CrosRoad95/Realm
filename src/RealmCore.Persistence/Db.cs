@@ -60,12 +60,12 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<InventoryItemData> InventoryItems => Set<InventoryItemData>();
     public DbSet<VehicleUpgradeData> VehicleUpgrades => Set<VehicleUpgradeData>();
     public DbSet<VehicleFuelData> VehicleFuels => Set<VehicleFuelData>();
-    public DbSet<DailyVisitsData> DailyVisits => Set<DailyVisitsData>();
+    public DbSet<UserDailyVisitsData> DailyVisits => Set<UserDailyVisitsData>();
     public DbSet<UserStatData> UserStats => Set<UserStatData>();
     public DbSet<UserGtaStatData> UserGtaStats => Set<UserGtaStatData>();
     public DbSet<JobStatisticsData> JobPoints => Set<JobStatisticsData>();
     public DbSet<JobUpgradeData> JobUpgrades => Set<JobUpgradeData>();
-    public DbSet<AchievementData> Achievements => Set<AchievementData>();
+    public DbSet<UserAchievementData> Achievements => Set<UserAchievementData>();
     public DbSet<DiscoveryData> Discoveries => Set<DiscoveryData>();
     public DbSet<GroupData> Groups => Set<GroupData>();
     public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
@@ -74,7 +74,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
-    public DbSet<BanData> Bans => Set<BanData>();
+    public DbSet<UserBanData> Bans => Set<UserBanData>();
     public DbSet<UserRewardData> UserRewards => Set<UserRewardData>();
     public DbSet<UserSettingData> UserSettings => Set<UserSettingData>();
     public DbSet<UserWhitelistedSerialData> UserWhitelistedSerials => Set<UserWhitelistedSerialData>();
@@ -171,7 +171,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .HasOne(x => x.DailyVisits)
                 .WithOne()
-                .HasForeignKey<DailyVisitsData>(x => x.UserId);
+                .HasForeignKey<UserDailyVisitsData>(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Stats)
@@ -397,7 +397,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => x.Id);
         });
 
-        modelBuilder.Entity<DailyVisitsData>(entityBuilder =>
+        modelBuilder.Entity<UserDailyVisitsData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(DailyVisits))
@@ -488,7 +488,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.VehicleId, x.EngineId });
         });
 
-        modelBuilder.Entity<AchievementData>(entityBuilder =>
+        modelBuilder.Entity<UserAchievementData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Achievements))
@@ -722,11 +722,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.UserId, x.DiscoveryId });
         });
 
-        //modelBuilder.Ignore<GroupData>();
-        //modelBuilder.Ignore<GroupMemberData>();
-        //modelBuilder.Ignore<GroupRoleData>();
-        //modelBuilder.Ignore<GroupRolePermissionData>();
-
         modelBuilder.Entity<GroupData>(entityBuilder =>
         {
             entityBuilder
@@ -809,7 +804,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.UserId, x.UpgradeId });
         });
 
-        modelBuilder.Entity<BanData>(entityBuilder =>
+        modelBuilder.Entity<UserBanData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Bans))

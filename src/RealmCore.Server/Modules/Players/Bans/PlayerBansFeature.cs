@@ -2,18 +2,18 @@
 
 namespace RealmCore.Server.Modules.Players.Bans;
 
-public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUsesUserPersistentData
+public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<UserBanDto>, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private ICollection<BanData> _bans = [];
+    private ICollection<UserBanData> _bans = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
 
-    public event Action<PlayerBansFeature, BanDto>? Added;
-    public event Action<PlayerBansFeature, BanDto>? Deactivated;
+    public event Action<PlayerBansFeature, UserBanDto>? Added;
+    public event Action<PlayerBansFeature, UserBanDto>? Deactivated;
     public event Action? VersionIncreased;
 
-    public BanDto[] ActiveBans
+    public UserBanDto[] ActiveBans
     {
         get
         {
@@ -21,7 +21,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
             try
             {
                 var now = _dateTimeProvider.Now;
-                return _bans.Where(x => x.IsActive(now)).Select(BanDto.Map).ToArray();
+                return _bans.Where(x => x.IsActive(now)).Select(UserBanDto.Map).ToArray();
             }
             finally
             {
@@ -53,7 +53,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
 
     public bool Add(int type, DateTime? until = null, string? reason = null, string? responsible = null)
     {
-        var banData = new BanData
+        var banData = new UserBanData
         {
             Serial = Player.Client.GetSerial(),
             End = until ?? DateTime.MaxValue,
@@ -71,7 +71,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
             {
                 _bans.Add(banData);
                 VersionIncreased?.Invoke();
-                Added?.Invoke(this, BanDto.Map(banData));
+                Added?.Invoke(this, UserBanDto.Map(banData));
                 return true;
             });
 
@@ -83,7 +83,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
         }
     }
 
-    public async Task<OneOf<BanDto[], NoBans>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<OneOf<UserBanDto[], NoBans>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         var last = _bans.LastOrDefault();
         if (last == null)
@@ -101,7 +101,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
             if (results.Length == 0)
                 return new NoBans();
 
-            return results.Select(BanDto.Map).ToArray();
+            return results.Select(UserBanDto.Map).ToArray();
         }
         finally
         {
@@ -111,7 +111,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
 
     public bool DeactivateBanById(int banId)
     {
-        BanData? ban;
+        UserBanData? ban;
         bool removed = false;
         _lock.Wait();
         try
@@ -131,7 +131,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
         if (removed && ban != null)
         {
             VersionIncreased?.Invoke();
-            Deactivated?.Invoke(this, BanDto.Map(ban));
+            Deactivated?.Invoke(this, UserBanDto.Map(ban));
             return true;
         }
         return false;
@@ -151,7 +151,7 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
         }
     }
 
-    private OneOf<BanData, BanOfGivenTypeNotFound> InternalGetBanByType(int type)
+    private OneOf<UserBanData, BanOfGivenTypeNotFound> InternalGetBanByType(int type)
     {
         var now = _dateTimeProvider.Now;
         var ban = _bans.FirstOrDefault(x => x.Type == type && x.IsActive(now));
@@ -160,13 +160,13 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
         return ban;
     }
     
-    public OneOf<BanDto, BanOfGivenTypeNotFound> GetBanByType(int type)
+    public OneOf<UserBanDto, BanOfGivenTypeNotFound> GetBanByType(int type)
     {
         var now = _dateTimeProvider.Now;
         _lock.Wait();
         try
         {
-            var banDto = InternalGetBanByType(type).Match(BanDto.Map, notFound => null);
+            var banDto = InternalGetBanByType(type).Match(UserBanDto.Map, notFound => null);
             if(banDto == null)
                 return new BanOfGivenTypeNotFound();
             return banDto;
@@ -177,15 +177,15 @@ public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>, IUs
         }
     }
 
-    public IEnumerator<BanDto> GetEnumerator()
+    public IEnumerator<UserBanDto> GetEnumerator()
     {
-        BanData[] view;
+        UserBanData[] view;
         lock (_lock)
             view = [.. _bans];
 
         foreach (var settingData in view)
         {
-            yield return BanDto.Map(settingData);
+            yield return UserBanDto.Map(settingData);
         }
     }
 

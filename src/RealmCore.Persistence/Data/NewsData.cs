@@ -10,3 +10,20 @@ public class NewsData
     public string Content { get; set; }
     public ICollection<NewsTagData> NewsTags { get; set; } = new List<NewsTagData>();
 }
+
+public class NewsTagData
+{
+    public int NewsId { get; set; }
+    public int TagId { get; set; }
+
+    public NewsData News { get; set; }
+    public TagData Tag { get; set; }
+}
+
+public class TagData
+{
+    public int Id { get; set; }
+    public string Tag { get; set; }
+
+    public ICollection<NewsTagData> NewsTags { get; set; } = new List<NewsTagData>();
+}

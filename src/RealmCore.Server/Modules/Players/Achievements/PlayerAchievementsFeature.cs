@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
-public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<AchievementDto>, IUsesUserPersistentData
+public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<UserAchievementDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
-    private ICollection<AchievementData> _achievements = [];
+    private ICollection<UserAchievementData> _achievements = [];
 
     public event Action<PlayerAchievementsFeature, int>? Unlocked;
     public event Action<PlayerAchievementsFeature, int, float>? Progressed;
@@ -21,12 +21,12 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<Achi
             _achievements = userData.Achievements;
     }
 
-    private AchievementData GetById(int id)
+    private UserAchievementData GetById(int id)
     {
         var stat = _achievements.FirstOrDefault(x => x.AchievementId == id);
         if (stat == null)
         {
-            stat = new AchievementData
+            stat = new UserAchievementData
             {
                 AchievementId = id
             };
@@ -57,12 +57,12 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<Achi
         }
     }
 
-    public AchievementDto Get(int achievementId)
+    public UserAchievementDto Get(int achievementId)
     {
         lock (_lock)
         {
             var achievement = GetById(achievementId);
-            return AchievementDto.Map(achievement);
+            return UserAchievementDto.Map(achievement);
         }
     }
 
@@ -146,15 +146,15 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<Achi
         }
     }
 
-    public IEnumerator<AchievementDto> GetEnumerator()
+    public IEnumerator<UserAchievementDto> GetEnumerator()
     {
-        AchievementData[] view;
+        UserAchievementData[] view;
         lock (_lock)
             view = [.. _achievements];
 
         foreach (var settingData in view)
         {
-            yield return AchievementDto.Map(settingData);
+            yield return UserAchievementDto.Map(settingData);
         }
     }
 

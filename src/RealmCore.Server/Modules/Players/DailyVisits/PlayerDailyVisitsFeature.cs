@@ -3,7 +3,7 @@
 public sealed class PlayerDailyVisitsFeature : IPlayerFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
-    private DailyVisitsData? _dailyVisitsData;
+    private UserDailyVisitsData? _dailyVisitsData;
 
     public DateTime LastVisit
     {
@@ -53,7 +53,7 @@ public sealed class PlayerDailyVisitsFeature : IPlayerFeature, IUsesUserPersiste
             }
             else
             {
-                _dailyVisitsData = new DailyVisitsData
+                _dailyVisitsData = new UserDailyVisitsData
                 {
                     LastVisit = DateTime.MinValue,
                     VisitsInRow = 0,

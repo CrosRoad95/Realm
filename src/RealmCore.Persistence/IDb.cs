@@ -22,17 +22,17 @@ public interface IDb
     DbSet<InventoryItemData> InventoryItems { get; }
     DbSet<VehicleUpgradeData> VehicleUpgrades { get; }
     DbSet<VehicleFuelData> VehicleFuels { get; }
-    DbSet<DailyVisitsData> DailyVisits { get; }
+    DbSet<UserDailyVisitsData> DailyVisits { get; }
     DbSet<UserStatData> UserStats { get; }
     DbSet<UserGtaStatData> UserGtaStats { get; }
     DbSet<JobUpgradeData> JobUpgrades { get; }
-    DbSet<AchievementData> Achievements { get; }
+    DbSet<UserAchievementData> Achievements { get; }
     DbSet<GroupData> Groups { get; }
     DbSet<GroupMemberData> GroupMembers { get; }
     DbSet<GroupRoleData> GroupsRoles { get; }
     DbSet<GroupRolePermissionData> GroupsRolesPermissions { get; }
     DbSet<UserUpgradeData> UserUpgrades { get; }
-    DbSet<BanData> Bans { get; }
+    DbSet<UserBanData> Bans { get; }
     DbSet<JobStatisticsData> JobPoints { get; }
     DbSet<UserRewardData> UserRewards { get; }
     DbSet<UserSettingData> UserSettings { get; }

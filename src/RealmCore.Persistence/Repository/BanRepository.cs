@@ -10,7 +10,7 @@ public sealed class BanRepository
     }
 
     #region Write
-    public async Task<BanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<UserBanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateForSerial));
         if(activity != null)
@@ -25,7 +25,7 @@ public sealed class BanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = new BanData
+        var ban = new UserBanData
         {
             Serial = serial,
             End = until ?? DateTime.MaxValue,
@@ -39,7 +39,7 @@ public sealed class BanRepository
         return ban;
     }
 
-    public async Task<BanData> CreateForUserIdAndSerial(int userId, string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<UserBanData> CreateForUserIdAndSerial(int userId, string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateForUserIdAndSerial));
         if (activity != null)
@@ -55,7 +55,7 @@ public sealed class BanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = new BanData
+        var ban = new UserBanData
         {
             UserId = userId,
             Serial = serial,
@@ -70,7 +70,7 @@ public sealed class BanRepository
         return ban;
     }
 
-    public async Task<BanData> CreateForUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<UserBanData> CreateForUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateForUserId));
         if (activity != null)
@@ -85,7 +85,7 @@ public sealed class BanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = new BanData
+        var ban = new UserBanData
         {
             UserId = userId,
             End = until ?? DateTime.MaxValue,
@@ -223,7 +223,7 @@ public sealed class BanRepository
     #endregion
 
     #region Read
-    public async Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<UserBanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetBySerial));
         if (activity != null)
@@ -243,7 +243,7 @@ public sealed class BanRepository
         return await query.ToArrayAsync(cancellationToken);
     }
     
-    public async Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<UserBanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByUserId));
         if (activity != null)
@@ -263,7 +263,7 @@ public sealed class BanRepository
         return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<UserBanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByUserIdOrSerial));
         if (activity != null)
@@ -284,7 +284,7 @@ public sealed class BanRepository
         return await query.ToArrayAsync(cancellationToken);
     }
 
-    private IQueryable<BanData> CreateQueryBase() => _db.Bans.TagWithSource(nameof(BanRepository));
+    private IQueryable<UserBanData> CreateQueryBase() => _db.Bans.TagWithSource(nameof(BanRepository));
     #endregion
 
     public static readonly ActivitySource Activity = new("RealmCore.BanRepository", "1.0.0");

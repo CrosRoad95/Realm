@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Data;
 
-public sealed class AchievementData
+public sealed class UserAchievementData
 {
     public int UserId { get; set; }
     public int AchievementId { get; set; }

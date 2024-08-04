@@ -22,8 +22,8 @@ public class UserData : IdentityUser<int>
     public ICollection<UserLicenseData> Licenses { get; set; } = new List<UserLicenseData>();
     public ICollection<VehicleUserAccessData> VehicleUserAccesses { get; set; } = new List<VehicleUserAccessData>();
     public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
-    public DailyVisitsData? DailyVisits { get; set; }
-    public ICollection<AchievementData> Achievements { get; set; } = new List<AchievementData>();
+    public UserDailyVisitsData? DailyVisits { get; set; }
+    public ICollection<UserAchievementData> Achievements { get; set; } = new List<UserAchievementData>();
     public ICollection<JobUpgradeData> JobUpgrades { get; set; } = new List<JobUpgradeData>();
     public ICollection<JobStatisticsData> JobStatistics { get; set; } = new List<JobStatisticsData>();
     public ICollection<DiscoveryData> Discoveries { get; set; } = new List<DiscoveryData>();
@@ -42,8 +42,8 @@ public class UserData : IdentityUser<int>
     public ICollection<UserNotificationData> Notifications { get; set; } = new List<UserNotificationData>();
     public ICollection<UserLoginHistoryData> LoginHistory { get; set; } = new List<UserLoginHistoryData>();
     public ICollection<UserMoneyHistoryData> MoneyHistory { get; set; } = new List<UserMoneyHistoryData>();
-    public ICollection<BanData> Bans { get; set; } = new List<BanData>();
-    public ICollection<BanData> ResponsibleBans { get; set; } = new List<BanData>();
+    public ICollection<UserBanData> Bans { get; set; } = new List<UserBanData>();
+    public ICollection<UserBanData> ResponsibleBans { get; set; } = new List<UserBanData>();
     public ICollection<UserPlayTimeData> PlayTimes { get; set; } = new List<UserPlayTimeData>();
     public ICollection<BlockedUserData> BlockedUsers { get; set; } = new List<BlockedUserData>();
     public ICollection<UserDailyTaskProgressData> DailyTasksProgress { get; set; } = [];

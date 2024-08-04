@@ -14,13 +14,13 @@ public sealed class BansService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<BanDto[]> GetBySerial(string serial, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<UserBanDto[]> GetBySerial(string serial, int? type = null, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
             var bans = await _banRepository.GetBySerial(serial, _dateTimeProvider.Now, type, cancellationToken);
-            return bans.Select(BanDto.Map).ToArray();
+            return bans.Select(UserBanDto.Map).ToArray();
         }
         finally
         {

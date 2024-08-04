@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Bans;
 
-public sealed class BanDto : IEqualityComparer<BanDto>
+public sealed class UserBanDto : IEqualityComparer<UserBanDto>
 {
     public required int Id { get; init; }
     public required DateTime End { get; init; }
@@ -11,14 +11,14 @@ public sealed class BanDto : IEqualityComparer<BanDto>
     public required int Type { get; init; }
     public required bool Active { get; init; }
 
-    public bool Equals(BanDto? x, BanDto? y) => x?.Id == y?.Id;
+    public bool Equals(UserBanDto? x, UserBanDto? y) => x?.Id == y?.Id;
 
-    public int GetHashCode([DisallowNull] BanDto obj) => obj.Id;
+    public int GetHashCode([DisallowNull] UserBanDto obj) => obj.Id;
 
     public bool IsActive(DateTime now) => Active && End > now;
 
     [return: NotNullIfNotNull(nameof(banData))]
-    public static BanDto? Map(BanData? banData)
+    public static UserBanDto? Map(UserBanData? banData)
     {
         if (banData == null)
             return null;

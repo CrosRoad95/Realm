@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
-public sealed class AchievementDto : IEquatable<AchievementDto>
+public sealed class UserAchievementDto : IEquatable<UserAchievementDto>
 {
     public required int AchievementId { get; init; }
     public required float Progress { get; init; }
@@ -8,12 +8,12 @@ public sealed class AchievementDto : IEquatable<AchievementDto>
     public required DateTime? PrizeReceivedDateTime { get; init; }
 
     [return: NotNullIfNotNull(nameof(achievementData))]
-    public static AchievementDto? Map(AchievementData? achievementData)
+    public static UserAchievementDto? Map(UserAchievementData? achievementData)
     {
         if (achievementData == null)
             return null;
 
-        return new AchievementDto
+        return new UserAchievementDto
         {
             AchievementId = achievementData.AchievementId,
             PrizeReceivedDateTime = achievementData.PrizeReceivedDateTime,
@@ -22,7 +22,7 @@ public sealed class AchievementDto : IEquatable<AchievementDto>
         };
     }
 
-    public bool Equals(AchievementDto? other)
+    public bool Equals(UserAchievementDto? other)
     {
         if (other == null)
             return false;
