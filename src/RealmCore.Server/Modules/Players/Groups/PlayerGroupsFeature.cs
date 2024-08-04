@@ -1,13 +1,17 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿
+namespace RealmCore.Server.Modules.Players.Groups;
 
-public sealed class PlayerGroupsFeature : IPlayerFeature, IUsesUserPersistentData
+public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMemberDto>, IUsesUserPersistentData
 {
-    private readonly SemaphoreSlim _lock = new(1);
+    private readonly object _lock = new();
     private ICollection<GroupMemberData> _groupMembers = [];
 
     public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
+
+    public event Action<PlayerGroupsFeature, GroupMemberDto>? Added;
+    public event Action<PlayerGroupsFeature, GroupMemberDto>? Removed;
     public PlayerGroupsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
@@ -15,21 +19,13 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IUsesUserPersistentDat
 
     public void LogIn(UserData userData)
     {
-        _lock.Wait();
-        try
-        {
+        lock(_lock)
             _groupMembers = userData.GroupMembers;
-        }
-        finally
-        {
-            _lock.Release();
-        }
     }
 
-    public bool AddGroupMember(GroupMemberData groupMemberData)
+    internal bool AddGroupMember(GroupMemberData groupMemberData)
     {
-        _lock.Wait();
-        try
+        lock (_lock)
         {
             var group = _groupMembers.FirstOrDefault(x => x.GroupId == groupMemberData.GroupId);
             if (group != null)
@@ -37,58 +33,57 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IUsesUserPersistentDat
 
             _groupMembers.Add(groupMemberData);
         }
-        finally
-        {
-            _lock.Release();
-        }
-
         VersionIncreased?.Invoke();
+        Added?.Invoke(this, GroupMemberDto.Map(groupMemberData));
         return true;
     }
 
-    public bool RemoveGroupMember(int groupId)
+    internal bool RemoveGroupMember(int groupId)
     {
-        _lock.Wait();
-        try
+        GroupMemberData? groupMemberData = null;
+        lock (_lock)
         {
-            var group = _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
-            if (group == null)
+            groupMemberData = _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
+            if (groupMemberData == null)
                 return false;
-            _groupMembers.Remove(group);
-        }
-        finally
-        {
-            _lock.Release();
+            _groupMembers.Remove(groupMemberData);
         }
 
         VersionIncreased?.Invoke();
+        Added?.Invoke(this, GroupMemberDto.Map(groupMemberData));
         return true;
     }
 
     public bool IsMember(int groupId)
     {
-        _lock.Wait();
-        try
-        {
+        lock (_lock)
             return _groupMembers.Any(x => x.GroupId == groupId);
-        }
-        finally
-        {
-            _lock.Release();
-        }
     }
 
-    public GroupMemberData? GetMemberOrDefault(int groupId)
+    public bool TryGetMember(int groupId, out GroupMemberDto groupMember)
     {
-        _lock.Wait();
-        try
+        lock (_lock)
         {
-            return _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
-        }
-        finally
-        {
-            _lock.Release();
+            groupMember = GroupMemberDto.Map(_groupMembers.FirstOrDefault(x => x.GroupId == groupId));
+            return groupMember != null;
         }
     }
 
+    public IEnumerator<GroupMemberDto> GetEnumerator()
+    {
+        GroupMemberDto[] view;
+        lock (_lock)
+            view = [.. _groupMembers.Select(GroupMemberDto.Map)];
+
+        foreach (var groupMemberDto in view)
+            yield return groupMemberDto;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    internal void Clear()
+    {
+        lock (_lock)
+            _groupMembers.Clear();
+    }
 }

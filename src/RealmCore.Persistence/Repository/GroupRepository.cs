@@ -18,12 +18,32 @@ public sealed class GroupRepository
             activity.AddTag("Name", name);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
+        var query = CreateQueryBase()
             .Include(x => x.Members)
             .Where(x => x.Name == name);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<GroupData[]> Search(string name, int limit = 10, byte[]? kinds = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(Search));
+
+        if (activity != null)
+        {
+            activity.AddTag("Name", name);
+        }
+
+        var query = CreateQueryBase()
+            .Include(x => x.Members)
+            .Where(x => x.Name.ToLower().Contains(name.ToLower()));
+
+        if(kinds != null)
+        {
+            query = query.Where(x => x.Kind != null && kinds.Contains(x.Kind.Value));
+        }
+
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<GroupData?> GetGroupByNameOrShortcut(string name, string shortcut, CancellationToken cancellationToken = default)
@@ -53,10 +73,9 @@ public sealed class GroupRepository
             activity.AddTag("Name", name);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
+        var query = CreateQueryBase()
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Name == name);
+            .Where(x => x.Name.ToLower() == name.ToLower());
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -74,7 +93,7 @@ public sealed class GroupRepository
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Name == name || x.Shortcut == shortcut);
+            .Where(x => x.Name.ToLower() == name.ToLower() || x.Shortcut == null || x.Shortcut.ToLower() == shortcut.ToLower());
         return await query.AnyAsync(cancellationToken);
     }
 
@@ -90,7 +109,7 @@ public sealed class GroupRepository
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.Shortcut == shortcut);
+            .Where(x => x.Shortcut != null && x.Shortcut.ToLower() == shortcut.ToLower());
         
         return await query.AnyAsync(cancellationToken);
     }
@@ -133,7 +152,7 @@ public sealed class GroupRepository
         return group;
     }
 
-    public async Task<GroupMemberData?> TryAddMember(int groupId, int userId, DateTime createdAt, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberData?> TryAddMember(int userId, int groupId, DateTime createdAt, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddMember));
 
@@ -158,7 +177,7 @@ public sealed class GroupRepository
             await _db.SaveChangesAsync(cancellationToken);
             return groupMember;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return null;
         }
@@ -197,6 +216,8 @@ public sealed class GroupRepository
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
+
+    private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));
 
     public static readonly ActivitySource Activity = new("RealmCore.GroupRepository", "1.0.0");
 }
