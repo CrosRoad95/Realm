@@ -3,15 +3,7 @@ using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
 namespace RealmCore.Server.Modules.Persistence;
 
-public interface IElementSaveService : IAsyncDisposable
-{
-    event Action<Element>? ElementSaved;
-
-    Task<bool> Save(CancellationToken cancellationToken = default);
-    Task SaveNewInventory(Inventory inventory, CancellationToken cancellationToken = default);
-}
-
-internal sealed partial class ElementSaveService : IElementSaveService
+public sealed partial class ElementSaveService : IAsyncDisposable
 {
     private readonly IDb _db;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;

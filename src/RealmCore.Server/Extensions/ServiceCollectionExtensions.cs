@@ -121,7 +121,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Services
-        services.AddScoped<IElementSaveService, ElementSaveService>();
+        services.AddScoped<ElementSaveService>();
         services.AddScoped<VehicleLoader>();
         services.AddScoped<VehicleService>();
         services.AddScoped<PlayerSearchService>();

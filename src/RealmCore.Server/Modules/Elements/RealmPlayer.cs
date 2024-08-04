@@ -166,7 +166,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public CultureInfo Culture { get => _culture; set => _culture = value; }
     public int UserId => User.Id;
 
-    public IElementSaveService Saving { get; init; }
+    public ElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public new PlayerMoneyFeature Money { get; init; }
     public PlayerBrowserFeature Browser { get; init; }
@@ -214,7 +214,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         GetRequiredService<PlayerContext>().Player = this;
         GetRequiredService<ElementContext>().Element = this;
 
-        Saving = GetRequiredService<IElementSaveService>();
+        Saving = GetRequiredService<ElementSaveService>();
 
         #region Initialize scope services
         Money = GetRequiredService<PlayerMoneyFeature>();

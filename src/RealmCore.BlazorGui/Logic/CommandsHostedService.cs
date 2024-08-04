@@ -301,10 +301,10 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, player.Vehicle?.AccessController?.ToString() ?? "brak");
         });
 
-        _commandService.Add("savemyveh", ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("savemyveh", async ([CallingPlayer] RealmPlayer player) =>
         {
             var vehicle = player.Vehicle ?? throw new InvalidOperationException();
-            vehicle.GetRequiredService<IElementSaveService>().Save();
+            await vehicle.GetRequiredService<ElementSaveService>().Save();
         });
 
         _commandService.Add("exclusivecv", ([CallingPlayer] RealmPlayer player) =>
@@ -940,14 +940,14 @@ internal sealed class CommandsHostedService : IHostedService
             {
                 if (element is RealmVehicle vehicle)
                 {
-                    await vehicle.GetRequiredService<IElementSaveService>().Save();
+                    await vehicle.GetRequiredService<ElementSaveService>().Save();
                     i++;
                 }
                 else if (element is RealmPlayer plr)
                 {
                     if (plr.User.IsLoggedIn)
                     {
-                        await plr.GetRequiredService<IElementSaveService>().Save();
+                        await plr.GetRequiredService<ElementSaveService>().Save();
                         i++;
                     }
                 }

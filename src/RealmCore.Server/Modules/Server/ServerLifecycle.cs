@@ -46,12 +46,12 @@ internal sealed class ServerLifecycle : IHostedService
             {
                 if (element is RealmVehicle vehicle)
                 {
-                    await vehicle.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
+                    await vehicle.GetRequiredService<ElementSaveService>().Save(CancellationToken.None);
                     i++;
                 }
                 else if (element is RealmPlayer player)
                 {
-                    await player.GetRequiredService<IElementSaveService>().Save(CancellationToken.None);
+                    await player.GetRequiredService<ElementSaveService>().Save(CancellationToken.None);
                     i++;
                 }
             }

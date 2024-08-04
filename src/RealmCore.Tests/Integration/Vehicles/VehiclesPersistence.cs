@@ -24,7 +24,7 @@ public class VehiclesPersistence
 
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
-        await vehicle.GetRequiredService<IElementSaveService>().Save();
+        await vehicle.GetRequiredService<ElementSaveService>().Save();
         var vehiclePersistentId = vehicle.VehicleId;
         await vehiclesService.Destroy(vehicle);
 

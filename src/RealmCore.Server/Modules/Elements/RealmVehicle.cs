@@ -36,7 +36,7 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int VehicleId => Persistence.Id;
 
-    public IElementSaveService Saving { get; init; }
+    public ElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public VehicleAccessFeature Access { get; init; }
     public VehiclePersistenceFeature Persistence { get; init; }
@@ -73,7 +73,7 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
         GetRequiredService<VehicleContext>().Vehicle = this;
         GetRequiredService<ElementContext>().Element = this;
 
-        Saving = GetRequiredService<IElementSaveService>();
+        Saving = GetRequiredService<ElementSaveService>();
 
         #region Initialize scope services
         Access = GetRequiredService<VehicleAccessFeature>();

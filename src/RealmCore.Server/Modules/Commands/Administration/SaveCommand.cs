@@ -6,10 +6,10 @@ internal class SaveCommand : IInGameCommand
     public string[] RequiredPolicies { get; } = ["Owner"];
 
     private readonly IElementCollection _elementCollection;
-    private readonly IElementSaveService _saveService;
+    private readonly ElementSaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(IElementCollection elementCollection, IElementSaveService saveService, ILogger<SaveCommand> logger)
+    public SaveCommand(IElementCollection elementCollection, ElementSaveService saveService, ILogger<SaveCommand> logger)
     {
         _elementCollection = elementCollection;
         _saveService = saveService;

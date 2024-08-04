@@ -6,11 +6,11 @@ internal class ReloadElementsCommand : IInGameCommand
     public string[] RequiredPolicies { get; } = ["Owner"];
 
     private readonly IElementCollection _elementCollection;
-    private readonly IElementSaveService _saveService;
+    private readonly ElementSaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
     private readonly VehicleLoader _vehicleLoader;
 
-    public ReloadElementsCommand(IElementCollection elementCollection, IElementSaveService saveService, ILogger<SaveCommand> logger, VehicleLoader vehicleLoader)
+    public ReloadElementsCommand(IElementCollection elementCollection, ElementSaveService saveService, ILogger<SaveCommand> logger, VehicleLoader vehicleLoader)
     {
         _elementCollection = elementCollection;
         _saveService = saveService;
