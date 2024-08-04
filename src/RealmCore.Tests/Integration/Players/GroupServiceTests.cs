@@ -1,22 +1,32 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class GroupServiceTests
+public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
-    ////[Fact]
-    //public async Task YouCanAddMemberToGroupAndThenRemoveIt()
-    //{
-    //    using var hosting = new RealmTestingServerHosting();
-    //    var player = await hosting.CreatePlayer();
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingPlayer _player;
+    private readonly PlayerGroupsFeature _groups;
+    private readonly GroupsService _groupsService;
 
-    //    var groupService = hosting.GetRequiredService<GroupsService>();
-    //    var group = await groupService.CreateGroup("Test group4", "TG4", 0);
+    public GroupServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _groups = _player.Groups;
+        _groupsService = _fixture.Hosting.GetRequiredService<GroupsService>();
+    }
 
-    //    await groupService.TryAddMember(player, group.id, 100, "Leader");
-    //    var removed = await groupService.RemoveMember(player, player.UserId);
+    [Fact]
+    private async Task GroupCanBeCreated()
+    {
+        var name = Guid.NewGuid().ToString();
 
-    //    player.Groups.IsMember(group.id).Should().BeFalse();
-    //    var group2 = await groupService.GetGroupByName("Test group4");
-    //    removed.Should().BeTrue();
-    //    group2.Value.members.Should().BeEmpty();
-    //}
+        var result = await _groupsService.Create(name);
+
+        ((GroupsResults.Created)result.Value).group.Name.Should().Be(name);
+    }
+
+    public void Dispose()
+    {
+
+    }
 }

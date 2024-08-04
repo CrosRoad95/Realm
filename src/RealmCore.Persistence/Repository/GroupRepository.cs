@@ -111,7 +111,7 @@ public sealed class GroupRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<GroupData> Create(string name, string shortcut, byte kind = 1, CancellationToken cancellationToken = default)
+    public async Task<GroupData> Create(string name, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
 

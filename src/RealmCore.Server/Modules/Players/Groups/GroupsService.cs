@@ -1,7 +1,17 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
+
+namespace RealmCore.Server.Modules.Players.Groups;
+
+public static class GroupsResults
+{
+    public record struct Created(GroupDto group);
+    public record struct NameInUse();
+    public record struct ShortcutInUse();
+}
 
 public sealed class GroupsService
 {
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -13,6 +23,26 @@ public sealed class GroupsService
         _serviceProvider = _serviceScope.ServiceProvider;
         _dateTimeProvider = dateTimeProvider;
         _groupRepository = _serviceProvider.GetRequiredService<GroupRepository>();
+    }
+
+    public async Task<OneOf<Created, NameInUse, ShortcutInUse>> Create(string name, string? shortcut = null, int kind = 0, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            if (await _groupRepository.ExistsByName(name, cancellationToken))
+                return new NameInUse();
+
+            if (shortcut != null && await _groupRepository.ExistsByShortcut(shortcut, cancellationToken))
+                return new ShortcutInUse();
+
+            var groupData = await _groupRepository.Create(name, shortcut, (byte)kind, cancellationToken);
+            return new Created(GroupDto.Map(groupData));
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public async Task<GroupDto?> GetGroupByName(string groupName, CancellationToken cancellationToken = default)
@@ -36,18 +66,6 @@ public sealed class GroupsService
     public async Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
         return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
-    }
-
-    public async Task<GroupDto> CreateGroup(string groupName, string shortcut, int groupKind = 0, CancellationToken cancellationToken = default)
-    {
-        if (await _groupRepository.ExistsByName(groupName, cancellationToken))
-            throw new GroupNameInUseException(groupName);
-
-        if (await _groupRepository.ExistsByShortcut(shortcut, cancellationToken))
-            throw new GroupShortcutInUseException(shortcut);
-
-        var groupData = await _groupRepository.Create(groupName, shortcut, (byte)groupKind, cancellationToken);
-        return GroupDto.Map(groupData);
     }
 
     public async Task<bool> TryAddMember(RealmPlayer player, int groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
