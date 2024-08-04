@@ -71,6 +71,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
     public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
     public DbSet<GroupRolePermissionData> GroupsRolesPermissions => Set<GroupRolePermissionData>();
+    public DbSet<GroupEventData> GroupsEvents => Set<GroupEventData>();
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
@@ -746,6 +747,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.Group)
                 .HasForeignKey(x => x.GroupId)
                 .HasPrincipalKey(x => x.Id);
+
+            entityBuilder
+                .HasMany(x => x.Events)
+                .WithOne()
+                .HasForeignKey(x => x.GroupId);
         });
 
         modelBuilder.Entity<GroupMemberData>(entityBuilder =>
@@ -785,6 +791,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(GroupsRolesPermissions))
                 .HasKey(x => new { x.GroupRoleId, x.PermissionId });
+        });
+
+        modelBuilder.Entity<GroupEventData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupsEvents))
+                .HasKey(x => x.Id);
         });
 
         modelBuilder.Entity<DiscordIntegrationData>(entityBuilder =>

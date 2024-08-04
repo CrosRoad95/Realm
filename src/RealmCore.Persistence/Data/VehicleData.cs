@@ -38,3 +38,8 @@ public sealed class VehicleData
     public ICollection<VehicleEventData> VehicleEvents { get; set; } = new List<VehicleEventData>();
 #pragma warning restore CS8618
 }
+
+public class VehicleEventData : EventDataBase
+{
+    public int VehicleId { get; set; }
+}
