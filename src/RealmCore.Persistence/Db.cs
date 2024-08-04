@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence;
+﻿using System.Xml;
+
+namespace RealmCore.Persistence;
 
 public class DbSynchronizationContex
 {
@@ -68,7 +70,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<GroupData> Groups => Set<GroupData>();
     public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
     public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
-    public DbSet<GroupRolePermissionData> RolesPermissions => Set<GroupRolePermissionData>();
+    public DbSet<GroupRolePermissionData> GroupsRolesPermissions => Set<GroupRolePermissionData>();
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
@@ -191,7 +193,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.Settings)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
-            
+
             entityBuilder
                 .HasMany(x => x.Secrets)
                 .WithOne()
@@ -272,7 +274,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.LoginHistory)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
-            
+
             entityBuilder
                 .HasMany(x => x.MoneyHistory)
                 .WithOne()
@@ -321,7 +323,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
-            
+
             entityBuilder
                 .HasMany<BlockedUserData>()
                 .WithOne(x => x.User2)
@@ -411,7 +413,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .ToTable(nameof(UserStats))
                 .HasKey(x => new { x.UserId, x.StatId });
         });
-        
+
         modelBuilder.Entity<UserGtaStatData>(entityBuilder =>
         {
             entityBuilder
@@ -435,7 +437,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.SettingId)
                 .HasMaxLength(255);
         });
-        
+
         modelBuilder.Entity<UserNotificationData>(entityBuilder =>
         {
             entityBuilder
@@ -448,7 +450,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.Excerpt)
                 .HasMaxLength(255);
         });
-        
+
         modelBuilder.Entity<UserLoginHistoryData>(entityBuilder =>
         {
             entityBuilder
@@ -461,7 +463,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.Serial)
                 .HasMaxLength(32);
         });
-        
+
         modelBuilder.Entity<UserMoneyHistoryData>(entityBuilder =>
         {
             entityBuilder
@@ -626,7 +628,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.Spawned)
                 .HasDefaultValue(false)
                 .IsRequired();
-            
+
             entityBuilder.Property(x => x.IsRemoved)
                 .HasDefaultValue(false)
                 .IsRequired();
@@ -720,6 +722,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.UserId, x.DiscoveryId });
         });
 
+        //modelBuilder.Ignore<GroupData>();
+        //modelBuilder.Ignore<GroupMemberData>();
+        //modelBuilder.Ignore<GroupRoleData>();
+        //modelBuilder.Ignore<GroupRolePermissionData>();
+
         modelBuilder.Entity<GroupData>(entityBuilder =>
         {
             entityBuilder
@@ -739,6 +746,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.Group)
                 .HasForeignKey(x => x.GroupId)
                 .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasMany(x => x.Roles)
+                .WithOne(x => x.Group)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
         });
 
         modelBuilder.Entity<GroupMemberData>(entityBuilder =>
@@ -755,9 +767,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.HasOne(x => x.Role)
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.RoleId)
-                .HasPrincipalKey(x => x.Id);
+                .HasPrincipalKey(x => x.GroupId);
         });
-        
+
         modelBuilder.Entity<GroupRoleData>(entityBuilder =>
         {
             entityBuilder
@@ -770,13 +782,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.HasMany(x => x.Permissions)
                 .WithOne(x => x.GroupRole)
                 .HasForeignKey(x => x.GroupRoleId)
-                .HasPrincipalKey(x => x.Id);
+                .HasPrincipalKey(x => x.GroupId);
         });
-        
+
         modelBuilder.Entity<GroupRolePermissionData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(GroupsRoles))
+                .ToTable(nameof(GroupsRolesPermissions))
                 .HasKey(x => new { x.GroupRoleId, x.PermissionId });
         });
 

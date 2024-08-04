@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealmCore.MySql;
 
@@ -10,9 +11,11 @@ using RealmCore.MySql;
 namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20240804074318_RemoveFractionsAndGroupsTables")]
+    partial class RemoveFractionsAndGroupsTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,102 +271,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.HasIndex("UserId2");
 
                     b.ToTable("Friends", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<byte?>("Kind")
-                        .HasColumnType("tinyint unsigned");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
-
-                    b.Property<string>("Shortcut")
-                        .HasMaxLength(8)
-                        .HasColumnType("varchar(8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Shortcut")
-                        .IsUnique();
-
-                    b.ToTable("Groups", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupMemberData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("longtext");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("GroupMembers", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupRoleData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GroupsRoles", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupRolePermissionData", b =>
-                {
-                    b.Property<int>("GroupRoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupRoleId", "PermissionId");
-
-                    b.ToTable("GroupsRolesPermissions", (string)null);
                 });
 
             modelBuilder.Entity("RealmCore.Persistence.Data.InventoryData", b =>
@@ -1612,55 +1519,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("User2");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupMemberData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.GroupData", "Group")
-                        .WithMany("Members")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RealmCore.Persistence.Data.GroupRoleData", "Role")
-                        .WithMany("Members")
-                        .HasForeignKey("RoleId")
-                        .HasPrincipalKey("GroupId");
-
-                    b.HasOne("RealmCore.Persistence.Data.UserData", "User")
-                        .WithMany("GroupMembers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupRoleData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.GroupData", "Group")
-                        .WithMany("Roles")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupRolePermissionData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.GroupRoleData", "GroupRole")
-                        .WithMany("Permissions")
-                        .HasForeignKey("GroupRoleId")
-                        .HasPrincipalKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GroupRole");
-                });
-
             modelBuilder.Entity("RealmCore.Persistence.Data.InventoryItemData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.InventoryData", "Inventory")
@@ -2030,20 +1888,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("WorldNode");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupData", b =>
-                {
-                    b.Navigation("Members");
-
-                    b.Navigation("Roles");
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupRoleData", b =>
-                {
-                    b.Navigation("Members");
-
-                    b.Navigation("Permissions");
-                });
-
             modelBuilder.Entity("RealmCore.Persistence.Data.InventoryData", b =>
                 {
                     b.Navigation("InventoryItems");
@@ -2089,8 +1933,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("Discoveries");
 
                     b.Navigation("Events");
-
-                    b.Navigation("GroupMembers");
 
                     b.Navigation("GtaSaStats");
 

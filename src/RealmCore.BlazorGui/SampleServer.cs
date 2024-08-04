@@ -21,7 +21,6 @@ public static class SampleServerExtensions
         services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
 
         #region In game command
-        services.AddInGameCommand<CreateGroupCommand>();
         services.AddInGameCommand<GiveItemCommand>();
         services.AddInGameCommand<GiveLicenseCommand>();
         services.AddInGameCommand<InventoryCommand>();
