@@ -355,7 +355,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("accessinfobyid", async ([CallingPlayer] RealmPlayer player, int id) =>
         {
-            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
+            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
             var access = await vehicleRepository.GetAllVehicleAccesses(id);
             if (access == null)
             {
@@ -1069,8 +1069,8 @@ internal sealed class CommandsHostedService : IHostedService
         
         _commandService.Add("testupload", async ([CallingPlayer] RealmPlayer player) =>
         {
-            await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleNone", "txt", 123, "[]", DateTime.Now);
-            await player.GetRequiredService<IUploadedFilesRepository>().Add("sampleUser", "txt", 123, "[]", DateTime.Now, player.UserId);
+            await player.GetRequiredService<UploadedFilesRepository>().Add("sampleNone", "txt", 123, "[]", DateTime.Now);
+            await player.GetRequiredService<UploadedFilesRepository>().Add("sampleUser", "txt", 123, "[]", DateTime.Now, player.UserId);
         });
         
         _commandService.Add("setskin", ([CallingPlayer] RealmPlayer player) =>

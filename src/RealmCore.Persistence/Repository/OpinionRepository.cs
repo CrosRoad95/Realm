@@ -1,12 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IOpinionRepository
-{
-    Task<bool> Add(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default);
-    Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default);
-}
-
-internal sealed class OpinionRepository : IOpinionRepository
+public sealed class OpinionRepository
 {
     private readonly IDb _db;
 

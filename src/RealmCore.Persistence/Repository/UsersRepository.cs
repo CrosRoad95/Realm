@@ -1,15 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IUsersRepository
-{
-    Task<UserData?> GetBySerial(string serial, CancellationToken cancellationToken = default);
-    Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default);
-    Task<string[]> GetRoles(int userId, CancellationToken cancellationToken = default);
-    Task<UserData?> GetUserByUserName(string userName, DateTime dateTime, CancellationToken cancellationToken = default);
-    Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default);
-}
-
-internal sealed class UsersRepository : IUsersRepository
+public sealed class UsersRepository
 {
     private readonly IDb _db;
 

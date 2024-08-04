@@ -8,12 +8,12 @@ public sealed partial class ElementSaveService : IAsyncDisposable
     private readonly IDb _db;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IInventoryRepository _inventoryRepository;
+    private readonly InventoryRepository _inventoryRepository;
 
     public event Action<Element>? ElementSaved;
     private readonly Element _element;
 
-    public ElementSaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext, IInventoryRepository inventoryRepository)
+    public ElementSaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext, InventoryRepository inventoryRepository)
     {
         _db = db;
         _userDataSavers = userDataSavers;

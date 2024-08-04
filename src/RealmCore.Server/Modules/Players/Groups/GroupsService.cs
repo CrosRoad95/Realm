@@ -4,76 +4,58 @@ public sealed class GroupsService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly GroupRepository _groupRepository;
 
-    public GroupsService(IServiceProvider serviceProvider)
+    public GroupsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
+        _dateTimeProvider = dateTimeProvider;
+        _groupRepository = _serviceProvider.GetRequiredService<GroupRepository>();
     }
 
-    private Group Map(GroupData groupData)
+    public async Task<GroupDto?> GetGroupByName(string groupName, CancellationToken cancellationToken = default)
     {
-        return new Group
-        {
-            id = groupData.Id,
-            name = groupData.Name,
-            shortcut = groupData.Shortcut,
-            kind = groupData.Kind ?? 0,
-            members = groupData.Members.Select(x => new GroupMember
-            {
-                userId = x.UserId,
-                rank = x.Rank,
-                rankName = x.RankName
-            }).ToArray()
-        };
-    }
-
-    public async Task<Group?> GetGroupByName(string groupName, CancellationToken cancellationToken = default)
-    {
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        var groupData = await groupRepository.GetByName(groupName, cancellationToken);
+        var groupData = await _groupRepository.GetByName(groupName, cancellationToken);
         if (groupData == null)
             return null;
 
-        return Map(groupData);
+        return GroupDto.Map(groupData);
     }
 
-    public async Task<Group?> GetGroupByNameOrShortCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
+    public async Task<GroupDto?> GetGroupByNameOrShortCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        var groupData = await groupRepository.GetGroupByNameOrShortcut(groupName, shortcut, cancellationToken);
+        var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut, cancellationToken);
         if (groupData == null)
             return null;
 
-        return Map(groupData);
+        return GroupDto.Map(groupData);
     }
 
     public async Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        return await groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
+        return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
     }
 
-    public async Task<Group> CreateGroup(string groupName, string shortcut, int groupKind = 0, CancellationToken cancellationToken = default)
+    public async Task<GroupDto> CreateGroup(string groupName, string shortcut, int groupKind = 0, CancellationToken cancellationToken = default)
     {
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        if (await groupRepository.ExistsByName(groupName, cancellationToken))
+        if (await _groupRepository.ExistsByName(groupName, cancellationToken))
             throw new GroupNameInUseException(groupName);
 
-        if (await groupRepository.ExistsByShortcut(shortcut, cancellationToken))
+        if (await _groupRepository.ExistsByShortcut(shortcut, cancellationToken))
             throw new GroupShortcutInUseException(shortcut);
 
-        var groupData = await groupRepository.Create(groupName, shortcut, (byte)groupKind, cancellationToken);
-        return Map(groupData);
+        var groupData = await _groupRepository.Create(groupName, shortcut, (byte)groupKind, cancellationToken);
+        return GroupDto.Map(groupData);
     }
 
-    public async Task<bool> TryAddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    public async Task<bool> TryAddMember(RealmPlayer player, int groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
     {
         if (player.Groups.IsMember(groupId))
             return false;
 
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        var groupMemberData = await groupRepository.TryAddMember(groupId, player.UserId, rank, rankName, cancellationToken);
+        var groupMemberData = await _groupRepository.TryAddMember(groupId, player.UserId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
         if (groupMemberData == null)
             return false;
 
@@ -86,8 +68,7 @@ public sealed class GroupsService
         if (!player.Groups.IsMember(groupId))
             return false;
 
-        var groupRepository = _serviceProvider.GetRequiredService<IGroupRepository>();
-        if (await groupRepository.TryRemoveMember(groupId, player.UserId, cancellationToken))
+        if (await _groupRepository.TryRemoveMember(groupId, player.UserId, cancellationToken))
         {
             player.Groups.RemoveGroupMember(groupId);
         }

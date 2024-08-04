@@ -3,7 +3,7 @@
 public sealed class PlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserNotificationDto>, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IUserNotificationRepository _userNotificationRepository;
+    private readonly UserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserNotificationData> _userNotificationDataCollection = [];
 
@@ -13,7 +13,7 @@ public sealed class PlayerNotificationsFeature : IPlayerFeature, IEnumerable<Use
 
     public RealmPlayer Player { get; }
 
-    public PlayerNotificationsFeature(PlayerContext playerContext, IUserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider, NotificationsService notificationsService)
+    public PlayerNotificationsFeature(PlayerContext playerContext, UserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider, NotificationsService notificationsService)
     {
         Player = playerContext.Player;
         _userNotificationRepository = userNotificationRepository;

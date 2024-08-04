@@ -1,25 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IVehicleRepository
-{
-    Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
-    Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default);
-    Task<int[]> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default);
-    Task<VehicleUserAccessData[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
-    Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default);
-    Task<LightInfoVehicleDto[]> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
-    Task<int[]> GetOwner(int vehicleId, CancellationToken cancellationToken = default);
-    Task<VehicleData?> GetReadOnlyById(int id, CancellationToken cancellationToken = default);
-    Task<VehicleData?> GetById(int id, CancellationToken cancellationToken = default);
-    Task<VehicleData[]> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
-    Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default);
-    Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default);
-    Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default);
-    Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default);
-    Task<bool> SoftRemove(int id, CancellationToken cancellationToken = default);
-}
-
-internal sealed class VehicleRepository : IVehicleRepository
+public sealed class VehicleRepository
 {
     private readonly IDb _db;
 

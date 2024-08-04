@@ -3,16 +3,16 @@
 public sealed class FeedbackService
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private readonly IRatingRepository _ratingRepository;
-    private readonly IOpinionRepository _opinionRepository;
+    private readonly RatingRepository _ratingRepository;
+    private readonly OpinionRepository _opinionRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceScope _serviceScope;
 
     public FeedbackService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
-        _ratingRepository = _serviceScope.ServiceProvider.GetRequiredService<IRatingRepository>();
-        _opinionRepository = _serviceScope.ServiceProvider.GetRequiredService<IOpinionRepository>();
+        _ratingRepository = _serviceScope.ServiceProvider.GetRequiredService<RatingRepository>();
+        _opinionRepository = _serviceScope.ServiceProvider.GetRequiredService<OpinionRepository>();
         _dateTimeProvider = dateTimeProvider;
     }
 

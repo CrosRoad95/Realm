@@ -1,19 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IFriendRepository
-{
-    Task<bool> AreFriends(int userId1, int userId2);
-    Task CreateFriend(int userId1, int userId2, DateTime now);
-    Task CreatePendingRequest(int userId1, int userId2, DateTime now);
-    Task<int[]> GetByUserId(int userId);
-    Task<int[]> GetPendingIncomingFriendsRequests(int userId);
-    Task<int[]> GetPendingOutgoingFriendsRequests(int userId);
-    Task<bool> IsPendingFriendRequest(int userId1, int userId2);
-    Task<bool> RemoveFriend(int userId1, int userId2);
-    Task<bool> RemovePendingRequest(int userId1, int userId2);
-}
-
-internal sealed class FriendRepository : IFriendRepository
+public sealed class FriendRepository
 {
     private readonly IDb _db;
 

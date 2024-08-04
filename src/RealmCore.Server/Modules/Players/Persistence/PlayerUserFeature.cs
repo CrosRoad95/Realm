@@ -36,7 +36,7 @@ public sealed class PlayerUserFeature : IPlayerFeature, IDisposable
     private UserData? _user;
     private readonly Dictionary<string, bool> _authorizedPoliciesCache = [];
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IUserEventRepository _userEventRepository;
+    private readonly UserEventRepository _userEventRepository;
     private ClaimsPrincipal? _claimsPrincipal;
     private int _version = 0;
 
@@ -63,7 +63,7 @@ public sealed class PlayerUserFeature : IPlayerFeature, IDisposable
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerUserFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
+    public PlayerUserFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, UserEventRepository userEventRepository)
     {
         Player = playerContext.Player;
         _dateTimeProvider = dateTimeProvider;

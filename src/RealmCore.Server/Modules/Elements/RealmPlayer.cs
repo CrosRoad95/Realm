@@ -188,7 +188,6 @@ public class RealmPlayer : Player, IAsyncDisposable
     public PlayerSessionsFeature Sessions { get; init; }
     public PlayerAdminFeature Admin { get; init; }
     public PlayerGroupsFeature Groups { get; init; }
-    public PlayerFractionsFeature Fractions { get; init; }
     public PlayerGuiFeature Gui { get; init; }
     public PlayerHudFeature Hud { get; init; }
     public PlayerInventoryFeature Inventory { get; init; }
@@ -237,7 +236,6 @@ public class RealmPlayer : Player, IAsyncDisposable
         Sessions = GetRequiredService<PlayerSessionsFeature>();
         Admin = GetRequiredService<PlayerAdminFeature>();
         Groups = GetRequiredService<PlayerGroupsFeature>();
-        Fractions = GetRequiredService<PlayerFractionsFeature>();
         Gui = GetRequiredService<PlayerGuiFeature>();
         Hud = GetRequiredService<PlayerHudFeature>();
         Inventory = GetRequiredService<PlayerInventoryFeature>();

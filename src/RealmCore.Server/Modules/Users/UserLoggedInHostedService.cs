@@ -4,7 +4,7 @@ internal sealed class UserLoggedInHostedService : PlayerLifecycle, IHostedServic
 {
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
+    private readonly UserLoginHistoryRepository _userLoginHistoryRepository;
     private readonly ILogger<UserLoggedInHostedService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
@@ -12,7 +12,7 @@ internal sealed class UserLoggedInHostedService : PlayerLifecycle, IHostedServic
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
-        _userLoginHistoryRepository = _serviceProvider.GetRequiredService<IUserLoginHistoryRepository>();
+        _userLoginHistoryRepository = _serviceProvider.GetRequiredService<UserLoginHistoryRepository>();
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
     }

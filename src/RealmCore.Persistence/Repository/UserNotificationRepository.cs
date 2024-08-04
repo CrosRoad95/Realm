@@ -1,16 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IUserNotificationRepository
-{
-    Task<int> CountUnread(int userId, CancellationToken cancellationToken = default);
-    Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default);
-    Task<UserNotificationData[]> FetchMore(int userId, int lastId, int number, CancellationToken cancellationToken = default);
-    Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
-    Task<UserNotificationData?> GetById(int id, CancellationToken cancellationToken = default);
-    Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default);
-}
-
-internal sealed class UserNotificationRepository : IUserNotificationRepository
+public sealed class UserNotificationRepository
 {
     private readonly IDb _db;
 

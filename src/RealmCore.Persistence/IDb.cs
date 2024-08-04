@@ -29,8 +29,6 @@ public interface IDb
     DbSet<AchievementData> Achievements { get; }
     DbSet<GroupData> Groups { get; }
     DbSet<GroupMemberData> GroupMembers { get; }
-    DbSet<FractionData> Fractions { get; }
-    DbSet<FractionMemberData> FractionMembers { get; }
     DbSet<UserUpgradeData> UserUpgrades { get; }
     DbSet<BanData> Bans { get; }
     DbSet<JobStatisticsData> JobPoints { get; }

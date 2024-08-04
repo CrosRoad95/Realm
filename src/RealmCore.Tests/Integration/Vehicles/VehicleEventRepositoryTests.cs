@@ -14,7 +14,7 @@ public class VehicleEventRepositoryTests
         var vehicleId2 = vehicle2.VehicleId;
 
         var dateTimeProvider = hosting.GetRequiredService<IDateTimeProvider>();
-        var vehicleEventRepository = hosting.GetRequiredService<IVehicleEventRepository>();
+        var vehicleEventRepository = hosting.GetRequiredService<VehicleEventRepository>();
 
         await vehicleEventRepository.AddEvent(vehicleId1, 1, dateTimeProvider.Now, "a");
         await vehicleEventRepository.AddEvent(vehicleId1, 1, dateTimeProvider.Now.AddMinutes(1), "b");

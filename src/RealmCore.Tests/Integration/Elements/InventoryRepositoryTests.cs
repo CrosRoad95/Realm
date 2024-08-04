@@ -14,7 +14,7 @@ public class InventoryRepositoryTests : IClassFixture<RealmTestingServerHostingF
     {
         var player = await _fixture.Hosting.CreatePlayer();
 
-        var repository = _fixture.Hosting.GetRequiredService<IInventoryRepository>();
+        var repository = _fixture.Hosting.GetRequiredService<InventoryRepository>();
         var id = player.User.Id;
          
         var inventoryId = await repository.CreateInventoryForUserId(id, 22);
@@ -31,7 +31,7 @@ public class InventoryRepositoryTests : IClassFixture<RealmTestingServerHostingF
     {
         var player = await _fixture.Hosting.CreatePlayer(name: Guid.NewGuid().ToString());
 
-        var repository = _fixture.Hosting.GetRequiredService<IInventoryRepository>();
+        var repository = _fixture.Hosting.GetRequiredService<InventoryRepository>();
         var id = player.User.Id;
 
         await _fixture.Hosting.LogOutPlayer(player);

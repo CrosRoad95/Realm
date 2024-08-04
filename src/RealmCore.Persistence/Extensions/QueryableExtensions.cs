@@ -29,7 +29,6 @@ public static class QueryableExtensions
             .Include(x => x.GtaSaStats)
             .Include(x => x.Discoveries)
             .Include(x => x.GroupMembers)
-            .Include(x => x.FractionMembers)
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
             .Include(x => x.Settings)

@@ -6,7 +6,7 @@ public sealed class PlayersUsersService
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IUsersRepository _usersRepository;
+    private readonly UsersRepository _usersRepository;
 
 
     public PlayersUsersService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
@@ -14,7 +14,7 @@ public sealed class PlayersUsersService
         _serviceProvider = serviceProvider;
         _dateTimeProvider = dateTimeProvider;
         _serviceScope = _serviceProvider.CreateAsyncScope();
-        _usersRepository = _serviceScope.ServiceProvider.GetRequiredService<IUsersRepository>();
+        _usersRepository = _serviceScope.ServiceProvider.GetRequiredService<UsersRepository>();
     }
 
     public async Task<UserData?> GetUserByUserName(string userName, CancellationToken cancellationToken = default)

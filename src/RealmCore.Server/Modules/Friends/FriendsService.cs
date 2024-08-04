@@ -22,7 +22,7 @@ public sealed class FriendsService
 {
     private readonly IServiceScope _scope;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IFriendRepository _friendRepository;
+    private readonly FriendRepository _friendRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<FriendsService> _logger;
 
@@ -30,7 +30,7 @@ public sealed class FriendsService
     {
         _scope = serviceProvider.CreateScope();
         _serviceProvider = _scope.ServiceProvider;
-        _friendRepository = _serviceProvider.GetRequiredService<IFriendRepository>();
+        _friendRepository = _serviceProvider.GetRequiredService<FriendRepository>();
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }

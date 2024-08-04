@@ -1,19 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
-public interface IBanRepository
-{
-    Task<BanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);
-    Task<BanData> CreateForUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);
-    Task<BanData> CreateForUserIdAndSerial(int userId, string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default);
-    Task<bool> Delete(int id, CancellationToken cancellationToken = default);
-    Task<int[]> DeleteBySerial(string serial, int? type = 0, CancellationToken cancellationToken = default);
-    Task<int[]> DeleteByUserId(int userId, int? type = 0, CancellationToken cancellationToken = default);
-    Task<int[]> DeleteByUserIdOrSerial(int userId, string serial, int? type = 0, CancellationToken cancellationToken = default);
-    Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
-    Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default);
-    Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default);
-}
 
-internal sealed class BanRepository : IBanRepository
+public sealed class BanRepository
 {
     private readonly IDb _db;
 
@@ -22,6 +9,7 @@ internal sealed class BanRepository : IBanRepository
         _db = db;
     }
 
+    #region Write
     public async Task<BanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateForSerial));
@@ -111,69 +99,6 @@ internal sealed class BanRepository : IBanRepository
         return ban;
     }
 
-    public async Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetBySerial));
-        if (activity != null)
-        {
-            activity.AddTag("Serial", serial);
-            activity.AddTag("Now", now);
-            activity.AddTag("Type", type);
-        }
-
-        var query = _db.Bans
-            .AsNoTracking()
-            .TagWithSource(nameof(BanRepository))
-            .Where(x => x.Serial == serial && x.End > now && x.Active);
-
-        if (type != null)
-            query = query.Where(x => x.Type == type);
-
-        return await query.ToArrayAsync(cancellationToken);
-    }
-    
-    public async Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetByUserId));
-        if (activity != null)
-        {
-            activity.AddTag("UserId", userId);
-            activity.AddTag("Now", now);
-            activity.AddTag("Type", type);
-        }
-
-        var query = _db.Bans
-            .AsNoTracking()
-            .TagWithSource(nameof(BanRepository))
-            .Where(x => x.UserId == userId && x.End > now && x.Active);
-
-        if(type != null)
-            query = query.Where(x => x.Type == type);
-
-        return await query.ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetByUserIdOrSerial));
-        if (activity != null)
-        {
-            activity.AddTag("UserId", userId);
-            activity.AddTag("Serial", serial);
-            activity.AddTag("Now", now);
-            activity.AddTag("Type", type);
-        }
-
-        var query = _db.Bans
-            .AsNoTracking()
-            .TagWithSource(nameof(BanRepository))
-            .Where(x => (x.Serial == serial || x.UserId == userId) && x.End > now && x.Active);
-
-        if (type != null)
-            query = query.Where(x => x.Type == type);
-
-        return await query.ToArrayAsync(cancellationToken);
-    }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
     {
@@ -295,6 +220,72 @@ internal sealed class BanRepository : IBanRepository
         await _db.SaveChangesAsync(cancellationToken);
         return [.. deletedBansIds];
     }
+    #endregion
+
+    #region Read
+    public async Task<BanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetBySerial));
+        if (activity != null)
+        {
+            activity.AddTag("Serial", serial);
+            activity.AddTag("Now", now);
+            activity.AddTag("Type", type);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.Serial == serial && x.End > now && x.Active);
+
+        if (type != null)
+            query = query.Where(x => x.Type == type);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+    
+    public async Task<BanData[]> GetByUserId(int userId, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByUserId));
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Now", now);
+            activity.AddTag("Type", type);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && x.End > now && x.Active);
+
+        if(type != null)
+            query = query.Where(x => x.Type == type);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<BanData[]> GetByUserIdOrSerial(int userId, string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByUserIdOrSerial));
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Serial", serial);
+            activity.AddTag("Now", now);
+            activity.AddTag("Type", type);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => (x.Serial == serial || x.UserId == userId) && x.End > now && x.Active);
+
+        if (type != null)
+            query = query.Where(x => x.Type == type);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
+    private IQueryable<BanData> CreateQueryBase() => _db.Bans.TagWithSource(nameof(BanRepository));
+    #endregion
 
     public static readonly ActivitySource Activity = new("RealmCore.BanRepository", "1.0.0");
 }

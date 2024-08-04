@@ -1,13 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IRatingRepository
-{
-    Task ChangeLastRating(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default);
-    Task<(int, DateTime)?> GetLastRating(int userId, int ratingId, CancellationToken cancellationToken = default);
-    Task<bool> Rate(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default);
-}
-
-internal sealed class RatingRepository : IRatingRepository
+public sealed class RatingRepository
 {
     private readonly IDb _db;
 

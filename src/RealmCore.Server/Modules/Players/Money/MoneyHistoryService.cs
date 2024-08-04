@@ -5,13 +5,13 @@ public sealed class MoneyHistoryService
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceScope _serviceScope;
-    private readonly IUserMoneyHistoryRepository _userMoneyHistoryRepository;
+    private readonly UserMoneyHistoryRepository _userMoneyHistoryRepository;
 
     public MoneyHistoryService(IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
     {
         _dateTimeProvider = dateTimeProvider;
         _serviceScope = serviceProvider.CreateScope();
-        _userMoneyHistoryRepository = _serviceScope.ServiceProvider.GetRequiredService<IUserMoneyHistoryRepository>();
+        _userMoneyHistoryRepository = _serviceScope.ServiceProvider.GetRequiredService<UserMoneyHistoryRepository>();
     }
 
     public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default)

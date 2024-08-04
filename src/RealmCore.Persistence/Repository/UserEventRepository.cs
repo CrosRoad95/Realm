@@ -1,13 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IUserEventRepository
-{
-    Task AddEvent(int userId, int eventType, DateTime dateTime, string? metadata = null, CancellationToken cancellationToken = default);
-    Task<UserEventData[]> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
-    Task<UserEventData[]> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default);
-}
-
-internal sealed class UserEventRepository : IUserEventRepository
+public sealed class UserEventRepository
 {
     private readonly IDb _db;
 

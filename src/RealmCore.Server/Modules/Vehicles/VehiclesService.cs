@@ -22,7 +22,7 @@ public sealed class VehiclesService
     public async Task<RealmVehicle?> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
     {
         var vehicle = _elementFactory.CreateVehicle(location, model);
-        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle((ushort)model, _dateTimeProvider.Now, cancellationToken);
+        var vehicleData = await vehicle.GetRequiredService<VehicleRepository>().CreateVehicle((ushort)model, _dateTimeProvider.Now, cancellationToken);
 
         if (_vehiclesInUse.TrySetActive(vehicleData.Id, vehicle))
         {
@@ -40,7 +40,7 @@ public sealed class VehiclesService
     {
         if (player.User.IsLoggedIn)
         {
-            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
+            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
             return await vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
         }
         return [];
@@ -50,7 +50,7 @@ public sealed class VehiclesService
     {
         if (player.User.IsLoggedIn)
         {
-            var vehicleRepository = player.GetRequiredService<IVehicleRepository>();
+            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
             return await vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
         }
         return [];
@@ -83,7 +83,7 @@ public sealed class VehiclesService
         if (vehicle.Persistence.IsLoaded)
             throw new InvalidOperationException();
 
-        var vehicleRepository = vehicle.GetRequiredService<IVehicleRepository>();
+        var vehicleRepository = vehicle.GetRequiredService<VehicleRepository>();
         var vehicleService = vehicle.GetRequiredService<VehicleService>();
         var location = vehicle.GetLocation();
 

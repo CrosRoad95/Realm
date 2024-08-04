@@ -5,7 +5,7 @@ public sealed class NotificationsService
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IUserNotificationRepository _userNotificationRepository;
+    private readonly UserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly UsersInUse _usersInUse;
 
@@ -13,7 +13,7 @@ public sealed class NotificationsService
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
-        _userNotificationRepository = _serviceProvider.GetRequiredService<IUserNotificationRepository>();
+        _userNotificationRepository = _serviceProvider.GetRequiredService<UserNotificationRepository>();
         _dateTimeProvider = dateTimeProvider;
         _usersInUse = usersInUse;
     }

@@ -10,7 +10,7 @@ public class TransactionContextTests
         using var hosting = new RealmTestingServerHosting();
         var player = await hosting.CreatePlayer(name: Guid.NewGuid().ToString());
 
-        var repository = hosting.GetRequiredService<IInventoryRepository>();
+        var repository = hosting.GetRequiredService<InventoryRepository>();
         var transactionContext = hosting.GetRequiredService<ITransactionContext>();
         var id = player.User.Id;
 

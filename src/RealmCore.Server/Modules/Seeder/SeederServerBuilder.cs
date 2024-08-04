@@ -8,7 +8,6 @@ internal sealed class SeederServerBuilder : IDisposable
     private const string _basePath = "Seed";
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
-    private readonly FractionsService _fractionService;
     private readonly IServiceProvider _serviceProvider;
     private readonly PlayersUsersService _playersUsersService;
     private readonly IServiceScope _serviceScope;
@@ -19,12 +18,11 @@ internal sealed class SeederServerBuilder : IDisposable
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, FractionsService fractionService, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, IServiceProvider serviceProvider, PlayersUsersService playersUsersService)
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, GroupRepository groupRepository, IServiceProvider serviceProvider, PlayersUsersService playersUsersService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
-        _fractionService = fractionService;
         _serviceProvider = serviceProvider;
         _playersUsersService = playersUsersService;
         _serviceScope = serviceProvider.CreateScope();
@@ -159,39 +157,6 @@ internal sealed class SeederServerBuilder : IDisposable
         }
     }
 
-    private async Task BuildFractions(Dictionary<string, FractionSeedData> fractions)
-    {
-        foreach (var fraction in fractions)
-        {
-            var id = fraction.Value.Id;
-
-            if (await _fractionService.TryCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position))
-            {
-                _logger.LogInformation("Seeder: Created fraction of id {fractionId} name: {fractionName}, code: {fractionCode}.", id, fraction.Key, fraction.Value.Code);
-                _isUpToDate = false;
-            }
-
-            foreach (var member in fraction.Value.Members)
-            {
-                var userId = _createdUsers[member.Key].Id;
-                if (!_fractionService.HasMember(id, userId))
-                {
-                    try
-                    {
-                        await _fractionService.AddMember(id, userId, member.Value.Rank, member.Value.RankName);
-                        _logger.LogInformation("Seeder: Added member {userId} with rank: {fractionRank} ({fractionRankName}) to the fraction with id {fractionId}.", userId, member.Value.Rank, member.Value.RankName, id);
-                        _isUpToDate = false;
-                    }
-                    catch (Exception)
-                    {
-                        // Ignore
-                    }
-                }
-            }
-            _logger.LogInformation("Seeder: Created fraction '{fractionCode}' with id {fractionId}.", fraction.Value.Code, id);
-        }
-    }
-
     public async Task Build(CancellationToken cancellationToken = default)
     {
         var result = new JObject();
@@ -254,7 +219,6 @@ internal sealed class SeederServerBuilder : IDisposable
     {
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityUsers(seedData.Users);
-        await BuildFractions(seedData.Fractions);
         _createdUsers.Clear();
         if (_isUpToDate)
         {

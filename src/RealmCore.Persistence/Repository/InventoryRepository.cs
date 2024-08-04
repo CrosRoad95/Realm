@@ -1,17 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IInventoryRepository
-{
-    Task<int> CreateInventoryForUserId(int userId, InventoryData inventoryData, CancellationToken cancellationToken = default);
-    Task<int> CreateInventoryForUserId(int userId, int size, CancellationToken cancellationToken = default);
-    Task<int> CreateInventoryForVehicleId(int vehicleId, InventoryData inventoryData, CancellationToken cancellationToken = default);
-    Task<int> CreateInventoryForVehicleId(int vehicleId, int size, CancellationToken cancellationToken = default);
-    Task<UserInventoryData[]> GetAllInventoriesByUserId(int userId, CancellationToken cancellationToken = default);
-    Task<VehicleInventoryData[]> GetAllInventoriesByVehicleId(int vehicleId, CancellationToken cancellationToken = default);
-    Task<InventoryData?> GetInventoryById(int inventoryId, CancellationToken cancellationToken = default);
-}
-
-internal sealed class InventoryRepository : IInventoryRepository
+public sealed class InventoryRepository
 {
     private readonly IDb _db;
 

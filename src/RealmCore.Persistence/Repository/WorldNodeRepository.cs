@@ -1,17 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public interface IWorldNodeRepository
-{
-    Task<WorldNodeScheduledActionData> AddScheduledAction(int worldNodeId, DateTime scheduledTime, object? actionData);
-    Task<WorldNodeData> Create(Vector3 position, Vector3 rotation, byte interior, ushort dimension, DateTime createdAt, DateTime lastUpdateAt, string typeName, object? metadata);
-    Task<WorldNodeData[]> GetAll(CancellationToken cancellationToken);
-    Task<WorldNodeScheduledActionData[]> GetAllScheduledActions(CancellationToken cancellationToken);
-    Task Remove(WorldNodeData worldNodeData);
-    Task<bool> RemoveScheduledAction(int worldNodeScheduledActionId);
-    Task UpdateMetadata(int worldNodeId, object? metadata, DateTime now);
-}
-
-internal sealed class WorldNodeRepository : IWorldNodeRepository
+public sealed class WorldNodeRepository
 {
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
     private readonly IDb _db;

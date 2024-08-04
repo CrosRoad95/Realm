@@ -18,7 +18,7 @@ internal sealed class WorldNodesHostedService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var serviceScope = _serviceProvider.CreateScope();
-        var worldNodeRepository = serviceScope.ServiceProvider.GetRequiredService<IWorldNodeRepository>();
+        var worldNodeRepository = serviceScope.ServiceProvider.GetRequiredService<WorldNodeRepository>();
         var worldNodesData = await worldNodeRepository.GetAll(cancellationToken);
         var worldNodeScheduledActionsData = await worldNodeRepository.GetAllScheduledActions(cancellationToken);
 

@@ -8,27 +8,26 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPersistence<T>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> dbOptions) where T : DbContext, IDb
     {
-        services.AddScoped<IVehicleRepository, VehicleRepository>();
-        services.AddScoped<IGroupRepository, GroupRepository>();
-        services.AddScoped<IFractionRepository, FractionRepository>();
-        services.AddScoped<IBanRepository, BanRepository>();
-        services.AddScoped<IJobRepository, JobRepository>();
-        services.AddScoped<IUserRewardRepository, UserRewardRepository>();
-        services.AddScoped<IVehicleEventRepository, VehicleEventRepository>();
-        services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
-        services.AddScoped<IUserLoginHistoryRepository, UserLoginHistoryRepository>();
-        services.AddScoped<IUserMoneyHistoryRepository, UserMoneyHistoryRepository>();
-        services.AddScoped<IUserEventRepository, UserEventRepository>();
-        services.AddScoped<IRatingRepository, RatingRepository>();
-        services.AddScoped<IOpinionRepository, OpinionRepository>();
-        services.AddScoped<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
-        services.AddScoped<INewsRepository, NewsRepository>();
-        services.AddScoped<IInventoryRepository, InventoryRepository>();
-        services.AddScoped<IFriendRepository, FriendRepository>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<IWorldNodeRepository, WorldNodeRepository>();
-        services.AddScoped<IUploadedFilesRepository, UploadedFilesRepository>();
-        services.AddScoped<ITransactionContext, TransactionContext>();
+        services.AddScoped<VehicleRepository>();
+        services.AddScoped<GroupRepository>();
+        services.AddScoped<BanRepository>();
+        services.AddScoped<JobRepository>();
+        services.AddScoped<UserRewardRepository>();
+        services.AddScoped<VehicleEventRepository>();
+        services.AddScoped<UserNotificationRepository>();
+        services.AddScoped<UserLoginHistoryRepository>();
+        services.AddScoped<UserMoneyHistoryRepository>();
+        services.AddScoped<UserEventRepository>();
+        services.AddScoped<RatingRepository>();
+        services.AddScoped<OpinionRepository>();
+        services.AddScoped<UserWhitelistedSerialsRepository>();
+        services.AddScoped<NewsRepository>();
+        services.AddScoped<InventoryRepository>();
+        services.AddScoped<FriendRepository>();
+        services.AddScoped<UsersRepository>();
+        services.AddScoped<WorldNodeRepository>();
+        services.AddScoped<UploadedFilesRepository>();
+        services.AddScoped<TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions);
 

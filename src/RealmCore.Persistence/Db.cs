@@ -67,8 +67,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<DiscoveryData> Discoveries => Set<DiscoveryData>();
     public DbSet<GroupData> Groups => Set<GroupData>();
     public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
-    public DbSet<FractionData> Fractions => Set<FractionData>();
-    public DbSet<FractionMemberData> FractionMembers => Set<FractionMemberData>();
+    public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
+    public DbSet<GroupRolePermissionData> RolesPermissions => Set<GroupRolePermissionData>();
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
@@ -222,13 +222,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder
                 .HasMany(x => x.GroupMembers)
-                .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entityBuilder
-                .HasMany(x => x.FractionMembers)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
@@ -752,57 +745,39 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         {
             entityBuilder
                 .ToTable(nameof(GroupMembers))
-                .HasKey(x => new { x.GroupId, x.UserId });
-
-            entityBuilder.Property(x => x.RankName)
-                .HasMaxLength(128);
-
-            entityBuilder.Property(x => x.RankName)
-                .HasMaxLength(64);
+                .HasKey(x => x.Id);
 
             entityBuilder.HasOne(x => x.Group)
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.GroupId)
                 .HasPrincipalKey(x => x.Id);
-        });
 
-        modelBuilder.Entity<FractionData>(entityBuilder =>
+            entityBuilder.HasOne(x => x.Role)
+                .WithMany(x => x.Members)
+                .HasForeignKey(x => x.RoleId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<GroupRoleData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(Fractions))
+                .ToTable(nameof(GroupsRoles))
                 .HasKey(x => x.Id);
-
-            entityBuilder.HasIndex(x => x.Name).IsUnique();
-            entityBuilder.HasIndex(x => x.Code).IsUnique();
 
             entityBuilder.Property(x => x.Name)
                 .HasMaxLength(128);
 
-            entityBuilder.Property(x => x.Code)
-                .HasMaxLength(8);
-
-            entityBuilder.HasMany(x => x.Members)
-                .WithOne(x => x.Fraction)
-                .HasForeignKey(x => x.FractionId)
+            entityBuilder.HasMany(x => x.Permissions)
+                .WithOne(x => x.GroupRole)
+                .HasForeignKey(x => x.GroupRoleId)
                 .HasPrincipalKey(x => x.Id);
         });
-
-        modelBuilder.Entity<FractionMemberData>(entityBuilder =>
+        
+        modelBuilder.Entity<GroupRolePermissionData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(FractionMembers))
-                .HasKey(x => new { x.FractionId, x.UserId });
-
-            entityBuilder.Property(x => x.RankName)
-                .HasMaxLength(128);
-
-            entityBuilder.Property(x => x.RankName)
-                .HasMaxLength(64);
-
-            entityBuilder.HasOne(x => x.Fraction)
-                .WithMany(x => x.Members)
-                .HasForeignKey(x => x.FractionId)
-                .HasPrincipalKey(x => x.Id);
+                .ToTable(nameof(GroupsRoles))
+                .HasKey(x => new { x.GroupRoleId, x.PermissionId });
         });
 
         modelBuilder.Entity<DiscordIntegrationData>(entityBuilder =>

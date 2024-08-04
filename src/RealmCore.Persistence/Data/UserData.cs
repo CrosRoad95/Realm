@@ -28,7 +28,6 @@ public class UserData : IdentityUser<int>
     public ICollection<JobStatisticsData> JobStatistics { get; set; } = new List<JobStatisticsData>();
     public ICollection<DiscoveryData> Discoveries { get; set; } = new List<DiscoveryData>();
     public ICollection<GroupMemberData> GroupMembers { get; set; } = new List<GroupMemberData>();
-    public ICollection<FractionMemberData> FractionMembers { get; set; } = new List<FractionMemberData>();
     public DiscordIntegrationData? DiscordIntegration { get; set; }
     public ICollection<UserUpgradeData> Upgrades { get; set; } = new List<UserUpgradeData>();
     public ICollection<UserStatData> Stats { get; set; } = new List<UserStatData>();
@@ -52,4 +51,9 @@ public class UserData : IdentityUser<int>
     public ICollection<UserBoostData> Boosts { get; set; } = [];
     public ICollection<UserActiveBoostData> ActiveBoosts { get; set; } = [];
     public ICollection<UserSecretsData> Secrets { get; set; } = [];
+}
+
+public class UserEventData : EventDataBase
+{
+    public int UserId { get; set; }
 }

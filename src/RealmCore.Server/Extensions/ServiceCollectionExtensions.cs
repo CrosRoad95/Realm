@@ -128,7 +128,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PlayersUsersService>();
         services.AddSingleton<UsersService>();
         services.AddSingleton<GroupsService>();
-        services.AddSingleton<FractionsService>();
         services.AddSingleton<BansService>();
         services.AddSingleton<RewardsService>();
         services.AddSingleton<FeedbackService>();
@@ -172,7 +171,6 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<PlayerSessionsFeature>();
         services.AddPlayerScopedFeature<PlayerAdminFeature>();
         services.AddPlayerScopedFeature<PlayerGroupsFeature>();
-        services.AddPlayerScopedFeature<PlayerFractionsFeature>();
         services.AddPlayerScopedFeature<PlayerGuiFeature>();
         services.AddPlayerScopedFeature<PlayerHudFeature>();
         services.AddPlayerScopedFeature<PlayerInventoryFeature>();
@@ -222,7 +220,6 @@ public static class ServiceCollectionExtensions
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
         services.AddHostedService<MigrateDatabaseService>();
-        services.AddHostedService<LoadFractionsService>();
         services.AddHostedService<SeedServerService>();
         services.AddHostedService<LoadVehicleService>();
         services.AddHostedService<BrowserGuiHostedService>();

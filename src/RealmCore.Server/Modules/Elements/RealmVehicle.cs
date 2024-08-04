@@ -84,7 +84,7 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
         Engines = GetRequiredService<VehicleEnginesFeature>();
         Events = GetRequiredService<VehicleEventsFeature>();
         Fuel = GetRequiredService<VehicleFuelFeature>();
-        Inventory = GetRequiredService<IVehicleInventoryFeature>();
+        Inventory = GetRequiredService<VehicleInventoryFeature>();
         #endregion
     }
 

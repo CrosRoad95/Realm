@@ -3,14 +3,14 @@
 public sealed class BansService
 {
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-    private readonly IBanRepository _banRepository;
+    private readonly BanRepository _banRepository;
     private readonly IServiceScope _serviceScope;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public BansService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
-        _banRepository = _serviceScope.ServiceProvider.GetRequiredService<IBanRepository>();
+        _banRepository = _serviceScope.ServiceProvider.GetRequiredService<BanRepository>();
         _dateTimeProvider = dateTimeProvider;
     }
 

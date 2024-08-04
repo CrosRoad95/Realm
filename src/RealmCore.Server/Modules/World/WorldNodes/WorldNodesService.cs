@@ -78,7 +78,7 @@ public sealed class WorldNodesService
     private readonly List<WorldNode> _worldNodes = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ISchedulerService _schedulerService;
-    private readonly IWorldNodeRepository _worldNodeRepository;
+    private readonly WorldNodeRepository _worldNodeRepository;
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
 
@@ -91,7 +91,7 @@ public sealed class WorldNodesService
         _serviceProvider = _serviceScope.ServiceProvider;
         _dateTimeProvider = dateTimeProvider;
         _schedulerService = schedulerService;
-        _worldNodeRepository = _serviceProvider.GetRequiredService<IWorldNodeRepository>();
+        _worldNodeRepository = _serviceProvider.GetRequiredService<WorldNodeRepository>();
     }
 
     public bool TryGetById<T>(int id, out T node) where T : WorldNode
