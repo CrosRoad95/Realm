@@ -60,6 +60,7 @@ public interface IDb
     DbSet<UserBoostData> Boosts { get; }
     DbSet<UserActiveBoostData> ActiveBoosts { get; }
     DbSet<UserSecretsData> UserSecrets { get; }
+    DbSet<GroupEventData> GroupsEvents { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

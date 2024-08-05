@@ -148,6 +148,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<WorldNodesService>();
         services.AddSingleton<MapLoader>();
         services.AddSingleton<VehiclesAccessService>();
+        services.AddSingleton<DataEventsService>();
         #endregion
 
         #region Player features

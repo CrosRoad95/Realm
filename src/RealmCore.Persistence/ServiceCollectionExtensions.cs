@@ -13,11 +13,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<BanRepository>();
         services.AddScoped<JobRepository>();
         services.AddScoped<UserRewardRepository>();
-        services.AddScoped<VehicleEventRepository>();
         services.AddScoped<UserNotificationRepository>();
         services.AddScoped<UserLoginHistoryRepository>();
         services.AddScoped<UserMoneyHistoryRepository>();
-        services.AddScoped<UserEventRepository>();
+        services.AddScoped<DataEventRepository>();
         services.AddScoped<RatingRepository>();
         services.AddScoped<OpinionRepository>();
         services.AddScoped<UserWhitelistedSerialsRepository>();

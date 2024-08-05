@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using System.Numerics;
-
-namespace RealmCore.Resources.ClientInterface;
+﻿namespace RealmCore.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {

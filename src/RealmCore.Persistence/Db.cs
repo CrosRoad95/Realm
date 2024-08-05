@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace RealmCore.Persistence;
+﻿namespace RealmCore.Persistence;
 
 public class DbSynchronizationContex
 {

@@ -127,6 +127,7 @@
 		<Using Include="RealmCore.Server.Modules.Search" />
 		<Using Include="RealmCore.TestingTools.Classes" />
 		<Using Include="RealmCore.Server.Modules.Players.DailyVisits" />
+		<Using Include="FluentAssertions.Extensions" />
 	</ItemGroup>
 
 </Project>

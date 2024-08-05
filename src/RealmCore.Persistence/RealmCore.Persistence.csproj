@@ -41,6 +41,7 @@
 		<Using Include="RealmCore.Persistence.Data.Helpers" />
 		<Using Include="System.Data" />
 		<Using Include="RealmCore.Persistence.Data.Bases" />
+		<Using Include="RealmCore.Persistence.Common" />
 	</ItemGroup>
 
 </Project>

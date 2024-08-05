@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using RealmCore.Server.Modules.Inventories;
 
 namespace RealmCore.TestingTools;
 
@@ -35,11 +34,13 @@ public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetim
 
     public async Task InitializeAsync()
     {
-        _player = await _hosting.CreatePlayer();
+        _player = await _hosting.CreatePlayer(name: CreatePlayerName());
         _player.Inventory.CreatePrimary(100);
         var itemsCollection = _hosting.GetRequiredService<ItemsCollection>();
         Seed(itemsCollection);
     }
+
+    protected virtual string? CreatePlayerName() => null;
 
     public Task DisposeAsync()
     {
@@ -100,4 +101,9 @@ public class RealmTestingServerHostingFixtureWithPlayer<TPlayer> : IAsyncLifetim
 public class RealmTestingServerHostingFixtureWithPlayer : RealmTestingServerHostingFixtureWithPlayer<RealmTestingPlayer>
 {
 
+}
+
+public class RealmTestingServerHostingFixtureWithUniquePlayer : RealmTestingServerHostingFixtureWithPlayer<RealmTestingPlayer>
+{
+    protected override string? CreatePlayerName() => Guid.NewGuid().ToString();
 }

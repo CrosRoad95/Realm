@@ -1,7 +1,4 @@
-﻿using Ionic.Zlib;
-using Org.BouncyCastle.Asn1.Cms;
-using SlipeServer.Packets.Enums;
-using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
+﻿using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
 
 namespace RealmCore.Server.Modules.Players.Groups;
 

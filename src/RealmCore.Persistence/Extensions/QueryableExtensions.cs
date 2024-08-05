@@ -67,4 +67,27 @@ public static class QueryableExtensions
     {
         return queryable.TagWith(string.IsNullOrEmpty(tag) ? $"{methodName}" : $"{tag}{methodName}");
     }
+
+    public static IQueryable<T> Paginate<T>(this IQueryable<T> query, QueryPage page)
+    {
+        if (page.page <= 0)
+        {
+            throw new ArgumentException("Page number must be greater than 0.", nameof(page.page));
+        }
+
+        if (page.limit <= 0)
+        {
+            throw new ArgumentException("Page size must be greater than 0.", nameof(page.limit));
+        }
+
+        return query.Skip((page.page - 1) * page.limit).Take(page.limit);
+    }
+
+    public static IQueryable<T> InDateTimeRange<T>(this IQueryable<T> query, DateRange dateRange) where T: EventDataBase
+    {
+        if(dateRange.from >= dateRange.to)
+            throw new ArgumentException("Invalid dateRange", nameof(dateRange));
+
+        return query.Where(x => x.DateTime >= dateRange.from && x.DateTime <= dateRange.to);
+    }
 }

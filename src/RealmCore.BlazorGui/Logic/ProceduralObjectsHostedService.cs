@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Assets.Factories;
-
-namespace RealmCore.BlazorGui.Logic;
+﻿namespace RealmCore.BlazorGui.Logic;
 
 internal sealed class ProceduralObjectsHostedService : IHostedLifecycleService
 {
