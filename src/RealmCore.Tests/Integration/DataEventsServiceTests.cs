@@ -1,18 +1,16 @@
 ﻿namespace RealmCore.Tests.Integration;
 
-public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IDisposable
+public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IDisposable
 {
     private readonly RealmTestingServerHostingFixtureWithUniquePlayer _fixture;
     private readonly RealmTestingPlayer _player;
-    private readonly PlayerGroupsFeature _groups;
     private readonly DataEventsService _dataEventsService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GroupServiceTests(RealmTestingServerHostingFixtureWithUniquePlayer fixture)
+    public DataEventsServiceTests(RealmTestingServerHostingFixtureWithUniquePlayer fixture)
     {
         _fixture = fixture;
         _player = _fixture.Player;
-        _groups = _player.Groups;
         _dataEventsService = _fixture.Hosting.GetRequiredService<DataEventsService>();
         _dateTimeProvider = _fixture.Hosting.GetRequiredService<IDateTimeProvider>();
     }
@@ -40,6 +38,14 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         eventsData.Should().BeEquivalentTo([expectedEventData], options => options
             .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 1.Seconds()))
             .WhenTypeIs<DateTime>());
+    }
+    
+    [Fact]
+    public async Task AddingEventShouldWork2()
+    {
+        var eventData = await _dataEventsService.Add(new DataEvent(DataEventType.Player, _player.UserId, 1));
+
+        _player.Events.ToArray().Length.Should().Be(1);
     }
 
     public void Dispose()

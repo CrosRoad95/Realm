@@ -37,13 +37,15 @@ public sealed class DataEventsService
     private readonly IServiceProvider _serviceProvider;
     private readonly DataEventRepository _dataEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly UsersInUse _usersInUse;
 
-    public DataEventsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
+    public DataEventsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, UsersInUse usersInUse)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         _dataEventRepository = _serviceProvider.GetRequiredService<DataEventRepository>();
         _dateTimeProvider = dateTimeProvider;
+        _usersInUse = usersInUse;
     }
 
     public async Task<EventDataDto> Add(DataEvent dataEvent, CancellationToken cancellationToken = default)
@@ -52,6 +54,13 @@ public sealed class DataEventsService
         try
         {
             var eventDataBase = await _dataEventRepository.Add(dataEvent, _dateTimeProvider.Now, cancellationToken);
+            if(dataEvent.dataEventType == DataEventType.Player)
+            {
+                if(_usersInUse.TryGetPlayerByUserId(dataEvent.entityId, out var player))
+                {
+                    player.Events.Add((UserEventData)eventDataBase);
+                }
+            }
             return EventDataDto.Map(eventDataBase);
         }
         finally

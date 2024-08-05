@@ -71,6 +71,16 @@ public class PlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto>, IU
         VersionIncreased?.Invoke();
         Added?.Invoke(this, [UserEventDto.Map(userEvent)]);
     }
+    
+    internal void Add(UserEventData userEventData)
+    {
+        lock (_lock)
+        {
+            _userEventData.Add(userEventData);
+        }
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, [UserEventDto.Map(userEventData)]);
+    }
 
     public UserEventData[] Get(IEnumerable<int>? events = null, int limit = 10)
     {
