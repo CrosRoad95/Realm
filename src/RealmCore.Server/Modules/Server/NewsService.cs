@@ -3,14 +3,14 @@
 public sealed class NewsService
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private readonly INewsRepository _newsRepository;
+    private readonly NewsRepository _newsRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceScope _serviceScope;
 
     public NewsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
-        _newsRepository = _serviceScope.ServiceProvider.GetRequiredService<INewsRepository>();
+        _newsRepository = _serviceScope.ServiceProvider.GetRequiredService<NewsRepository>();
         _dateTimeProvider = dateTimeProvider;
     }
 

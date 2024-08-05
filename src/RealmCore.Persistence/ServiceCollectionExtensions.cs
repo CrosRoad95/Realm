@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UsersRepository>();
         services.AddScoped<WorldNodeRepository>();
         services.AddScoped<UploadedFilesRepository>();
-        services.AddScoped<TransactionContext>();
+        services.AddScoped<ITransactionContext, TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions);
 
