@@ -60,6 +60,25 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         monitorPlayer.GetOccurredEvents().Should().BeEquivalentTo(["VersionIncreased", "Added"]);
         monitorService.GetOccurredEvents().Should().BeEquivalentTo(["MemberAdded"]);
     }
+    
+    [Fact]
+    private async Task MemberDataShouldContainBasicInformationsAboutGroup()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        await _groupsService.TryAddMember(_player, group.Id);
+        var members = await _groupsService.GetGroupMembers(_player.UserId);
+
+        var groupMember1 = _player.Groups.Where(x => x.Group!.Name == name).FirstOrDefault();
+        var groupMember2 = members.Where(x => x.Group!.Name == name).FirstOrDefault();
+
+        using var _ = new AssertionScope();
+        groupMember1.Should().NotBeNull();
+        groupMember2.Should().NotBeNull();
+    }
 
     public void Dispose()
     {

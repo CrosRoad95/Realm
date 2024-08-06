@@ -58,6 +58,15 @@ public static class QueryableExtensions
             .AsSplitQuery();
     }
 
+    public static IQueryable<GroupData> IncludeAll(this IQueryable<GroupData> query)
+    {
+        return query
+            .Include(x => x.Members)
+            .Include(x => x.Roles)
+            .ThenInclude(x => x.Permissions)
+            .AsSplitQuery();
+    }
+
     public static IQueryable<VehicleData> IsSpawned(this IQueryable<VehicleData> query)
     {
         return query.Where(x => x.Spawned);

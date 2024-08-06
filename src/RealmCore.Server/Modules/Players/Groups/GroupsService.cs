@@ -50,6 +50,36 @@ public sealed class GroupsService
         }
     }
 
+    public async Task<GroupDto?> GetById(int id, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var groupData = await _groupRepository.GetById(id, cancellationToken);
+
+            return GroupDto.Map(groupData);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<GroupDto?> GetByName(string name, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var groupData = await _groupRepository.GetByName(name, cancellationToken);
+
+            return GroupDto.Map(groupData);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
     public async Task<GroupDto[]> Search(string name, int limit = 10, byte[]? kinds = null, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
@@ -57,7 +87,7 @@ public sealed class GroupsService
         {
             var results = await _groupRepository.Search(name, limit, kinds, cancellationToken);
 
-            return results.Select(GroupDto.Map).ToArray();
+            return results.Select(x => GroupDto.Map(x)).ToArray();
         }
         finally
         {
@@ -205,5 +235,19 @@ public sealed class GroupsService
         }
 
         return removed;
+    }
+
+    public async Task<GroupMemberDto[]> GetGroupMembers(int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var groupMemberData = await _groupRepository.GetGroupMembersByUserId(userId, kinds, cancellationToken);
+            return groupMemberData.Select(GroupMemberDto.Map).ToArray();
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

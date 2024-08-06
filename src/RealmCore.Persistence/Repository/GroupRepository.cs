@@ -9,6 +9,46 @@ public sealed class GroupRepository
         _db = db;
     }
 
+    public async Task<GroupMemberData[]> GetGroupMembersByUserId(int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupMembersByUserId));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = CreateQueryBase()
+            .Include(x => x.Members)
+            .ThenInclude(x => x.Group)
+            .Where(x => x.Members.Any(x => x.UserId == userId));
+
+        if (kinds != null)
+        {
+            query = query.Where(x => x.Kind != null && kinds.Contains(x.Kind.Value));
+        }
+
+        var query2 = query.SelectMany(x => x.Members);
+
+        return await query2.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<GroupData?> GetById(int id, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByName));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+        }
+
+        var query = CreateQueryBase()
+            .IncludeAll()
+            .Where(x => x.Id == id);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<GroupData?> GetByName(string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetByName));
@@ -19,7 +59,7 @@ public sealed class GroupRepository
         }
 
         var query = CreateQueryBase()
-            .Include(x => x.Members)
+            .IncludeAll()
             .Where(x => x.Name == name);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -152,7 +192,7 @@ public sealed class GroupRepository
         return group;
     }
 
-    public async Task<GroupMemberData?> TryAddMember(int userId, int groupId, DateTime createdAt, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberData?> TryAddMember(int groupId, int userId, DateTime createdAt, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddMember));
 
@@ -172,6 +212,7 @@ public sealed class GroupRepository
             Metadata = metadata
         };
         _db.GroupMembers.Add(groupMember);
+
         try
         {
             await _db.SaveChangesAsync(cancellationToken);
