@@ -118,7 +118,7 @@ public sealed class GroupRepository
     {
         var query = _db.GroupsRoles
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Id == roleId)
+            .Where(x => x.Id == roleId.id)
             .Include(x => x.Permissions);
 
         var groupRole = await query.FirstOrDefaultAsync(cancellationToken);
@@ -153,7 +153,7 @@ public sealed class GroupRepository
             .Include(x => x.Group)
             .Include(x => x.Role)
             .ThenInclude(x => x!.Permissions)
-            .Where(x => x.GroupId == groupId && x.UserId == userId);
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         if (kinds != null)
         {
@@ -198,7 +198,7 @@ public sealed class GroupRepository
 
         var query = CreateQueryBase()
             .IncludeAll()
-            .Where(x => x.Id == groupId);
+            .Where(x => x.Id == groupId.id);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -338,7 +338,7 @@ public sealed class GroupRepository
 
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.GroupId == groupId && x.UserId == userId);
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -348,7 +348,7 @@ public sealed class GroupRepository
         var query = _db.GroupsRoles
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.GroupId == groupId)
+            .Where(x => x.GroupId == groupId.id)
             .Select(x => x.Id);
 
         var permissions = await query.ToArrayAsync(cancellationToken);
@@ -361,7 +361,7 @@ public sealed class GroupRepository
         var query = _db.GroupsRolesPermissions
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.GroupRoleId == roleId)
+            .Where(x => x.GroupRoleId == roleId.id)
             .Select(x => x.PermissionId);
 
         var permissions = await query.ToArrayAsync(cancellationToken);
@@ -374,7 +374,7 @@ public sealed class GroupRepository
         var query = _db.GroupsRoles
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Id == roleId)
+            .Where(x => x.Id == roleId.id)
             .Select(x => x.GroupId);
 
         var groupId = await query.FirstOrDefaultAsync(cancellationToken);
@@ -388,7 +388,7 @@ public sealed class GroupRepository
     {
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.GroupId == groupId && x.UserId == userId);
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         var groupMember = await query.FirstOrDefaultAsync(cancellationToken);
 
@@ -417,7 +417,7 @@ public sealed class GroupRepository
 
         var query = _db.GroupsRoles
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Id == roleId);
+            .Where(x => x.Id == roleId.id);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Name, name), cancellationToken) == 1;
     }
@@ -436,7 +436,7 @@ public sealed class GroupRepository
 
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.GroupId == groupId && x.UserId == userId);
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
@@ -452,7 +452,7 @@ public sealed class GroupRepository
 
         var query = _db.GroupsRoles
             .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Id == roleId);
+            .Where(x => x.Id == roleId.id);
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }

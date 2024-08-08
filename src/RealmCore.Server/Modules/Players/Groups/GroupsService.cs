@@ -58,7 +58,7 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<GroupDto?> GetGroupById(int id, CancellationToken cancellationToken = default)
+    public async Task<GroupDto?> GetGroupById(GroupId id, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try

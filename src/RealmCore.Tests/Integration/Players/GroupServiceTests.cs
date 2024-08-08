@@ -21,11 +21,12 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var name = Guid.NewGuid().ToString();
 
         var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
 
         using var _ = new AssertionScope();
-
-        ((GroupsResults.Created)result.Value).group.Name.Should().Be(name);
+        group.Name.Should().Be(name);
         _groupsService.GetGroupByName(name).Should().NotBeNull();
+        _groupsService.GetGroupById(group.Id).Should().NotBeNull();
     }
     
     [Fact]
