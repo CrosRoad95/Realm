@@ -766,8 +766,10 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.HasOne(x => x.Role)
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.RoleId)
-                .HasPrincipalKey(x => x.GroupId);
+                .HasPrincipalKey(x => x.Id);
         });
+
+        //modelBuilder.Ignore<GroupRoleData>();
 
         modelBuilder.Entity<GroupRoleData>(entityBuilder =>
         {
@@ -780,8 +782,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.HasMany(x => x.Permissions)
                 .WithOne(x => x.GroupRole)
-                .HasForeignKey(x => x.GroupRoleId)
-                .HasPrincipalKey(x => x.GroupId);
+                .HasForeignKey(x => x.GroupRoleId);
         });
 
         modelBuilder.Entity<GroupRolePermissionData>(entityBuilder =>

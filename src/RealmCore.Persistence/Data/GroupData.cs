@@ -39,6 +39,7 @@ public sealed class GroupRoleData
     public ICollection<GroupRolePermissionData> Permissions { get; set; } = [];
     public ICollection<GroupMemberData> Members { get; set; } = [];
 }
+
 public sealed class GroupRolePermissionData
 {
     public int GroupRoleId { get; set; }

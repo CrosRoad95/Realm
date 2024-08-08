@@ -74,7 +74,7 @@ public sealed class UsersRepository
         }
 
         var query = CreateQueryBase()
-            .AsNoTracking()
+            .AsNoTrackingWithIdentityResolution()
             .IncludeAll(dateTime)
             .Where(u => u.UserName == userName);
 

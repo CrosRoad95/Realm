@@ -1,5 +1,7 @@
-﻿using RealmCore.BlazorGui.Concepts;
+﻿using OneOf.Types;
+using RealmCore.BlazorGui.Concepts;
 using RealmCore.BlazorGui.Modules.World;
+using RealmCore.Server.Modules.Players.Groups;
 using RealmCore.Server.Modules.Players.Sessions;
 using RealmCore.Server.Modules.World.WorldNodes;
 using Color = System.Drawing.Color;
@@ -31,11 +33,12 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
     private readonly WorldNodesService _worldNodesService;
+    private readonly GroupsService _groupsService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -53,6 +56,7 @@ internal sealed class CommandsHostedService : IHostedService
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         _worldNodesService = worldNodesService;
+        _groupsService = groupsService;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -1088,10 +1092,11 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, $"{boolean1}, {boolean2}");
         });
 
-        AddInventoryCommands();
         AddBoostCommands();
         AddSecretsCommands();
         AddNodesCommands();
+        AddInventoryCommands();
+        AddCommandGroups();
     }
 
     internal sealed class TestSession : Session
@@ -1252,6 +1257,58 @@ internal sealed class CommandsHostedService : IHostedService
         {
             player.Inventory.Primary!.RemoveItemByItemId(1);
             _chatBox.OutputTo(player, "Item removed");
+        });
+    }
+
+    private void AddCommandGroups()
+    {
+        _commandService.Add("listmygroups", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var groups = player.Groups.Select(x => x.GroupId).ToArray();
+            _chatBox.OutputTo(player, $"My groups: {string.Join(", ", groups)}");
+            foreach (var group in player.Groups)
+            {
+               _chatBox.OutputTo(player, $"\tMy group: {group.GroupId}, name: {group.Group?.Name}, role: {(group.RoleId != null ? group.RoleId : "<none>")}");
+               _chatBox.OutputTo(player, $"\tPermissions: {(group.Permissions != null ? string.Join(", ", group.Permissions.Select(x => x.ToString())) : "<none>")}");
+            }
+        });
+        
+        _commandService.Add("groupsetrole", async ([CallingPlayer] RealmPlayer player, int groupId, int roleId) =>
+        {
+            var changed = await _groupsService.SetMemberRole(groupId, player.UserId, roleId);
+            if(changed)
+            {
+                _chatBox.OutputTo(player, $"Role in group {groupId} changed to {roleId}");
+            }
+            else
+            {
+                _chatBox.OutputTo(player, $"Failed to change role");
+            }
+        });
+        
+        _commandService.Add("groupinfo", async ([CallingPlayer] RealmPlayer player, int groupId) =>
+        {
+            var group = await _groupsService.GetById(groupId);
+            if(group == null)
+            {
+                _chatBox.OutputTo(player, "Group doesn't exists");
+                return;
+            }
+            _chatBox.OutputTo(player, $"Name: {group.Name}");
+            _chatBox.OutputTo(player, $"Roles: {string.Join(", ", group.Roles.Select(x => new { x.Id, x.Name }))}");
+        });
+
+        _commandService.Add("creategrouprole", async ([CallingPlayer] RealmPlayer player, int groupId, string name) =>
+        {
+            var role = await _groupsService.CreateRole(groupId, name, []);
+            _chatBox.OutputTo(player, $"Role created: {role.Id}");
+        });
+
+        _commandService.Add("setrolepermissions", async ([CallingPlayer] RealmPlayer player, int roleId, [ReadRestAsString] string arguments) =>
+        {
+            var permissions = arguments.Split(' ').Select(int.Parse).ToArray();
+            var role = await _groupsService.SetRolePermissions(roleId, permissions);
+            _chatBox.OutputTo(player, "Role permissions changed");
         });
     }
 }

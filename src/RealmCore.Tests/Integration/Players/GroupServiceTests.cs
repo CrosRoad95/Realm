@@ -79,6 +79,44 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         groupMember1.Should().NotBeNull();
         groupMember2.Should().NotBeNull();
     }
+    
+    [Fact]
+    private async Task SettingAndChangingRoleShouldUpdatePermissions()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        await _groupsService.TryAddMember(_player, group.Id);
+        var members = await _groupsService.GetGroupMembers(_player.UserId);
+
+        var groupMember = _player.Groups.GetById(group.Id);
+
+        {
+            using var _ = new AssertionScope();
+            groupMember!.Permissions.Should().BeNull();
+            groupMember!.RoleId.Should().BeNull();
+        }
+
+        var groupRole = await _groupsService.CreateRole(group.Id, "foobar", [1, 2, 3]);
+        var otherGroupRole = await _groupsService.CreateRole(group.Id, "other", [4, 5, 6]);
+        await _groupsService.SetMemberRole(group.Id, _player.UserId, groupRole.Id);
+
+        groupMember = _player.Groups.GetById(group.Id);
+
+        {
+            using var _ = new AssertionScope();
+            groupMember!.Permissions.Should().BeEquivalentTo([1,2,3]);
+            groupMember!.RoleId.Should().Be(groupRole.Id);
+        }
+
+        await _groupsService.SetRolePermissions(groupRole.Id, [100]);
+        await _groupsService.SetRolePermissions(otherGroupRole.Id, [200]);
+
+        groupMember = _player.Groups.GetById(group.Id);
+        groupMember!.Permissions.Should().BeEquivalentTo([100]);
+    }
 
     public void Dispose()
     {

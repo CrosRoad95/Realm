@@ -1,4 +1,5 @@
-﻿using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
+﻿using SlipeServer.Server.Elements;
+using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
 
 namespace RealmCore.Server.Modules.Players.Groups;
 
@@ -16,17 +17,20 @@ public sealed class GroupsService
     private readonly IServiceScope _serviceScope;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly UsersInUse _usersInUse;
+    private readonly GroupsManager _groupsManager;
     private readonly GroupRepository _groupRepository;
 
     public event Action<int, RealmPlayer>? MemberAdded;
     public event Action<int, RealmPlayer>? MemberRemoved;
+    public event Action<int, RealmPlayer>? MemberChanged;
 
-    public GroupsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, UsersInUse usersInUse)
+    public GroupsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, UsersInUse usersInUse, GroupsManager groupsManager)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         _dateTimeProvider = dateTimeProvider;
         _usersInUse = usersInUse;
+        _groupsManager = groupsManager;
         _groupRepository = _serviceProvider.GetRequiredService<GroupRepository>();
     }
 
@@ -150,11 +154,17 @@ public sealed class GroupsService
             if (player.Groups.IsMember(groupId))
                 return false;
 
-            var groupMemberData = await _groupRepository.TryAddMember(groupId, player.UserId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
-            if (groupMemberData == null)
-                return false;
+            added = await _groupRepository.TryAddMember(groupId, player.UserId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
+            if (added){
+                var groupMemberData = await _groupRepository.GetGroupMembersByUserIdAndGroupId(groupId, player.UserId, cancellationToken: cancellationToken);
+                if (groupMemberData == null)
+                    return false;
 
-            added = player.Groups.AddGroupMember(groupMemberData);
+                if (!player.Groups.AddGroupMember(groupMemberData))
+                    return false;
+
+                _groupsManager.AddPlayerToGroup(groupId, player);
+            }
         }
         finally
         {
@@ -190,48 +200,31 @@ public sealed class GroupsService
 
     public async Task<bool> RemoveMember(RealmPlayer player, int groupId, CancellationToken cancellationToken = default)
     {
-        bool removed = false;
-
-        await _semaphore.WaitAsync(cancellationToken);
-        try
-        {
-            if (!player.Groups.IsMember(groupId))
-                return false;
-
-            if (await _groupRepository.TryRemoveMember(groupId, player.UserId, cancellationToken))
-                removed = player.Groups.RemoveGroupMember(groupId);
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
-
-        if (removed)
-        {
-            MemberRemoved?.Invoke(groupId, player);
-        }
-
-        return removed;
+        return await RemoveMember(groupId, player.UserId, cancellationToken);
     }
 
     public async Task<bool> RemoveMember(int userId, int groupId, CancellationToken cancellationToken = default)
     {
-        if (_usersInUse.TryGetPlayerByUserId(userId, out var player))
-        {
-            return await RemoveMember(player, groupId, cancellationToken);
-        }
-
         bool removed = false;
 
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
             if (await _groupRepository.TryRemoveMember(groupId, userId, cancellationToken))
-                removed = player.Groups.RemoveGroupMember(groupId);
+            {
+                removed = true;
+            }
         }
         finally
         {
             _semaphore.Release();
+        }
+
+        if(removed && _usersInUse.TryGetPlayerByUserId(userId, out var player))
+        {
+            var playerRemovedFromGroup = player.Groups.RemoveGroupMember(groupId);
+            if (playerRemovedFromGroup)
+                MemberRemoved?.Invoke(groupId, player);
         }
 
         return removed;
@@ -249,5 +242,136 @@ public sealed class GroupsService
         {
             _semaphore.Release();
         }
+    }
+
+    public async Task<bool> ExistsByName(string name, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.ExistsByName(name, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.ExistsByShortcut(shortcut, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<GroupRoleDto> CreateRole(int groupId, string name, int[] permissions, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var groupRoleData = await _groupRepository.CreateRole(groupId, name, permissions, cancellationToken);
+            return GroupRoleDto.Map(groupRoleData);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<int[]> GetGroupRoles(int groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetGroupRoles(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<int[]> GetRolePermissions(int roleId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetRolePermissions(roleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> SetMemberRole(int groupId, int userId, int roleId, CancellationToken cancellationToken = default)
+    {
+        bool roleChanged = false;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var roles = await _groupRepository.GetGroupRoles(groupId, cancellationToken);
+            if (!roles.Contains(roleId))
+                return false;
+            
+            if (await _groupRepository.SetMemberRole(groupId, userId, roleId, cancellationToken))
+            {
+                roleChanged = true;
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        if (roleChanged && _usersInUse.TryGetPlayerByUserId(userId, out var player))
+        {
+            int[] permissions;
+            await _semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                permissions = await _groupRepository.GetRolePermissions(roleId, cancellationToken);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            var changed = player.Groups.SetGroupRole(groupId, roleId, permissions);
+            if (changed)
+                MemberChanged?.Invoke(groupId, player);
+        }
+
+        return roleChanged;
+    }
+
+    public async Task<bool> SetRolePermissions(int roleId, int[] permissions, CancellationToken cancellationToken = default)
+    {
+        int? groupId = null;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            if (!await _groupRepository.SetRolePermissions(roleId, permissions, cancellationToken))
+                return false;
+            groupId = await _groupRepository.GetGroupIdByRoleId(roleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        if(groupId != null)
+        {
+            foreach (var player in _groupsManager.GetPlayersInGroup(groupId.Value))
+            {
+                player.Groups.SetGroupRolePermissions(groupId.Value, roleId, permissions);
+            }
+        }
+        return true;
     }
 }

@@ -8,7 +8,6 @@ public sealed class PlayersUsersService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly UsersRepository _usersRepository;
 
-
     public PlayersUsersService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceProvider = serviceProvider;

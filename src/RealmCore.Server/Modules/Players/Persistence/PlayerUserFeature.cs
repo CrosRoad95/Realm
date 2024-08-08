@@ -100,6 +100,19 @@ public sealed class PlayerUserFeature : IPlayerFeature, IDisposable
                 var db = Player.GetRequiredService<IDb>();
                 db.ChangeTracker.Clear();
                 db.Attach(userData);
+
+                void DetachEntitiesOfType<T>() where T : class
+                {
+                    var entries = db.ChangeTracker.Entries<T>().ToArray();
+                    foreach (var entry in entries)
+                    {
+                        entry.State = EntityState.Detached;
+                    }
+                }
+                DetachEntitiesOfType<GroupData>();
+                DetachEntitiesOfType<GroupMemberData>();
+                DetachEntitiesOfType<GroupRoleData>();
+                DetachEntitiesOfType<GroupRolePermissionData>();
             }
             catch(Exception)
             {

@@ -1,4 +1,6 @@
-﻿
+﻿using SlipeServer.Server.Elements;
+using System.Xml.Linq;
+
 namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMemberDto>, IUsesUserPersistentData
@@ -12,6 +14,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
 
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Added;
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Removed;
+    public event Action<PlayerGroupsFeature, int, int>? GroupRoleChanged;
     public PlayerGroupsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
@@ -19,7 +22,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
 
     public void LogIn(UserData userData)
     {
-        lock(_lock)
+        lock (_lock)
             _groupMembers = userData.GroupMembers;
     }
 
@@ -54,6 +57,53 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         return true;
     }
 
+    internal bool SetGroupRolePermissions(int groupId, int roleId, int[] permissions)
+    {
+        GroupMemberData? groupMemberData = null;
+        lock (_lock)
+        {
+            groupMemberData = _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
+            if (groupMemberData == null || groupMemberData.RoleId != roleId)
+                return false;
+
+            groupMemberData.Role = new GroupRoleData
+            {
+                Permissions = permissions.Select(x => new GroupRolePermissionData
+                {
+                    PermissionId = x
+                }).ToArray()
+            };
+        }
+
+        VersionIncreased?.Invoke();
+        GroupRoleChanged?.Invoke(this, groupId, roleId);
+        return true;
+    }
+
+    internal bool SetGroupRole(int groupId, int roleId, int[] permissions)
+    {
+        GroupMemberData? groupMemberData = null;
+        lock (_lock)
+        {
+            groupMemberData = _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
+            if (groupMemberData == null)
+                return false;
+
+            groupMemberData.RoleId = roleId;
+            groupMemberData.Role = new GroupRoleData
+            {
+                Permissions = permissions.Select(x => new GroupRolePermissionData
+                {
+                    PermissionId = x
+                }).ToArray()
+            };
+        }
+
+        VersionIncreased?.Invoke();
+        GroupRoleChanged?.Invoke(this, groupId, roleId);
+        return true;
+    }
+
     public bool IsMember(int groupId)
     {
         lock (_lock)
@@ -67,6 +117,14 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
             groupMember = GroupMemberDto.Map(_groupMembers.FirstOrDefault(x => x.GroupId == groupId));
             return groupMember != null;
         }
+    }
+
+    public GroupMemberDto? GetById(int id)
+    {
+        GroupMemberData? groupMemberData;
+        lock (_lock)
+            groupMemberData = _groupMembers.Where(x => x.Group!.Id == id).FirstOrDefault();
+        return GroupMemberDto.Map(groupMemberData);
     }
 
     public IEnumerator<GroupMemberDto> GetEnumerator()

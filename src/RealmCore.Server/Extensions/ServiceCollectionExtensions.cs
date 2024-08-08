@@ -149,6 +149,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<MapLoader>();
         services.AddSingleton<VehiclesAccessService>();
         services.AddSingleton<DataEventsService>();
+        services.AddSingleton<GroupsManager>();
         #endregion
 
         #region Player features
@@ -251,6 +252,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<FriendsHostedService>();
         services.AddHostedService<UserLoggedInHostedService>();
         services.AddHostedService<WorldNodesHostedService>();
+        services.AddHostedService<GroupsLogic>();
 
         services.AddResources();
 
