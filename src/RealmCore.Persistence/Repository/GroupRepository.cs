@@ -2,20 +2,20 @@
 
 public record struct GroupId(int id)
 {
-    public static implicit operator int(GroupId id) => id;
-    public static implicit operator GroupId(int id) => id;
+    public static implicit operator int(GroupId id) => id.id;
+    public static implicit operator GroupId(int id) => new(id);
 }
 
 public record struct GroupRoleId(int id)
 {
-    public static implicit operator int(GroupRoleId id) => id;
-    public static implicit operator GroupRoleId(int id) => id;
+    public static implicit operator int(GroupRoleId id) => id.id;
+    public static implicit operator GroupRoleId(int id) => new(id);
 }
 
 public record struct GroupMemberId(int id)
 {
-    public static implicit operator int(GroupMemberId id) => id;
-    public static implicit operator GroupMemberId(int id) => id;
+    public static implicit operator int(GroupMemberId id) => id.id;
+    public static implicit operator GroupMemberId(int id) => new(id);
 }
 
 public sealed class GroupRepository
