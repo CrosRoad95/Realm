@@ -51,8 +51,8 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
 
         var monitorPlayer = _groups.Monitor();
         var monitorService = _groupsService.Monitor();
-        var added = await _groupsService.TryAddMember(_player, group.Id);
-        var removed = await _groupsService.TryAddMember(_player, group.Id);
+        var added = await _groupsService.AddMember(_player, group.Id);
+        var removed = await _groupsService.AddMember(_player, group.Id);
 
         using var _ = new AssertionScope();
         added.Should().BeTrue();
@@ -69,8 +69,8 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var result = await _groupsService.Create(name);
         var group = ((GroupsResults.Created)result.Value).group;
 
-        await _groupsService.TryAddMember(_player, group.Id);
-        var members = await _groupsService.GetGroupMembers(_player.UserId);
+        await _groupsService.AddMember(_player, group.Id);
+        var members = await _groupsService.GetGroupMembersByUserId(_player.UserId);
 
         var groupMember1 = _player.Groups.Where(x => x.Group!.Name == name).FirstOrDefault();
         var groupMember2 = members.Where(x => x.Group!.Name == name).FirstOrDefault();
@@ -88,8 +88,7 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var result = await _groupsService.Create(name);
         var group = ((GroupsResults.Created)result.Value).group;
 
-        await _groupsService.TryAddMember(_player, group.Id);
-        var members = await _groupsService.GetGroupMembers(_player.UserId);
+        await _groupsService.AddMember(_player, group.Id);
 
         var groupMember = _player.Groups.GetById(group.Id);
 

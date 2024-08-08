@@ -1288,7 +1288,7 @@ internal sealed class CommandsHostedService : IHostedService
         
         _commandService.Add("groupinfo", async ([CallingPlayer] RealmPlayer player, int groupId) =>
         {
-            var group = await _groupsService.GetById(groupId);
+            var group = await _groupsService.GetGroupById(groupId);
             if(group == null)
             {
                 _chatBox.OutputTo(player, "Group doesn't exists");

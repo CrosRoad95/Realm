@@ -32,7 +32,7 @@ public static class QueryableExtensions
             .ThenInclude(x => x.Group)
             .Include(x => x.GroupMembers)
             .ThenInclude(x => x.Role)
-            .ThenInclude(x => x.Permissions)
+            .ThenInclude(x => x!.Permissions)
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
             .Include(x => x.Settings)

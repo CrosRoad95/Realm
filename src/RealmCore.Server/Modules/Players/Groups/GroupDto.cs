@@ -2,8 +2,8 @@
 
 public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
 {
-    public required int Id { get; init; }
-    public required int GroupId { get; init; }
+    public required GroupRoleId Id { get; init; }
+    public required GroupId GroupId { get; init; }
     public required string Name { get; init; }
     public required int[] Permissions { get; init; }
     public bool Equals(GroupRoleData? x, GroupRoleData? y) => x?.Id == y?.Id;
@@ -28,9 +28,9 @@ public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
 
 public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
 {
-    public required int Id { get; init; }
-    public required int GroupId { get; init; }
-    public required int? RoleId { get; init; }
+    public required GroupMemberId Id { get; init; }
+    public required GroupId GroupId { get; init; }
+    public required GroupRoleId? RoleId { get; init; }
     public required int[]? Permissions { get; init; }
     public required string? Metadata { get; init; }
     public required DateTime? CreatedAt { get; init; }
@@ -60,7 +60,7 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
 
 public sealed class GroupDto : IEqualityComparer<GroupDto>
 {
-    public required int Id { get; init; }
+    public required GroupId Id { get; init; }
     public required string Name { get; init; }
     public required string? Shortcut { get; init; }
     public required byte? Kind { get; init; }

@@ -1,4 +1,6 @@
-﻿using SlipeServer.Server.Elements;
+﻿using RealmCore.Persistence.Context;
+using RealmCore.Persistence.Repository;
+using SlipeServer.Server.Elements;
 using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
 
 namespace RealmCore.Server.Modules.Players.Groups;
@@ -18,6 +20,7 @@ public sealed class GroupsService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly UsersInUse _usersInUse;
     private readonly GroupsManager _groupsManager;
+    private readonly ITransactionContext _transactionContext;
     private readonly GroupRepository _groupRepository;
 
     public event Action<int, RealmPlayer>? MemberAdded;
@@ -31,6 +34,7 @@ public sealed class GroupsService
         _dateTimeProvider = dateTimeProvider;
         _usersInUse = usersInUse;
         _groupsManager = groupsManager;
+        _transactionContext = _serviceProvider.GetRequiredService<ITransactionContext>();
         _groupRepository = _serviceProvider.GetRequiredService<GroupRepository>();
     }
 
@@ -39,10 +43,10 @@ public sealed class GroupsService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            if (await _groupRepository.ExistsByName(name, cancellationToken))
+            if (await _groupRepository.GroupExistsByName(name, cancellationToken))
                 return new NameInUse();
 
-            if (shortcut != null && await _groupRepository.ExistsByShortcut(shortcut, cancellationToken))
+            if (shortcut != null && await _groupRepository.GroupExistsByShortcut(shortcut, cancellationToken))
                 return new ShortcutInUse();
 
             var groupData = await _groupRepository.Create(name, shortcut, (byte)kind, cancellationToken);
@@ -54,12 +58,12 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<GroupDto?> GetById(int id, CancellationToken cancellationToken = default)
+    public async Task<GroupDto?> GetGroupById(int id, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var groupData = await _groupRepository.GetById(id, cancellationToken);
+            var groupData = await _groupRepository.GetGroupById(id, cancellationToken);
 
             return GroupDto.Map(groupData);
         }
@@ -69,12 +73,12 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<GroupDto?> GetByName(string name, CancellationToken cancellationToken = default)
+    public async Task<GroupDto?> GetGroupByName(string name, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var groupData = await _groupRepository.GetByName(name, cancellationToken);
+            var groupData = await _groupRepository.GetGroupByName(name, cancellationToken);
 
             return GroupDto.Map(groupData);
         }
@@ -84,12 +88,12 @@ public sealed class GroupsService
         }
     }
     
-    public async Task<GroupDto[]> Search(string name, int limit = 10, byte[]? kinds = null, CancellationToken cancellationToken = default)
+    public async Task<GroupDto[]> SearchGroups(string name, int limit = 10, byte[]? kinds = null, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var results = await _groupRepository.Search(name, limit, kinds, cancellationToken);
+            var results = await _groupRepository.SearchGroups(name, limit, kinds, cancellationToken);
 
             return results.Select(x => GroupDto.Map(x)).ToArray();
         }
@@ -99,28 +103,12 @@ public sealed class GroupsService
         }
     }
     
-    public async Task<GroupDto?> GetGroupByName(string groupName, CancellationToken cancellationToken = default)
+    public async Task<GroupDto?> GetGroupByNameOrShortCut(string name, string shortcut, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var groupData = await _groupRepository.GetByName(groupName, cancellationToken);
-            if (groupData == null)
-                return null;
-            return GroupDto.Map(groupData);
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
-    }
-
-    public async Task<GroupDto?> GetGroupByNameOrShortCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
-    {
-        await _semaphore.WaitAsync(cancellationToken);
-        try
-        {
-            var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut, cancellationToken);
+            var groupData = await _groupRepository.GetGroupByNameOrShortcut(name, shortcut, cancellationToken);
             if (groupData == null)
                 return null;
 
@@ -132,12 +120,12 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut, CancellationToken cancellationToken = default)
+    public async Task<bool> GroupExistsByNameOrShortcut(string name, string shortcut, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut, cancellationToken);
+            return await _groupRepository.GroupExistsByNameOrShortcut(name, shortcut, cancellationToken);
         }
         finally
         {
@@ -145,25 +133,33 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> TryAddMember(RealmPlayer player, int groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AddMember(RealmPlayer player, GroupId groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        return await AddMember(player.UserId, groupId, roleId, metadata, cancellationToken);
+    }
+    
+    public async Task<bool> AddMember(int userId, GroupId groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
     {
         bool added = false;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            if (player.Groups.IsMember(groupId))
-                return false;
+            added = await _groupRepository.AddMember(groupId, userId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
 
-            added = await _groupRepository.TryAddMember(groupId, player.UserId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
-            if (added){
-                var groupMemberData = await _groupRepository.GetGroupMembersByUserIdAndGroupId(groupId, player.UserId, cancellationToken: cancellationToken);
-                if (groupMemberData == null)
-                    return false;
+            if (added)
+            {
+                if (_usersInUse.TryGetPlayerByUserId(userId, out var player))
+                {
+                    var groupMemberData = await _groupRepository.GetGroupMemberByUserIdAndGroupId(groupId, player.UserId, cancellationToken: cancellationToken);
 
-                if (!player.Groups.AddGroupMember(groupMemberData))
-                    return false;
+                    if (groupMemberData == null)
+                        return false;
 
-                _groupsManager.AddPlayerToGroup(groupId, player);
+                    if (!player.Groups.AddGroupMember(groupMemberData))
+                        return false;
+
+                    _groupsManager.AddPlayerToGroup(groupId, player);
+                }
             }
         }
         finally
@@ -171,46 +167,17 @@ public sealed class GroupsService
             _semaphore.Release();
         }
 
-        if (added)
-        {
-            MemberAdded?.Invoke(groupId, player);
-        }
-
         return added;
     }
-    
-    public async Task<bool> TryAddMember(int userId, int groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
-    {
-        if(_usersInUse.TryGetPlayerByUserId(userId, out var player))
-        {
-            return await TryAddMember(player, groupId, roleId, metadata, cancellationToken);
-        }
 
-        await _semaphore.WaitAsync(cancellationToken);
-        try
-        {
-            var groupMemberData = await _groupRepository.TryAddMember(groupId, userId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
-            return groupMemberData != null;
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
-    }
-
-    public async Task<bool> RemoveMember(RealmPlayer player, int groupId, CancellationToken cancellationToken = default)
-    {
-        return await RemoveMember(groupId, player.UserId, cancellationToken);
-    }
-
-    public async Task<bool> RemoveMember(int userId, int groupId, CancellationToken cancellationToken = default)
+    public async Task<bool> RemoveMember(int userId, GroupId groupId, CancellationToken cancellationToken = default)
     {
         bool removed = false;
 
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            if (await _groupRepository.TryRemoveMember(groupId, userId, cancellationToken))
+            if (await _groupRepository.RemoveMember(groupId, userId, cancellationToken))
             {
                 removed = true;
             }
@@ -230,7 +197,12 @@ public sealed class GroupsService
         return removed;
     }
 
-    public async Task<GroupMemberDto[]> GetGroupMembers(int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
+    public async Task<bool> RemoveMember(RealmPlayer player, GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        return await RemoveMember(groupId, player.UserId, cancellationToken);
+    }
+
+    public async Task<GroupMemberDto[]> GetGroupMembersByUserId(int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
@@ -244,12 +216,12 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> ExistsByName(string name, CancellationToken cancellationToken = default)
+    public async Task<bool> GroupExistsByName(string name, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _groupRepository.ExistsByName(name, cancellationToken);
+            return await _groupRepository.GroupExistsByName(name, cancellationToken);
         }
         finally
         {
@@ -257,12 +229,12 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
+    public async Task<bool> GroupExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _groupRepository.ExistsByShortcut(shortcut, cancellationToken);
+            return await _groupRepository.GroupExistsByShortcut(shortcut, cancellationToken);
         }
         finally
         {
@@ -270,7 +242,7 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<GroupRoleDto> CreateRole(int groupId, string name, int[] permissions, CancellationToken cancellationToken = default)
+    public async Task<GroupRoleDto> CreateRole(GroupId groupId, string name, int[] permissions, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
@@ -284,7 +256,7 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<int[]> GetGroupRoles(int groupId, CancellationToken cancellationToken = default)
+    public async Task<int[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
@@ -310,7 +282,7 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> SetMemberRole(int groupId, int userId, int roleId, CancellationToken cancellationToken = default)
+    public async Task<bool> SetMemberRole(GroupId groupId, int userId, int roleId, CancellationToken cancellationToken = default)
     {
         bool roleChanged = false;
         await _semaphore.WaitAsync(cancellationToken);
@@ -352,7 +324,7 @@ public sealed class GroupsService
 
     public async Task<bool> SetRolePermissions(int roleId, int[] permissions, CancellationToken cancellationToken = default)
     {
-        int? groupId = null;
+        GroupId? groupId = null;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
