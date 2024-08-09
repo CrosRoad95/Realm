@@ -49,7 +49,7 @@ public sealed class GroupsService
             if (shortcut != null && await _groupRepository.GroupExistsByShortcut(shortcut, cancellationToken))
                 return new ShortcutInUse();
 
-            var groupData = await _groupRepository.Create(name, shortcut, (byte)kind, cancellationToken);
+            var groupData = await _groupRepository.Create(name, _dateTimeProvider.Now, shortcut, (byte)kind, cancellationToken);
             return new Created(GroupDto.Map(groupData));
         }
         finally

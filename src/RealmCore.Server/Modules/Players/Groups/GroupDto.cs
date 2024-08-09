@@ -30,6 +30,7 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
 {
     public required GroupMemberId Id { get; init; }
     public required GroupId GroupId { get; init; }
+    public required int UserId { get; init; }
     public required GroupRoleId? RoleId { get; init; }
     public required int[]? Permissions { get; init; }
     public required string? Metadata { get; init; }
@@ -49,6 +50,7 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
         {
             Id = groupMemberData.Id,
             GroupId = groupMemberData.GroupId,
+            UserId = groupMemberData.UserId,
             RoleId = groupMemberData.RoleId,
             Permissions = groupMemberData.Role != null ? groupMemberData.Role.Permissions.Select(x => x.PermissionId).ToArray() : null,
             Metadata = groupMemberData.Metadata,

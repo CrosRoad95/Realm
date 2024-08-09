@@ -28,7 +28,7 @@ public sealed class GroupRepository
     }
 
     #region Create
-    public async Task<GroupData> Create(string name, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
+    public async Task<GroupData> Create(string name, DateTime createdAt, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
 
@@ -44,6 +44,7 @@ public sealed class GroupRepository
             Name = name,
             Shortcut = shortcut,
             Kind = kind,
+            CreatedAt = createdAt
         };
         _db.Groups.Add(group);
 
