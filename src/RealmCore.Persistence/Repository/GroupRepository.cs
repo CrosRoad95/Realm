@@ -457,6 +457,164 @@ public sealed class GroupRepository
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
+
+    public async Task SetGroupSetting(GroupId groupId, int settingId, string value, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetGroupSetting));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", groupId);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.GroupsSettings
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId.id && x.SettingId == settingId);
+
+        var groupSettingData = await query.FirstOrDefaultAsync(cancellationToken);
+        if(groupSettingData != null)
+        {
+            groupSettingData.Value = value;
+        }
+        else
+        {
+            _db.GroupsSettings.Add(new GroupSettingData
+            {
+                GroupId = groupId.id,
+                SettingId = settingId,
+                Value = value
+            });
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        _db.ChangeTracker.Clear();
+    }
+
+    public async Task<string?> GetGroupSetting(GroupId groupId, int settingId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupSetting));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", groupId);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.GroupsSettings
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId.id && x.SettingId == settingId);
+
+        var groupSettingData = await query.FirstOrDefaultAsync(cancellationToken);
+        if(groupSettingData != null)
+        {
+            return groupSettingData.Value;
+        }
+        return null;
+    }
+
+    public async Task<IReadOnlyDictionary<int, string>> GetGroupSettings(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupSettings));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", groupId);
+        }
+
+        var query = _db.GroupsSettings
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId.id);
+
+        var settings = await query.ToDictionaryAsync(x => x.SettingId, x => x.Value, cancellationToken);
+        return settings;
+    }
+
+    public async Task<bool> CreateJoinRequest(GroupId groupId, int userId, DateTime createdAt, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CreateJoinRequest));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var joinRequest = new GroupJoinRequestData
+        {
+            GroupId = groupId.id,
+            UserId = userId,
+            CreatedAt = createdAt,
+            Metadata = metadata ?? "",
+        };
+
+        _db.GroupsJoinRequests.Add(joinRequest);
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+            _db.ChangeTracker.Clear();
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    public async Task<GroupJoinRequestData[]> GetJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CreateJoinRequest));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Group)
+            .Where(x => x.UserId == userId);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<GroupJoinRequestData[]> GetJoinRequestsByGroupId(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CreateJoinRequest));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Group)
+            .Where(x => x.GroupId == groupId.id);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<bool> RemoveJoinRequest(GroupId groupId, int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveJoinRequest));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", groupId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) == 1;
+    }
     #endregion
     
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));

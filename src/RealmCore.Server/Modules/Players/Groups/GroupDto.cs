@@ -91,3 +91,27 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
         };
     }
 }
+
+public sealed class GroupJoinRequestDto : IEqualityComparer<GroupJoinRequestDto>
+{
+    public required GroupId GroupId { get; init; }
+    public required DateTime CreatedAt { get; init; }
+    public required GroupDto Group { get; init; }
+    public bool Equals(GroupJoinRequestDto? x, GroupJoinRequestDto? y) => x?.GroupId == y?.GroupId;
+
+    public int GetHashCode([DisallowNull] GroupJoinRequestDto obj) => obj.GroupId;
+
+    [return: NotNullIfNotNull(nameof(groupJoinRequestData))]
+    public static GroupJoinRequestDto? Map(GroupJoinRequestData? groupJoinRequestData)
+    {
+        if (groupJoinRequestData == null)
+            return null;
+
+        return new()
+        {
+            GroupId = groupJoinRequestData.GroupId,
+            CreatedAt = groupJoinRequestData.CreatedAt,
+            Group = GroupDto.Map(groupJoinRequestData.Group)
+        };
+    }
+}

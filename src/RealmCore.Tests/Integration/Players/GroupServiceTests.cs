@@ -6,6 +6,7 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     private readonly RealmTestingPlayer _player;
     private readonly PlayerGroupsFeature _groups;
     private readonly GroupsService _groupsService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public GroupServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
@@ -13,6 +14,7 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         _player = _fixture.Player;
         _groups = _player.Groups;
         _groupsService = _fixture.Hosting.GetRequiredService<GroupsService>();
+        _dateTimeProvider = _fixture.Hosting.GetRequiredService<IDateTimeProvider>();
     }
 
     [Fact]
@@ -116,6 +118,44 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
 
         groupMember = _player.Groups.GetById(group.Id);
         groupMember!.Permissions.Should().BeEquivalentTo([100]);
+    }
+
+    [Fact]
+    private async Task GroupSettingsShouldBeChangeable()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        await _groupsService.SetGroupSetting(group.Id, 1, "foo");
+        var settingValue = await _groupsService.GetGroupSetting(group.Id, 1);
+        var settings = await _groupsService.GetGroupSettings(group.Id);
+
+        using var _ = new AssertionScope();
+        settingValue.Should().Be("foo");
+        settings.Should().BeEquivalentTo(new Dictionary<int, string>
+        {
+            [1] = "foo"
+        });
+    }
+    
+    [Fact]
+    private async Task SendingJoinRequestsShouldWork()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        var sent = await _groupsService.CreateJoinRequest(group.Id, _player);
+        var requestsSentToGroups = await _groupsService.GetJoinRequestsByUserId(_player);
+        var removed = await _groupsService.RemoveJoinRequest(group.Id, _player);
+
+        using var _ = new AssertionScope();
+        sent.Should().BeTrue();
+        requestsSentToGroups.Select(x => x.GroupId).Should().Contain(group.Id);
+        removed.Should().BeTrue();
     }
 
     public void Dispose()

@@ -70,6 +70,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
     public DbSet<GroupRolePermissionData> GroupsRolesPermissions => Set<GroupRolePermissionData>();
     public DbSet<GroupEventData> GroupsEvents => Set<GroupEventData>();
+    public DbSet<GroupSettingData> GroupsSettings => Set<GroupSettingData>();
+    public DbSet<GroupJoinRequestData> GroupsJoinRequests => Set<GroupJoinRequestData>();
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
@@ -338,6 +340,10 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
 
+            entityBuilder
+                .HasMany(x => x.GroupsJoinRequests)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -747,8 +753,18 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasPrincipalKey(x => x.Id);
 
             entityBuilder
-                .HasMany(x => x.Events)
+                .HasMany(x => x.Roles)
                 .WithOne()
+                .HasForeignKey(x => x.GroupId);
+
+            entityBuilder
+                .HasMany(x => x.Settings)
+                .WithOne()
+                .HasForeignKey(x => x.GroupId);
+
+            entityBuilder
+                .HasMany(x => x.JoinRequests)
+                .WithOne(x => x.Group)
                 .HasForeignKey(x => x.GroupId);
         });
 
@@ -768,8 +784,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasForeignKey(x => x.RoleId)
                 .HasPrincipalKey(x => x.Id);
         });
-
-        //modelBuilder.Ignore<GroupRoleData>();
 
         modelBuilder.Entity<GroupRoleData>(entityBuilder =>
         {
@@ -797,6 +811,20 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(GroupsEvents))
                 .HasKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<GroupSettingData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupsSettings))
+                .HasKey(x => new { x.GroupId, x.SettingId });
+        });
+        
+        modelBuilder.Entity<GroupJoinRequestData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupsJoinRequests))
+                .HasKey(x => new { x.GroupId, x.UserId });
         });
 
         modelBuilder.Entity<DiscordIntegrationData>(entityBuilder =>

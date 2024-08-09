@@ -113,6 +113,7 @@ public sealed class PlayerUserFeature : IPlayerFeature, IDisposable
                 DetachEntitiesOfType<GroupMemberData>();
                 DetachEntitiesOfType<GroupRoleData>();
                 DetachEntitiesOfType<GroupRolePermissionData>();
+                DetachEntitiesOfType<GroupJoinRequestData>();
             }
             catch(Exception)
             {

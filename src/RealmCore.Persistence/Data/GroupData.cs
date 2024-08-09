@@ -13,6 +13,8 @@ public sealed class GroupData
     public ICollection<GroupMemberData> Members { get; set; } = [];
     public ICollection<GroupRoleData> Roles { get; set; } = [];
     public ICollection<GroupEventData> Events { get; set; } = [];
+    public ICollection<GroupSettingData> Settings { get; set; } = [];
+    public ICollection<GroupJoinRequestData> JoinRequests { get; set; } = [];
 }
 
 public sealed class GroupMemberData
@@ -51,4 +53,21 @@ public sealed class GroupRolePermissionData
 public sealed class GroupEventData : EventDataBase
 {
     public int GroupId { get; set; }
+}
+
+public sealed class GroupSettingData
+{
+    public int GroupId { get; set; }
+    public int SettingId { get; set; }
+    public string Value { get; set; }
+}
+
+public sealed class GroupJoinRequestData
+{
+    public int GroupId { get; set; }
+    public int UserId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string Metadata { get; set; }
+
+    public GroupData? Group { get; set; }
 }

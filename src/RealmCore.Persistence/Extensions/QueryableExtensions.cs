@@ -33,6 +33,7 @@ public static class QueryableExtensions
             .Include(x => x.GroupMembers)
             .ThenInclude(x => x.Role)
             .ThenInclude(x => x!.Permissions)
+            .Include(x => x.GroupsJoinRequests)
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
             .Include(x => x.Settings)
@@ -68,6 +69,8 @@ public static class QueryableExtensions
             .Include(x => x.Members)
             .Include(x => x.Roles)
             .ThenInclude(x => x.Permissions)
+            .Include(x => x.Settings)
+            .Include(x => x.JoinRequests)
             .AsSplitQuery();
     }
 

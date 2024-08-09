@@ -1,7 +1,4 @@
-﻿using RealmCore.Persistence.Context;
-using RealmCore.Persistence.Repository;
-using SlipeServer.Server.Elements;
-using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
+﻿using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
 
 namespace RealmCore.Server.Modules.Players.Groups;
 
@@ -345,5 +342,99 @@ public sealed class GroupsService
             }
         }
         return true;
+    }
+
+    public async Task SetGroupSetting(GroupId groupId, int settingId, string value, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            await _groupRepository.SetGroupSetting(groupId, settingId, value, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<string?> GetGroupSetting(GroupId groupId, int settingId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetGroupSetting(groupId, settingId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<IReadOnlyDictionary<int, string>> GetGroupSettings(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetGroupSettings(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> CreateJoinRequest(GroupId groupId, RealmPlayer player, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        return await CreateJoinRequest(groupId, player.UserId, metadata, cancellationToken);
+    }
+
+    public async Task<bool> CreateJoinRequest(GroupId groupId, int userId, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.CreateJoinRequest(groupId, userId, _dateTimeProvider.Now, metadata, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<GroupJoinRequestDto[]> GetJoinRequestsByUserId(RealmPlayer player, CancellationToken cancellationToken = default)
+    {
+        return await GetJoinRequestsByUserId(player.UserId, cancellationToken);
+    }
+
+    public async Task<GroupJoinRequestDto[]> GetJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var requests = await _groupRepository.GetJoinRequestsByUserId(userId, cancellationToken);
+            return requests.Select(GroupJoinRequestDto.Map).ToArray();
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> RemoveJoinRequest(GroupId groupId, RealmPlayer player, CancellationToken cancellationToken = default)
+    {
+        return await RemoveJoinRequest(groupId, player.UserId, cancellationToken);
+    }
+
+    public async Task<bool> RemoveJoinRequest(GroupId groupId, int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.RemoveJoinRequest(groupId, userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }
