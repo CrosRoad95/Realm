@@ -4,7 +4,7 @@ namespace RealmCore.Server.Modules.Users;
 
 public sealed class UsersService
 {
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     private readonly IServiceScope _serviceScope;
     private readonly ILogger<UsersService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -13,6 +13,7 @@ public sealed class UsersService
     private readonly IServiceProvider _serviceProvider;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private readonly SignInManager<UserData> _signInManager;
+    private readonly UsersRepository _usersRepository;
 
     public event Func<RealmPlayer, Task>? LoggedIn;
     public event Func<RealmPlayer, Task>? LoggedOut;
@@ -24,10 +25,11 @@ public sealed class UsersService
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
-        _serviceProvider = serviceProvider;
         _serviceScope = serviceProvider.CreateScope();
+        _serviceProvider = _serviceScope.ServiceProvider;
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
-        _signInManager = _serviceScope.ServiceProvider.GetRequiredService<SignInManager<UserData>>();
+        _signInManager = _serviceProvider.GetRequiredService<SignInManager<UserData>>();
+        _usersRepository = _serviceProvider.GetRequiredService<UsersRepository>();
     }
 
     public async Task<OneOf<Registered, FailedToRegister>> Register(string username, string password)
@@ -114,7 +116,7 @@ public sealed class UsersService
                 await AuthorizePolicies(player);
                 UpdateLastData(player);
 
-                await player.GetRequiredService<PlayersUsersService>().TryUpdateLastNickname(userData.Id, player.Name);
+                await TryUpdateLastNicknameCore(userData.Id, player.Name);
                 if (LoggedIn != null)
                 {
                     foreach (Func<RealmPlayer, Task> item in LoggedIn.GetInvocationList())
@@ -173,6 +175,50 @@ public sealed class UsersService
         var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
         player.User.SetAuthorizedPolicyState(policy, result.Succeeded);
         return result.Succeeded;
+    }
+
+    public async Task<UserData?> GetUserByUserName(string userName, bool includeAll = true, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetUserByUserName(userName, _dateTimeProvider.Now, includeAll, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<UserData?> GetUserById(int id, bool includeAll = true, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetUserById(id, _dateTimeProvider.Now, includeAll, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> TryUpdateLastNicknameCore(int userId, string nick, CancellationToken cancellationToken = default)
+    {
+        return await _usersRepository.TryUpdateLastNickname(userId, nick, cancellationToken);
+    }
+    
+    public async Task<bool> TryUpdateLastNickname(int userId, string nick, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await TryUpdateLastNicknameCore(userId, nick, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     private async Task<string?> AuthorizePolicies(RealmPlayer player)

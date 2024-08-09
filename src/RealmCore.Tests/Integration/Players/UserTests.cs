@@ -17,7 +17,7 @@ public class UserTests
 
         #region Act
         var registerResult = await usersService.Register(login, password);
-        var user = await player.GetRequiredService<PlayersUsersService>().GetUserByUserName(login) ?? throw new Exception("User not found");
+        var user = await player.GetRequiredService<UsersService>().GetUserByUserName(login) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
         var logIn = async () => await usersService.LogIn(player, user);

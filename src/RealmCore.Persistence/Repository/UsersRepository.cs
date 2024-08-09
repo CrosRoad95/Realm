@@ -64,19 +64,40 @@ public sealed class UsersRepository
         return roles;
     }
 
-    public async Task<UserData?> GetUserByUserName(string userName, DateTime dateTime, CancellationToken cancellationToken = default)
+    public async Task<UserData?> GetUserById(int userId, DateTime dateTime, bool includeAll = true, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetUserByUserName));
 
         if (activity != null)
         {
-            activity.SetTag("userName", userName);
+            activity.SetTag("UserId", userId);
         }
 
         var query = CreateQueryBase()
             .AsNoTrackingWithIdentityResolution()
-            .IncludeAll(dateTime)
+            .Where(u => u.Id == userId);
+
+        if (includeAll)
+            query = query.IncludeAll(dateTime);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<UserData?> GetUserByUserName(string userName, DateTime dateTime, bool includeAll = true, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetUserByUserName));
+
+        if (activity != null)
+        {
+            activity.SetTag("UserName", userName);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
             .Where(u => u.UserName == userName);
+
+        if (includeAll)
+            query = query.IncludeAll(dateTime);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }

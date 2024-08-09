@@ -8,7 +8,7 @@ internal sealed class SeederServerBuilder : IDisposable
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<UserData> _userManager;
     private readonly IServiceProvider _serviceProvider;
-    private readonly PlayersUsersService _playersUsersService;
+    private readonly UsersService _playersUsersService;
     private readonly IServiceScope _serviceScope;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
@@ -17,7 +17,7 @@ internal sealed class SeederServerBuilder : IDisposable
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, GroupRepository groupRepository, IServiceProvider serviceProvider, PlayersUsersService playersUsersService)
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, GroupRepository groupRepository, IServiceProvider serviceProvider, UsersService playersUsersService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;

@@ -75,7 +75,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
 
     public async Task<RealmPlayer> LoginPlayer(RealmPlayer player, bool dontLoadData = true)
     {
-        var userService = player.GetRequiredService<PlayersUsersService>();
+        var userService = player.GetRequiredService<UsersService>();
         var user = await userService.GetUserByUserName(player.Name);
 
         if (user == null)

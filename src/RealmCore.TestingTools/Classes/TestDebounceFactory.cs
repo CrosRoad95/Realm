@@ -48,8 +48,15 @@ public class TestDebounce : IDebounce
         try
         {
             await _semaphore.WaitAsync(cancellationToken);
-            action();
-            _taskCompletionSource?.SetResult();
+            try
+            {
+                action();
+                _taskCompletionSource?.SetResult();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
         catch (TaskCanceledException)
         {
@@ -62,8 +69,15 @@ public class TestDebounce : IDebounce
         try
         {
             await _semaphore.WaitAsync(cancellationToken);
-            await task();
-            _taskCompletionSource?.SetResult();
+            try
+            {
+                await task();
+                _taskCompletionSource?.SetResult();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
         catch (TaskCanceledException)
         {

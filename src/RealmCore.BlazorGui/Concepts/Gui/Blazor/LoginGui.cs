@@ -14,14 +14,14 @@ public class LoginGui : BrowserGui
 
     public async Task LoginAdmin()
     {
-        var user = await Player.GetRequiredService<PlayersUsersService>().GetUserByUserName("admin") ?? throw new Exception("User not found");
+        var user = await Player.GetRequiredService<UsersService>().GetUserByUserName("admin") ?? throw new Exception("User not found");
         if (user != null)
             await _usersService.LogIn(Player, user);
     }
 
     public async Task LoginUser()
     {
-        var user = await Player.GetRequiredService<PlayersUsersService>().GetUserByUserName("user") ?? throw new Exception("User not found");
+        var user = await Player.GetRequiredService<UsersService>().GetUserByUserName("user") ?? throw new Exception("User not found");
         if (user != null)
             await _usersService.LogIn(Player, user);
     }

@@ -125,7 +125,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<VehicleLoader>();
         services.AddScoped<VehicleService>();
         services.AddScoped<PlayerSearchService>();
-        services.AddSingleton<PlayersUsersService>();
+        services.AddSingleton<UsersService>();
         services.AddSingleton<UsersService>();
         services.AddSingleton<GroupsService>();
         services.AddSingleton<BansService>();
