@@ -554,9 +554,9 @@ public sealed class GroupRepository
             Metadata = metadata ?? "",
         };
 
-        _db.GroupsJoinRequests.Add(joinRequest);
         try
         {
+            _db.GroupsJoinRequests.Add(joinRequest);
             await _db.SaveChangesAsync(cancellationToken);
             _db.ChangeTracker.Clear();
             return true;

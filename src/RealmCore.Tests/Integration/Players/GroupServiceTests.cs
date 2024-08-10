@@ -157,6 +157,21 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         requestsSentToGroups.Select(x => x.GroupId).Should().Contain(group.Id);
         removed.Should().BeTrue();
     }
+    
+    [Fact]
+    private async Task YouCanSendOnlyOneJoinRequest()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        var sent1 = await _groupsService.CreateJoinRequest(group.Id, _player);
+        var sent2 = await _groupsService.CreateJoinRequest(group.Id, _player);
+
+        sent1.Should().BeTrue();
+        sent2.Should().BeFalse();
+    }
 
     public void Dispose()
     {
