@@ -69,6 +69,7 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
     public required DateTime? CreatedAt { get; init; }
     public required GroupMemberDto[] Members { get; init; }
     public required GroupRoleDto[] Roles { get; init; }
+    public required IReadOnlyDictionary<int, string> Settings { get; init; }
     public bool Equals(GroupDto? x, GroupDto? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] GroupDto obj) => obj.Id;
@@ -87,7 +88,8 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
             Kind = groupData.Kind,
             CreatedAt = groupData.CreatedAt,
             Members = mapMembers ? groupData.Members.Select(GroupMemberDto.Map).ToArray() : [],
-            Roles = groupData.Roles.Select(GroupRoleDto.Map).ToArray()
+            Roles = groupData.Roles.Select(GroupRoleDto.Map).ToArray(),
+            Settings = groupData.Settings.ToDictionary(x => x.SettingId, x => x.Value),
         };
     }
 }

@@ -437,4 +437,30 @@ public sealed class GroupsService
             _semaphore.Release();
         }
     }
+
+    public async Task<int> CountJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.CountJoinRequestsByUserId(userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<int> CountJoinRequestsByGroupId(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.CountJoinRequestsByGroupId(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 }

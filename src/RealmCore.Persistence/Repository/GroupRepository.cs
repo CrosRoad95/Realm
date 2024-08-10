@@ -230,7 +230,11 @@ public sealed class GroupRepository
         }
 
         IQueryable<GroupData> query = CreateQueryBase()
-            .Include(x => x.Members);
+            .Include(x => x.Members)
+            .ThenInclude(x => x.Role)
+            .ThenInclude(x => x!.Permissions)
+            .Include(x => x.Settings)
+            .AsSplitQuery();
 
         if (!string.IsNullOrEmpty(name))
             query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
@@ -561,6 +565,42 @@ public sealed class GroupRepository
         {
             return false;
         }
+    }
+
+    public async Task<int> CountJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CountJoinRequestsByUserId));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Group)
+            .Where(x => x.UserId == userId);
+
+        return await query.CountAsync(cancellationToken);
+    }
+    
+    public async Task<int> CountJoinRequestsByGroupId(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CountJoinRequestsByGroupId));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Group)
+            .Where(x => x.GroupId == groupId.id);
+
+        return await query.CountAsync(cancellationToken);
     }
 
     public async Task<GroupJoinRequestData[]> GetJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
