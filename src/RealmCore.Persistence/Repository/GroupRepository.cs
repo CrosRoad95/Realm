@@ -30,7 +30,7 @@ public sealed class GroupRepository
     }
 
     #region Create
-    public async Task<GroupData> Create(string name, DateTime createdAt, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
+    public async Task<GroupData?> Create(string name, DateTime createdAt, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
 
@@ -48,10 +48,20 @@ public sealed class GroupRepository
             Kind = kind,
             CreatedAt = createdAt
         };
-        _db.Groups.Add(group);
 
-        await _db.SaveChangesAsync(cancellationToken);
-        _db.ChangeTracker.Clear();
+        try
+        {
+            _db.Groups.Add(group);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
 
         return group;
     }
@@ -80,16 +90,19 @@ public sealed class GroupRepository
         try
         {
             await _db.SaveChangesAsync(cancellationToken);
-            _db.ChangeTracker.Clear();
             return true;
         }
         catch (Exception)
         {
             return false;
         }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
     }
 
-    public async Task<GroupRoleData> CreateRole(GroupId groupId, string name, int[] permissions, CancellationToken cancellationToken = default)
+    public async Task<GroupRoleData?> CreateRole(GroupId groupId, string name, int[] permissions, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(RemoveMember));
 
@@ -110,9 +123,19 @@ public sealed class GroupRepository
             }).ToArray()
         };
 
-        _db.GroupsRoles.Add(groupRole);
-        await _db.SaveChangesAsync(cancellationToken);
-        _db.ChangeTracker.Clear();
+        try
+        {
+            _db.GroupsRoles.Add(groupRole);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
 
         return groupRole;
     }
@@ -133,8 +156,20 @@ public sealed class GroupRepository
         {
             PermissionId = x
         }).ToList();
-        await _db.SaveChangesAsync(cancellationToken);
-        _db.ChangeTracker.Clear();
+
+        try
+        {
+
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
 
         return true;
     }
@@ -266,7 +301,7 @@ public sealed class GroupRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<GroupData?> GetGroupByGroupId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupByGroupId));
@@ -283,7 +318,7 @@ public sealed class GroupRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<GroupId?> GetGroupIdByRoleId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupIdByRoleId));
@@ -397,7 +432,7 @@ public sealed class GroupRepository
 
         return permissions;
     }
-    
+
     public async Task<GroupRoleData[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsRoles
@@ -442,8 +477,19 @@ public sealed class GroupRepository
             return false;
 
         groupMember.RoleId = roleId;
-        await _db.SaveChangesAsync(cancellationToken);
-        _db.ChangeTracker.Clear();
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
 
         return true;
     }
@@ -516,7 +562,7 @@ public sealed class GroupRepository
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
 
-    public async Task SetGroupSetting(GroupId groupId, int settingId, string value, CancellationToken cancellationToken = default)
+    public async Task<bool> SetGroupSetting(GroupId groupId, int settingId, string value, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(SetGroupSetting));
 
@@ -531,22 +577,34 @@ public sealed class GroupRepository
             .Where(x => x.GroupId == groupId.id && x.SettingId == settingId);
 
         var groupSettingData = await query.FirstOrDefaultAsync(cancellationToken);
-        if(groupSettingData != null)
-        {
-            groupSettingData.Value = value;
-        }
-        else
-        {
-            _db.GroupsSettings.Add(new GroupSettingData
-            {
-                GroupId = groupId.id,
-                SettingId = settingId,
-                Value = value
-            });
-        }
 
-        await _db.SaveChangesAsync(cancellationToken);
-        _db.ChangeTracker.Clear();
+        try
+        {
+            if (groupSettingData != null)
+            {
+                groupSettingData.Value = value;
+            }
+            else
+            {
+                _db.GroupsSettings.Add(new GroupSettingData
+                {
+                    GroupId = groupId.id,
+                    SettingId = settingId,
+                    Value = value
+                });
+            }
+
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+        return true;
     }
 
     public async Task<string?> GetGroupSetting(GroupId groupId, int settingId, CancellationToken cancellationToken = default)
@@ -565,7 +623,7 @@ public sealed class GroupRepository
             .Where(x => x.GroupId == groupId.id && x.SettingId == settingId);
 
         var groupSettingData = await query.FirstOrDefaultAsync(cancellationToken);
-        if(groupSettingData != null)
+        if (groupSettingData != null)
         {
             return groupSettingData.Value;
         }
@@ -612,12 +670,15 @@ public sealed class GroupRepository
         {
             _db.GroupsJoinRequests.Add(joinRequest);
             await _db.SaveChangesAsync(cancellationToken);
-            _db.ChangeTracker.Clear();
             return true;
         }
         catch (Exception)
         {
             return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
         }
     }
 
@@ -638,7 +699,7 @@ public sealed class GroupRepository
 
         return await query.CountAsync(cancellationToken);
     }
-    
+
     public async Task<int> CountJoinRequestsByGroupId(GroupId groupId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CountJoinRequestsByGroupId));
@@ -712,7 +773,7 @@ public sealed class GroupRepository
 
     public async Task<GroupMemberData[]> GetGroupMembers(GroupId groupId, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(RemoveJoinRequest));
+        using var activity = Activity.StartActivity(nameof(GetGroupMembers));
 
         if (activity != null)
         {
@@ -721,6 +782,7 @@ public sealed class GroupRepository
 
         var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
             .Include(x => x.Role)
             .ThenInclude(x => x!.Permissions)
             .Where(x => x.GroupId == groupId.id);
@@ -728,7 +790,7 @@ public sealed class GroupRepository
         return await query.ToArrayAsync(cancellationToken);
     }
     #endregion
-    
+
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));
 
     public static readonly ActivitySource Activity = new("RealmCore.GroupRepository", "1.0.0");

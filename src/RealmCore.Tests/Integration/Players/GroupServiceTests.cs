@@ -6,7 +6,6 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     private readonly RealmTestingPlayer _player;
     private readonly PlayerGroupsFeature _groups;
     private readonly GroupsService _groupsService;
-    private readonly IDateTimeProvider _dateTimeProvider;
 
     public GroupServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
@@ -14,7 +13,6 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         _player = _fixture.Player;
         _groups = _player.Groups;
         _groupsService = _fixture.Hosting.GetRequiredService<GroupsService>();
-        _dateTimeProvider = _fixture.Hosting.GetRequiredService<IDateTimeProvider>();
     }
 
     [Fact]
@@ -22,11 +20,10 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
         using var _ = new AssertionScope();
-        group.Name.Should().Be(name);
+        group!.Name.Should().Be(name);
         _groupsService.GetGroupByName(name).Should().NotBeNull();
         _groupsService.GetGroupById(group.Id).Should().NotBeNull();
     }
@@ -40,8 +37,8 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var result2 = await _groupsService.Create(name);
 
         using var _ = new AssertionScope();
-        result1.Value.Should().BeOfType<GroupsResults.Created>();
-        result2.Value.Should().BeOfType<GroupsResults.NameInUse>();
+        result1.Should().NotBeNull();
+        result2.Should().BeNull();
     }
 
     [Fact]
@@ -49,12 +46,11 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
         var monitorPlayer = _groups.Monitor();
         var monitorService = _groupsService.Monitor();
-        var added = await _groupsService.AddMember(_player, group.Id);
+        var added = await _groupsService.AddMember(_player, group!.Id);
         var removed = await _groupsService.AddMember(_player, group.Id);
 
         using var _ = new AssertionScope();
@@ -69,10 +65,9 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        await _groupsService.AddMember(_player, group.Id);
+        await _groupsService.AddMember(_player, group!.Id);
         var members = await _groupsService.GetGroupMembersByUserId(_player.UserId);
 
         var groupMember1 = _player.Groups.Where(x => x.Group!.Name == name).FirstOrDefault();
@@ -88,16 +83,15 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        await _groupsService.AddMember(_player, group.Id);
+        await _groupsService.AddMember(_player, group!.Id);
 
         var groupMember = _player.Groups.GetById(group.Id);
 
         {
             using var _ = new AssertionScope();
-            groupMember!.Permissions.Should().BeNull();
+            groupMember!.Permissions.Should().BeEmpty();
             groupMember!.RoleId.Should().BeNull();
         }
 
@@ -125,10 +119,9 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        await _groupsService.SetGroupSetting(group.Id, 1, "foo");
+        await _groupsService.SetGroupSetting(group!.Id, 1, "foo");
         var settingValue = await _groupsService.GetGroupSetting(group.Id, 1);
         var settings = await _groupsService.GetGroupSettings(group.Id);
 
@@ -145,10 +138,9 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        var sent = await _groupsService.CreateJoinRequest(group.Id, _player);
+        var sent = await _groupsService.CreateJoinRequest(group!.Id, _player);
         var requestsSentToGroups = await _groupsService.GetJoinRequestsByUserId(_player);
         var removed = await _groupsService.RemoveJoinRequest(group.Id, _player);
 
@@ -163,10 +155,9 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        var sent1 = await _groupsService.CreateJoinRequest(group.Id, _player);
+        var sent1 = await _groupsService.CreateJoinRequest(group!.Id, _player);
         var sent2 = await _groupsService.CreateJoinRequest(group.Id, _player);
 
         using var _ = new AssertionScope();
@@ -179,10 +170,9 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     {
         var name = Guid.NewGuid().ToString();
 
-        var result = await _groupsService.Create(name);
-        var group = ((GroupsResults.Created)result.Value).group;
+        var group = await _groupsService.Create(name);
 
-        var groupRole = await _groupsService.CreateRole(group.Id, "foobar", [1, 2, 3]);
+        var groupRole = await _groupsService.CreateRole(group!.Id, "foobar", [1, 2, 3]);
         await _groupsService.AddMember(_player, group.Id);
         await _groupsService.SetMemberRole(group.Id, _player.UserId, groupRole.Id);
         var removed1 = await _groupsService.RemoveRole(groupRole.Id);
