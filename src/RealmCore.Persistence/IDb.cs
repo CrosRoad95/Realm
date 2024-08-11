@@ -28,7 +28,7 @@ public interface IDb
     DbSet<JobUpgradeData> JobUpgrades { get; }
     DbSet<UserAchievementData> Achievements { get; }
     DbSet<GroupData> Groups { get; }
-    DbSet<GroupMemberData> GroupMembers { get; }
+    DbSet<GroupMemberData> GroupsMembers { get; }
     DbSet<GroupRoleData> GroupsRoles { get; }
     DbSet<GroupRolePermissionData> GroupsRolesPermissions { get; }
     DbSet<UserUpgradeData> UserUpgrades { get; }

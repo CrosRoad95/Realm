@@ -66,7 +66,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserAchievementData> Achievements => Set<UserAchievementData>();
     public DbSet<DiscoveryData> Discoveries => Set<DiscoveryData>();
     public DbSet<GroupData> Groups => Set<GroupData>();
-    public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
+    public DbSet<GroupMemberData> GroupsMembers => Set<GroupMemberData>();
     public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
     public DbSet<GroupRolePermissionData> GroupsRolesPermissions => Set<GroupRolePermissionData>();
     public DbSet<GroupEventData> GroupsEvents => Set<GroupEventData>();
@@ -753,11 +753,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasPrincipalKey(x => x.Id);
 
             entityBuilder
-                .HasMany(x => x.Roles)
-                .WithOne()
-                .HasForeignKey(x => x.GroupId);
-
-            entityBuilder
                 .HasMany(x => x.Settings)
                 .WithOne()
                 .HasForeignKey(x => x.GroupId);
@@ -771,7 +766,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         modelBuilder.Entity<GroupMemberData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(GroupMembers))
+                .ToTable(nameof(GroupsMembers))
                 .HasKey(x => x.Id);
 
             entityBuilder.HasOne(x => x.Group)

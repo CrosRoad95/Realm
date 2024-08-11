@@ -75,7 +75,7 @@ public sealed class GroupRepository
             RoleId = roleId,
             Metadata = metadata
         };
-        _db.GroupMembers.Add(groupMember);
+        _db.GroupsMembers.Add(groupMember);
 
         try
         {
@@ -150,7 +150,7 @@ public sealed class GroupRepository
             activity.AddTag("UserId", userId);
         }
 
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Include(x => x.Group)
@@ -378,7 +378,7 @@ public sealed class GroupRepository
             activity.AddTag("UserId", userId);
         }
 
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
@@ -429,7 +429,7 @@ public sealed class GroupRepository
     #region Update
     public async Task<bool> SetMemberRole(GroupId groupId, int userId, GroupRoleId? roleId = null, CancellationToken cancellationToken = default)
     {
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
@@ -457,7 +457,7 @@ public sealed class GroupRepository
             activity.AddTag("RoleId", roleId);
         }
 
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.RoleId == roleId.id);
 
@@ -493,7 +493,7 @@ public sealed class GroupRepository
             activity.AddTag("UserId", userId);
         }
 
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
@@ -719,7 +719,7 @@ public sealed class GroupRepository
             activity.AddTag("GroupId", groupId);
         }
 
-        var query = _db.GroupMembers
+        var query = _db.GroupsMembers
             .TagWithSource(nameof(GroupRepository))
             .Include(x => x.Role)
             .ThenInclude(x => x!.Permissions)
