@@ -211,6 +211,7 @@ public sealed class GroupRepository
         }
 
         var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
             .Include(x => x.Members)
             .ThenInclude(x => x.Group)
             .Where(x => x.Members.Any(x => x.UserId == userId));
@@ -235,6 +236,7 @@ public sealed class GroupRepository
         }
 
         var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
             .IncludeAll()
             .Where(x => x.Id == groupId.id);
 
@@ -251,6 +253,7 @@ public sealed class GroupRepository
         }
 
         var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
             .IncludeAll()
             .Where(x => x.Name == name);
 
@@ -266,11 +269,9 @@ public sealed class GroupRepository
             activity.AddTag("Name", name);
         }
 
-        IQueryable<GroupData> query = CreateQueryBase()
-            .Include(x => x.Members)
-            .ThenInclude(x => x.Role)
-            .ThenInclude(x => x!.Permissions)
-            .Include(x => x.Settings)
+        var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
+            .IncludeAll()
             .AsSplitQuery();
 
         if (!string.IsNullOrEmpty(name))
@@ -294,26 +295,26 @@ public sealed class GroupRepository
             activity.AddTag("Shortcut", shortcut);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
-            .Include(x => x.Members)
+        var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
+            .IncludeAll()
             .Where(x => x.Name == name || x.Shortcut == shortcut);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<GroupData?> GetGroupByGroupId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    public async Task<GroupData?> GetGroupByGroupRoleId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetGroupByGroupId));
+        using var activity = Activity.StartActivity(nameof(GetGroupByGroupRoleId));
 
         if (activity != null)
         {
             activity.AddTag("GroupRoleId", groupRoleId);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
-            .Include(x => x.Members)
+        var query = CreateQueryBase()
+            .AsNoTrackingWithIdentityResolution()
+            .IncludeAll()
             .Where(x => x.Roles.Any(y => y.Id == groupRoleId.id));
 
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -328,9 +329,8 @@ public sealed class GroupRepository
             activity.AddTag("GroupRoleId", groupRoleId);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
-            .Include(x => x.Members)
+        var query = CreateQueryBase()
+            .IncludeAll()
             .Where(x => x.Roles.Any(y => y.Id == groupRoleId.id))
             .Select(x => x.Id);
 
@@ -347,6 +347,7 @@ public sealed class GroupRepository
         }
 
         var query = CreateQueryBase()
+            .AsNoTracking()
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Name.ToLower() == name.ToLower());
 
@@ -363,9 +364,8 @@ public sealed class GroupRepository
             activity.AddTag("Shortcut", shortcut);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
-            .AsNoTrackingWithIdentityResolution()
+        var query = CreateQueryBase()
+            .AsNoTracking()
             .Where(x => x.Name.ToLower() == name.ToLower() || x.Shortcut == null || x.Shortcut.ToLower() == shortcut.ToLower());
         return await query.AnyAsync(cancellationToken);
     }
@@ -379,8 +379,7 @@ public sealed class GroupRepository
             activity.AddTag("Shortcut", shortcut);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
+        var query = CreateQueryBase()
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Shortcut != null && x.Shortcut.ToLower() == shortcut.ToLower());
 
@@ -396,10 +395,11 @@ public sealed class GroupRepository
             activity.AddTag("Name", name);
         }
 
-        var query = _db.Groups
-            .TagWithSource(nameof(GroupRepository))
+        var query = CreateQueryBase()
+            .AsNoTracking()
             .Where(x => x.Name == name)
             .Select(x => x.Id);
+
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -414,6 +414,7 @@ public sealed class GroupRepository
         }
 
         var query = _db.GroupsMembers
+            .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
@@ -436,10 +437,10 @@ public sealed class GroupRepository
     public async Task<GroupRoleData[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsRoles
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTracking()
             .Include(x => x.Members)
             .Include(x => x.Permissions)
-            .AsNoTracking()
-            .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id);
 
         var permissions = await query.ToArrayAsync(cancellationToken);
@@ -450,8 +451,8 @@ public sealed class GroupRepository
     public async Task<int[]> GetRolePermissions(GroupRoleId roleId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsRolesPermissions
-            .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
+            .AsNoTracking()
             .Where(x => x.GroupRoleId == roleId.id)
             .Select(x => x.PermissionId);
 
