@@ -80,7 +80,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         return true;
     }
 
-    internal bool SetGroupRole(int groupId, int roleId, int[] permissions)
+    internal bool SetGroupRole(int groupId, int? roleId, int[] permissions)
     {
         GroupMemberData? groupMemberData = null;
         lock (_lock)
@@ -90,13 +90,20 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
                 return false;
 
             groupMemberData.RoleId = roleId;
-            groupMemberData.Role = new GroupRoleData
+            if(roleId == null)
             {
-                Permissions = permissions.Select(x => new GroupRolePermissionData
+                groupMemberData.Role = null;
+            }
+            else
+            {
+                groupMemberData.Role = new GroupRoleData
                 {
-                    PermissionId = x
-                }).ToArray()
-            };
+                    Permissions = permissions.Select(x => new GroupRolePermissionData
+                    {
+                        PermissionId = x
+                    }).ToArray()
+                };
+            }
         }
 
         VersionIncreased?.Invoke();

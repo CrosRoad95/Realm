@@ -297,15 +297,18 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> SetMemberRole(GroupId groupId, int userId, int roleId, CancellationToken cancellationToken = default)
+    public async Task<bool> SetMemberRole(GroupId groupId, int userId, GroupRoleId? roleId, CancellationToken cancellationToken = default)
     {
         bool roleChanged = false;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var roles = await _groupRepository.GetGroupRolesIds(groupId, cancellationToken);
-            if (!roles.Contains(roleId))
-                return false;
+            if(roleId != null)
+            {
+                var roles = await _groupRepository.GetGroupRolesIds(groupId, cancellationToken);
+                if (!roles.Contains(roleId.Value))
+                    return false;
+            }
             
             if (await _groupRepository.SetMemberRole(groupId, userId, roleId, cancellationToken))
             {
@@ -323,7 +326,14 @@ public sealed class GroupsService
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
-                permissions = await _groupRepository.GetRolePermissions(roleId, cancellationToken);
+                if(roleId == null)
+                {
+                    permissions = [];
+                }
+                else
+                {
+                    permissions = await _groupRepository.GetRolePermissions(roleId.Value, cancellationToken);
+                }
             }
             finally
             {
