@@ -1,12 +1,16 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
 {
+    private GroupRoleData? Data { get; init; }
     public required GroupRoleId Id { get; init; }
     public required GroupId GroupId { get; init; }
     public required string Name { get; init; }
     public required int[] Permissions { get; init; }
-    public required GroupMemberDto[] Members { get; init; }
+    public required int MembersCount { get; init; }
+    public GroupMemberDto[] GetMembers() => Data != null ? Data.Members.Select(GroupMemberDto.Map).ToArray() : [];
     public bool Equals(GroupRoleData? x, GroupRoleData? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] GroupRoleData obj) => obj.Id;
@@ -19,10 +23,11 @@ public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
 
         return new()
         {
+            Data = groupRoleData,
             Id = groupRoleData.Id,
             GroupId = groupRoleData.GroupId,
             Name = groupRoleData.Name,
-            Members = groupRoleData.Members.Select(GroupMemberDto.Map).ToArray(),
+            MembersCount = groupRoleData.Members.Count,
             Permissions = groupRoleData.Permissions.Select(x => x.PermissionId).ToArray()
         };
     }
