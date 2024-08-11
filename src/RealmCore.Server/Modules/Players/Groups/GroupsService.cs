@@ -253,17 +253,33 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<int[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
+    public async Task<int[]> GetGroupRolesIds(GroupId groupId, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _groupRepository.GetGroupRoles(groupId, cancellationToken);
+            return await _groupRepository.GetGroupRolesIds(groupId, cancellationToken);
         }
         finally
         {
             _semaphore.Release();
         }
+    }
+    
+    public async Task<GroupRoleDto[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        GroupRoleData[] groupRoles;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groupRoles = await _groupRepository.GetGroupRoles(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return groupRoles.Select(GroupRoleDto.Map).ToArray();
     }
 
     public async Task<int[]> GetRolePermissions(int roleId, CancellationToken cancellationToken = default)
@@ -285,7 +301,7 @@ public sealed class GroupsService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var roles = await _groupRepository.GetGroupRoles(groupId, cancellationToken);
+            var roles = await _groupRepository.GetGroupRolesIds(groupId, cancellationToken);
             if (!roles.Contains(roleId))
                 return false;
             
@@ -457,6 +473,20 @@ public sealed class GroupsService
         try
         {
             return await _groupRepository.CountJoinRequestsByGroupId(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<GroupMemberDto[]> GetGroupMembers(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var members = await _groupRepository.GetGroupMembers(groupId, cancellationToken);
+            return members.Select(GroupMemberDto.Map).ToArray();
         }
         finally
         {

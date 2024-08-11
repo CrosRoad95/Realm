@@ -348,13 +348,26 @@ public sealed class GroupRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<int[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
+    public async Task<int[]> GetGroupRolesIds(GroupId groupId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsRoles
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id)
             .Select(x => x.Id);
+
+        var permissions = await query.ToArrayAsync(cancellationToken);
+
+        return permissions;
+    }
+    
+    public async Task<GroupRoleData[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        var query = _db.GroupsRoles
+            .Include(x => x.Permissions)
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId.id);
 
         var permissions = await query.ToArrayAsync(cancellationToken);
 
@@ -646,7 +659,7 @@ public sealed class GroupRepository
         if (activity != null)
         {
             activity.AddTag("GroupId", groupId);
-            activity.AddTag("UserId", groupId);
+            activity.AddTag("UserId", userId);
         }
 
         var query = _db.GroupsJoinRequests
@@ -654,6 +667,24 @@ public sealed class GroupRepository
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
+    }
+
+    public async Task<GroupMemberData[]> GetGroupMembers(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveJoinRequest));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.GroupMembers
+            .TagWithSource(nameof(GroupRepository))
+            .Include(x => x.Role)
+            .ThenInclude(x => x!.Permissions)
+            .Where(x => x.GroupId == groupId.id);
+
+        return await query.ToArrayAsync(cancellationToken);
     }
     #endregion
     
