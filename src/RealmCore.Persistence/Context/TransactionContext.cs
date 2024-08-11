@@ -4,6 +4,8 @@ public interface ITransactionContext
 {
     Task ExecuteAsync(Func<IDb, Task> operation, CancellationToken cancellationToken = default);
     Task<T> ExecuteAsync<T>(Func<IDb, Task<T>> operation, CancellationToken cancellationToken = default);
+    Task ExecuteAsync(Func<Task> operation, CancellationToken cancellationToken = default);
+    Task<T> ExecuteAsync<T>(Func<Task<T>> operation, CancellationToken cancellationToken = default);
 }
 
 internal sealed class TransactionContext : ITransactionContext
@@ -46,6 +48,47 @@ internal sealed class TransactionContext : ITransactionContext
             try
             {
                 var result = await operation(_db);
+                await transaction.CommitAsync(cancellationToken);
+                return result;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
+
+    public async Task ExecuteAsync(Func<Task> operation, CancellationToken cancellationToken = default)
+    {
+        var executionStrategy = _db.Database.CreateExecutionStrategy();
+
+        await executionStrategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync(_isolationLevel, cancellationToken);
+            try
+            {
+                await operation();
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
+
+    public async Task<T> ExecuteAsync<T>(Func<Task<T>> operation, CancellationToken cancellationToken = default)
+    {
+        var executionStrategy = _db.Database.CreateExecutionStrategy();
+
+        return await executionStrategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync(_isolationLevel, cancellationToken);
+            try
+            {
+                var result = await operation();
                 await transaction.CommitAsync(cancellationToken);
                 return result;
             }

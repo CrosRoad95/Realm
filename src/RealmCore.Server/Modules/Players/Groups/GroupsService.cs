@@ -498,14 +498,17 @@ public sealed class GroupsService
 
     public async Task<bool> RemoveRole(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
     {
-        bool removed;
-        GroupId? groupId;
+        GroupId? groupId = null;
+        bool removed = false;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            groupId = await _groupRepository.GetGroupIdByRoleId(groupRoleId, cancellationToken);
-            await _groupRepository.RemoveAllMembersFromRole(groupRoleId, cancellationToken);
-            removed = await _groupRepository.RemoveRole(groupRoleId, cancellationToken);
+            await _transactionContext.ExecuteAsync(async () =>
+            {
+                groupId = await _groupRepository.GetGroupIdByRoleId(groupRoleId, cancellationToken);
+                await _groupRepository.RemoveAllMembersFromRole(groupRoleId, cancellationToken);
+                removed = await _groupRepository.RemoveRole(groupRoleId, cancellationToken);
+            }, cancellationToken);
         }
         finally
         {
