@@ -1,4 +1,6 @@
-﻿using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
+﻿using RealmCore.Persistence.Repository;
+using SlipeServer.Packets.Enums;
+using static RealmCore.Server.Modules.Players.Groups.GroupsResults;
 
 namespace RealmCore.Server.Modules.Players.Groups;
 
@@ -492,5 +494,31 @@ public sealed class GroupsService
         {
             _semaphore.Release();
         }
+    }
+
+    public async Task<bool> RemoveRole(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    {
+        bool removed;
+        GroupId? groupId;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groupId = await _groupRepository.GetGroupIdByRoleId(groupRoleId, cancellationToken);
+            await _groupRepository.RemoveAllMembersFromRole(groupRoleId, cancellationToken);
+            removed = await _groupRepository.RemoveRole(groupRoleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        if (removed && groupId != null)
+        {
+            foreach (var player in _groupsManager.GetPlayersInGroup(groupId.Value))
+            {
+                player.Groups.RemoveFromRole(groupId.Value, groupRoleId);
+            }
+        }
+        return removed;
     }
 }

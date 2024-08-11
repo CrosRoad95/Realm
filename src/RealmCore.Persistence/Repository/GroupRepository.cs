@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Xml.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {
@@ -264,6 +266,41 @@ public sealed class GroupRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
+    
+    public async Task<GroupData?> GetGroupByGroupId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupByGroupId));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupRoleId", groupRoleId);
+        }
+
+        var query = _db.Groups
+            .TagWithSource(nameof(GroupRepository))
+            .Include(x => x.Members)
+            .Where(x => x.Roles.Any(y => y.Id == groupRoleId.id));
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<GroupId?> GetGroupIdByRoleId(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupIdByRoleId));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupRoleId", groupRoleId);
+        }
+
+        var query = _db.Groups
+            .TagWithSource(nameof(GroupRepository))
+            .Include(x => x.Members)
+            .Where(x => x.Roles.Any(y => y.Id == groupRoleId.id))
+            .Select(x => x.Id);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
 
     public async Task<bool> GroupExistsByName(string name, CancellationToken cancellationToken = default)
     {
@@ -364,6 +401,7 @@ public sealed class GroupRepository
     public async Task<GroupRoleData[]> GetGroupRoles(GroupId groupId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsRoles
+            .Include(x => x.Members)
             .Include(x => x.Permissions)
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
@@ -386,23 +424,10 @@ public sealed class GroupRepository
 
         return permissions;
     }
-
-    public async Task<GroupId?> GetGroupIdByRoleId(GroupRoleId roleId, CancellationToken cancellationToken = default)
-    {
-        var query = _db.GroupsRoles
-            .AsNoTracking()
-            .TagWithSource(nameof(GroupRepository))
-            .Where(x => x.Id == roleId.id)
-            .Select(x => x.GroupId);
-
-        var groupId = await query.FirstOrDefaultAsync(cancellationToken);
-
-        return groupId;
-    }
     #endregion
 
     #region Update
-    public async Task<bool> SetMemberRole(GroupId groupId, int userId, GroupRoleId roleId, CancellationToken cancellationToken = default)
+    public async Task<bool> SetMemberRole(GroupId groupId, int userId, GroupRoleId? roleId = null, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
@@ -421,6 +446,22 @@ public sealed class GroupRepository
         _db.ChangeTracker.Clear();
 
         return true;
+    }
+
+    public async Task<bool> RemoveAllMembersFromRole(GroupRoleId roleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllMembersFromRole));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", roleId);
+        }
+
+        var query = _db.GroupMembers
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.RoleId == roleId.id);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.RoleId, (int?)null), cancellationToken) > 0;
     }
 
     public async Task<bool> SetRoleName(GroupRoleId roleId, string name, CancellationToken cancellationToken = default)

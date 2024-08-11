@@ -14,7 +14,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
 
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Added;
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Removed;
-    public event Action<PlayerGroupsFeature, int, int>? GroupRoleChanged;
+    public event Action<PlayerGroupsFeature, int, int?>? GroupRoleChanged;
     public PlayerGroupsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
@@ -102,6 +102,27 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         VersionIncreased?.Invoke();
         GroupRoleChanged?.Invoke(this, groupId, roleId);
         return true;
+    }
+
+    internal bool RemoveFromRole(int groupId, int? roleId = null)
+    {
+        lock (_lock)
+        {
+            var groupMemberData = _groupMembers.FirstOrDefault(x => x.GroupId == groupId);
+            if (groupMemberData == null)
+                return false;
+
+            if (roleId != null && roleId != groupMemberData.RoleId)
+                return false;
+
+            groupMemberData.RoleId = null;
+            groupMemberData.Role = null;
+        }
+
+        VersionIncreased?.Invoke();
+        GroupRoleChanged?.Invoke(this, groupId, null);
+        return true;
+
     }
 
     public bool IsMember(int groupId)

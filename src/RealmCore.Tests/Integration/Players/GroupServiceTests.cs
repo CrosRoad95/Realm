@@ -169,8 +169,33 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var sent1 = await _groupsService.CreateJoinRequest(group.Id, _player);
         var sent2 = await _groupsService.CreateJoinRequest(group.Id, _player);
 
+        using var _ = new AssertionScope();
         sent1.Should().BeTrue();
         sent2.Should().BeFalse();
+    }
+    
+    [Fact]
+    private async Task RemovingRoleShouldRemovePlayersFromRolesAndRevokePermissions()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var result = await _groupsService.Create(name);
+        var group = ((GroupsResults.Created)result.Value).group;
+
+        var groupRole = await _groupsService.CreateRole(group.Id, "foobar", [1, 2, 3]);
+        await _groupsService.AddMember(_player, group.Id);
+        await _groupsService.SetMemberRole(group.Id, _player.UserId, groupRole.Id);
+        var removed1 = await _groupsService.RemoveRole(groupRole.Id);
+        var removed2 = await _groupsService.RemoveRole(groupRole.Id);
+        var monitorPlayer = _groups.Monitor();
+        var isMember = _groups.TryGetMember(group.Id, out var member);
+
+        using var _ = new AssertionScope();
+        removed1.Should().BeTrue();
+        removed2.Should().BeFalse();
+        isMember.Should().BeTrue();
+        member.RoleId.Should().BeNull();
+        member.Permissions.Should().BeEmpty();
     }
 
     public void Dispose()

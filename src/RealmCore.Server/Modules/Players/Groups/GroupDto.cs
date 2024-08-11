@@ -6,6 +6,7 @@ public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
     public required GroupId GroupId { get; init; }
     public required string Name { get; init; }
     public required int[] Permissions { get; init; }
+    public required GroupMemberDto[] Members { get; init; }
     public bool Equals(GroupRoleData? x, GroupRoleData? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] GroupRoleData obj) => obj.Id;
@@ -21,6 +22,7 @@ public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
             Id = groupRoleData.Id,
             GroupId = groupRoleData.GroupId,
             Name = groupRoleData.Name,
+            Members = groupRoleData.Members.Select(GroupMemberDto.Map).ToArray(),
             Permissions = groupRoleData.Permissions.Select(x => x.PermissionId).ToArray()
         };
     }
@@ -32,7 +34,7 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
     public required GroupId GroupId { get; init; }
     public required int UserId { get; init; }
     public required GroupRoleId? RoleId { get; init; }
-    public required int[]? Permissions { get; init; }
+    public required int[] Permissions { get; init; } = [];
     public required string? Metadata { get; init; }
     public required DateTime? CreatedAt { get; init; }
     public required GroupDto? Group { get; init; }
@@ -52,7 +54,7 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
             GroupId = groupMemberData.GroupId,
             UserId = groupMemberData.UserId,
             RoleId = groupMemberData.RoleId,
-            Permissions = groupMemberData.Role != null ? groupMemberData.Role.Permissions.Select(x => x.PermissionId).ToArray() : null,
+            Permissions = groupMemberData.Role != null ? groupMemberData.Role.Permissions.Select(x => x.PermissionId).ToArray() : [],
             Metadata = groupMemberData.Metadata,
             CreatedAt = groupMemberData.CreatedAt,
             Group = GroupDto.Map(groupMemberData.Group, false)
