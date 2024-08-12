@@ -127,18 +127,18 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<bool> AddMember(RealmPlayer player, GroupId groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AddMember(RealmPlayer player, GroupId groupId, int? roleId = null, string? metadata = null, bool force = false, CancellationToken cancellationToken = default)
     {
-        return await AddMember(player.UserId, groupId, roleId, metadata, cancellationToken);
+        return await AddMember(player.UserId, groupId, roleId, metadata, force, cancellationToken);
     }
-    
-    public async Task<bool> AddMember(int userId, GroupId groupId, int? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+
+    public async Task<bool> AddMember(int userId, GroupId groupId, int? roleId = null, string? metadata = null, bool force = false, CancellationToken cancellationToken = default)
     {
         bool added = false;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            added = await _groupRepository.AddMember(groupId, userId, _dateTimeProvider.Now, roleId, metadata, cancellationToken);
+            added = await _groupRepository.AddMember(groupId, userId, _dateTimeProvider.Now, roleId, metadata, force, cancellationToken);
 
             if (added)
             {
@@ -198,7 +198,7 @@ public sealed class GroupsService
 
     public async Task<bool> RemoveMember(RealmPlayer player, GroupId groupId, CancellationToken cancellationToken = default)
     {
-        return await RemoveMember(groupId, player.UserId, cancellationToken);
+        return await RemoveMember(player.UserId, groupId, cancellationToken);
     }
 
     public async Task<GroupMemberDto[]> GetGroupMembersByUserId(int userId, int[]? kinds = null, CancellationToken cancellationToken = default)

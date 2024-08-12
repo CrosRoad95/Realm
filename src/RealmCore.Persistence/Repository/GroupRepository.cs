@@ -66,7 +66,7 @@ public sealed class GroupRepository
         return group;
     }
 
-    public async Task<bool> AddMember(GroupId groupId, int userId, DateTime createdAt, GroupRoleId? roleId = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AddMember(GroupId groupId, int userId, DateTime createdAt, GroupRoleId? roleId = null, string? metadata = null, bool force = false, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(AddMember));
 
@@ -75,6 +75,13 @@ public sealed class GroupRepository
             activity.AddTag("GroupId", groupId);
             activity.AddTag("UserId", userId);
             activity.AddTag("RoleId", roleId);
+        }
+
+        if (!force)
+        {
+            var isInGroup = await IsUserInGroup(groupId, userId, cancellationToken);
+            if (isInGroup)
+                return false;
         }
 
         var groupMember = new GroupMemberData
@@ -386,7 +393,7 @@ public sealed class GroupRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<int> GetGroupIdByName(string name, CancellationToken cancellationToken = default)
+    public async Task<int?> GetGroupIdByName(string name, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupIdByName));
 
@@ -399,6 +406,23 @@ public sealed class GroupRepository
             .AsNoTracking()
             .Where(x => x.Name == name)
             .Select(x => x.Id);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<byte?> GetGroupKindById(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupIdByName));
+
+        if (activity != null)
+        {
+            activity.AddTag("Name", groupId);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.Id == groupId.id)
+            .Select(x => x.Kind);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -417,6 +441,41 @@ public sealed class GroupRepository
             .AsNoTracking()
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
+
+        return await query.AnyAsync(cancellationToken);
+    }
+    
+    public async Task<bool> IsUserInGroupOfKind(byte groupKind, int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(IsUserInGroupOfKind));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupKind", groupKind);
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsMembers
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.Group!.Kind == groupKind && x.UserId == userId);
+
+        return await query.AnyAsync(cancellationToken);
+    }
+    
+    public async Task<bool> IsInAnyGroup(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(IsInAnyGroup));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsMembers
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.UserId == userId);
 
         return await query.AnyAsync(cancellationToken);
     }

@@ -42,6 +42,24 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     }
 
     [Fact]
+    private async Task MemberCanBeAddedToGivenGroupOnce()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var group = await _groupsService.Create(name);
+
+        var monitorPlayer = _groups.Monitor();
+        var monitorService = _groupsService.Monitor();
+
+        var added1 = await _groupsService.AddMember(_player, group!.Id);
+        var added2 = await _groupsService.AddMember(_player, group!.Id);
+
+        using var _ = new AssertionScope();
+        added1.Should().BeTrue();
+        added2.Should().BeFalse();
+    }
+
+    [Fact]
     private async Task MemberShouldBeAddedAndRemovePlayerFromGroup()
     {
         var name = Guid.NewGuid().ToString();
@@ -51,13 +69,17 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var monitorPlayer = _groups.Monitor();
         var monitorService = _groupsService.Monitor();
         var added = await _groupsService.AddMember(_player, group!.Id);
-        var removed = await _groupsService.AddMember(_player, group.Id);
+        var wasIngroup = _player.Groups.IsMember(group.Id);
+        var removed = await _groupsService.RemoveMember(_player, group.Id);
+        var isInGroup = _player.Groups.IsMember(group.Id);
 
         using var _ = new AssertionScope();
         added.Should().BeTrue();
-        _player.Groups.IsMember(group.Id).Should().BeTrue();
-        monitorPlayer.GetOccurredEvents().Should().BeEquivalentTo(["VersionIncreased", "Added"]);
-        monitorService.GetOccurredEvents().Should().BeEquivalentTo(["MemberAdded"]);
+        removed.Should().BeTrue();
+        wasIngroup.Should().BeTrue();
+        isInGroup.Should().BeFalse();
+        monitorPlayer.GetOccurredEvents().Should().BeEquivalentTo(["VersionIncreased", "Added", "VersionIncreased", "Removed"]);
+        monitorService.GetOccurredEvents().Should().BeEquivalentTo(["MemberAdded", "MemberRemoved"]);
     }
     
     [Fact]

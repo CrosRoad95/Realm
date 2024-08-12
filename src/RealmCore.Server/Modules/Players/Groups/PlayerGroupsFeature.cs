@@ -53,7 +53,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         }
 
         VersionIncreased?.Invoke();
-        Added?.Invoke(this, GroupMemberDto.Map(groupMemberData));
+        Removed?.Invoke(this, GroupMemberDto.Map(groupMemberData));
         return true;
     }
 
