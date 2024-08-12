@@ -447,6 +447,20 @@ public sealed class GroupsService
             _semaphore.Release();
         }
     }
+    
+    public async Task<GroupJoinRequestDto[]> GetJoinRequestsByGroupId(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var requests = await _groupRepository.GetJoinRequestsByGroupId(groupId, cancellationToken);
+            return requests.Select(GroupJoinRequestDto.Map).ToArray();
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 
     public async Task<bool> RemoveJoinRequest(GroupId groupId, RealmPlayer player, CancellationToken cancellationToken = default)
     {
