@@ -104,6 +104,7 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
 public sealed class GroupJoinRequestDto : IEqualityComparer<GroupJoinRequestDto>
 {
     public required GroupId GroupId { get; init; }
+    public required int UserId { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required string Metadata { get; init; }
     public required GroupDto Group { get; init; }
@@ -120,6 +121,7 @@ public sealed class GroupJoinRequestDto : IEqualityComparer<GroupJoinRequestDto>
         return new()
         {
             GroupId = groupJoinRequestData.GroupId,
+            UserId = groupJoinRequestData.UserId,
             CreatedAt = groupJoinRequestData.CreatedAt,
             Metadata = groupJoinRequestData.Metadata,
             Group = GroupDto.Map(groupJoinRequestData.Group)
