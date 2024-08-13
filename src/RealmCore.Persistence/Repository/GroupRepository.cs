@@ -849,6 +849,25 @@ public sealed class GroupRepository
 
         return await query.ToArrayAsync(cancellationToken);
     }
+
+    public async Task<int[]> GetGroupMemberPermissions(GroupId groupId, int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupMemberPermissions));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsMembers
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.GroupId == groupId.id && x.UserId == userId)
+            .SelectMany(x => x.Role!.Permissions.Select(y => y.PermissionId));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
     #endregion
 
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));

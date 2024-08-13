@@ -101,7 +101,7 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     }
     
     [Fact]
-    private async Task SettingAndChangingRoleShouldUpdatePermissions()
+    private async Task ChangingRoleShouldUpdatePermissions()
     {
         var name = Guid.NewGuid().ToString();
 
@@ -133,7 +133,12 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         await _groupsService.SetRolePermissions(otherGroupRole.Id, [200]);
 
         groupMember = _player.Groups.GetById(group.Id);
-        groupMember!.Permissions.Should().BeEquivalentTo([100]);
+        var permissionsFromDatabase = await _groupsService.GetGroupMemberPermissions(group.Id, _player.UserId);
+        {
+            using var _ = new AssertionScope();
+            permissionsFromDatabase.Should().BeEquivalentTo([100]);
+            groupMember!.Permissions.Should().BeEquivalentTo([100]);
+        }
     }
 
     [Fact]

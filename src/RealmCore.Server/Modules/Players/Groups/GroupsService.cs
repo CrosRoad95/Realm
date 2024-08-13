@@ -548,4 +548,18 @@ public sealed class GroupsService
         }
         return removed;
     }
+
+    public async Task<int[]> GetGroupMemberPermissions(GroupId groupId, int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            var permissions = await _groupRepository.GetGroupMemberPermissions(groupId, userId, cancellationToken);
+            return permissions;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 }
