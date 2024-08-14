@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
+public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
     private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
     private readonly RealmTestingPlayer _player;
     private readonly PlayerGroupsFeature _groups;
     private readonly GroupsService _groupsService;
 
-    public GroupServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    public GroupsServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
         _fixture = fixture;
         _player = _fixture.Player;
