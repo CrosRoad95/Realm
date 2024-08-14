@@ -400,6 +400,19 @@ public sealed class GroupsService
             _semaphore.Release();
         }
     }
+    
+    public async Task<string?> GetGroupName(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetGroupName(groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 
     public async Task<IReadOnlyDictionary<int, string>> GetGroupSettings(GroupId groupId, CancellationToken cancellationToken = default)
     {

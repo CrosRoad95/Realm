@@ -690,6 +690,24 @@ public sealed class GroupRepository
         return null;
     }
 
+    public async Task<string?> GetGroupName(GroupId groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupName));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", groupId);
+        }
+
+        var query = _db.Groups
+            .AsNoTracking()
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.Id == groupId.id)
+            .Select(x => x.Name);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyDictionary<int, string>> GetGroupSettings(GroupId groupId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupSettings));

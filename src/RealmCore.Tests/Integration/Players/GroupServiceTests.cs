@@ -21,8 +21,10 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
         var name = Guid.NewGuid().ToString();
 
         var group = await _groupsService.Create(name);
+        var groupName = await _groupsService.GetGroupName(group!.Id);
 
         using var _ = new AssertionScope();
+        groupName.Should().Be(name);
         group!.Name.Should().Be(name);
         _groupsService.GetGroupByName(name).Should().NotBeNull();
         _groupsService.GetGroupById(group.Id).Should().NotBeNull();
