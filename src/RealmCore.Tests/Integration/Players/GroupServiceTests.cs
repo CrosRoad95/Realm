@@ -180,6 +180,37 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
     }
     
     [Fact]
+    private async Task YouShouldBeAbleToSendOnlyOneJoinRequestToGroup()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var group = await _groupsService.Create(name);
+
+        var sent1 = await _groupsService.CreateJoinRequest(group!.Id, _player);
+        var sent2 = await _groupsService.CreateJoinRequest(group!.Id, _player);
+
+        using var _ = new AssertionScope();
+        sent1.Should().BeTrue();
+        sent2.Should().BeFalse();
+    }
+    
+    [Fact]
+    private async Task YouShouldBeAbleToRemoveAllJoinRequests()
+    {
+        var name = Guid.NewGuid().ToString();
+
+        var group = await _groupsService.Create(name);
+
+        var sent = await _groupsService.CreateJoinRequest(group!.Id, _player);
+        await _groupsService.RemoveAllJoinRequestsByUserId(_player.UserId);
+        var requestsSentToGroups = await _groupsService.GetJoinRequestsByUserId(_player);
+
+        using var _ = new AssertionScope();
+        sent.Should().BeTrue();
+        requestsSentToGroups.Should().BeEmpty();
+    }
+    
+    [Fact]
     private async Task YouCanSendOnlyOneJoinRequest()
     {
         var name = Guid.NewGuid().ToString();

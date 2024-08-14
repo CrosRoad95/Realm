@@ -830,6 +830,22 @@ public sealed class GroupRepository
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
+    
+    public async Task<bool> RemoveAllJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllJoinRequestsByUserId));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.GroupsJoinRequests
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.UserId == userId);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
+    }
 
     public async Task<GroupMemberData[]> GetGroupMembers(GroupId groupId, CancellationToken cancellationToken = default)
     {

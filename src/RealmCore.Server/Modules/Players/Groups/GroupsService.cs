@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿using Org.BouncyCastle.Asn1.Cms;
+using RealmCore.Persistence.Repository;
+
+namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class GroupsService
 {
@@ -411,6 +414,18 @@ public sealed class GroupsService
         }
     }
 
+    public async Task<bool> RemoveAllJoinRequestsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.RemoveAllJoinRequestsByUserId(userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
     public async Task<bool> CreateJoinRequest(GroupId groupId, RealmPlayer player, string? metadata = null, CancellationToken cancellationToken = default)
     {
         return await CreateJoinRequest(groupId, player.UserId, metadata, cancellationToken);
