@@ -562,4 +562,17 @@ public sealed class GroupsService
             _semaphore.Release();
         }
     }
+
+    public async Task<string?> GetRoleName(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GetRoleName(groupRoleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 }

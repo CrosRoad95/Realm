@@ -185,7 +185,7 @@ public sealed class GroupRepository
     #region Read
     public async Task<GroupMemberData?> GetGroupMemberByUserIdAndGroupId(GroupId groupId, int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetGroupMembersByUserId));
+        using var activity = Activity.StartActivity(nameof(GetGroupMemberByUserIdAndGroupId));
 
         if (activity != null)
         {
@@ -217,20 +217,20 @@ public sealed class GroupRepository
             activity.AddTag("UserId", userId);
         }
 
-        var query = CreateQueryBase()
+        var query = _db.GroupsMembers
+            .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Include(x => x.Members)
-            .ThenInclude(x => x.Group)
-            .Where(x => x.Members.Any(x => x.UserId == userId));
+            .Include(x => x.Group)
+            .Include(x => x.Role)
+            .ThenInclude(x => x!.Permissions)
+            .Where(x => x.UserId == userId);
 
         if (kinds != null)
         {
-            query = query.Where(x => x.Kind != null && kinds.Contains(x.Kind.Value));
+            query = query.Where(x => x.Group!.Kind != null && kinds.Contains(x.Group.Kind.Value));
         }
 
-        var query2 = query.SelectMany(x => x.Members);
-
-        return await query2.ToArrayAsync(cancellationToken);
+        return await query.ToArrayAsync(cancellationToken);
     }
 
     public async Task<GroupData?> GetGroupById(GroupId groupId, CancellationToken cancellationToken = default)
@@ -867,6 +867,24 @@ public sealed class GroupRepository
             .SelectMany(x => x.Role!.Permissions.Select(y => y.PermissionId));
 
         return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<string?> GetRoleName(GroupRoleId groupRoleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetRoleName));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupRoleId);
+        }
+
+        var query = _db.GroupsRoles
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == groupRoleId.id)
+            .Select(x => x.Name);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
     #endregion
 

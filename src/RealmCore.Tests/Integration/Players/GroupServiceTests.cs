@@ -119,12 +119,14 @@ public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureW
 
         var groupRole = await _groupsService.CreateRole(group.Id, "foobar", [1, 2, 3]);
         var otherGroupRole = await _groupsService.CreateRole(group.Id, "other", [4, 5, 6]);
+        var otherGroupRoleName = await _groupsService.GetRoleName(otherGroupRole.Id);
         await _groupsService.SetMemberRole(group.Id, _player.UserId, groupRole.Id);
 
         groupMember = _player.Groups.GetById(group.Id);
 
         {
             using var _ = new AssertionScope();
+            otherGroupRoleName.Should().Be("other");
             groupMember!.Permissions.Should().BeEquivalentTo([1,2,3]);
             groupMember!.RoleId.Should().Be(groupRole.Id);
         }
