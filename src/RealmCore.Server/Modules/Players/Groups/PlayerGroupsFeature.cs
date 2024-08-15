@@ -23,7 +23,7 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
     public void LogIn(UserData userData)
     {
         lock (_lock)
-            _groupMembers = userData.GroupMembers;
+            _groupMembers = [.. userData.GroupMembers];
     }
 
     internal bool AddGroupMember(GroupMemberData groupMemberData)

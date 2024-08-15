@@ -1,9 +1,11 @@
 ﻿using OneOf.Types;
 using RealmCore.BlazorGui.Concepts;
 using RealmCore.BlazorGui.Modules.World;
+using RealmCore.Persistence.Repository;
 using RealmCore.Server.Modules.Players.Groups;
 using RealmCore.Server.Modules.Players.Sessions;
 using RealmCore.Server.Modules.World.WorldNodes;
+using SlipeServer.Packets.Enums;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
@@ -1262,6 +1264,16 @@ internal sealed class CommandsHostedService : IHostedService
 
     private void AddCommandGroups()
     {
+        _commandService.Add("groupstest", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var group = await _groupsService.Create(Guid.NewGuid().ToString());
+            await _groupsService.AddMember(player.UserId, group!.Id);
+            var role = await _groupsService.CreateRole(group!.Id, "test", []);
+            var changed = await _groupsService.SetMemberRole(group.Id, player.UserId, role.Id);
+            await _groupsService.SetRolePermissions(role.Id, [1, 3, 5]);
+            _chatBox.OutputTo(player, "Created group with role.");
+        });
+        
         _commandService.Add("listmygroups", ([CallingPlayer] RealmPlayer player) =>
         {
             var groups = player.Groups.Select(x => x.GroupId).ToArray();
@@ -1296,6 +1308,12 @@ internal sealed class CommandsHostedService : IHostedService
             }
             _chatBox.OutputTo(player, $"Name: {group.Name}");
             _chatBox.OutputTo(player, $"Roles: {string.Join(", ", group.Roles.Select(x => new { x.Id, x.Name }))}");
+        });
+
+        _commandService.Add("setrole", async ([CallingPlayer] RealmPlayer player, int groupId, int roleId) =>
+        {
+            await _groupsService.SetMemberRole(groupId, player.UserId, roleId);
+            _chatBox.OutputTo(player, $"Role changed");
         });
 
         _commandService.Add("creategrouprole", async ([CallingPlayer] RealmPlayer player, int groupId, string name) =>
