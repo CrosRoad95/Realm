@@ -139,7 +139,8 @@ local function prepareElements(elements, hud)
 				for blipId, imageAsset in pairs(element.blips)do
 					element.blipsIcons[blipId] = prepareAsset(imageAsset)
 				end
-				element.data = radarCreateInstance(0, 0, element.size[1], element.size[2], element.map, element.blipsIcons);
+				local ex, ey = calculateElementPosition(element, hud.position[1], hud.position[2]);
+				element.data = radarCreateInstance(ex, ey, element.size[1], element.size[2], element.map, element.blipsIcons);
 			end
 		end
 	end

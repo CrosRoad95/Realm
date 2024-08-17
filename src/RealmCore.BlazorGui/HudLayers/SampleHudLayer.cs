@@ -20,7 +20,7 @@ public class SampleHudLayer : HudLayer<SampleHudState>
 
     protected override void Build(IHudBuilder builder, IHudBuilderContext context)
     {
-        builder.Add(new RadarHudElement(new Vector2(0, 0), new Size(400, 400), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/map.jpg")), new Dictionary<int, IImageAsset>
+        builder.Add(new RadarHudElement(new Vector2(100, 100), new Size(400, 400), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/map.jpg")), new Dictionary<int, IImageAsset>
         {
             [0] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg"),
             [43] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg")
