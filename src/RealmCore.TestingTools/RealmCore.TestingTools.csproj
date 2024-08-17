@@ -13,7 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20240816-144453" />
+		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20240815-104807" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 	</ItemGroup>
 

@@ -94,11 +94,11 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer 
     protected int _playerCounter = 0;
     public RealmTestingServer(IServiceProvider serviceProvider, Action<ServerBuilder>? serverBuilder = null) : base(serviceProvider, serverBuilder)
     {
-        this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
+        this.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<ulong>()))
             .Returns(new Tuple<string, string, string>("7815696ECBF1C96E6894B779456D330E", "", ""));
     }
 
-    protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
+    protected override IClient CreateClient(ulong binaryAddress, INetWrapper netWrapper)
     {
         var player = Instantiate<TPlayer>();
         player.Name = $"TestPlayer{++_playerCounter}"; // TODO:
