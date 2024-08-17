@@ -9,6 +9,7 @@ local fps = 0;
 local counter = 0;
 local startTick;
 local currentTick;
+local blipsList = {}
 
 local function isHudVisible(hudId)
 	return visibleHuds[hudId] and true or false
@@ -305,6 +306,26 @@ addEventHandler("onClientPreRender", root, function()
         end 
 end);
 
+function handleAddBlip(id, icon, x, y, z, color, visibleDistance, size, interior, dimension)
+	blipsList[id] = {
+		icon = icon,
+		position = {x,y,z},
+		color = color,
+		visibleDistance = visibleDistance,
+		size = size,
+		interior = interior,
+		dimension = dimension
+	}
+end
+
+function handleRemoveBlip(id)
+	blipsList[id] = nil;
+end
+
+function handleRemoveAllBlips()
+	blipsList = {}
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification)
 	hubBind("SetHudVisible", handleSetHudVisible)
@@ -317,6 +338,9 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("RemoveHud3d", handleRemoveHud3d)
 	hubBind("AddDisplay3dRing", handleAddDisplay3dRing)
 	hubBind("RemoveDisplay3dRing", handleRemoveDisplay3dRing)
+	hubBind("AddBlip", handleAddBlip)
+	hubBind("RemoveBlip", handleRemoveBlip)
+	hubBind("RemoveAllBlips", handleRemoveAllBlips)
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)
@@ -384,10 +408,29 @@ function radarRenderBlips(data, px, py, pz, blipsIcons)
     for k,blip in pairs(getElementsByType("blip")) do
         radarRenderBlip(data, blip, px,py,pz, blipsIcons);
     end
+
+	for id,blip in pairs(blipsList)do
+		radarRenderBlipCore(data, blipsIcons, px, py, pz, blip.position[1], blip.position[2], blip.position[3], blip.icon, blip.color, blip.size, blip.visibleDistance)
+	end
+end
+
+function radarRenderBlipCore(data, blipsIcons, px, py, pz, bx, by, bz, icon, iconColor, blipsScale, visibleDistance)
+    local dist = getDistanceBetweenPoints2D(px, py, bx, by) / 2 * data.zoom
+    local rot = math.atan2(bx - px, by - py) + math.rad(data.cameraRotation)
+	local blipsScale = data.blipsScale * blipsScale;
+
+	local x, y = radarGetPositionFromWorld(data, bx, by, rot, dist, blipsScale)
+	local blipIcon = blipsIcons[icon];
+    if blipIcon and blipIcon.isLoaded then
+		if(visibleDistance >= dist)then
+	        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, 0, 0, 0, iconColor)
+		end
+    else
+		dxDrawRectangle(x, y - blipsScale, blipsScale, blipsScale, iconColor);
+	end
 end
 
 function radarRenderBlip(data, blip, px, py, pz, blipsIcons)
-    local attach = getElementAttachedTo(blip)
     local bx, by, bz = getElementPosition(blip)
     local dist = getDistanceBetweenPoints2D(px, py, bx, by) / 2 * data.zoom
     local rot = math.atan2(bx - px, by - py) + math.rad(data.cameraRotation)

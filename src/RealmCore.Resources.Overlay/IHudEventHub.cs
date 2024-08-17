@@ -13,4 +13,7 @@ internal interface IHudEventHub
     void RemoveHud3d(string hudId);
     void AddDisplay3dRing(string id, float px, float py, float pz, double time);
     void RemoveDisplay3dRing(string id);
+    void AddBlip(string id, int icon, float x, float y, float z, double color, float visibleDistance, float size, int interior, int dimension);
+    void RemoveBlip(string id);
+    void RemoveAllBlips();
 }

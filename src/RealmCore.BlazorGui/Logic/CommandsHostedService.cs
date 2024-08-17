@@ -554,29 +554,6 @@ internal sealed class CommandsHostedService : IHostedService
                 _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
         });
 
-        _commandService.Add("createhud", async ([CallingPlayer] RealmPlayer player) =>
-        {
-            var hud = player.Hud.AddLayer<SampleHudLayer>();
-            if (hud == null)
-                return;
-
-            await Task.Delay(1000);
-            hud.Offset = new Vector2(0, 100);
-        });
-
-        _commandService.Add("updatehud", ([CallingPlayer] RealmPlayer player) =>
-        {
-            if (player.Hud.TryGetLayer(out SampleHudLayer layer))
-            {
-                layer.Update();
-            }
-        });
-
-        _commandService.Add("destroyhud", ([CallingPlayer] RealmPlayer player) =>
-        {
-            player.Hud.RemoveLayer<SampleHudLayer>();
-        });
-
         _commandService.Add("createtestpickups", ([CallingPlayer] RealmPlayer player) =>
         {
             var pickup1 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f)), 1274);
@@ -1101,6 +1078,7 @@ internal sealed class CommandsHostedService : IHostedService
         AddNodesCommands();
         AddInventoryCommands();
         AddCommandGroups();
+        AddHudCommands();
     }
 
     internal sealed class TestSession : Session
@@ -1329,6 +1307,50 @@ internal sealed class CommandsHostedService : IHostedService
             var permissions = arguments.Split(' ').Select(int.Parse).ToArray();
             var role = await _groupsService.SetRolePermissions(roleId, permissions);
             _chatBox.OutputTo(player, "Role permissions changed");
+        });
+    }
+
+    private void AddHudCommands()
+    {
+        _commandService.Add("createclientblip", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Hud.CreateBlip(0, Vector3.Zero, Color.Red, 100, 1, 0, 0);
+            player.Hud.CreateBlip(0, new Vector3(100, 100, 0), Color.Red, 100, 2, 0, 0);
+        });
+        
+        _commandService.Add("createtempclientblip", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var blip = player.Hud.CreateBlip(0, Vector3.Zero, Color.Red, 100, 16, 0, 0);
+            await Task.Delay(2500);
+            player.Hud.RemoveBlip(blip);
+        });
+        
+        _commandService.Add("removeclientblip", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Hud.RemoveAllBlips();
+        });
+        
+        _commandService.Add("createhud", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var hud = player.Hud.AddLayer<SampleHudLayer>();
+            if (hud == null)
+                return;
+
+            await Task.Delay(1000);
+            hud.Offset = new Vector2(0, 100);
+        });
+
+        _commandService.Add("updatehud", ([CallingPlayer] RealmPlayer player) =>
+        {
+            if (player.Hud.TryGetLayer(out SampleHudLayer layer))
+            {
+                layer.Update();
+            }
+        });
+
+        _commandService.Add("destroyhud", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Hud.RemoveLayer<SampleHudLayer>();
         });
     }
 }

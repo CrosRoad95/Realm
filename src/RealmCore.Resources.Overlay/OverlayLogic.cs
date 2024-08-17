@@ -34,6 +34,9 @@ internal class OverlayLogic
         _overlayService.Hud3dStateChanged = HandleHud3dStateChanged;
         _overlayService.Display3dRingAdded = HandleDisplay3dRingAdded;
         _overlayService.Display3dRingRemoved = HandleDisplay3dRingRemoved;
+        _overlayService.BlipAdded = HandleAddBlip;
+        _overlayService.BlipRemoved = HandleRemoveBlip;
+        _overlayService.AllBlipsRemoved = HandleRemoveAllBlips;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -104,5 +107,20 @@ internal class OverlayLogic
     private void HandleDisplay3dRingRemoved(Player player, string id)
     {
         _luaEventHub.Broadcast(x => x.RemoveDisplay3dRing(id));
+    }
+
+    private void HandleAddBlip(Player player, string id, int icon, float px, float y, float z, double color, float visibleDistance, float size, int interior, int dimension)
+    {
+        _luaEventHub.Broadcast(x => x.AddBlip(id, icon, px, y, z, color, visibleDistance, size, interior, dimension));
+    }
+
+    private void HandleRemoveBlip(Player player, string id)
+    {
+        _luaEventHub.Broadcast(x => x.RemoveBlip(id));
+    }
+
+    private void HandleRemoveAllBlips(Player player)
+    {
+        _luaEventHub.Broadcast(x => x.RemoveAllBlips());
     }
 }

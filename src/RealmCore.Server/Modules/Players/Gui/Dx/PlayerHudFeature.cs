@@ -5,6 +5,7 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
     private readonly object _lock = new();
 
     private readonly List<IHudLayer> _hudLayers = [];
+    private readonly IOverlayService _overlayService;
 
     public event Action<PlayerHudFeature, IHudLayer>? LayerAdded;
     public event Action<PlayerHudFeature, IHudLayer>? LayerRemoved;
@@ -22,9 +23,10 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerHudFeature(PlayerContext playerContext)
+    public PlayerHudFeature(PlayerContext playerContext, IOverlayService overlayService)
     {
         Player = playerContext.Player;
+        _overlayService = overlayService;
     }
 
     public bool AddLayer(IHudLayer hudLayer)
@@ -123,6 +125,24 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
         return false;
     }
 
+    public ClientBlip CreateBlip(int icon, Vector3 position, Color color, float visibleDistance, float size, int interior, int dimension)
+    {
+        var id = Guid.NewGuid().ToString();
+
+        _overlayService.AddBlip(Player, id, icon, position, color, visibleDistance, size, interior, dimension);
+        return new(id);
+    }
+
+    public void RemoveBlip(ClientBlip clientBlip)
+    {
+        _overlayService.RemoveBlip(Player, clientBlip.id);
+    }
+
+    public void RemoveAllBlips()
+    {
+        _overlayService.RemoveAllBlips(Player);
+    }
+
     public void Dispose()
     {
         lock (_lock)
@@ -153,3 +173,5 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 }
+
+public readonly record struct ClientBlip(string id);

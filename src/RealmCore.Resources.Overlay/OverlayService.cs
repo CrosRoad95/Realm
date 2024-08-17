@@ -15,6 +15,9 @@ public interface IOverlayService
     internal Action<string, Dictionary<int, object?>>? Hud3dStateChanged { get; set; }
     internal Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
     internal Action<Player, string>? Display3dRingRemoved { get; set; }
+    internal Action<Player, string, int, float, float, float, double, float, float, int, int>? BlipAdded { get; set; }
+    internal Action<Player, string>? BlipRemoved { get; set; }
+    internal Action<Player>? AllBlipsRemoved { get; set; }
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
@@ -27,6 +30,9 @@ public interface IOverlayService
     void SetHudPosition(Player player, string hudId, Vector2 position);
     void SetHudState(Player player, string hudId, Dictionary<int, object?> state);
     void SetHudVisible(Player player, string hudId, bool visible);
+    void AddBlip(Player player, string id, int icon, Vector3 position, Color color, float visibleDistance, float size, int interior, int dimension);
+    void RemoveBlip(Player player, string id);
+    void RemoveAllBlips(Player player);
 }
 
 internal sealed class OverlayService : IOverlayService
@@ -52,6 +58,10 @@ internal sealed class OverlayService : IOverlayService
     public Action<string, Dictionary<int, object?>>? Hud3dStateChanged { get; set; }
     public Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
     public Action<Player, string>? Display3dRingRemoved { get; set; }
+    public Action<Player, string, int, float, float, float, double, float, float, int, int>? BlipAdded { get; set; }
+    public Action<Player, string>? BlipRemoved { get; set; }
+    public Action<Player>? AllBlipsRemoved { get; set; }
+
     private readonly IAssetsService _assetsService;
 
     public OverlayService(IAssetsService assetsService)
@@ -120,5 +130,20 @@ internal sealed class OverlayService : IOverlayService
     public void RemoveRing3dDisplay(Player player, string id)
     {
         Display3dRingRemoved?.Invoke(player, id);
+    }
+
+    public void AddBlip(Player player, string id, int icon, Vector3 position, Color color, float visibleDistance, float size, int interior, int dimension)
+    {
+        BlipAdded?.Invoke(player, id, icon, position.X, position.Y, position.Z, color.ToLuaColor(), visibleDistance, size, interior, dimension);
+    }
+
+    public void RemoveBlip(Player player, string id)
+    {
+        BlipRemoved?.Invoke(player, id);
+    }
+
+    public void RemoveAllBlips(Player player)
+    {
+        AllBlipsRemoved?.Invoke(player);
     }
 }
