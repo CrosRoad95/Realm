@@ -55,16 +55,21 @@ local function calculateBoundingBox(position, elements)
 	return maxX + x, maxY + y
 end
 
+local function calculateElementPosition(element, offsetX, offsetY)
+	local ex, ey = element.position[1], element.position[2];
+	if(element.positioningMode == "Relative")then
+		ex = ex + offsetX;
+		ey = ey + offsetY;
+	end
+	return ex, ey;
+end
+
 local function renderHud(position, elements)
 	local x,y = unpack(position);
 	local ex, ey, position;
 	local content;
 	for i,element in ipairs(elements)do
-		ex, ey = element.position[1], element.position[2];
-		if(element.positioningMode == "Relative")then
-			ex = ex + x;
-			ey = ey + y;
-		end
+		ex, ey = calculateElementPosition(element, x, y);
 		if(element.type == "text")then
 			content = element.content;
 			local text = nil;
@@ -88,46 +93,55 @@ local function renderHud(position, elements)
 		elseif(element.type == "rectangle")then
 			dxDrawRectangle(ex, ey, element.size[1], element.size[2], element.color)
 		elseif(element.type == "radar")then
-			if(element.data == nil)then
-			end
-			if(element.map == nil)then
-				element.map = prepareAsset(element.image)
-			end
-			if(element.map ~= nil and element.data == nil)then
-				element.data = radarCreateInstance(ex, ey, element.size[1], element.size[2], element.map)
-			end
-			
-			if(element.data ~= nil)then
-				radarRender(element.data);
-			end
-
-			--dxDrawImage(ex, ey, v[5], v[6], v.data.rt, 0, 0, 0)
+			radarRender(element);
 		end
 	end
 end
 
 function prepareAsset(assetInfo)
-	iprint("prepare asset", assetInfo)
 	local assetType = assetInfo[1];
 	if(assetType == "FileSystemFont")then
-		iprint("fuile system font", assetInfo)
 		if(not assets[assetInfo[2]])then
 			return requestAsset(assetInfo[2])
 		end
 	elseif(assetType == "MtaFont")then
 		return assetInfo[2]
 	elseif(assetType == "RemoteImage")then
-		return requestAsset(assetInfo[2])
+		local data = requestAsset(assetInfo[2]);
+		local lazy = {
+			isLoaded = data ~= nil,
+			data = data
+		}
+		if(not lazy.isLoaded)then
+			setTimer(function()
+				local data = requestAsset(assetInfo[2]);
+				if(data)then
+					lazy.isLoaded = true;
+					lazy.data = data;
+					killTimer(sourceTimer);
+				end
+			end, 250, 10);
+		end
+		return lazy;
 	end
 	return assetInfo;
 end
 
-local function prepareElements(elements)
-	for i,v in ipairs(elements)do
-		if(v.type == "text" or v.type == "computedValue")then
-			v.font = prepareAsset(v.font);
-		elseif(v.type == "radar")then
-			v.map = prepareAsset(v.image);
+local function prepareElements(elements, hud)
+	for i,element in ipairs(elements)do
+		if(element.type == "text" or element.type == "computedValue")then
+			element.font = prepareAsset(element.font);
+		elseif(element.type == "radar")then
+			element.map = prepareAsset(element.image);
+			if(not element.blipsIcons)then
+				element.blipsIcons = {}
+			end
+			for blipId, imageAsset in pairs(element.blips)do
+				element.blipsIcons[blipId] = prepareAsset(imageAsset)
+			end
+			if(element.map ~= nil and element.blipsIcons ~= nil and element.data == nil)then
+				element.data = radarCreateInstance(0, 0, element.size[1], element.size[2], element.map, element.blipsIcons);
+			end
 		end
 	end
 end
@@ -235,11 +249,13 @@ local function handleCreateHud(hudId, x, y, elements)
 		return;
 	end
 
-	huds[hudId] = {
+	local hud = {
 		position = {x,y},
 		elements = elements,
 	};
-	prepareElements(elements);
+
+	huds[hudId] = hud;
+	prepareElements(elements, hud);
 end
 
 local function handleCreateHud3d(hudId, x, y, z, elements)
@@ -313,7 +329,7 @@ createBlip(-2398.69385, -580.74835, 132.74271, 43)
 createBlip(-2667.43286, -243.74574, 6.23506, 43)
 createBlip(0, 0, 0, 43)
 
-function radarCreateInstance(px, py, psx, psy, mapTexture, blipsTextures)
+function radarCreateInstance(px, py, psx, psy, mapTexture, blipsIcons)
 	local data = {
 		radarPosition = {px, py},
 		radarSize = {psx, psy},
@@ -321,7 +337,7 @@ function radarCreateInstance(px, py, psx, psy, mapTexture, blipsTextures)
 		blipsScale = 32,
 		rotationEnabled = true,
 		mapTexture = mapTexture,
-		blipsTextures = blipsTextures,
+		blipsIcons = blipsIcons,
 		radarShader = dxCreateShader(embeddedAssets.radar),
 		cameraRotation = 0,
 		zoom = 1,
@@ -332,10 +348,15 @@ function radarCreateInstance(px, py, psx, psy, mapTexture, blipsTextures)
 	return data;
 end
 
-function radarRender(data)
+function radarRender(element)
+	local data = element.data;
+	if(not data.mapTexture.isLoaded)then
+		return;
+	end
+
 	if(data.needsRefresh)then
 		dxSetRenderTarget(data.renderTarget, true);
-		dxDrawImage(0, 0, data.size[1], data.size[2], data.mapTexture);
+		dxDrawImage(0, 0, data.size[1], data.size[2], data.mapTexture.data);
 		dxSetRenderTarget();
 		data.needsRefresh = false;
 	end
@@ -356,16 +377,16 @@ function radarRender(data)
     end
 
     dxDrawImage(data.radarPosition[1], data.radarPosition[2], data.radarSize[1], data.radarSize[2], data.radarShader)
-    radarRenderBlips(data, px, py, pz, data.blipsTextures);
+    radarRenderBlips(data, px, py, pz, data.blipsIcons);
 end
 
-function radarRenderBlips(data, px, py, pz, blipsTextures)
+function radarRenderBlips(data, px, py, pz, blipsIcons)
     for k,blip in pairs(getElementsByType("blip")) do
-        radarRenderBlip(data, blip, px,py,pz, blipsTextures);
+        radarRenderBlip(data, blip, px,py,pz, blipsIcons);
     end
 end
 
-function radarRenderBlip(data, blip, px, py, pz, blips)
+function radarRenderBlip(data, blip, px, py, pz, blipsIcons)
     local attach = getElementAttachedTo(blip)
     local bx, by, bz = getElementPosition(blip)
     local dist = getDistanceBetweenPoints2D(px, py, bx, by) / 2 * data.zoom
@@ -374,8 +395,9 @@ function radarRenderBlip(data, blip, px, py, pz, blips)
 	local blipsScale = data.blipsScale;
 
 	local x, y = radarGetPositionFromWorld(data, bx, by, rot, dist, blipsScale)
-    if fileExists("blips/"..icon..".png") and getBlipVisibleDistance(blip) >= dist then
-        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, "blips/"..icon..".png", 0, 0, 0, tocolor(255, 255, 255, 200))
+	local blipIcon = blipsIcons[icon];
+    if blipIcon and blipIcon.isLoaded and getBlipVisibleDistance(blip) >= dist then
+        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, 0, 0, 0, tocolor(255, 255, 255, 200))
     else
 		dxDrawRectangle(x, y - blipsScale, blipsScale, blipsScale, tocolor(128,0,128));
 	end

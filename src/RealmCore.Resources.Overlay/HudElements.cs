@@ -143,13 +143,16 @@ public readonly struct RadarHudElement : IHudElement
     private readonly Size _size;
     private readonly PositioningMode _positioningMode;
     private readonly IImageHudElementContent _content;
+    private readonly Dictionary<int, IImageAsset> _blips;
+
     public IHudElementContent? Content => _content;
 
-    public RadarHudElement(Vector2 position, Size size, IImageHudElementContent content, PositioningMode positioningMode = PositioningMode.Relative)
+    public RadarHudElement(Vector2 position, Size size, IImageHudElementContent content, Dictionary<int, IImageAsset> blips, PositioningMode positioningMode = PositioningMode.Relative)
     {
         _position = position;
         _size = size;
         _content = content;
+        _blips = blips;
         _positioningMode = positioningMode;
     }
 
@@ -165,6 +168,7 @@ public readonly struct RadarHudElement : IHudElement
             ["positioningMode"] = _positioningMode.ToString(),
             ["size"] = _size.ToLuaArray(),
             ["image"] = image,
+            ["blips"] = _blips.ToDictionary(x => (LuaValue)x.Key, x => assetsService.Map(x.Value)),
         };
     }
 }

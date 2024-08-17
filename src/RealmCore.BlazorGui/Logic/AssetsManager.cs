@@ -19,6 +19,7 @@ internal sealed class AssetsManager : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        await _assetsCollection.AddRemoteImage(_browserService.HttpClient, "assets/blip43.jpg");
         await _assetsCollection.AddRemoteImage(_browserService.HttpClient, "assets/map.jpg");
     }
 }
