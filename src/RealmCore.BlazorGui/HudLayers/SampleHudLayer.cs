@@ -22,6 +22,7 @@ public class SampleHudLayer : HudLayer<SampleHudState>
     {
         builder.Add(new RadarHudElement(new Vector2(0, 0), new Size(400, 400), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/map.jpg")), new Dictionary<int, IImageAsset>
         {
+            [0] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg"),
             [43] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg")
         }, PositioningMode.Absolute));
         builder.Add(new TextHudElement(new CurrentFPSTextHudElementContent(), new Vector2(0, context.Bottom - 20), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center, positioningMode: PositioningMode.Absolute));

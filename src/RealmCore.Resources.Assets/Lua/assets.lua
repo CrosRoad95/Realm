@@ -31,7 +31,7 @@ function loadAsset(name, assetInfo)
 	elseif(assetType == "RemoteImage")then
 		if(not downloadingOrDownloadedRemoteAssets[name])then
 			fetchRemote(assetInfo[3], function(response)
-				loadedAssets[name] = dxCreateTexture(response);
+				loadedAssets[name] = dxCreateTexture(response, "argb", false);
 			end)
 			downloadingOrDownloadedRemoteAssets[name] = true
 		end

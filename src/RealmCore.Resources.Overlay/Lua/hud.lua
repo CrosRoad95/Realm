@@ -112,7 +112,8 @@ function prepareAsset(assetInfo)
 			isLoaded = data ~= nil,
 			data = data
 		}
-		if(not lazy.isLoaded)then
+		if(not lazy.isLoaded and not lazy.requesting)then
+			lazy.requesting = true
 			setTimer(function()
 				local data = requestAsset(assetInfo[2]);
 				if(data)then
@@ -132,14 +133,12 @@ local function prepareElements(elements, hud)
 		if(element.type == "text" or element.type == "computedValue")then
 			element.font = prepareAsset(element.font);
 		elseif(element.type == "radar")then
-			element.map = prepareAsset(element.image);
-			if(not element.blipsIcons)then
+			if(element.data == nil)then
+				element.map = prepareAsset(element.image);
 				element.blipsIcons = {}
-			end
-			for blipId, imageAsset in pairs(element.blips)do
-				element.blipsIcons[blipId] = prepareAsset(imageAsset)
-			end
-			if(element.map ~= nil and element.blipsIcons ~= nil and element.data == nil)then
+				for blipId, imageAsset in pairs(element.blips)do
+					element.blipsIcons[blipId] = prepareAsset(imageAsset)
+				end
 				element.data = radarCreateInstance(0, 0, element.size[1], element.size[2], element.map, element.blipsIcons);
 			end
 		end
@@ -325,22 +324,22 @@ end)
 -- Radar
 --------
 
-createBlip(-2398.69385, -580.74835, 132.74271, 43)
-createBlip(-2667.43286, -243.74574, 6.23506, 43)
-createBlip(0, 0, 0, 43)
+--createBlip(-2398.69385, -580.74835, 132.74271, 43)
+--createBlip(-2667.43286, -243.74574, 6.23506, 43)
+--createBlip(0, 0, 0, 43)
 
 function radarCreateInstance(px, py, psx, psy, mapTexture, blipsIcons)
 	local data = {
 		radarPosition = {px, py},
 		radarSize = {psx, psy},
 		size = {3072, 3072},
-		blipsScale = 32,
+		blipsScale = 20,
 		rotationEnabled = true,
 		mapTexture = mapTexture,
 		blipsIcons = blipsIcons,
 		radarShader = dxCreateShader(embeddedAssets.radar),
 		cameraRotation = 0,
-		zoom = 1,
+		zoom = 1.5,
 		needsRefresh = true
 	}
 	data.renderTarget = dxCreateRenderTarget(data.size[1], data.size[2], true);
@@ -392,14 +391,15 @@ function radarRenderBlip(data, blip, px, py, pz, blipsIcons)
     local dist = getDistanceBetweenPoints2D(px, py, bx, by) / 2 * data.zoom
     local rot = math.atan2(bx - px, by - py) + math.rad(data.cameraRotation)
     local icon = getBlipIcon(blip);
+	local iconColor = tocolor(getBlipColor(blip))
 	local blipsScale = data.blipsScale;
 
 	local x, y = radarGetPositionFromWorld(data, bx, by, rot, dist, blipsScale)
 	local blipIcon = blipsIcons[icon];
     if blipIcon and blipIcon.isLoaded and getBlipVisibleDistance(blip) >= dist then
-        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, 0, 0, 0, tocolor(255, 255, 255, 200))
+        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, 0, 0, 0, iconColor)
     else
-		dxDrawRectangle(x, y - blipsScale, blipsScale, blipsScale, tocolor(128,0,128));
+		dxDrawRectangle(x, y - blipsScale, blipsScale, blipsScale, iconColor);
 	end
 end
 
