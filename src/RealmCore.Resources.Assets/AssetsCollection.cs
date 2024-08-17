@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.Assets.Classes;
-using RenderWareBuilders;
+﻿using RenderWareBuilders;
 
 namespace RealmCore.Resources.Assets;
 
@@ -209,7 +208,20 @@ public class AssetsCollection
         {
             var fullPath = Path.Combine(_basePath, path);
             CreateDirectoryForFile(fullPath);
-            _assets.Add(name, new FileSystemFont(name, path));
+            _assets.Add(name, new FontAsset(name, path));
+        }
+    }
+
+    public async Task AddRemoteImage(HttpClient httpClient, string path)
+    {
+        // Check if file exists
+        var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, path));
+        response.EnsureSuccessStatusCode();
+
+        var fullPath = Path.Join(httpClient.BaseAddress!.ToString(), path);
+        lock (_lock)
+        {
+            _assets.Add(path, new RemoteImageAsset(path, fullPath, Path.GetFileNameWithoutExtension(path), ""));
         }
     }
 

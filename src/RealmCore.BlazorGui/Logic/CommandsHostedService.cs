@@ -1,11 +1,8 @@
-﻿using OneOf.Types;
-using RealmCore.BlazorGui.Concepts;
+﻿using RealmCore.BlazorGui.Concepts;
 using RealmCore.BlazorGui.Modules.World;
-using RealmCore.Persistence.Repository;
 using RealmCore.Server.Modules.Players.Groups;
 using RealmCore.Server.Modules.Players.Sessions;
 using RealmCore.Server.Modules.World.WorldNodes;
-using SlipeServer.Packets.Enums;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
@@ -62,6 +59,11 @@ internal sealed class CommandsHostedService : IHostedService
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
+        _commandService.Add("now", () =>
+        {
+            _chatBox.Output(_dateTimeProvider.Now.ToString());
+        });
+        
         _commandService.Add("testpolicy", () =>
         {
             _chatBox.Output("Ok");

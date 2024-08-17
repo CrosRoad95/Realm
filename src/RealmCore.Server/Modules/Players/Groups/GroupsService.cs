@@ -1,7 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.Cms;
-using RealmCore.Persistence.Repository;
-
-namespace RealmCore.Server.Modules.Players.Groups;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class GroupsService
 {

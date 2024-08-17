@@ -10,6 +10,7 @@ public interface IBrowserService
     event Action<Player>? BrowserLoaded;
 
     Action<IMessage>? MessageHandler { get; set; }
+    HttpClient HttpClient { get; }
 
     internal void RelayBrowserReady(Player player);
 
@@ -30,6 +31,9 @@ internal sealed class BrowserService : IBrowserService
 
     private readonly Uri _baseUrl;
     private readonly IOptions<BrowserOptions> _browserOptions;
+    private readonly HttpClient _httpClient;
+
+    public HttpClient HttpClient => _httpClient;
 
     public BrowserService(IOptions<BrowserOptions> browserOptions, ILogger<BrowserService> logger)
     {
@@ -39,10 +43,17 @@ internal sealed class BrowserService : IBrowserService
             try
             {
                 _baseUrl = new Uri(browserOptions.Value.BaseRemoteUrl);
+                _httpClient = new HttpClient()
+                {
+                    BaseAddress = _baseUrl,
+                };
             }
             catch (UriFormatException ex)
             {
                 logger.LogError(ex, "Invalid URI format: {baseRemoteUrl}", browserOptions.Value.BaseRemoteUrl);
+                // TODO:
+                _baseUrl = null;
+                _httpClient = null;
                 throw;
             }
         }

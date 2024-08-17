@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Modules.Players.Groups;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class GroupRoleDto : IEqualityComparer<GroupRoleData>
 {

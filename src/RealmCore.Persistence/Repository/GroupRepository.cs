@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {

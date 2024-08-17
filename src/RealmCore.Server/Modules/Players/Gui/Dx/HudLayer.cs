@@ -104,6 +104,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
     {
         return StatePropertyTextHudElementContent.Create(expression);
     }
+
     public virtual void Dispose() { }
 }
 

@@ -2,6 +2,7 @@
 local loadedAssets = {}
 local modelsToReplace = {}
 local replacedModels = {}
+local downloadingOrDownloadedRemoteAssets = {}
 
 function requestAsset(name)
 	local assetInfo = assetsList[name];
@@ -23,10 +24,17 @@ end
 function loadAsset(name, assetInfo)
 	local assetType = assetInfo[1]
 	if(assetType == "MtaFont")then
-		loadedAssets[name] = dassetInfo[3];
+		loadedAssets[name] = assetInfo[3];
 	elseif(assetType == "FileSystemFont")then
 		checkIfAssetExists(assetInfo[3])
 		loadedAssets[name] = dxCreateFont(assetInfo[3], 12)
+	elseif(assetType == "RemoteImage")then
+		if(not downloadingOrDownloadedRemoteAssets[name])then
+			fetchRemote(assetInfo[3], function(response)
+				loadedAssets[name] = dxCreateTexture(response);
+			end)
+			downloadingOrDownloadedRemoteAssets[name] = true
+		end
 	end
 
 	return loadedAssets[name]
@@ -104,10 +112,6 @@ function tryReplaceModel(modelId)
 end
 
 function tryReplaceModels()
-	--for i,v in ipairs(getElementsByType("object", root, true))do
-	--	tryReplaceModel(getElementModel(v));
-	--end
-
 	for model,v in pairs(modelsToReplace)do
 		tryReplaceModel(model)
 	end
@@ -117,8 +121,4 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	for i,v in ipairs(getElementsByType("object", root, true))do
 		tryReplaceModel(getElementModel(v));
 	end
-	
-	--addEventHandler( "onClientElementStreamIn", root, function()
-	--	tryReplaceModel(getElementModel(source))
-	--end)
 end)

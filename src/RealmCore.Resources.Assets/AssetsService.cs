@@ -1,11 +1,16 @@
-﻿using RealmCore.Resources.Assets.Classes;
-using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Elements;
-using SlipeServer.Server.Enums;
-
-namespace RealmCore.Resources.Assets;
+﻿namespace RealmCore.Resources.Assets;
 
 public record struct ReplacedModel(ushort model, string modelAsset, string? collisionAsset, string textureAsset);
+
+internal static class AssetType
+{
+    public const string FileSystemFont = "FileSystemFont";
+    public const string MtaFont = "MtaFont";
+    public const string DFF = "DFF";
+    public const string COL = "COL";
+    public const string TXD = "TXD";
+    public const string RemoteImage = "RemoteImage";
+}
 
 public interface IAssetsService
 {
@@ -41,11 +46,12 @@ internal sealed class AssetsService : IAssetsService
     {
         return asset switch
         {
-            FileSystemFont font => new LuaValue(new LuaValue[] { "FileSystemFont", font.Name, font.Path }),
-            BuildInFont font => new LuaValue(new LuaValue[] { "MtaFont", font.Name }),
-            AssetDFF dff => new LuaValue(new LuaValue[] { "DFF", dff.Name, _assetEncryptionProvider.TryEncryptPath(dff.Path) }),
-            AssetCOL col => new LuaValue(new LuaValue[] { "COL", col.Name, _assetEncryptionProvider.TryEncryptPath(col.Path) }),
-            AssetTXD txd => new LuaValue(new LuaValue[] { "TXD", txd.Name, _assetEncryptionProvider.TryEncryptPath(txd.Path) }),
+            FontAsset font => new LuaValue(new LuaValue[] { AssetType.FileSystemFont, font.Name, font.Path }),
+            BuildInFont font => new LuaValue(new LuaValue[] { AssetType.MtaFont, font.Name }),
+            AssetDFF dff => new LuaValue(new LuaValue[] { AssetType.DFF, dff.Name, _assetEncryptionProvider.TryEncryptPath(dff.Path) }),
+            AssetCOL col => new LuaValue(new LuaValue[] { AssetType.COL, col.Name, _assetEncryptionProvider.TryEncryptPath(col.Path) }),
+            AssetTXD txd => new LuaValue(new LuaValue[] { AssetType.TXD, txd.Name, _assetEncryptionProvider.TryEncryptPath(txd.Path) }),
+            RemoteImageAsset remoteImage => new LuaValue(new LuaValue[] { AssetType.RemoteImage, remoteImage.Path, remoteImage.FullPath, remoteImage.Checksum }),
             _ => throw new NotImplementedException()
         };
     }

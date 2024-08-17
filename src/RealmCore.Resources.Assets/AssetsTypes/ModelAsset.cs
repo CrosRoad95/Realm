@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Resources.Assets.Interfaces;
+﻿namespace RealmCore.Resources.Assets.AssetsTypes;
 
 public interface IAssetDFF : IAsset
 {

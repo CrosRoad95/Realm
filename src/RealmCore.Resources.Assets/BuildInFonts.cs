@@ -1,16 +1,5 @@
 ﻿namespace RealmCore.Resources.Assets;
 
-internal sealed class BuildInFont : IBuiltInFont
-{
-    public string Name { get; }
-    public string Checksum { get; } = string.Empty;
-
-    public BuildInFont(string name)
-    {
-        Name = name;
-    }
-}
-
 public static class BuildInFonts
 {
     public static IBuiltInFont Default { get; } = new BuildInFont("default");

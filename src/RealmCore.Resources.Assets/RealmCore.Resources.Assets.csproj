@@ -23,6 +23,10 @@
 
 	<ItemGroup>
 	  <Using Include="RealmCore.Resources.Assets.Interfaces" />
+	  <Using Include="RealmCore.Resources.Assets.AssetsTypes" />
+	  <Using Include="SlipeServer.Packets.Definitions.Lua" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	  <Using Include="SlipeServer.Server.Enums" />
 	  <Using Include="SlipeServer.Server" />
 	  <Using Include="SlipeServer.Server.Resources" />
 	  <Using Include="System.Runtime.CompilerServices" />

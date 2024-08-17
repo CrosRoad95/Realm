@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using System.Xml.Linq;
-
-namespace RealmCore.Server.Modules.Players.Groups;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMemberDto>, IUsesUserPersistentData
 {
