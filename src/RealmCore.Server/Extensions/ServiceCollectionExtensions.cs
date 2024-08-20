@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Modules.Players.Discord;
 using RealmCore.Server.Modules.Players.Integrations;
+using RealmCore.Server.Modules.TimeBaseOperations;
 using RealmCore.Server.Modules.World.WorldNodes;
 
 namespace RealmCore.Server.Extensions;
@@ -128,6 +129,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UsersService>();
         services.AddSingleton<UsersService>();
         services.AddSingleton<GroupsService>();
+        services.AddSingleton<TimeBaseOperationsService>();
         services.AddSingleton<BansService>();
         services.AddSingleton<RewardsService>();
         services.AddSingleton<FeedbackService>();

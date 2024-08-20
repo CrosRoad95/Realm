@@ -106,6 +106,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserBoostData> Boosts => Set<UserBoostData>();
     public DbSet<UserActiveBoostData> ActiveBoosts => Set<UserActiveBoostData>();
     public DbSet<UserSecretsData> UserSecrets => Set<UserSecretsData>();
+    public DbSet<TimeBaseOperationData> TimeBaseOperations => Set<TimeBaseOperationData>();
+    public DbSet<TimeBaseOperationGroupData> TimeBaseOperationsGroups => Set<TimeBaseOperationGroupData>();
+    public DbSet<TimeBaseOperationDataGroupUserData> TimeBaseOperationsGroupsUsers => Set<TimeBaseOperationDataGroupUserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -1043,6 +1046,42 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(UserSecrets))
                 .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<TimeBaseOperationData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(TimeBaseOperations))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<TimeBaseOperationGroupData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(TimeBaseOperationsGroups))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<TimeBaseOperationDataGroupUserData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(TimeBaseOperationsGroupsUsers))
+                .HasKey(x => new { x.UserId, x.GroupId, x.TimeBasedOperationId });
+
+            entityBuilder.HasOne(x => x.User)
+                .WithMany(x => x.TimeBaseOperations)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.Group)
+                .WithMany(x => x.TimeBasedOperationDataGroupUser)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.Operation)
+                .WithOne(x => x.TimeBasedOperationDataGroupUser)
+                .HasForeignKey<TimeBaseOperationDataGroupUserData>(x => x.TimeBasedOperationId)
+                .IsRequired();
         });
     }
 

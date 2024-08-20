@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<VehicleRepository>();
         services.AddScoped<GroupRepository>();
+        services.AddScoped<TimeBaseOperationRepository>();
         services.AddScoped<BanRepository>();
         services.AddScoped<JobRepository>();
         services.AddScoped<UserRewardRepository>();

@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {
@@ -147,6 +150,14 @@ public sealed class GroupRepository
 
     public async Task<bool> SetRolePermissions(GroupRoleId roleId, int[] permissions, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SetRolePermissions));
+
+        if (activity != null)
+        {
+            activity.AddTag("RoleId", roleId);
+            activity.AddTag("Permissions", permissions);
+        }
+
         var query = _db.GroupsRoles
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.Id == roleId.id)

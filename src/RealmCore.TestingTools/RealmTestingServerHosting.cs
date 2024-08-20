@@ -60,7 +60,7 @@ public class RealmTestingServerHosting<TPlayer> : TestingServerHosting<TPlayer> 
         outerServerBuilder?.Invoke(serverBuilder);
     })
     {
-        this.Server.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<uint>()))
+        this.Server.NetWrapperMock.Setup(x => x.GetClientSerialExtraAndVersion(It.IsAny<ulong>()))
             .Returns(new Tuple<string, string, string>("A8F5F167F44F4964E6C998DEE827110C", "123", "1.6.0-001"));
 
         var waitHandle = new AutoResetEvent(false);
