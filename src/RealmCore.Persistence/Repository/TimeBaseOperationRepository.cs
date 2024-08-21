@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public sealed class TimeBaseOperationRepository
 {
@@ -14,7 +11,7 @@ public sealed class TimeBaseOperationRepository
 
     public async Task<TimeBaseOperationGroupData?> GetGroupById(int id, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(CreateGroup));
+        using var activity = Activity.StartActivity(nameof(GetGroupById));
 
         if (activity != null)
         {
@@ -76,6 +73,10 @@ public sealed class TimeBaseOperationRepository
         if (group == null)
             return null;
 
+        var count = await CountOperationsByGroupId(groupId, cancellationToken);
+        if (count >= group.Limit)
+            return null;
+
         var timeBaseOperationDataGroupUser = new TimeBaseOperationDataGroupUserData
         {
             GroupId = groupId,
@@ -107,6 +108,24 @@ public sealed class TimeBaseOperationRepository
         return timeBaseOperationDataGroupUser;
     }
 
+    public async Task<int> CountOperationsByGroupId(int id, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CountOperationsByGroupId));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+        }
+
+        var query = _db.TimeBaseOperationsGroups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == id)
+            .SelectMany(x => x.TimeBasedOperationDataGroupUser);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
     public async Task<TimeBaseOperationDataGroupUserData[]> GetOperationsByUserIdAndCategory(int userId, int category, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetOperationsByUserIdAndCategory));
@@ -127,9 +146,27 @@ public sealed class TimeBaseOperationRepository
         return await query.ToArrayAsync(cancellationToken);
     }
 
+    public async Task<bool> SetStatus(int id, int status, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetStatus));
+
+        if (activity != null)
+        {
+            activity.AddTag("Id", id);
+            activity.AddTag("Status", status);
+        }
+
+        var query = _db.TimeBaseOperations
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == id);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Status, status), cancellationToken) == 1;
+    }
+    
     public async Task<bool> DeleteOperation(int id, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetOperationsByUserIdAndCategory));
+        using var activity = Activity.StartActivity(nameof(DeleteOperation));
 
         if (activity != null)
         {

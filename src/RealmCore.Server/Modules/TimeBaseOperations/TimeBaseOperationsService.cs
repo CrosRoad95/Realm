@@ -43,6 +43,8 @@ public sealed class TimeBaseOperationForUserDto : IEqualityComparer<TimeBaseOper
     public required object? Output { get; init; }
     public required object? Metadata { get; init; }
 
+    public bool IsCompleted(IDateTimeProvider dateTimeProvider) => dateTimeProvider.Now >= EndDateTime;
+
     public bool Equals(TimeBaseOperationForUserDto? x, TimeBaseOperationForUserDto? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] TimeBaseOperationForUserDto obj) => obj.Id;
@@ -155,8 +157,34 @@ public sealed class TimeBaseOperationsService
 
         return timeBaseOperations.Select(TimeBaseOperationForUserDto.Map).ToArray();
     }
+    
+    public async Task<int> CountOperationsByGroupId(int id, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _timeBaseOperationRepository.CountOperationsByGroupId(id, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
+    public async Task<bool> SetStatus(int id, int status, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _timeBaseOperationRepository.SetStatus(id, status, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 
-    public static JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+    internal static JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         TypeNameHandling = TypeNameHandling.All,
     };
