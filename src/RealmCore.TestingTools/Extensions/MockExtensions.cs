@@ -11,7 +11,7 @@ internal static class MockExtensions
             It.IsAny<Exception>(),
             (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
             .Verifiable();
-        loggerMock.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
+        loggerMock.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable?)null);
 
     }
 }

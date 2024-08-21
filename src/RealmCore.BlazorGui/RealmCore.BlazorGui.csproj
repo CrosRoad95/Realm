@@ -112,5 +112,10 @@
 	  <Using Include="System.ComponentModel.DataAnnotations" />
 	  <Using Include="RealmCore.Resources.Assets.Factories" />
 	  <Using Include="System.Diagnostics" />
+	  <Using Include="RealmCore.Server.Modules.World.WorldNodes" />
+	  <Using Include="RealmCore.Server.Modules.Players.Sessions" />
+	  <Using Include="RealmCore.Server.Modules.Players.Groups" />
+	  <Using Include="RealmCore.BlazorGui.Modules.World" />
+	  <Using Include="RealmCore.BlazorGui.Concepts" />
 	</ItemGroup>
 </Project>

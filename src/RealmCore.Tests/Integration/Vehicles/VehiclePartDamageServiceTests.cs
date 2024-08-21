@@ -41,7 +41,7 @@ public class VehiclePartDamageServiceTests
         {
             destroyed = true;
         }
-        vehicle.PartDamage.PartDestroyed += handlePartDestroyed;
+        vehicle.PartDamage.PartRemoved += handlePartDestroyed;
         vehicle.PartDamage.TryAddPart(1, 0);
 
         destroyed.Should().BeTrue();
@@ -72,10 +72,10 @@ public class VehiclePartDamageServiceTests
         {
             destroyed = true;
         }
-        vehicle.PartDamage.PartDestroyed += handlePartDestroyed;
+        vehicle.PartDamage.PartRemoved += handlePartDestroyed;
         vehicle.PartDamage.TryAddPart(1, 100);
 
-        vehicle.PartDamage.Modify(1, difference);
+        vehicle.PartDamage.TryModify(1, difference);
         destroyed.Should().Be(shouldBeDestroyed);
     }
 }

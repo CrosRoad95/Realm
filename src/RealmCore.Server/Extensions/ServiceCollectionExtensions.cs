@@ -7,13 +7,6 @@ namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddCommand<TCommand>(this IServiceCollection services) where TCommand : class, IInGameCommand
-    {
-        services.AddSingleton(new CommandTypeWrapper(typeof(TCommand)));
-        services.AddTransient<TCommand>();
-        return services;
-    }
-
     public static IServiceCollection AddSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, ISeederProvider
     {
         services.AddSingleton<ISeederProvider, TSeederProvider>();
@@ -23,13 +16,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAsyncSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
     {
         services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
-        return services;
-    }
-
-    public static IServiceCollection AddInGameCommand<TInGameCommand>(this IServiceCollection services) where TInGameCommand : class, IInGameCommand
-    {
-        services.AddTransient<IInGameCommand>(x => x.GetRequiredService<TInGameCommand>());
-        services.AddTransient<TInGameCommand>();
         return services;
     }
 
@@ -87,11 +73,6 @@ public static class ServiceCollectionExtensions
         {
             throw new Exception("Database connection string is not configured.");
         }
-
-        services.AddSingleton<HelpCommand>();
-        services.AddCommand<SaveCommand>();
-        services.AddCommand<ServerInfoCommand>();
-        services.AddCommand<ReloadElementsCommand>();
 
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();

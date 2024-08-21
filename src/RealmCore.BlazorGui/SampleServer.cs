@@ -1,14 +1,12 @@
 ﻿using Serilog.Events;
 using RealmCore.Server.Modules.Chat;
 using RealmCore.BlazorGui.Data;
-using RealmCore.BlazorGui.Commands;
 using RealmCore.BlazorGui.Data.Validators;
 using System.Diagnostics.CodeAnalysis;
 using RealmCore.BlazorGui.Logic;
 using Serilog;
 using RealmCore.BlazorGui.Logging;
 using RealmCore.Server.Modules.Players.Bans;
-using RealmCore.BlazorGui.Modules.World;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -19,20 +17,6 @@ public static class SampleServerExtensions
     public static IServiceCollection AddSampleServer(this IServiceCollection services)
     {
         services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
-
-        #region In game command
-        services.AddInGameCommand<GiveItemCommand>();
-        services.AddInGameCommand<GiveLicenseCommand>();
-        services.AddInGameCommand<InventoryCommand>();
-        services.AddInGameCommand<LicensesCommand>();
-        services.AddInGameCommand<TakeItemCommand>();
-        services.AddInGameCommand<AddPointsCommand>();
-        services.AddInGameCommand<JobsStatsCommand>();
-        services.AddInGameCommand<JobsStatsAllCommand>();
-        services.AddInGameCommand<GiveRewardCommand>();
-        services.AddInGameCommand<Display3dRing>();
-        services.AddInGameCommand<CurrencyCommand>();
-        #endregion
 
         services.AddSingleton<IUserDataSaver, TestSaver>();
 

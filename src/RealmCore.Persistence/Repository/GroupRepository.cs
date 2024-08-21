@@ -1,7 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {
@@ -55,7 +52,7 @@ public sealed class GroupRepository
             _db.Groups.Add(group);
             await _db.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

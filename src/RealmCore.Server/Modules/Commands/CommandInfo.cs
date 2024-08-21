@@ -107,10 +107,10 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
         _ => throw new ArgumentException("Unsupported TypeCode", nameof(targetType)),
     };
 
-    protected object[] GetArgs(RealmPlayer player, CommandArguments arguments, CancellationToken cancellationToken)
+    protected object?[] GetArgs(RealmPlayer player, CommandArguments arguments, CancellationToken cancellationToken)
     {
         int i = 0;
-        var args = new object[_parameters.Length];
+        var args = new object?[_parameters.Length];
         object? value = null;
 
         foreach (var parameterInfo in _parameters)
@@ -133,7 +133,7 @@ internal abstract class DelegateCommandInfoBase : CommandInfo
 
                 if (argument == null)
                 {
-                    value = (bool)parameterInfo.DefaultValue;
+                    value = (bool?)parameterInfo.DefaultValue;
                 }
                 else
                 {

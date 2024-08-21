@@ -66,7 +66,6 @@
 		<Using Include="RealmCore.Persistence" />
 		<Using Include="RealmCore.Resources.Base" />
 		<Using Include="RealmCore.Resources.Browser" />
-		<Using Include="RealmCore.Server.Modules.Commands.Administration" />
 		<Using Include="RealmCore.Server.Modules.Inventories" />
 		<Using Include="RealmCore.Server.Modules.Persistence" />
 		<Using Include="RealmCore.Server.Modules.Players.Administration" />

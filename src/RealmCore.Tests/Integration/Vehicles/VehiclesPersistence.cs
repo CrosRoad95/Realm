@@ -68,7 +68,7 @@ public class VehiclesPersistence
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         if (vehicle1 == null)
             throw new NullReferenceException();
-        vehicle1.Access.AddAsOwner(player);
+        vehicle1.Access.TryAddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;
         vehicle1.Upgrades.AddUpgrade(250, false);
         vehicle1.PartDamage.TryAddPart(200, 300);

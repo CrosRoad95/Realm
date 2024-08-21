@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.World.WorldNodes;
-
-namespace RealmCore.BlazorGui.Modules.World;
+﻿namespace RealmCore.BlazorGui.Modules.World;
 
 public record struct SampleState(int SampleValue);
 public record struct SampleAction(int SampleValue);

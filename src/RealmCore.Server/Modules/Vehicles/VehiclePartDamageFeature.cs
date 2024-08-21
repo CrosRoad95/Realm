@@ -4,7 +4,7 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
 {
     private readonly object _lock = new();
     private ICollection<VehiclePartDamageData> _vehiclePartDamages = [];
-    public event Action<VehiclePartDamageFeature, short>? PartDestroyed;
+    public event Action<VehiclePartDamageFeature, short>? PartRemoved;
     public event Action? VersionIncreased;
 
     public short[] Parts
@@ -43,7 +43,9 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
         }
 
         if (state == 0)
-            PartDestroyed?.Invoke(this, partId);
+            PartRemoved?.Invoke(this, partId);
+
+        VersionIncreased?.Invoke();
 
         return true;
     }
@@ -53,20 +55,31 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
         bool removed = false;
         lock (_lock)
         {
-            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId) ?? throw new ArgumentException("Part id doesn't exists");
-            _vehiclePartDamages.Remove(vehiclePartDamage);
+            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
+            if (vehiclePartDamage == null)
+                return false;
+
+            removed = _vehiclePartDamages.Remove(vehiclePartDamage);
         }
-        PartDestroyed?.Invoke(this, partId);
+
+        if(removed)
+        {
+            VersionIncreased?.Invoke();
+            PartRemoved?.Invoke(this, partId);
+        }
 
         return removed;
     }
 
-    public void Modify(short partId, float difference)
+    public bool TryModify(short partId, float difference)
     {
         float newState = 0;
         lock (_lock)
         {
-            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId) ?? throw new ArgumentException("Part id doesn't exists");
+            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
+            if (vehiclePartDamage == null)
+                return false;
+
             vehiclePartDamage.State += difference;
             if (vehiclePartDamage.State <= 0)
                 vehiclePartDamage.State = 0;
@@ -74,7 +87,13 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
         }
 
         if (newState == 0)
-            PartDestroyed?.Invoke(this, partId);
+        {
+            PartRemoved?.Invoke(this, partId);
+            VersionIncreased?.Invoke();
+            return true;
+        }
+
+        return false;
     }
 
     public bool HasPart(short partId)

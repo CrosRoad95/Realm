@@ -1,6 +1,4 @@
-﻿using RealmCore.BlazorGui.Modules.World;
-
-namespace RealmCore.BlazorGui.Logic;
+﻿namespace RealmCore.BlazorGui.Logic;
 
 internal sealed partial class PlayerGameplayHostedService : IHostedService
 {

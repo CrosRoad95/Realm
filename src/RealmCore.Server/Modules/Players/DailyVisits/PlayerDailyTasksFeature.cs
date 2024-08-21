@@ -61,7 +61,7 @@ public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersisten
         {
             lock (_lock)
             {
-                if (_dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, now) && x.DailyTaskId == taskId).Any())
+                if (_dailyTasksProgressData.Where(x => x.CreatedAt.AreSameDay(now) && x.DailyTaskId == taskId).Any())
                     return false;
 
                 _dailyTasksProgressData.Add(new UserDailyTaskProgressData
@@ -80,7 +80,7 @@ public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersisten
         at ??= _dateTimeProvider.Now;
         lock (_lock)
         {
-            var data = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, at.Value) && x.DailyTaskId == taskId).FirstOrDefault();
+            var data = _dailyTasksProgressData.Where(x => x.CreatedAt.AreSameDay(at.Value) && x.DailyTaskId == taskId).FirstOrDefault();
             return DailyTaskProgressDto.Map(data);
         }
     }
@@ -90,7 +90,7 @@ public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersisten
         at ??= _dateTimeProvider.Now;
         lock (_lock)
         {
-            var data = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, at.Value));
+            var data = _dailyTasksProgressData.Where(x => x.CreatedAt.AreSameDay(at.Value));
             return data.Select(DailyTaskProgressDto.Map).ToArray();
         }
     }
@@ -100,7 +100,7 @@ public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersisten
         at ??= _dateTimeProvider.Now;
         lock (_lock)
         {
-            var data = _dailyTasksProgressData.Where(x => AreSameDay(x.CreatedAt, at.Value) && x.DailyTaskId == taskId).FirstOrDefault();
+            var data = _dailyTasksProgressData.Where(x => x.CreatedAt.AreSameDay(at.Value) && x.DailyTaskId == taskId).FirstOrDefault();
             return data?.Progress ?? 0;
         }
     }
@@ -110,17 +110,14 @@ public sealed class PlayerDailyTasksFeature : IPlayerFeature, IUsesUserPersisten
         at ??= _dateTimeProvider.Now;
         lock (_lock)
         {
-            var data = _dailyTasksProgressData.Where(x => AreSameDay(at.Value, x.CreatedAt) && x.DailyTaskId == taskId).FirstOrDefault();
+            var data = _dailyTasksProgressData.Where(x => at.Value.AreSameDay(x.CreatedAt) && x.DailyTaskId == taskId).FirstOrDefault();
             if(data == null)
                 return false;
 
             data.Progress += progress;
-            return true;
         }
-    }
 
-    private bool AreSameDay(DateTime dateTime1, DateTime dateTime2)
-    {
-        return dateTime1.Year == dateTime2.Year && dateTime1.Month == dateTime2.Month && dateTime1.Day == dateTime2.Day;
+        VersionIncreased?.Invoke();
+        return true;
     }
 }

@@ -45,6 +45,9 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
 
         if (rebuild)
             Rebuild?.Invoke(this);
+
+        VersionIncreased?.Invoke();
+
         return true;
     }
 
@@ -60,6 +63,9 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
         UpgradeAdded?.Invoke(this, upgradeId);
         if (rebuild)
             Rebuild?.Invoke(this);
+
+        VersionIncreased?.Invoke();
+
         return true;
     }
 
@@ -80,6 +86,8 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
         if (rebuild)
             Rebuild?.Invoke(this);
 
+        VersionIncreased?.Invoke();
+
         return true;
     }
 
@@ -97,6 +105,8 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
 
         if (rebuild)
             Rebuild?.Invoke(this);
+
+        VersionIncreased?.Invoke();
     }
 
     public bool RemoveUpgrade(int upgradeId, bool rebuild = true)
@@ -111,6 +121,9 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
         UpgradeRemoved?.Invoke(this, upgradeId);
         if (rebuild)
             Rebuild?.Invoke(this);
+
+        VersionIncreased?.Invoke();
+
         return true;
     }
 

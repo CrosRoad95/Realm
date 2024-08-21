@@ -11,7 +11,7 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
     {
         _fixture = fixture;
         _player = _fixture.Player;
-        _inventory = _player.Inventory.Primary;
+        _inventory = _player.Inventory.Primary!;
         _itemsCollection = _fixture.Hosting.GetRequiredService<ItemsCollection>();
     }
 

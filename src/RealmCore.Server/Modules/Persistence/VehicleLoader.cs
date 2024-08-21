@@ -59,10 +59,9 @@ public sealed class VehicleLoader
             activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
             try
             {
-                // TODO: Replace with "TrySetSpawned"
-                await _vehicleRepository.SetSpawned(id, false, cancellationToken);
+                await _vehicleRepository.TrySetSpawned(id, false, cancellationToken);
             }
-            catch(Exception _)
+            catch(Exception)
             {
                 // Ignore,
             }

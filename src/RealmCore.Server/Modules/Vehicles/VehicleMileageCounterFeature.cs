@@ -49,6 +49,7 @@ public sealed class VehicleMileageCounterFeature : IVehicleFeature, IUsesVehicle
         var traveledDistanceNumber = traveledDistance.Length();
         if (_minimumDistanceThreshold > traveledDistanceNumber)
             return;
+
         _lastPosition = Vehicle.Position;
         HandleUpdate(traveledDistanceNumber);
     }
@@ -68,6 +69,7 @@ public sealed class VehicleMileageCounterFeature : IVehicleFeature, IUsesVehicle
 
         _mileage += traveledDistance;
         Traveled?.Invoke(this, _mileage, traveledDistance);
+        VersionIncreased?.Invoke();
     }
 
     public void Dispose()

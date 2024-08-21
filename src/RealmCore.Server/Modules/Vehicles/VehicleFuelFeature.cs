@@ -17,21 +17,22 @@ public sealed class VehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContai
         {
             lock (_lock)
             {
-                if (value != Active)
+                if (value == Active)
+                    return;
+
+                foreach (var item in _fuelContainers)
                 {
-                    foreach (var item in _fuelContainers)
-                    {
-                        if (item != value)
-                            item.Active = false;
-                    }
-                    _active = value;
-                    if(value != null)
-                    {
-                        value.Active = true;
-                    }
-                    ActiveChanged?.Invoke(this, _active);
+                    if (item != value)
+                        item.Active = false;
+                }
+                _active = value;
+                if(value != null)
+                {
+                    value.Active = true;
                 }
             }
+            ActiveChanged?.Invoke(this, _active);
+            VersionIncreased?.Invoke();
         }
     }
 
@@ -53,7 +54,10 @@ public sealed class VehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContai
     {
         var active = Active;
         if(active != null)
+        {
             active.Update(forceUpdate);
+            VersionIncreased?.Invoke();
+        }
     }
 
     public FuelContainer AddFuelContainer(short fuelType, float initialAmount, float maxCapacity, float fuelConsumptionPerOneKm, float minimumDistanceThreshold, bool makeActive = false)
@@ -77,6 +81,9 @@ public sealed class VehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContai
 
         if (makeActive)
             Active = fuelContainer;
+
+        VersionIncreased?.Invoke();
+
         return fuelContainer;
     }
 

@@ -39,6 +39,8 @@ public sealed class PlayerSecretsFeature : IPlayerFeature, IUsesUserPersistentDa
             });
         }
 
+        VersionIncreased?.Invoke();
+
         return true;
     }
 

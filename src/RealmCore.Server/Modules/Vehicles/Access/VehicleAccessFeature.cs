@@ -30,11 +30,8 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleU
         var vehicleUserAccessData = _userAccesses
             .Where(x => x.UserId == userId && (accessType == null || x.AccessType == accessType))
             .FirstOrDefault();
-        if (vehicleUserAccessData != null)
-        {
-            return true;
-        }
-        return false;
+
+        return vehicleUserAccessData != null;
     }
 
     public bool TryGetAccess(int userId, out VehicleUserAccessDto vehicleAccess)
@@ -70,39 +67,43 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleU
             return InternalHasAccess(userId);
     }
 
-    public VehicleUserAccessDto AddAccess(int userId, byte accessType, string? customValue = null)
+    public VehicleUserAccessDto? TryAddAccess(int userId, byte accessType, string? customValue = null)
     {
+        var vehicleUserAccessData = new VehicleUserAccessData
+        {
+            UserId = userId,
+            AccessType = accessType,
+            CustomValue = customValue,
+            VehicleId = VehicleId ?? 0
+        };
+
         lock (_lock)
         {
             if (InternalHasAccess(userId))
-                throw new VehicleAccessDefinedException();
-
-            var vehicleUserAccessData = new VehicleUserAccessData
-            {
-                UserId = userId,
-                AccessType = accessType,
-                CustomValue = customValue,
-                VehicleId = VehicleId ?? 0
-            };
+                return null;
 
             _userAccesses.Add(vehicleUserAccessData);
-            return VehicleUserAccessDto.Map(vehicleUserAccessData);
         }
+
+        VersionIncreased?.Invoke();
+
+        return VehicleUserAccessDto.Map(vehicleUserAccessData);
+
     }
 
-    public VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
+    public VehicleUserAccessDto? TryAddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
-        return AddAccess(player.UserId, accessType, customValue);
+        return TryAddAccess(player.UserId, accessType, customValue);
     }
 
-    public VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null)
+    public VehicleUserAccessDto? TryAddAsOwner(RealmPlayer player, string? customValue = null)
     {
-        return AddAccess(player, 0, customValue);
+        return TryAddAccess(player, 0, customValue);
     }
 
-    public VehicleUserAccessDto AddAsOwner(int userId, string? customValue = null)
+    public VehicleUserAccessDto? TryAddAsOwner(int userId, string? customValue = null)
     {
-        return AddAccess(userId, 0, customValue);
+        return TryAddAccess(userId, 0, customValue);
     }
 
     public bool IsOwner(int userId)

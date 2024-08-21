@@ -78,16 +78,14 @@ public sealed class TimeBaseOperationsService
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly UsersInUse _usersInUse;
     private readonly ITransactionContext _transactionContext;
     private readonly TimeBaseOperationRepository _timeBaseOperationRepository;
 
-    public TimeBaseOperationsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, UsersInUse usersInUse)
+    public TimeBaseOperationsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         _dateTimeProvider = dateTimeProvider;
-        _usersInUse = usersInUse;
         _transactionContext = _serviceProvider.GetRequiredService<ITransactionContext>();
         _timeBaseOperationRepository = _serviceProvider.GetRequiredService<TimeBaseOperationRepository>();
     }
@@ -110,6 +108,9 @@ public sealed class TimeBaseOperationsService
 
     public async Task<TimeBaseOperationForUserDto?> CreateForUser(int groupId, int userId, int type, int status, DateTime startDateTime, DateTime endDateTime, object? input = null, object? output = null, object? metadata = null, CancellationToken cancellationToken = default)
     {
+        if (startDateTime >= endDateTime)
+            throw new ArgumentException(null, nameof(startDateTime));
+
         TimeBaseOperationDataGroupUserData? timeBaseOperationDataGroupUser;
         var inputString = JsonConvert.SerializeObject(input, _jsonSerializerSettings);
         var outputString = JsonConvert.SerializeObject(output, _jsonSerializerSettings);

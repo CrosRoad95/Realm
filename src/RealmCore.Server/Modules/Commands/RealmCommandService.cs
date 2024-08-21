@@ -25,40 +25,11 @@ public sealed class RealmCommandService : PlayerLifecycle
     public string[] CommandNames => [.. _commands.Keys.Concat(_commands.Keys)];
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IEnumerable<IInGameCommand> inGameCommands, IOptions<CommandsOptions> options) : base(playersEventManager)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, PlayersEventManager playersEventManager, IOptions<CommandsOptions> options) : base(playersEventManager)
     {
         _logger = logger;
         _chatBox = chatBox;
         _options = options;
-        foreach (var inGameCommand in inGameCommands)
-        {
-            var type = inGameCommand.GetType();
-            var commandNameAttribute = type.GetCustomAttribute<CommandNameAttribute>();
-            if (commandNameAttribute == null)
-            {
-                logger.LogWarning("Command class {commandClass} has no CommandName attribute", type.Name);
-                continue;
-            }
-
-            var commandName = commandNameAttribute.Name.ToLower();
-            AddAsyncCommandHandler(commandName, async (player, args, token) =>
-            {
-                if (player.GetRequiredService(type) is not IInGameCommand inGameCommand)
-                    throw new InvalidOperationException();
-
-                if (inGameCommand.RequiredPolicies.Length > 0)
-                {
-                    var authorized = player.User.HasAuthorizedPolicies(inGameCommand.RequiredPolicies);
-                    if (!authorized)
-                    {
-                        _logger.LogInformation("Failed to execute command {command} because one of authorized policy failed", commandName);
-                        return;
-                    }
-                }
-
-                await inGameCommand.Handle(player, args, token);
-            });
-        }
     }
 
     protected override void PlayerJoined(RealmPlayer player)
@@ -271,10 +242,9 @@ public sealed class RealmCommandService : PlayerLifecycle
                 }
             }
         }
-        catch (RateLimitRejectedException ex)
+        catch (RateLimitRejectedException)
         {
             _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            //_logger.LogError(ex, "Rate limit exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
         }
         catch (CommandArgumentException ex)
         {

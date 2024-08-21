@@ -101,6 +101,9 @@ public sealed class PlayerBoostsFeature : IPlayerFeature, IUsesUserPersistentDat
         return false;
     }
 
+    public event Action<PlayerBoostsFeature, int>? BoostRemoved;
+    public event Action<PlayerBoostsFeature, int>? BoostAdded;
+    public event Action<PlayerBoostsFeature, int, TimeSpan>? BoostActivated;
     public void AddBoost(int boostId)
     {
         lock (_lock)
@@ -110,6 +113,10 @@ public sealed class PlayerBoostsFeature : IPlayerFeature, IUsesUserPersistentDat
                 BoostId = boostId,
             });
         }
+
+        BoostAdded?.Invoke(this, boostId);
+
+        VersionIncreased?.Invoke();
     }
     
     public bool TryActivateBoost(int boostId, TimeSpan activeFor, bool force = false)
@@ -119,33 +126,41 @@ public sealed class PlayerBoostsFeature : IPlayerFeature, IUsesUserPersistentDat
             if (IsActiveCore(boostId))
                 return false;
 
-            if(TryRemoveBoostCore(boostId) || force)
+            if(!TryRemoveBoostCore(boostId) && !force)
+                return false;
+
+            var now = _dateTimeProvider.Now;
+            _activeBoosts.Add(new UserActiveBoostData
             {
-                var now = _dateTimeProvider.Now;
-                _activeBoosts.Add(new UserActiveBoostData
-                {
-                    BoostId = boostId,
-                    ActivatedAt = now,
-                    RemainingTime = (int)activeFor.TotalSeconds
-                });
-                return true;
-            }
-            return false;
+                BoostId = boostId,
+                ActivatedAt = now,
+                RemainingTime = (int)activeFor.TotalSeconds
+            });
         }
+
+        BoostRemoved?.Invoke(this, boostId);
+        BoostActivated?.Invoke(this, boostId, activeFor);
+        return true;
     }
     
     public bool TryRemoveBoost(int boostId)
     {
+        bool removed = false;
         lock (_lock)
         {
             var boost = _boosts.Where(x => x.BoostId == boostId).FirstOrDefault();
             if(boost != null)
             {
-                _boosts.Remove(boost);
-                return true;
+                removed = _boosts.Remove(boost);
             }
-            return false;
         }
+
+        if (removed)
+        {
+            BoostRemoved?.Invoke(this, boostId);
+        }
+
+        return removed;
     }
 
     private bool IsActiveCore(int boostId)

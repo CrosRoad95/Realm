@@ -153,9 +153,9 @@ public sealed class VehicleRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
+    public async Task<bool> TrySetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(SetSpawned));
+        using var activity = Activity.StartActivity(nameof(TrySetSpawned));
 
         if (activity != null)
         {

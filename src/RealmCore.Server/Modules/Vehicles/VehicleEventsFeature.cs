@@ -28,6 +28,8 @@ public sealed class VehicleEventsFeature : IVehicleFeature, IUsesVehiclePersiste
                 Metadata = metadata,
             });
         }
+
+        VersionIncreased?.Invoke();
     }
 
     public IEnumerator<VehicleEventDto> GetEnumerator()

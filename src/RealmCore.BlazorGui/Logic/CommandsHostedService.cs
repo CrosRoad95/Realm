@@ -1,9 +1,4 @@
-﻿using RealmCore.BlazorGui.Concepts;
-using RealmCore.BlazorGui.Modules.World;
-using RealmCore.Server.Modules.Players.Groups;
-using RealmCore.Server.Modules.Players.Sessions;
-using RealmCore.Server.Modules.World.WorldNodes;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -33,11 +28,13 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly IElementCollection _elementCollection;
     private readonly WorldNodesService _worldNodesService;
     private readonly GroupsService _groupsService;
+    private readonly MapsService _mapsService;
+    private readonly MtaServer _mtaServer;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -56,6 +53,8 @@ internal sealed class CommandsHostedService : IHostedService
         _elementCollection = elementCollection;
         _worldNodesService = worldNodesService;
         _groupsService = groupsService;
+        _mapsService = mapsService;
+        _mtaServer = mtaServer;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -218,7 +217,7 @@ internal sealed class CommandsHostedService : IHostedService
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.TryAddPart(1, 1337);
-            vehicle.Access.AddAsOwner(player);
+            vehicle.Access.TryAddAsOwner(player);
             _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.VehicleId}");
         });
 
@@ -228,7 +227,7 @@ internal sealed class CommandsHostedService : IHostedService
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.TryAddPart(1, 1337);
-            vehicle.Access.AddAsOwner(player);
+            vehicle.Access.TryAddAsOwner(player);
             vehicle.AddPassenger(0, player);
             _chatBox.OutputTo(player, "Stworzono pojazd.");
             Task.Run(async () =>
@@ -259,7 +258,7 @@ internal sealed class CommandsHostedService : IHostedService
             if (vehicle == null)
                 return;
 
-            vehicle.Access.AddAsOwner(player);
+            vehicle.Access.TryAddAsOwner(player);
             _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.VehicleId}");
         });
 
@@ -329,20 +328,11 @@ internal sealed class CommandsHostedService : IHostedService
             vehicle.AccessController = VehicleNoAccessController.Instance;
         });
 
-        _commandService.Add("privateblip", async ([CallingPlayer] RealmPlayer player) =>
-        {
-            // TODO:
-            //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
-            //var blipElementComponent = scopedelementFactory.CreateBlip(BlipIcon.Pizza, player.Position);
-            //await Task.Delay(1000);
-            //player.DestroyComponent(scopedelementFactory.LastCreatedComponent);
-        });
-
         _commandService.Add("addmeasowner", ([CallingPlayer] RealmPlayer player) =>
         {
             var vehicle = player.Vehicle;
             if (vehicle != null)
-                vehicle.Access.AddAsOwner(player);
+                vehicle.Access.TryAddAsOwner(player);
         });
 
         _commandService.Add("accessinfo", ([CallingPlayer] RealmPlayer player) =>
@@ -1072,7 +1062,16 @@ internal sealed class CommandsHostedService : IHostedService
         {
             _chatBox.OutputTo(player, $"{boolean1}, {boolean2}");
         });
-
+        
+        _commandService.Add("serverinfo", ([CallingPlayer] RealmPlayer player) =>
+        {
+            _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _mtaServer.StartDatetime);
+            _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.User.IsLoggedIn).Count());
+            _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<RealmVehicle>());
+            _logger.LogInformation("Elements count: {elementsCount}", _elementCollection.Count);
+            _logger.LogInformation("Loaded global maps: {loadedMaps}", string.Join(", ", _mapsService.LoadedMaps));
+        });
+        
         AddBoostCommands();
         AddSecretsCommands();
         AddNodesCommands();

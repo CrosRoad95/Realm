@@ -19,8 +19,9 @@ internal sealed class PlayerDailyVisitsHostedService : PlayerLifecycle, IHostedS
         return Task.CompletedTask;
     }
 
-    protected override async Task PlayerLoggedIn(PlayerUserFeature userService, RealmPlayer player)
+    protected override Task PlayerLoggedIn(PlayerUserFeature userService, RealmPlayer player)
     {
         player.DailyVisits.Update(_dateTimeProvider.Now);
+        return Task.CompletedTask;
     }
 }

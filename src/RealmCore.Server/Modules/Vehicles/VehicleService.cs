@@ -20,7 +20,7 @@ public sealed class VehicleService
 
     public async Task<bool> SetVehicleSpawned(bool spawned = true, CancellationToken cancellationToken = default)
     {
-        return await _vehicleRepository.SetSpawned(_vehicle.Persistence.Id, spawned, cancellationToken);
+        return await _vehicleRepository.TrySetSpawned(_vehicle.Persistence.Id, spawned, cancellationToken);
     }
 
     public async Task Destroy(CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ public sealed class VehicleService
         {
             await _saveService.Save(cancellationToken);
             var id = _vehicle.Persistence.Id;
-            await _vehicleRepository.SetSpawned(id, false, cancellationToken);
+            await _vehicleRepository.TrySetSpawned(id, false, cancellationToken);
             _vehiclesInUse.TrySetInactive(id);
             _vehicle.Persistence.Unload();
         }
