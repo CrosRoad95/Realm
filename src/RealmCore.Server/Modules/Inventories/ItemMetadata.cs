@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Inventories;
 
-public sealed class ItemMetadata : Dictionary<string, object>
+public sealed class ItemMetadata : MetadataBase
 {
     public ItemMetadata(ItemMetadata metadata) : base(metadata)
     {

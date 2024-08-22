@@ -54,40 +54,9 @@ public class LoginRegisterTests
         }
     }
 
-    //[Fact]
-    //public async Task Test1()
-    //{
-    //    var server = new RealmTestingServer();
-
-    //    {
-    //        var player = server.CreatePlayer();
-    //        await server.LoginPlayer(player);
-
-    //        for (int i = 0; i < 25; i++)
-    //        {
-    //            player.Events.Add(i % 5, $"test{i}");
-    //        }
-
-    //        //await hosting.DisconnectPlayer(player);
-    //    }
-
-    //    {
-    //        var player = server.CreatePlayer();
-    //        await server.LoginPlayer(player);
-    //        var events = player.Events;
-    //        var initialCount1 = events.Count();
-    //        var fetched1 = await events.FetchMore();
-    //        var fetched2 = await events.FetchMore();
-    //        var initialCount2 = events.Count();
-    //        ;
-    //    }
-    //}
-
     [Fact]
     public async Task RemovingItemShouldRemoveItFromDatabase()
     {
-        using var _ = new AssertionScope();
-
         using var hosting = new RealmTestingServerHosting();
 
         var itemsCollection = hosting.GetRequiredService<ItemsCollection>();
@@ -112,16 +81,23 @@ public class LoginRegisterTests
             inventory1 = player1.Inventory.CreatePrimary(20);
         }
         inventory1.Number.Should().Be(0);
-        inventory1.AddItem(1);
-        inventory1.AddItem(1);
-        var item = inventory1.AddItem(1);
+        using(var access = inventory1.Open())
+        {
+            access.TryAddItem(1);
+            access.TryAddItem(1);
+            access.TryAddItem(1);
+        }
         inventory1.Number.Should().Be(3);
 
         await hosting.DisconnectPlayer(player1);
 
         var player2 = await hosting.CreatePlayer(name: playerName, dontLoadData: false);
         var inventory2 = player2.Inventory.Primary!;
-        inventory2.RemoveItem(item.LocalId, 1);
+        using (var access = inventory2.Open())
+        {
+            var item = access.Items.First();
+            access.RemoveItem(item).Should().BeTrue();
+        }
         player2.Inventory.Primary!.Number.Should().Be(2);
         await hosting.DisconnectPlayer(player2);
 

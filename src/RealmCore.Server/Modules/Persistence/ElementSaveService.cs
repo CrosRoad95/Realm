@@ -79,8 +79,8 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         vehicleData.IsFrozen = vehicle.IsFrozen;
         vehicleData.Paintjob = vehicle.PaintJob;
 
-        if (vehicle.Inventory.TryGetPrimary(out var inventory))
-            vehicleData.Inventories = SaveInventory(vehicleData.Inventories, inventory);
+        if (vehicle.Inventory.TryGetPrimary(out var inventory) && inventory is IPersistentInventory persistentInventory)
+            vehicleData.Inventories = SaveInventory(vehicleData.Inventories, persistentInventory);
 
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
 
@@ -101,8 +101,8 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
-        if (player.Inventory.TryGetPrimary(out var inventory))
-            userData.Inventories = SaveInventory(userData.Inventories, inventory);
+        if (player.Inventory.TryGetPrimary(out var inventory) && inventory is IPersistentInventory persistentInventory)
+            userData.Inventories = SaveInventory(userData.Inventories, persistentInventory);
 
         foreach (var item in _userDataSavers)
             await item.SaveAsync(userData, player, cancellationToken);
@@ -112,12 +112,13 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         return true;
     }
 
-    private ICollection<InventoryData> SaveInventory(ICollection<InventoryData> inventoriesData, Inventory inventory)
+    private ICollection<InventoryData> SaveInventory(ICollection<InventoryData> inventoriesData, IPersistentInventory persistentInventory)
     {
-        var existingInventoryData = inventoriesData.FirstOrDefault(x => x.Id == inventory.Id);
+        var inventory = (Inventory)persistentInventory;
+        var existingInventoryData = inventoriesData.FirstOrDefault(x => x.Id == persistentInventory.Id);
         if (existingInventoryData == null)
         {
-            inventoriesData = [Inventory.CreateData(inventory)];
+            inventoriesData = [PersistentElementInventory.CreateData(persistentInventory)];
         }
         else
         {
@@ -175,7 +176,7 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         }
     }
 
-    public async Task SaveNewInventory(Inventory inventory, CancellationToken cancellationToken = default)
+    public async Task SaveNewInventory(PersistentElementInventory inventory, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(SaveNewInventory));
 
@@ -201,15 +202,15 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         }
     }
 
-    private async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
+    private async Task<int> SaveNewPlayerInventory(PersistentElementInventory inventory, int userId, CancellationToken cancellationToken = default)
     {
-        var inventoryData = Inventory.CreateData(inventory);
+        var inventoryData = PersistentElementInventory.CreateData(inventory);
         return await _inventoryRepository.CreateInventoryForUserId(userId, inventoryData, cancellationToken);
     }
 
-    private async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
+    private async Task<int> SaveNewVehicleInventory(PersistentElementInventory inventory, int vehicleId, CancellationToken cancellationToken = default)
     {
-        var inventoryData = Inventory.CreateData(inventory);
+        var inventoryData = PersistentElementInventory.CreateData(inventory);
         return await _inventoryRepository.CreateInventoryForVehicleId(vehicleId, inventoryData, cancellationToken);
     }
 

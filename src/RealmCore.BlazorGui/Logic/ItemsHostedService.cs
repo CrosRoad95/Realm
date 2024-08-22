@@ -1,4 +1,6 @@
-﻿namespace RealmCore.BlazorGui.Logic;
+﻿using RealmCore.Server.Modules.Inventories;
+
+namespace RealmCore.BlazorGui.Logic;
 
 public class ItemsHostedService : PlayerLifecycle, IHostedService
 {
@@ -69,16 +71,20 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
 
     private void HandleInventoryItemRemoved(Inventory inventory, InventoryItem item)
     {
+
         var itemId = item.ItemId;
         switch (itemId)
         {
             case 3:
-                if (!inventory.HasItemById(itemId))
+                using(var access = inventory.Open())
                 {
-                    if (inventory.Owner is RealmPlayer player)
+                    if (!access.HasSpaceFor(itemId))
                     {
-                        player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
-                        _chatBox.OutputTo(player, "Bat taken");
+                        if (inventory is ElementInventory elementInventory && elementInventory.Owner is RealmPlayer player)
+                        {
+                            player.Weapons.Remove(WeaponId.Bat);
+                            _chatBox.OutputTo(player, "Bat taken");
+                        }
                     }
                 }
                 break;
@@ -91,7 +97,7 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         switch (itemId)
         {
             case 3:
-                if (inventory.Owner is RealmPlayer player)
+                if (inventory is ElementInventory elementInventory && elementInventory.Owner is RealmPlayer player)
                 {
                     if (!player.Weapons.Any(x => x.Type == WeaponId.Bat && x.Ammo > 0))
                     {
@@ -108,10 +114,15 @@ public class ItemsHostedService : PlayerLifecycle, IHostedService
         switch (action)
         {
             case ItemAction.Use:
-                if (inventory.Owner is RealmPlayer player)
+                if (inventory is ElementInventory elementInventory && elementInventory.Owner is RealmPlayer player)
                 {
                     _chatBox.OutputTo(player, $"Item used: {item.ItemId}");
-                    inventory.RemoveItem(item.LocalId);
+                    using(var access = inventory.Open())
+                    {
+                        var inventoryItem = access.FindItem(x => x.LocalId == x.LocalId);
+                        if(inventoryItem != null)
+                            access.RemoveItem(inventoryItem);
+                    }
                 }
                 break;
         }

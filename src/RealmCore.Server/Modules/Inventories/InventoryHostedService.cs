@@ -21,23 +21,26 @@ internal sealed class InventoryHostedService : PlayerLifecycle, IHostedService
 
     private async Task InventoryCreated(Inventory inventory)
     {
-        if (inventory.Id != 0)
+        if (inventory is not PersistentElementInventory persistentElementInventory)
             return;
 
-        if (inventory.Owner is RealmPlayer player)
+        if (persistentElementInventory.Id != 0)
+            return;
+
+        if (persistentElementInventory.Owner is RealmPlayer player)
         {
             if (player.User.IsLoggedIn)
             {
                 var saveService = player.GetRequiredService<ElementSaveService>();
-                await saveService.SaveNewInventory(inventory);
+                await saveService.SaveNewInventory(persistentElementInventory);
             }
         }
-        else if (inventory.Owner is RealmVehicle vehicle)
+        else if (persistentElementInventory.Owner is RealmVehicle vehicle)
         {
             if (vehicle.Persistence.IsLoaded)
             {
                 var saveService = vehicle.GetRequiredService<ElementSaveService>();
-                await saveService.SaveNewInventory(inventory);
+                await saveService.SaveNewInventory(persistentElementInventory);
             }
         }
     }

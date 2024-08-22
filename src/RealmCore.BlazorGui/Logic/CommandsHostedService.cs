@@ -410,7 +410,10 @@ internal sealed class CommandsHostedService : IHostedService
 
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(1);
+                using(var access = inventory.Open())
+                {
+                    access.TryAddItem(1);
+                }
                 _chatBox.OutputTo(player, $"Test item added");
             }
 
@@ -1189,25 +1192,39 @@ internal sealed class CommandsHostedService : IHostedService
 
     private void AddInventoryCommands()
     {
-        _commandService.Add("additem1", ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("listitems", ([CallingPlayer] RealmPlayer player) =>
         {
-            if (player.Inventory.TryGetPrimary(out var inventory))
+            var inventory = player.Inventory.Primary;
+            if (inventory == null)
             {
-                inventory.AddItem(1);
-                _chatBox.OutputTo(player, $"Test item added");
+                _chatBox.OutputTo(player, "Failed to list items. You don't have inventory");
+                return;
+            }
+
+            _chatBox.OutputTo(player, $"Type: {inventory.GetType().Name}");
+            _chatBox.OutputTo(player, $"Number: {inventory.Number}");
+            using (var access = inventory.Open())
+            {
+                foreach (var item in access.Items)
+                {
+                    _chatBox.OutputTo(player, $"Item: {item.ItemId}");
+                }
             }
         });
 
-        _commandService.Add("additem2", ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("additem", ([CallingPlayer] RealmPlayer player, uint itemId) =>
         {
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(2);
+                using (var access = inventory.Open())
+                {
+                    access.TryAddItem(itemId);
+                }
                 _chatBox.OutputTo(player, "Test item added");
             }
             else
             {
-                _chatBox.OutputTo(player, "Failed to add item");
+                _chatBox.OutputTo(player, "Failed to list items. You don't have inventory");
 
             }
         });
@@ -1218,25 +1235,10 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, "Inventory created");
         });
 
-        _commandService.Add("listitems", ([CallingPlayer] RealmPlayer player) =>
-        {
-            var inventory = player.Inventory.Primary;
-            if (inventory == null)
-            {
-                _chatBox.OutputTo(player, $"Błąd, nie masz ekwipunku");
-                return;
-            }
-
-            _chatBox.OutputTo(player, $"Number: {inventory.Number}");
-            foreach (var item in inventory.Items)
-            {
-                _chatBox.OutputTo(player, $"Item: {item.ItemId}");
-            }
-        });
-
         _commandService.Add("removeitem1", ([CallingPlayer] RealmPlayer player) =>
         {
-            player.Inventory.Primary!.RemoveItemByItemId(1);
+            using var access = player.Inventory.Primary!.Open();
+            access.RemoveItem(access.FindItem(x => x.ItemId == 1)!);
             _chatBox.OutputTo(player, "Item removed");
         });
     }

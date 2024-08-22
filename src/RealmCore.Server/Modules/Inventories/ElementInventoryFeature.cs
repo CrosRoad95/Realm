@@ -2,12 +2,12 @@
 
 public interface IElementInventoryFeature
 {
-    Inventory? Primary { get; }
+    ElementInventory? Primary { get; }
 
-    event Action<IElementInventoryFeature, Inventory>? PrimarySet;
+    event Action<IElementInventoryFeature, ElementInventory>? PrimarySet;
 
-    Inventory CreatePrimary(uint defaultInventorySize);
-    bool TryGetPrimary(out Inventory inventory);
+    ElementInventory CreatePrimary(uint defaultInventorySize);
+    bool TryGetPrimary(out ElementInventory inventory);
 }
 
 public interface IPlayerInventoryFeature : IPlayerFeature, IElementInventoryFeature
@@ -17,6 +17,50 @@ public interface IPlayerInventoryFeature : IPlayerFeature, IElementInventoryFeat
 public interface IVehicleInventoryFeature : IVehicleFeature, IElementInventoryFeature
 {
 
+}
+
+public abstract class ElementInventoryFeature : IElementInventoryFeature
+{
+    protected readonly ItemsCollection _itemsCollection;
+
+    public ElementInventory? Primary { get; private set; }
+    protected abstract Element Element { get; }
+
+    public event Action<IElementInventoryFeature, ElementInventory>? PrimarySet;
+
+    public ElementInventoryFeature(ItemsCollection itemsCollection)
+    {
+        _itemsCollection = itemsCollection;
+    }
+
+    public bool TryGetPrimary(out ElementInventory inventory)
+    {
+        inventory = Primary!;
+        return inventory != null;
+    }
+
+    protected bool Load(Element element, ICollection<InventoryData> inventories, ItemsCollection itemsCollection)
+    {
+        if (inventories != null && inventories.Count != 0)
+        {
+            var inventory = inventories.First();
+
+            Primary = PersistentElementInventory.CreateFromData(element, inventory, itemsCollection);
+            PrimarySet?.Invoke(this, Primary);
+            return true;
+        }
+        return false;
+    }
+
+    public ElementInventory CreatePrimary(uint inventorySize)
+    {
+        if (Primary == null)
+        {
+            Primary = new PersistentElementInventory(0, Element, inventorySize, _itemsCollection);
+            PrimarySet?.Invoke(this, Primary);
+        }
+        return Primary;
+    }
 }
 
 public sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature, IUsesUserPersistentData
@@ -56,49 +100,5 @@ public sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleI
     public void Unloaded()
     {
 
-    }
-}
-
-public abstract class ElementInventoryFeature : IElementInventoryFeature
-{
-    protected readonly ItemsCollection _itemsCollection;
-
-    public Inventory? Primary { get; private set; }
-    protected abstract Element Element { get; }
-
-    public event Action<IElementInventoryFeature, Inventory>? PrimarySet;
-
-    public ElementInventoryFeature(ItemsCollection itemsCollection)
-    {
-        _itemsCollection = itemsCollection;
-    }
-
-    public bool TryGetPrimary(out Inventory inventory)
-    {
-        inventory = Primary!;
-        return inventory != null;
-    }
-
-    protected bool Load(Element element, ICollection<InventoryData> inventories, ItemsCollection itemsCollection)
-    {
-        if (inventories != null && inventories.Count != 0)
-        {
-            var inventory = inventories.First();
-
-            Primary = Inventory.CreateFromData(element, inventory, itemsCollection);
-            PrimarySet?.Invoke(this, Primary);
-            return true;
-        }
-        return false;
-    }
-
-    public Inventory CreatePrimary(uint inventorySize)
-    {
-        if (Primary == null)
-        {
-            Primary = new Inventory(Element, inventorySize, _itemsCollection);
-            PrimarySet?.Invoke(this, Primary);
-        }
-        return Primary;
     }
 }
