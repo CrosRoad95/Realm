@@ -91,10 +91,11 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
             access.TryAddItem(1).Should().BeTrue();
             access.TryAddItem(1).Should().BeTrue();
             access.TryAddItem(1).Should().BeFalse();
-            access.Items.Should().HaveCount(2);
+            access.Items.Should().HaveCount(1);
         }
 
-        inventory.Items.Should().HaveCount(2);
+        inventory.Items.Should().HaveCount(1);
+        inventory.Number.Should().Be(2);
     }
     
     [Fact]
@@ -128,6 +129,204 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
         }
 
         inventory.Items[0].MetaData["bar"].Should().Be("baz");
+    }
+    
+    [Fact]
+    public void YouShouldNotBeAbleToRemoveMoreItemsThanYouHave1()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 4);
+            access.RemoveItem(access.Items.First(), 5).Should().BeFalse();
+        }
+
+        inventory.Number.Should().Be(4);
+    }
+    
+    [Fact]
+    public void YouShouldNotBeAbleToRemoveMoreItemsThanYouHave2()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 4);
+            access.RemoveItem(access.Items.First(), 3).Should().BeTrue();
+            access.RemoveItem(access.Items.First(), 3).Should().BeFalse();
+        }
+
+        inventory.Number.Should().Be(1);
+    }
+
+    [Fact]
+    public void YouShouldNotBeAbleToRemoveMoreItemsThanYouHave3()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 20);
+            access.RemoveItem(access.Items.First(), 8).Should().BeTrue();
+            access.RemoveItem(access.Items.First(), 8).Should().BeTrue();
+            access.RemoveItem(access.Items.First(), 4).Should().BeTrue();
+        }
+
+        inventory.Number.Should().Be(0);
+    }
+
+    [Fact]
+    public void StackingItemsShouldWork1()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 4);
+            access.TryAddItem(1, 4);
+            access.Items.First().Number.Should().Be(8);
+            access.Items.Should().HaveCount(1);
+        }
+
+        inventory.Number.Should().Be(8);
+    }
+    
+    
+    [Fact]
+    public void StackingItemsShouldWork3()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 4, tryStack: false);
+            access.TryAddItem(1, 4, tryStack: false);
+            access.Items.First().Number.Should().Be(4);
+            access.Items.Last().Number.Should().Be(4);
+            access.Items.Should().HaveCount(2);
+        }
+
+        inventory.Number.Should().Be(8);
+    }
+    
+    [Fact]
+    public void YouCanNotAddMoreItemsThanInventorySize()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 21);
+            access.Items.Should().BeEmpty();
+        }
+
+        inventory.Number.Should().Be(0);
+    }
+
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [Theory]
+    public void StackingItemsShouldWork2(int variant)
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            switch (variant)
+            {
+                case 1:
+                    access.TryAddItem(1, 20);
+                    break;
+                case 2:
+                    access.TryAddItem(1, 10);
+                    access.TryAddItem(1, 10);
+                    break;
+                case 3:
+                    access.TryAddItem(1, 8);
+                    access.TryAddItem(1, 8);
+                    access.TryAddItem(1, 4);
+                    break;
+                case 4:
+                    {
+                        for(int i = 0; i < 20;i++)
+                            access.TryAddItem(1, 1);
+                    }
+                    break;
+            }
+
+            var items = access.Items.ToArray();
+            items.Should().HaveCount(3);
+            items[0].Number.Should().Be(8);
+            items[1].Number.Should().Be(8);
+            items[2].Number.Should().Be(4);
+        }
+
+        inventory.Number.Should().Be(20);
+    }
+
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [Theory]
+    public void TransferItemShouldWork(int variant)
+    {
+        var inventory1 = new Inventory(20, _itemsCollection);
+        var inventory2 = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory1.Open())
+        {
+            access.TryAddItem(1, 20);
+        }
+
+        using (var access1 = inventory1.Open())
+        {
+            using var access2 = inventory2.Open();
+            switch (variant)
+            {
+                case 1:
+                    for (int i = 0; i < 20; i++)
+                        access1.TransferItem(access2, access1.Items.First().LocalId, 1).Should().BeTrue($"Iteration: {i}");
+                    break;
+                case 2:
+                    for (int i = 0; i < 20; i += 2)
+                        access1.TransferItem(access2, access1.Items.First().LocalId, 2).Should().BeTrue($"Iteration: {i}");
+                    break;
+                case 3:
+                    access1.TransferItem(access2, access1.Items.First().LocalId, 8).Should().BeTrue();
+                    access1.TransferItem(access2, access1.Items.First().LocalId, 8).Should().BeTrue();
+                    access1.TransferItem(access2, access1.Items.First().LocalId, 4).Should().BeTrue();
+                    break;
+            }
+        }
+
+        using var _ = new AssertionScope();
+        inventory1.Number.Should().Be(0);
+        inventory2.Number.Should().Be(20);
+    }
+
+    [Fact]
+    public void YouCanNotTransferMoreItemsThanYouHave()
+    {
+        var inventory1 = new Inventory(20, _itemsCollection);
+        var inventory2 = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory1.Open())
+        {
+            access.TryAddItem(1, 20);
+        }
+
+        using (var access1 = inventory1.Open())
+        {
+            using var access2 = inventory2.Open();
+            access1.TransferItem(access2, access1.Items.First().LocalId, 9).Should().BeFalse();
+        }
+
+        using var _ = new AssertionScope();
+        inventory1.Number.Should().Be(20);
+        inventory2.Number.Should().Be(0);
     }
 
     public void Dispose()

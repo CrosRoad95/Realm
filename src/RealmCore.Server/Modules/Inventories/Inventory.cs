@@ -1,14 +1,23 @@
-﻿namespace RealmCore.Server.Modules.Inventories;
+﻿using Microsoft.AspNetCore.Components.Web;
+using System;
+
+namespace RealmCore.Server.Modules.Inventories;
 
 internal interface IInventoryEvent;
-internal record struct InventoryAddItemEvent(InventoryItem inventoryItem) : IInventoryEvent;
-internal record struct InventoryRemoveItemEvent(InventoryItem inventoryItem) : IInventoryEvent;
-internal record struct InventoryChangedItemEvent(InventoryItem inventoryItem) : IInventoryEvent;
+internal record struct InventoryAddItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
+internal record struct InventoryRemoveItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
+internal record struct InventoryChangedItemEvent(int version, InventoryItem inventoryItem) : IInventoryEvent;
 
 public interface IPersistentInventory
 {
     public int Id { get; set; }
 }
+
+internal sealed class Version
+{
+    public int Current { get; set; }
+}
+
 public readonly struct InventoryAccess : IDisposable
 {
     private readonly Inventory _inventory;
@@ -16,8 +25,26 @@ public readonly struct InventoryAccess : IDisposable
     private readonly Queue<IInventoryEvent> _events = [];
     private readonly HashSet<string> _changedItems = [];
     private readonly List<InventoryItem> _items;
+    private readonly Version _version = new();
+    private readonly Dictionary<InventoryItem, uint> _removedItems = [];
 
-    public IReadOnlyList<InventoryItem> Items => _items;
+    public IEnumerable<InventoryItem> Items
+    {
+        get
+        {
+            foreach (var item in _items)
+            {
+                if (_removedItems.TryGetValue(item, out var removedNumber))
+                {
+                    if (item.Number <= removedNumber)
+                        continue;
+                }
+                yield return item;
+            }
+        }
+    }
+
+    public decimal Number => Items.Sum(x => x.Size * x.Number);
 
     internal InventoryAccess(Inventory inventory, ItemsCollection itemsCollection)
     {
@@ -26,30 +53,77 @@ public readonly struct InventoryAccess : IDisposable
         _items = [.. inventory.Items];
     }
 
-    public bool TryAddItem(uint itemId, uint number = 1, ItemMetadata? metaData = null, bool force = false)
+    public bool TryAddItem(uint itemId, uint number = 1, ItemMetadata? metaData = null, bool force = false, bool tryStack = true)
     {
-        var inventoryItem = new InventoryItem(_itemsCollection, itemId, number, metaData);
-        if (force || HasSpaceFor(inventoryItem))
-        {
+        if (number == 0)
             return false;
-        }
 
-        _items.Add(inventoryItem);
-        _events.Enqueue(new InventoryAddItemEvent(inventoryItem));
-        return true;
+        if (!force && !HasSpaceFor(itemId, number))
+            return false;
+
+        var itemsCollectionItem = _itemsCollection.Get(itemId);
+
+        if (tryStack)
+        {
+            var existingItems = Items.Where(x => x.ItemId == itemId).ToArray();
+            foreach (var item in existingItems)
+            {
+                var remainingSpace = itemsCollectionItem.StackSize - item.Number;
+                if(remainingSpace > 0)
+                {
+                    var add = Math.Min(number, remainingSpace);
+                    number -= add;
+                    item.Number += add;
+                    _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, add));
+                }
+            }
+
+            while(number > 0)
+            {
+                var add = Math.Min(number, itemsCollectionItem.StackSize);
+                var item = new InventoryItem(_itemsCollection, itemId, add, metaData != null ? new(metaData) : null);
+                _items.Add(item);
+                _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, add));
+                number -= add;
+            }
+            return true;
+        }
+        else
+        {
+            if (itemsCollectionItem.StackSize < number)
+                return false;
+
+            var item = new InventoryItem(_itemsCollection, itemId, number, metaData != null ? new(metaData) : null);
+            _items.Add(item);
+            _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, number));
+            return true;
+        }
     }
-    
 
     public InventoryItem? FindItem(Func<InventoryItem, bool> predicate)
     {
         return _items.Where(predicate).FirstOrDefault();
     }
-
-    public bool RemoveItem(InventoryItem inventoryItem)
+    
+    public bool RemoveItem(InventoryItem inventoryItem, uint number = 1)
     {
-        if (_items.Remove(inventoryItem))
+        if (Items.Contains(inventoryItem))
         {
-            _events.Enqueue(new InventoryRemoveItemEvent(inventoryItem));
+            if (_removedItems.TryGetValue(inventoryItem, out var value))
+            {
+                if (value + number > inventoryItem.Number)
+                    return false;
+
+                _removedItems[inventoryItem] += number;
+            }
+            else
+            {
+                if (number > inventoryItem.Number)
+                    return false;
+
+                _removedItems[inventoryItem] = number;
+            }
+            _events.Enqueue(new InventoryRemoveItemEvent(_version.Current, inventoryItem, number));
             return true;
         }
         return false;
@@ -57,16 +131,34 @@ public readonly struct InventoryAccess : IDisposable
 
     private decimal GetNumber() => _items.Sum(x => x.Size * x.Number);
 
-    public bool HasSpaceFor(uint itemId, int number = 1)
+    public bool HasSpaceFor(uint itemId, uint number = 1)
     {
         var inventoryItem = _itemsCollection.Get(itemId);
-        return number + (inventoryItem.Size * number) > _inventory.Size;
+        return Number + (inventoryItem.Size * number) <= _inventory.Size;
     }
-    
-    private bool HasSpaceFor(InventoryItem inventoryItem)
+
+    public bool HasSpaceFor(InventoryItem inventoryItem)
     {
         var number = GetNumber();
         return number + (inventoryItem.Size * number) > _inventory.Size;
+    }
+
+    public bool TransferItem(InventoryAccess destination, string localId, uint number)
+    {
+        if (number == 0)
+            return false;
+
+        var item = _items.Where(x => x.LocalId == localId).FirstOrDefault();
+        if (item == null)
+            return false;
+
+        if (!destination.HasSpaceFor(item.ItemId, number))
+            return false;
+
+        if (!RemoveItem(item, number))
+            return false;
+
+        return destination.TryAddItem(item.ItemId, number, item.MetaData);
     }
 
     public void Clear()
@@ -87,7 +179,7 @@ public readonly struct InventoryAccess : IDisposable
 public class Inventory
 {
     private readonly List<InventoryItem> _items = [];
-    private readonly SemaphoreSlim _semaphore = new(1,1);
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     public event Action<Inventory, InventoryItem>? ItemAdded;
     public event Action<Inventory, InventoryItem>? ItemRemoved;
     public event Action<Inventory, InventoryItem>? ItemChanged;
@@ -134,18 +226,38 @@ public class Inventory
         _size = size;
         _itemsCollection = itemsCollection;
 
-        if(items != null)
+        if (items != null)
             _items = [.. items];
     }
 
-    private void AddItem(InventoryItem item)
+    private void AddItem(InventoryItem item, uint number)
     {
-        _items.Add(item);
+        var existingItem = _items.FirstOrDefault(x => x == item);
+        if(existingItem != null)
+        {
+            existingItem.Number += number;
+        }
+        else
+        {
+            item.Number = number;
+            _items.Add(item);
+        }
     }
 
-    private bool RemoveItem(InventoryItem item)
+    private bool RemoveItem(InventoryItem item, uint number = 1)
     {
-        return _items.Remove(item);
+        if (item.Number < number)
+            return false;
+
+        if (item.Number > number)
+        {
+            item.Number -= (uint)number;
+            return true;
+        }
+        else
+        {
+            return _items.Remove(item);
+        }
     }
 
     public InventoryAccess Open(TimeSpan? timeout = null)
@@ -172,10 +284,10 @@ public class Inventory
             switch (inventoryEvent)
             {
                 case InventoryAddItemEvent addItemEvent:
-                    AddItem(addItemEvent.inventoryItem);
+                    AddItem(addItemEvent.inventoryItem, addItemEvent.number);
                     break;
                 case InventoryRemoveItemEvent removeItemEvent:
-                    RemoveItem(removeItemEvent.inventoryItem);
+                    RemoveItem(removeItemEvent.inventoryItem, removeItemEvent.number);
                     break;
             }
         }
@@ -237,8 +349,8 @@ public class Inventory
                     break;
             }
         }
-        
-        if(exceptions.Count > 0)
+
+        if (exceptions.Count > 0)
         {
             throw new AggregateException(exceptions);
         }
