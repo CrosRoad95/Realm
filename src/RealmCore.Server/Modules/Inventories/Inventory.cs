@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using System;
-
-namespace RealmCore.Server.Modules.Inventories;
+﻿namespace RealmCore.Server.Modules.Inventories;
 
 internal interface IInventoryEvent;
 internal record struct InventoryAddItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
+internal record struct InventoryItemNumberEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
 internal record struct InventoryRemoveItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
 internal record struct InventoryChangedItemEvent(int version, InventoryItem inventoryItem) : IInventoryEvent;
 
@@ -74,7 +72,7 @@ public readonly struct InventoryAccess : IDisposable
                     var add = Math.Min(number, remainingSpace);
                     number -= add;
                     item.Number += add;
-                    _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, add));
+                    _events.Enqueue(new InventoryItemNumberEvent(_version.Current, item, add));
                 }
             }
 
@@ -286,6 +284,9 @@ public class Inventory
                 case InventoryAddItemEvent addItemEvent:
                     AddItem(addItemEvent.inventoryItem, addItemEvent.number);
                     break;
+                case InventoryItemNumberEvent addItemEvent:
+                    AddItem(addItemEvent.inventoryItem, addItemEvent.number);
+                    break;
                 case InventoryRemoveItemEvent removeItemEvent:
                     RemoveItem(removeItemEvent.inventoryItem, removeItemEvent.number);
                     break;
@@ -307,6 +308,22 @@ public class Inventory
                             try
                             {
                                 ItemAdded?.Invoke(this, addItemEvent.inventoryItem);
+                            }
+                            catch (Exception ex)
+                            {
+                                exceptions.Add(ex);
+                            }
+                        }
+                    }
+                    break;
+                case InventoryItemNumberEvent itemNumberEvent:
+                    if (ItemChanged != null)
+                    {
+                        foreach (Action<Inventory, InventoryItem> callback in ItemChanged.GetInvocationList())
+                        {
+                            try
+                            {
+                                ItemChanged?.Invoke(this, itemNumberEvent.inventoryItem);
                             }
                             catch (Exception ex)
                             {

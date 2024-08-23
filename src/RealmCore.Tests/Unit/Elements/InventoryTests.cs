@@ -224,15 +224,16 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
         inventory.Number.Should().Be(0);
     }
 
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
+    [InlineData(1, new string[] { "ItemAdded", "ItemAdded", "ItemAdded" })]
+    [InlineData(2, new string[] { "ItemAdded", "ItemAdded", "ItemChanged", "ItemAdded" })]
+    [InlineData(3, new string[] { "ItemAdded", "ItemAdded", "ItemAdded" })]
+    [InlineData(4, new string[] { "ItemAdded", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemAdded", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemChanged", "ItemAdded", "ItemChanged", "ItemChanged", "ItemChanged" })]
     [Theory]
-    public void StackingItemsShouldWork2(int variant)
+    public void StackingItemsShouldWork2(int variant, string[] expectedEvents)
     {
         var inventory = new Inventory(20, _itemsCollection);
 
+        using var monitor = inventory.Monitor();
         using (var access = inventory.Open())
         {
             switch (variant)
@@ -264,6 +265,7 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
             items[2].Number.Should().Be(4);
         }
 
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(expectedEvents);
         inventory.Number.Should().Be(20);
     }
 
