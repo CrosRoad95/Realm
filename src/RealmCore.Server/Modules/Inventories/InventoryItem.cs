@@ -27,9 +27,6 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
                 old = _number;
                 _number = value;
             }
-
-            if (old != value)
-                NumberChanged?.Invoke(this, old, value);
         }
     }
 
@@ -53,10 +50,6 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
                 return [.. _metadata.Keys];
         }
     }
-
-    public event Action<InventoryItem, uint, uint>? NumberChanged;
-    public event Action<InventoryItem, string>? MetadataChanged;
-    public event Action<InventoryItem, string>? MetadataRemoved;
 
     public InventoryItem(InventoryItem item)
     {
@@ -96,7 +89,6 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
             _metadata[key] = value;
         }
 
-        MetadataChanged?.Invoke(this, key);
         return true;
     }
 
@@ -105,15 +97,8 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
         bool removed = false;
         lock (_lock)
         {
-            if (_metadata.ContainsKey(key))
-            {
-                _metadata.Remove(key);
-                removed = true;
-            }
+            removed = _metadata.Remove(key);
         }
-
-        if(removed)
-            MetadataRemoved?.Invoke(this, key);
 
         return removed;
     }
@@ -135,9 +120,6 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
                 changed = true;
             }
         }
-
-        if(changed)
-            MetadataChanged?.Invoke(this, key);
     }
 
     public object? GetMetadata(string key)

@@ -2,7 +2,7 @@
 
 internal interface IInventoryEvent;
 internal record struct InventoryAddItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
-internal record struct InventoryItemNumberEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
+internal record struct InventoryItemNumberEvent(int version, InventoryItem inventoryItem, uint number, bool add) : IInventoryEvent;
 internal record struct InventoryRemoveItemEvent(int version, InventoryItem inventoryItem, uint number) : IInventoryEvent;
 internal record struct InventoryChangedItemEvent(int version, InventoryItem inventoryItem) : IInventoryEvent;
 
@@ -19,18 +19,19 @@ internal sealed class Version
 public readonly struct InventoryAccess : IDisposable
 {
     private readonly Inventory _inventory;
+    private readonly InventoryItem[] _items;
     private readonly ItemsCollection _itemsCollection;
     private readonly Queue<IInventoryEvent> _events = [];
-    private readonly HashSet<string> _changedItems = [];
-    private readonly List<InventoryItem> _items;
     private readonly Version _version = new();
     private readonly Dictionary<InventoryItem, uint> _removedItems = [];
+    private readonly HashSet<string> _changedItems = [];
+    private readonly List<InventoryItem> _newItems = [];
 
     public IEnumerable<InventoryItem> Items
     {
         get
         {
-            foreach (var item in _items)
+            foreach (var item in _items.Concat(_newItems))
             {
                 if (_removedItems.TryGetValue(item, out var removedNumber))
                 {
@@ -71,8 +72,9 @@ public readonly struct InventoryAccess : IDisposable
                 {
                     var add = Math.Min(number, remainingSpace);
                     number -= add;
+
                     item.Number += add;
-                    _events.Enqueue(new InventoryItemNumberEvent(_version.Current, item, add));
+                    _events.Enqueue(new InventoryItemNumberEvent(_version.Current, item, add, _newItems.Contains(item)));
                 }
             }
 
@@ -80,7 +82,7 @@ public readonly struct InventoryAccess : IDisposable
             {
                 var add = Math.Min(number, itemsCollectionItem.StackSize);
                 var item = new InventoryItem(_itemsCollection, itemId, add, metaData != null ? new(metaData) : null);
-                _items.Add(item);
+                _newItems.Add(item);
                 _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, add));
                 number -= add;
             }
@@ -92,7 +94,7 @@ public readonly struct InventoryAccess : IDisposable
                 return false;
 
             var item = new InventoryItem(_itemsCollection, itemId, number, metaData != null ? new(metaData) : null);
-            _items.Add(item);
+            _newItems.Add(item);
             _events.Enqueue(new InventoryAddItemEvent(_version.Current, item, number));
             return true;
         }
@@ -284,7 +286,7 @@ public class Inventory
                 case InventoryAddItemEvent addItemEvent:
                     AddItem(addItemEvent.inventoryItem, addItemEvent.number);
                     break;
-                case InventoryItemNumberEvent addItemEvent:
+                case InventoryItemNumberEvent addItemEvent when addItemEvent.add:
                     AddItem(addItemEvent.inventoryItem, addItemEvent.number);
                     break;
                 case InventoryRemoveItemEvent removeItemEvent:

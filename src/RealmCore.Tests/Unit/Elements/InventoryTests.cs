@@ -192,24 +192,6 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
         inventory.Number.Should().Be(8);
     }
     
-    
-    [Fact]
-    public void StackingItemsShouldWork3()
-    {
-        var inventory = new Inventory(20, _itemsCollection);
-
-        using (var access = inventory.Open())
-        {
-            access.TryAddItem(1, 4, tryStack: false);
-            access.TryAddItem(1, 4, tryStack: false);
-            access.Items.First().Number.Should().Be(4);
-            access.Items.Last().Number.Should().Be(4);
-            access.Items.Should().HaveCount(2);
-        }
-
-        inventory.Number.Should().Be(8);
-    }
-    
     [Fact]
     public void YouCanNotAddMoreItemsThanInventorySize()
     {
@@ -267,6 +249,45 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
 
         monitor.GetOccurredEvents().Should().BeEquivalentTo(expectedEvents);
         inventory.Number.Should().Be(20);
+    }
+
+    [Fact]
+    public void StackingItemsShouldWork3()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 4, tryStack: false);
+            access.TryAddItem(1, 4, tryStack: false);
+            access.Items.First().Number.Should().Be(4);
+            access.Items.Last().Number.Should().Be(4);
+            access.Items.Should().HaveCount(2);
+        }
+
+        inventory.Number.Should().Be(8);
+    }
+
+    [Fact]
+    public void StackingItemsShouldWork4()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 1, null);
+            access.Items.Should().HaveCount(1);
+            access.Items.First().Number.Should().Be(1);
+        }
+        
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 1, null);
+            access.Items.Should().HaveCount(1);
+            access.Items.First().Number.Should().Be(2);
+        }
+
+        inventory.Number.Should().Be(2);
     }
 
     [InlineData(1)]
