@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Integration;
+﻿using System;
+
+namespace RealmCore.Tests.Integration;
 
 public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IDisposable
 {
@@ -31,13 +33,9 @@ public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFix
 
         using var _ = new AssertionScope();
 
-        eventData.Should().BeEquivalentTo(expectedEventData, options => options
-            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 1.Seconds()))
-            .WhenTypeIs<DateTime>());
+        eventData.Should().BeEquivalentTo(expectedEventData, RealmTestsHelpers.DateTimeCloseTo);
 
-        eventsData.Should().BeEquivalentTo([expectedEventData], options => options
-            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 1.Seconds()))
-            .WhenTypeIs<DateTime>());
+        eventsData.Should().BeEquivalentTo([expectedEventData], RealmTestsHelpers.DateTimeCloseTo);
     }
     
     [Fact]
@@ -50,6 +48,5 @@ public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFix
 
     public void Dispose()
     {
-
     }
 }
