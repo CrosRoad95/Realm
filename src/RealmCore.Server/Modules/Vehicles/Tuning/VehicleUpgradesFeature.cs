@@ -144,6 +144,8 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
     public void Loaded(VehicleData vehicleData, bool preserveData = false)
     {
         _upgrades = vehicleData.Upgrades;
+
+        ForceRebuild();
     }
 
     public void Unloaded()

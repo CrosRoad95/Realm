@@ -26,7 +26,11 @@ internal sealed class VehiclesTuningHostedService : IHostedService
     private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         if (element is RealmVehicle vehicle)
-            vehicle.Upgrades.Rebuild += HandleRebuild;
+        {
+            var upgrades = vehicle.Upgrades;
+            upgrades.Rebuild += HandleRebuild;
+            upgrades.ForceRebuild();
+        }
     }
 
     private void HandleRebuild(VehicleUpgradesFeature upgrades)
