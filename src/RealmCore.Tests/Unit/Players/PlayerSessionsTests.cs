@@ -1,7 +1,20 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerSessionsTests
+public class PlayerSessionsTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+    private readonly PlayerSessionsFeature _sessions;
+
+    public PlayerSessionsTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+        _sessions = _player.Sessions;
+    }
+
     internal sealed class TestSession : Session
     {
         public override string Name => "Test";
@@ -74,29 +87,24 @@ public class PlayerSessionsTests
     [InlineData(true, new ElementType[] { ElementType.Marker, ElementType.Blip })]
     [InlineData(false, new ElementType[] { ElementType.Marker })]
     [Theory]
-    public async Task CreatingAndRemovingObjectiveShouldWork(bool withBlip, ElementType[] createdElementTypes)
+    public void CreatingAndRemovingObjectiveShouldWork(bool withBlip, ElementType[] createdElementTypes)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var testJobSession = player.Sessions.Begin<TestJobSession>();
+        var testJobSession = _sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateMarkerObjective(withBlip);
-        var elements = player.ElementFactory.CreatedElements.ToList();
+        var elements = _player.ElementFactory.CreatedElements.ToList();
         elements.Select(x => x.ElementType).Should().BeEquivalentTo(createdElementTypes);
         testJobSession.ObjectiveCount.Should().Be(1);
         objective.Dispose();
-        elements = player.ElementFactory.CreatedElements.ToList();
+        elements = _player.ElementFactory.CreatedElements.ToList();
+
         testJobSession.ObjectiveCount.Should().Be(0);
         elements.Count.Should().Be(0);
     }
 
     [Fact]
-    public async Task MarkerObjectiveShouldBeCompletable()
+    public void MarkerObjectiveShouldBeCompletable()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var testJobSession = player.Sessions.Begin<TestJobSession>();
+        var testJobSession = _sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateMarkerObjective(false);
 
         bool completed = false;
@@ -105,7 +113,7 @@ public class PlayerSessionsTests
             completed = true;
         }
         objective.Completed += handleCompleted;
-        player.Position = new Vector3(383.6543f, -82.01953f, 3.914598f);
+        _player.Position = new Vector3(383.6543f, -82.01953f, 3.914598f);
         completed.Should().BeTrue();
         testJobSession.ObjectiveCount.Should().Be(0);
     }
@@ -114,12 +122,9 @@ public class PlayerSessionsTests
     [InlineData(500.0f, -82.01953f, 3.914598f, 0)]
     [InlineData(600.0f, -82.01953f, 3.914598f, 1)]
     [Theory]
-    public async Task OneOfObjectiveShouldBeCompletable(float x, float y, float z, int expectedObjectiveCount)
+    public void OneOfObjectiveShouldBeCompletable(float x, float y, float z, int expectedObjectiveCount)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var testJobSession = player.Sessions.Begin<TestJobSession>();
+        var testJobSession = _sessions.Begin<TestJobSession>();
         var objective = testJobSession.CreateOneOfObjective();
 
         bool completed = false;
@@ -128,20 +133,17 @@ public class PlayerSessionsTests
             completed = true;
         }
         objective.Completed += handleCompleted;
-        player.Position = new Vector3(x, y, z);
+        _player.Position = new Vector3(x, y, z);
         testJobSession.ObjectiveCount.Should().Be(expectedObjectiveCount);
         completed.Should().Be(expectedObjectiveCount == 0);
     }
 
     [Fact]
-    public async Task CreateTransportObjectObjectiveShouldBeCompletable()
+    public void CreateTransportObjectObjectiveShouldBeCompletable()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var testJobSession = player.Sessions.Begin<TestJobSession>();
-        var myObject = player.ElementFactory.CreateObject(new Location(new Vector3(100, 100, 100), Vector3.Zero), (ObjectModel)1337);
-        myObject.TrySetOwner(player);
+        var testJobSession = _sessions.Begin<TestJobSession>();
+        var myObject = _player.ElementFactory.CreateObject(new Location(new Vector3(100, 100, 100), Vector3.Zero), (ObjectModel)1337);
+        myObject.TrySetOwner(_player);
         var objective = testJobSession.CreateTransportObjectObjective1();
 
         bool completed = false;
@@ -160,160 +162,136 @@ public class PlayerSessionsTests
     }
 
     [Fact]
-    public async Task BeginningSessionShouldTriggerAppropriateEvents()
+    public void BeginningSessionShouldTriggerAppropriateEvents()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        using var monitor = player.Sessions.Monitor();
-        player.Sessions.Begin<TestSession>();
+        using var monitor = _sessions.Monitor();
+        _sessions.Begin<TestSession>();
         monitor.GetOccurredEvents().Should().BeEquivalentTo(["Started"]);
 
-        player.Sessions.TryGet(out TestSession foundSession1).Should().BeTrue();
-        player.Sessions.TryGet(out FailedToStartTestSession foundSession2).Should().BeFalse();
-        player.Sessions.ToList().Should().BeEquivalentTo([foundSession1]);
+        _sessions.TryGet(out TestSession foundSession1).Should().BeTrue();
+        _sessions.TryGet(out FailedToStartTestSession foundSession2).Should().BeFalse();
+        _sessions.ToList().Should().BeEquivalentTo([foundSession1]);
 
-        var getSession1 = () => player.Sessions.Get<TestSession>();
-        var getSession2 = () => player.Sessions.Get<FailedToStartTestSession>();
+        var getSession1 = () => _sessions.Get<TestSession>();
+        var getSession2 = () => _sessions.Get<FailedToStartTestSession>();
 
         getSession1.Should().NotThrow();
         getSession2.Should().Throw<SessionNotFoundException>().Which.SessionType.Should().Be< FailedToStartTestSession>();
     }
 
     [Fact]
-    public async Task SessionShouldNotBeAddedIfFailedToStart()
+    public void SessionShouldNotBeAddedIfFailedToStart()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var beginSession = () =>  player.Sessions.Begin<FailedToStartTestSession>();
-        using var monitor = player.Sessions.Monitor();
+        var beginSession = () => _sessions.Begin<FailedToStartTestSession>();
+        using var monitor = _sessions.Monitor();
 
         beginSession.Should().Throw<InvalidOperationException>();
         monitor.GetOccurredEvents().Should().BeEquivalentTo([]);
-        player.Sessions.Count.Should().Be(0);
+        _sessions.Count.Should().Be(0);
     }
 
     [Fact]
-    public async Task OnlyOneSessionOfGivenTypeCanBeBegan()
+    public void OnlyOneSessionOfGivenTypeCanBeBegan()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var beginSession = () => player.Sessions.Begin<TestSession>();
+        var beginSession = () => _sessions.Begin<TestSession>();
 
         var testSession = beginSession.Should().NotThrow().Subject;
         beginSession.Should().Throw<SessionAlreadyBegunException>();
 
-        player.Sessions.Count.Should().Be(1);
+        _sessions.Count.Should().Be(1);
 
-        player.Sessions.IsDuring<TestSession>().Should().BeTrue();
-        player.Sessions.IsDuring(testSession).Should().BeTrue();
+        _sessions.IsDuring<TestSession>().Should().BeTrue();
+        _sessions.IsDuring(testSession).Should().BeTrue();
     }
 
     [Fact]
-    public async Task EndingSessionShouldWorkAsExpected1()
+    public void EndingSessionShouldWorkAsExpected1()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var session = _sessions.Begin<TestSession>();
 
-        var session = player.Sessions.Begin<TestSession>();
-
-        player.Sessions.TryEnd(session).Should().BeTrue();
-        player.Sessions.TryEnd(session).Should().BeFalse();
+        _sessions.TryEnd(session).Should().BeTrue();
+        _sessions.TryEnd(session).Should().BeFalse();
 
         session.EndedCount.Should().Be(1);
     }
 
     [Fact]
-    public async Task EndingSessionShouldWorkAsExpected2()
+    public void EndingSessionShouldWorkAsExpected2()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var session = _sessions.Begin<TestSession>();
 
-        var session = player.Sessions.Begin<TestSession>();
+        var end = () => _sessions.TryEnd<TestSession>();
 
-        var end = () => player.Sessions.TryEnd<TestSession>();
-
-        player.Sessions.TryEnd<TestSession>().Should().BeTrue();
-        player.Sessions.TryEnd<TestSession>().Should().BeFalse();
+        _sessions.TryEnd<TestSession>().Should().BeTrue();
+        _sessions.TryEnd<TestSession>().Should().BeFalse();
 
         session.EndedCount.Should().Be(1);
     }
 
     [Fact]
-    public async Task TryEndingSessionShouldWorkAsExpected1()
+    public void TryEndingSessionShouldWorkAsExpected1()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _sessions.Begin<TestSession>();
 
-        player.Sessions.Begin<TestSession>();
+        _sessions.TryEnd<TestSession>().Should().BeTrue();
+        _sessions.TryEnd<TestSession>().Should().BeFalse();
 
-        player.Sessions.TryEnd<TestSession>().Should().BeTrue();
-        player.Sessions.TryEnd<TestSession>().Should().BeFalse();
-
-        player.Sessions.Should().BeEmpty();
+        _sessions.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task TryEndingSessionShouldWorkAsExpected2()
+    public void TryEndingSessionShouldWorkAsExpected2()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var session = _sessions.Begin<TestSession>();
 
-        var session = player.Sessions.Begin<TestSession>();
+        _sessions.TryEnd(session).Should().BeTrue();
+        _sessions.TryEnd(session).Should().BeFalse();
 
-        player.Sessions.TryEnd(session).Should().BeTrue();
-        player.Sessions.TryEnd(session).Should().BeFalse();
-
-        player.Sessions.Should().BeEmpty();
+        _sessions.Should().BeEmpty();
     }
 
     [Fact]
     public async Task SessionsShouldBeCleanedUpWhenPlayerDisconnect()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var session = player.Sessions.Begin<TestSession>();
+        var session = _sessions.Begin<TestSession>();
         using var monitorSession = session.Monitor();
-        using var monitorSessions = player.Sessions.Monitor();
-        await hosting.DisconnectPlayer(player);
+        using var monitorSessions = _sessions.Monitor();
 
-        player.Sessions.ToArray().Should().BeEmpty();
+        await _hosting.DisconnectPlayer(_player);
+
+        _sessions.ToArray().Should().BeEmpty();
 
         monitorSession.GetOccurredEvents().Should().BeEquivalentTo(["Ended"]);
         monitorSessions.GetOccurredEvents().Should().BeEquivalentTo(["Ended"]);
     }
 
     [Fact]
-    public async Task SessionShouldMeasureTimeAppropriately()
+    public void SessionShouldMeasureTimeAppropriately()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var session = _sessions.Begin<TestSession>();
 
-        var session = player.Sessions.Begin<TestSession>();
-
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
         session.TryStop();
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
         session.TryStart();
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
 
         session.Elapsed.Should().Be(TimeSpan.FromMinutes(1));
     }
 
     [Fact]
-    public async Task SessionCancellationTokenShouldBeCancelledWhenSessionEnd()
+    public void SessionCancellationTokenShouldBeCancelledWhenSessionEnd()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var session = player.Sessions.Begin<TestSession>();
+        var session = _sessions.Begin<TestSession>();
         var token = session.CreateCancellationToken();
         token.IsCancellationRequested.Should().BeFalse();
 
-        player.Sessions.TryEnd<TestSession>();
+        _sessions.TryEnd<TestSession>();
         token.IsCancellationRequested.Should().BeTrue();
+    }
+
+    public void Dispose()
+    {
+        _sessions.Clear();
     }
 }

@@ -160,6 +160,12 @@ public sealed class PlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
         return true;
     }
 
+    public void Clear()
+    {
+        lock(_lock)
+            _sessions.Clear();
+    }
+
     public IEnumerator<Session> GetEnumerator()
     {
         Session[] view;
