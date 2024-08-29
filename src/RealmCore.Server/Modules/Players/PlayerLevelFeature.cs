@@ -130,4 +130,10 @@ public sealed class PlayerLevelFeature : IPlayerFeature, IUsesUserPersistentData
             CheckForNextLevel();
         }
     }
+
+    public void Clear()
+    {
+        _experience = 0;
+        _level = 0;
+    }
 }

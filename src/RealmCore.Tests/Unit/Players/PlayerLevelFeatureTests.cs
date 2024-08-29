@@ -1,10 +1,26 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerLevelFeatureTests
+public class PlayerLevelFeatureTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
-    private uint Seed(RealmTestingServerHosting hosting, int step = 10)
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingPlayer _player;
+    private readonly PlayerLevelFeature _level;
+    private readonly uint _totalRequiredExperience;
+
+    public PlayerLevelFeatureTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        var levelsCollection = hosting.GetRequiredService<LevelsCollection>();
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _level = _player.Level;
+
+        _totalRequiredExperience = Seed(_fixture.Hosting.GetRequiredService<LevelsCollection>());
+    }
+
+    private uint Seed(LevelsCollection levelsCollection, int step = 10)
+    {
+        if(levelsCollection.HasKey(1))
+            return 0;
+
         uint totalRequiredExperience = 0;
         for (int i = 0; i < 10; i++)
         {
@@ -16,57 +32,52 @@ public class PlayerLevelFeatureTests
     }
 
     [Fact]
-    public async Task TestIfLevelsAreCountingCorrectly()
+    public void TestIfLevelsAreCountingCorrectly()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var totalRequiredExperience = Seed(hosting);
-        var level = player.Level;
-
         int addedLevels = 0;
-        var monitor = level.Monitor();
+        var monitor = _level.Monitor();
 
-        level.Changed += (e, level, levelChange) =>
+        _level.Changed += (e, level, levelChange) =>
         {
             if(levelChange == LevelChange.Increase)
                 addedLevels++;
         };
 
-        level.GiveExperience(50);
+        _level.GiveExperience(50);
+
+        using var _ = new AssertionScope();
 
         addedLevels.Should().Be(2);
-        level.Experience.Should().Be(20);
-        level.NextLevelRequiredExperience.Should().Be(30);
-        monitor.OccurredEvents[0].Parameters.Should().BeEquivalentTo(new object[] { level, 1, LevelChange.Increase });
-        monitor.OccurredEvents[1].Parameters.Should().BeEquivalentTo(new object[] { level, 2, LevelChange.Increase });
-        monitor.OccurredEvents[2].Parameters.Should().BeEquivalentTo(new object[] { level, 0, 20 });
-        monitor.GetOccurredEvents().Should().BeEquivalentTo(["Changed", "Changed", "ExperienceChanged"]);
+        _level.Experience.Should().Be(20);
+        _level.NextLevelRequiredExperience.Should().Be(30);
+        monitor.OccurredEvents[0].Parameters.Should().BeEquivalentTo(new object[] { _level, 1, LevelChange.Increase });
+        monitor.OccurredEvents[1].Parameters.Should().BeEquivalentTo(new object[] { _level, 2, LevelChange.Increase });
+        monitor.OccurredEvents[2].Parameters.Should().BeEquivalentTo(new object[] { _level, 0, 20 });
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(["Changed", "Changed", "ExperienceChanged", "VersionIncreased"]);
         monitor.Clear();
 
-        level.GiveExperience(1000);
-        addedLevels.Should().Be(10);
-        level.Experience.Should().Be(1050 - totalRequiredExperience);
-        level.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
+        _level.GiveExperience(1000);
 
-        level.Current = 0;
-        level.Experience = 0;
+        addedLevels.Should().Be(10);
+        _level.Experience.Should().Be(1050 - _totalRequiredExperience);
+        _level.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
     }
 
     [Fact]
     public async Task GivingExperienceShouldBeThreadSafe()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var totalRequiredExperience = Seed(hosting, 10000);
-        var level = player.Level;
-
         await ParallelHelpers.Run(() =>
         {
-            level.GiveExperience(1);
+            _level.GiveExperience(1);
         });
 
-        level.Experience.Should().Be(800);
+        using var _ = new AssertionScope();
+        _level.Experience.Should().Be(250);
+        _level.Current.Should().Be(10);
+    }
+
+    public void Dispose()
+    {
+        _level.Clear();
     }
 }
