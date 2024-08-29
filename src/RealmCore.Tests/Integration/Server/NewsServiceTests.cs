@@ -1,16 +1,24 @@
 ﻿namespace RealmCore.Tests.Integration.Server;
 
-public class NewsServiceTests
+public class NewsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingPlayer _player;
+    private readonly NewsService _newsService;
+    private readonly IDb _db;
+
+    public NewsServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _newsService = _fixture.Hosting.GetRequiredService<NewsService>();
+        _db = _fixture.Hosting.GetRequiredService<IDb>();
+    }
+
     [Fact]
     public async Task AddingAndListingNewsShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var now = hosting.DateTimeProvider.Now;
-        var newsService = hosting.GetRequiredService<NewsService>();
-        var context = hosting.GetRequiredService<IDb>();
-
+        var now = _fixture.Hosting.DateTimeProvider.Now;
         var tag1 = Guid.NewGuid().ToString();
         var tag2 = Guid.NewGuid().ToString();
         var tag3 = Guid.NewGuid().ToString();
@@ -23,7 +31,7 @@ public class NewsServiceTests
         };
         var title = Guid.NewGuid().ToString();
 
-        context.News.Add(new NewsData
+        _db.News.Add(new NewsData
         {
             Title = $"title1{title}",
             Excerpt = "excerpt",
@@ -41,7 +49,7 @@ public class NewsServiceTests
                 },
             }
         });
-        context.News.Add(new NewsData
+        _db.News.Add(new NewsData
         {
             Title = $"title2{title}",
             Excerpt = "excerpt",
@@ -59,7 +67,7 @@ public class NewsServiceTests
                 },
             }
         });
-        context.News.Add(new NewsData
+        _db.News.Add(new NewsData
         {
             Title = $"title2 not visible{title}",
             Excerpt = "excerpt",
@@ -77,9 +85,9 @@ public class NewsServiceTests
                 },
             }
         });
-        await context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
-        var newsList = await newsService.Get(2);
+        var newsList = await _newsService.Get(2);
         newsList.Should().BeEquivalentTo(new List<NewsDto>
         {
             new NewsDto
