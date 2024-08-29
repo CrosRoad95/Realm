@@ -5,7 +5,6 @@ public sealed class VehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>, 
     private readonly object _lock = new();
     private ICollection<VehicleUpgradeData> _upgrades = [];
 
-
     public event Action<VehicleUpgradesFeature, int>? UpgradeAdded;
     public event Action<VehicleUpgradesFeature, int>? UpgradeRemoved;
     public event Action<VehicleUpgradesFeature>? Rebuild;

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿using System.Security.Cryptography;
+
+namespace RealmCore.Server.Modules.Players;
 
 public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>, IUsesUserPersistentData
 {
@@ -64,7 +66,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
                 Value = 0
             };
             _stats.Add(stat);
-            VersionIncreased?.Invoke();
+
             return stat;
         }
         return stat;
@@ -81,7 +83,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
                 Value = 0
             };
             _gtaSaStats.Add(stat);
-            VersionIncreased?.Invoke();
+
             return stat;
         }
         return stat;
@@ -91,41 +93,53 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
+        UserStatData stat;
+
         lock (_lock)
         {
-            var stat = GetStatById(statId);
+            stat = GetStatById(statId);
             stat.Value += value;
-            VersionIncreased?.Invoke();
-            Increased?.Invoke(this, statId, stat.Value);
         }
+
+        Increased?.Invoke(this, statId, stat.Value);
+        VersionIncreased?.Invoke();
     }
 
     public void Decrease(int statId, float value = 1)
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
+        UserStatData stat;
+
         lock (_lock)
         {
-            var stat = GetStatById(statId);
+            stat = GetStatById(statId);
             stat.Value -= value;
-            VersionIncreased?.Invoke();
-            Increased?.Invoke(this, statId, stat.Value);
         }
+
+        Decreased?.Invoke(this, statId, stat.Value);
+        VersionIncreased?.Invoke();
     }
 
     public void Set(int statId, float value)
     {
+        UserStatData stat;
+        float old;
         lock (_lock)
         {
-            var stat = GetStatById(statId);
-            var old = stat.Value;
+            stat = GetStatById(statId);
+            if (value == stat.Value)
+                return;
+
+            old = stat.Value;
             stat.Value = value;
-            if (stat.Value > old)
-                Increased?.Invoke(this, statId, stat.Value);
-            else if (stat.Value < old)
-                Decreased?.Invoke(this, statId, stat.Value);
-            VersionIncreased?.Invoke();
         }
+
+        if (stat.Value > old)
+            Increased?.Invoke(this, statId, stat.Value);
+        else if (stat.Value < old)
+            Decreased?.Invoke(this, statId, stat.Value);
+        VersionIncreased?.Invoke();
     }
 
     public float Get(int statId)
@@ -155,6 +169,15 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
         {
             var stat = GetGtaSaStatById(statId);
             return stat.Value;
+        }
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _gtaSaStats.Clear();
+            _stats.Clear();
         }
     }
 
