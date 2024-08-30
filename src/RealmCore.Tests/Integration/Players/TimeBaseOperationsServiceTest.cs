@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Integration.Players;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace RealmCore.Tests.Integration.Players;
 
 public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IAsyncDisposable
 {
@@ -92,7 +94,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         var count = await _timeBaseOperationsService.CountOperationsByGroupId(group.Id);
 
         using var _ = new AssertionScope();
-        operations.Should().BeEmpty();
+        operations.Where(x => x.Id == operation!.Id).Should().BeEmpty();
         count.Should().Be(0);
     }
     
@@ -125,15 +127,16 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         var group = await _timeBaseOperationsService.CreateGroup(1, 2, _sampleMetadata);
 
         var operation = await _timeBaseOperationsService.CreateForUser(group.Id, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
-        await _timeBaseOperationsService.SetStatus(operation!.Id, 2);
+        var updated = await _timeBaseOperationsService.SetStatus(operation!.Id, 2);
         var operations = await _timeBaseOperationsService.GetByUserIdAndCategory(_player.UserId, 1);
 
         using var _ = new AssertionScope();
-        operations[0].Status.Should().Be(2);
+        updated.Should().BeTrue();
+        operations.Where(x => x.Id == operation!.Id).First().Status.Should().Be(2);
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return ValueTask.CompletedTask;
+        await _fixture.Hosting.GetRequiredService<IDb>().TimeBaseOperations.ExecuteDeleteAsync();
     }
 }
