@@ -16,7 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserRewardRepository>();
         services.AddScoped<UserNotificationRepository>();
         services.AddScoped<UserLoginHistoryRepository>();
-        services.AddScoped<UserMoneyHistoryRepository>();
         services.AddScoped<DataEventRepository>();
         services.AddScoped<RatingRepository>();
         services.AddScoped<OpinionRepository>();

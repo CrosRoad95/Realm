@@ -21,7 +21,6 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly UsersService _usersService;
     private readonly VehiclesService _vehiclesService;
     private readonly IElementOutlineService _elementOutlineService;
-    private readonly MoneyHistoryService _userMoneyHistoryService;
     private readonly IMapNamesService _mapNamesService;
     private readonly VehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
@@ -34,7 +33,7 @@ internal sealed class CommandsHostedService : IHostedService
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, MoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -46,7 +45,6 @@ internal sealed class CommandsHostedService : IHostedService
         _usersService = usersService;
         _vehiclesService = vehiclesService;
         _elementOutlineService = elementOutlineService;
-        _userMoneyHistoryService = userMoneyHistoryService;
         _mapNamesService = mapNamesService;
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;

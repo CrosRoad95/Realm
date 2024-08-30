@@ -43,7 +43,7 @@ public sealed class UserLoginHistoryRepository
         }
 
         var query = _db.UserLoginHistory
-            .TagWithSource(nameof(UserMoneyHistoryRepository))
+            .TagWithSource(nameof(UserLoginHistoryRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.DateTime)

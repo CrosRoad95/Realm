@@ -45,7 +45,6 @@ public interface IDb
     DbSet<OpinionData> Opinions { get; }
     DbSet<UserNotificationData> UserNotifications { get; }
     DbSet<UserLoginHistoryData> UserLoginHistory { get; }
-    DbSet<UserMoneyHistoryData> UserMoneyHistory { get; }
     DbSet<NewsData> News { get; }
     DbSet<TagData> Tags { get; }
     DbSet<NewsTagData> NewsTags { get; }

@@ -41,7 +41,6 @@ public class UserData : IdentityUser<int>
     public virtual ICollection<UserEventData> Events { get; set; } = new List<UserEventData>();
     public ICollection<UserNotificationData> Notifications { get; set; } = new List<UserNotificationData>();
     public ICollection<UserLoginHistoryData> LoginHistory { get; set; } = new List<UserLoginHistoryData>();
-    public ICollection<UserMoneyHistoryData> MoneyHistory { get; set; } = new List<UserMoneyHistoryData>();
     public ICollection<UserBanData> Bans { get; set; } = new List<UserBanData>();
     public ICollection<UserBanData> ResponsibleBans { get; set; } = new List<UserBanData>();
     public ICollection<UserPlayTimeData> PlayTimes { get; set; } = new List<UserPlayTimeData>();

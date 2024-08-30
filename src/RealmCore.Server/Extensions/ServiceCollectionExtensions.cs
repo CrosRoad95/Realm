@@ -116,7 +116,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<FeedbackService>();
         services.AddSingleton<SpawnMarkersService>();
         services.AddSingleton<NewsService>();
-        services.AddSingleton<MoneyHistoryService>();
         services.AddSingleton<BrowserGuiService>();
         services.AddSingleton<MapsService>();
         services.AddSingleton<PlayersEventManager>();
