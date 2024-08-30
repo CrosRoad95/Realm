@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Serving;
 
-internal class ServerFilesProvider : IServerFilesProvider
+internal sealed class ServerFilesProvider : IServerFilesProvider
 {
     private readonly string _basePath;
     public ServerFilesProvider(string basePath)

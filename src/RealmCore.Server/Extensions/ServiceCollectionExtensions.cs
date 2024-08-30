@@ -206,7 +206,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
         services.AddHostedService<MigrateDatabaseService>();
         services.AddHostedService<SeedServerService>();
-        services.AddHostedService<LoadVehicleService>();
+        services.AddHostedService<LoadVehiclesService>();
         services.AddHostedService<BrowserGuiHostedService>();
         services.AddHostedService<AdminResourceHostedService>();
         services.AddHostedService<AFKResourceHostedService>();

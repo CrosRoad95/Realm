@@ -13,10 +13,8 @@ public sealed class PlayerBanPipeline : IPlayerJoinedPipeline
         _bansService = bansService;
     }
 
-    public async Task<bool> Next(Player plr)
+    public async Task<bool> Next(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
-
         var serial = player.Client.Serial;
         if (serial == null)
             player.Client.FetchSerial();

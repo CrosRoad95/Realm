@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Modules.Players.Administration;
+﻿namespace RealmCore.Server.Modules.Players.Administration;
 
 internal sealed class AdminResourceHostedService : IHostedService
 {

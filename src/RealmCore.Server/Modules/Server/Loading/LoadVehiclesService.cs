@@ -5,12 +5,12 @@ public sealed class VehicleLoadingOptions
     public bool SkipVehicleLoading { get; set; }
 }
 
-internal sealed class LoadVehicleService : IHostedLifecycleService
+internal sealed class LoadVehiclesService : IHostedLifecycleService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptions<VehicleLoadingOptions> _options;
 
-    public LoadVehicleService(IServiceProvider serviceProvider, IOptions<VehicleLoadingOptions> options)
+    public LoadVehiclesService(IServiceProvider serviceProvider, IOptions<VehicleLoadingOptions> options)
     {
         _serviceProvider = serviceProvider;
         _options = options;

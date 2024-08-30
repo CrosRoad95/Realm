@@ -1,9 +1,8 @@
-﻿
-namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players;
 
 public interface IPlayerJoinedPipeline
 {
-    Task<bool> Next(Player player);
+    Task<bool> Next(RealmPlayer player);
 }
 
 internal sealed class PlayerJoinedPipelineHostedService : IHostedService
@@ -12,13 +11,15 @@ internal sealed class PlayerJoinedPipelineHostedService : IHostedService
     private readonly IEnumerable<IPlayerJoinedPipeline> _playerPipelines;
     private readonly PlayersEventManager _playersEventManager;
     private readonly ILogger<PlayerJoinedPipelineHostedService> _logger;
+    private readonly AntiCheat _antiCheat;
 
-    public PlayerJoinedPipelineHostedService(MtaServer mtaServer, IEnumerable<IPlayerJoinedPipeline> playerPipelines, PlayersEventManager playersEventManager, ILogger<PlayerJoinedPipelineHostedService> logger)
+    public PlayerJoinedPipelineHostedService(MtaServer mtaServer, IEnumerable<IPlayerJoinedPipeline> playerPipelines, PlayersEventManager playersEventManager, ILogger<PlayerJoinedPipelineHostedService> logger, AntiCheat antiCheat)
     {
         _mtaServer = mtaServer;
         _playerPipelines = playerPipelines;
         _playersEventManager = playersEventManager;
         _logger = logger;
+        _antiCheat = antiCheat;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -33,12 +34,22 @@ internal sealed class PlayerJoinedPipelineHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void HandlePlayerJoined(Player player)
+    private async void HandlePlayerJoined(Player plr)
     {
         using var activity = Activity.StartActivity(nameof(HandlePlayerJoined));
 
+        var player = (RealmPlayer)plr;
+
         try
         {
+            var serial = player.Client.GetSerial();
+            if (!Regexes.ValidSerial().IsMatch(serial))
+            {
+                _antiCheat.ReportViolation(player, KnownAntiCheatViolation.InvalidSerial, new AntiCheatViolationDetails(serial));
+                player.Kick("Nie udało się wejść na serwer.");
+
+                return;
+            }
             bool success = true;
             foreach (var playerPipeline in _playerPipelines)
             {

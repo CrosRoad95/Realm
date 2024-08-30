@@ -5,7 +5,7 @@ public interface IDiscordIntegration : IIntegration
     ulong DiscordUserId { get; }
     string? Name { get; }
 
-    string GenerateAndGetConnectionCode(TimeSpan? validFor = null);
+    bool GenerateAndGetConnectionCode(out string code, TimeSpan? validFor = null);
     void Integrate(ulong discordUserId, string name, bool isNew = false);
     bool TryVerify(string code, ulong discordUserId, string name);
 }
@@ -77,16 +77,20 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         return false;
     }
 
-    public string GenerateAndGetConnectionCode(TimeSpan? validFor = null)
+    public bool GenerateAndGetConnectionCode(out string code, TimeSpan? validFor = null)
     {
         lock (_lock)
         {
             if (IsIntegrated())
-                throw new IntegrationAlreadyCreatedException();
+            {
+                code = "";
+                return false;
+            }
 
             _discordConnectionCode = Guid.NewGuid().ToString();
             _discordConnectionCodeValidUntil = _dateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
-            return _discordConnectionCode;
+            code = _discordConnectionCode;
+            return true;
         }
     }
 

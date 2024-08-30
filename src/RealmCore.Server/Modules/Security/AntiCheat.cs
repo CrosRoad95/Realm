@@ -4,9 +4,10 @@ public enum KnownAntiCheatViolation
 {
     ExplosionSpam,
     ExplosionOutsideRange,
+    InvalidSerial,
 }
 
-public record AntiCheatViolationDetails();
+public record AntiCheatViolationDetails(object? Data = null);
 
 public sealed class AntiCheat
 {
