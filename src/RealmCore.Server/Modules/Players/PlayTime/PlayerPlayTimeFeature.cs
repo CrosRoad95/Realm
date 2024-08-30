@@ -132,6 +132,15 @@ public sealed class PlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPl
         }
     }
 
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _playTimes.Clear();
+            _category = 0;
+        }
+    }
+
     public IEnumerator<PlayerPlayTimeDto> GetEnumerator()
     {
         lock (_lock)

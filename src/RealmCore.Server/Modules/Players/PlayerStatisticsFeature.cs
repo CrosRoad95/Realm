@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players;
 
 public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>, IUsesUserPersistentData
 {

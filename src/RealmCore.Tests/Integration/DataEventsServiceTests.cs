@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RealmCore.Tests.Integration;
+﻿namespace RealmCore.Tests.Integration;
 
 public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IDisposable
 {

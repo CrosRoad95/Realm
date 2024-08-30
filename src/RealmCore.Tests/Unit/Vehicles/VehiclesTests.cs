@@ -1,12 +1,22 @@
 ﻿namespace RealmCore.Tests.Unit.Vehicles;
 
-public class VehiclesTests
+public class VehiclesTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
-    [Fact]
-    public async Task IsInMovePropertyShouldWork()
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public VehiclesTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+    }
+
+    [Fact]
+    public void IsInMovePropertyShouldWork()
+    {
+        var vehicle = _hosting.CreateVehicle();
 
         vehicle.IsInMove.Should().BeFalse();
         vehicle.Velocity = new Vector3(0.1f, 0.1f, 0.1f);
@@ -16,8 +26,7 @@ public class VehiclesTests
     [Fact]
     public void VehicleContextShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
 
         vehicle.GetRequiredService<VehicleContext>().Vehicle.Should().Be(vehicle);
     }
@@ -25,8 +34,7 @@ public class VehiclesTests
     [Fact]
     public void VehicleFuelShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 50, 50, 1, 1, true);
         fuelContainer.Update(true);
@@ -42,8 +50,7 @@ public class VehiclesTests
     [Fact]
     public void VehicleFuelShouldNotBeConsumedWhenVehicleMovedOverLargeDistance()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 50, 50, 1, 1, true);
         fuelContainer.Update(true);
@@ -56,8 +63,7 @@ public class VehiclesTests
     [Fact]
     public void VehicleEngineShouldBeTurnedOffWhenFuelRanOut()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         vehicle.IsEngineOn = true;
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 100, 100, 100, 1, true);
@@ -77,8 +83,7 @@ public class VehiclesTests
     [Fact]
     public void FuelShouldNotBeConsumedWhenFuelContainerIsNotActive()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         vehicle.IsEngineOn = true;
 
         var fuelContainer = vehicle.Fuel.AddFuelContainer(0, 100, 100, 100, 1, true);

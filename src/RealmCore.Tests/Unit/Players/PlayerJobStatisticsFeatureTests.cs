@@ -1,26 +1,33 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerJobStatisticsFeatureTests
+public class PlayerJobStatisticsFeatureTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
-    [Fact]
-    public async Task AddPointsTimePlayedShouldWork()
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+    private readonly PlayerJobStatisticsFeature _jobStatistics;
+
+    public PlayerJobStatisticsFeatureTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var obj = hosting.CreateFocusableObject();
-        var statistics = player.JobStatistics;
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+        _jobStatistics = _player.JobStatistics;
+    }
 
-        #region Act
-        statistics.AddPoints(1, 2);
-        statistics.AddPoints(1, 2);
-        statistics.AddPoints(2, 2);
-        statistics.AddTimePlayed(1, 2);
-        statistics.AddTimePlayed(1, 2);
-        statistics.AddTimePlayed(2, 2);
-        #endregion
+    [Fact]
+    public void AddPointsTimePlayedShouldWork()
+    {
+        var obj = _hosting.CreateFocusableObject();
 
-        #region Assert
-        statistics.Should().BeEquivalentTo(new List<UserJobStatisticsDto>
+        _jobStatistics.AddPoints(1, 2);
+        _jobStatistics.AddPoints(1, 2);
+        _jobStatistics.AddPoints(2, 2);
+        _jobStatistics.AddTimePlayed(1, 2);
+        _jobStatistics.AddTimePlayed(1, 2);
+        _jobStatistics.AddTimePlayed(2, 2);
+
+        _jobStatistics.Should().BeEquivalentTo(new List<UserJobStatisticsDto>
         {
             new UserJobStatisticsDto
             {
@@ -42,6 +49,5 @@ public class PlayerJobStatisticsFeatureTests
 
             return options;
         });
-        #endregion
     }
 }

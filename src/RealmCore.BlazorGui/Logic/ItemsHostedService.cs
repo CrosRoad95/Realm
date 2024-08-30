@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Inventories;
-
-namespace RealmCore.BlazorGui.Logic;
+﻿namespace RealmCore.BlazorGui.Logic;
 
 public class ItemsHostedService : PlayerLifecycle, IHostedService
 {

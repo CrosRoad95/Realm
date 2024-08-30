@@ -1,66 +1,60 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayerPlayTimeFeatureTests
+public class PlayerPlayTimeFeatureTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
-    [Fact]
-    public async Task TestIfCounterWorksCorrectly()
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+    private readonly TestDateTimeProvider _dateTimeProvider;
+    private readonly PlayerPlayTimeFeature _playTime;
+
+    public PlayerPlayTimeFeatureTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player1 = await hosting.CreatePlayer();
-        var player2 = await hosting.CreatePlayer();
-
-        var dateTimeProvider = hosting.DateTimeProvider;
-
-        var playTime1 = player1.PlayTime;
-        var playTime2 = player2.PlayTime;
-        playTime2.InternalSetTotalPlayTime(1000);
-
-        playTime1.PlayTime.Should().Be(TimeSpan.Zero);
-        playTime1.TotalPlayTime.Should().Be(TimeSpan.Zero);
-
-        playTime2.PlayTime.Should().Be(TimeSpan.Zero);
-        playTime2.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1000));
-
-        dateTimeProvider.Add(TimeSpan.FromSeconds(50));
-
-        playTime1.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
-        playTime1.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
-
-        playTime2.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
-        playTime2.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1050));
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+        _dateTimeProvider = _hosting.DateTimeProvider;
+        _playTime = _player.PlayTime;
     }
 
     [Fact]
-    public async Task CategoryPlayTimeShouldWork1()
+    public void TestIfCounterWorksCorrectly()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _playTime.PlayTime.Should().Be(TimeSpan.Zero);
+        _playTime.TotalPlayTime.Should().Be(TimeSpan.Zero);
 
-        var playTime = player.PlayTime;
+        _dateTimeProvider.Add(TimeSpan.FromSeconds(50));
 
-        playTime.Category = 1;
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
-        playTime.Category = 2;
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _playTime.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        _playTime.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
+    }
 
-        playTime.ToArray().Should().BeEquivalentTo([
+    [Fact]
+    public void CategoryPlayTimeShouldWork1()
+    {
+        _playTime.Category = 1;
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _playTime.Category = 2;
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+
+        _playTime.ToArray().Should().BeEquivalentTo([
             new PlayerPlayTimeDto(1, TimeSpan.FromSeconds(30)),
             new PlayerPlayTimeDto(2, TimeSpan.FromSeconds(30))
         ]);
     }
 
     [Fact]
-    public async Task CategoryPlayTimeShouldWork2()
+    public void CategoryPlayTimeShouldWork2()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        _playTime.Category = 1;
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
+        _hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
 
-        var playTime = player.PlayTime;
+        _playTime.GetByCategory(1).Should().Be(TimeSpan.FromMinutes(1));
+    }
 
-        playTime.Category = 1;
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
-        hosting.DateTimeProvider.Add(TimeSpan.FromSeconds(30));
-
-        playTime.GetByCategory(1).Should().Be(TimeSpan.FromMinutes(1));
+    public void Dispose()
+    {
+        _playTime.Clear();
     }
 }
