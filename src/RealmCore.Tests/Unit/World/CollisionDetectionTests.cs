@@ -1,23 +1,31 @@
 ﻿namespace RealmCore.Tests.Unit.World;
 
-public class CollisionDetectionTests
+public class CollisionDetectionTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public CollisionDetectionTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+    }
+
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public async Task CollisionSphereDetection(bool usePlayerElementFactory)
+    public void CollisionSphereDetection(bool usePlayerElementFactory)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
         {
-            elementFactory = player.ElementFactory;
+            elementFactory = _player.ElementFactory;
         }
         else
         {
-            elementFactory = hosting.GetRequiredService<IElementFactory>();
+            elementFactory = _hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);
@@ -34,9 +42,9 @@ public class CollisionDetectionTests
             elementLeft++;
         };
 
-        player.Position = position;
+        _player.Position = position;
         realmWorldObject.Position = position;
-        player.Position = new Vector3(0, 0, 0);
+        _player.Position = new Vector3(0, 0, 0);
         realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();
@@ -55,19 +63,16 @@ public class CollisionDetectionTests
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public async Task MarkerDetection(bool usePlayerElementFactory)
+    public void MarkerDetection(bool usePlayerElementFactory)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
         {
-            elementFactory = player.ElementFactory;
+            elementFactory = _player.ElementFactory;
         }
         else
         {
-            elementFactory = hosting.GetRequiredService<IElementFactory>();
+            elementFactory = _hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);
@@ -85,9 +90,9 @@ public class CollisionDetectionTests
             elementLeft++;
         };
 
-        player.Position = position;
+        _player.Position = position;
         realmWorldObject.Position = position;
-        player.Position = new Vector3(0, 0, 0);
+        _player.Position = new Vector3(0, 0, 0);
         realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();
@@ -106,19 +111,16 @@ public class CollisionDetectionTests
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public async Task PickupDetection(bool usePlayerElementFactory)
+    public void PickupDetection(bool usePlayerElementFactory)
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         IElementFactory elementFactory;
         if (usePlayerElementFactory)
         {
-            elementFactory = player.ElementFactory;
+            elementFactory = _player.ElementFactory;
         }
         else
         {
-            elementFactory = hosting.GetRequiredService<IElementFactory>();
+            elementFactory = _hosting.GetRequiredService<IElementFactory>();
         }
 
         var position = new Vector3(100, 0, 0);
@@ -130,9 +132,9 @@ public class CollisionDetectionTests
             elementEntered++;
         };
 
-        player.Position = position;
+        _player.Position = position;
         realmWorldObject.Position = position;
-        player.Position = new Vector3(0, 0, 0);
+        _player.Position = new Vector3(0, 0, 0);
         realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();

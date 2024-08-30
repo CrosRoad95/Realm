@@ -40,20 +40,31 @@ public class VehicleUpgrade3 : IVehicleHandlingModifier
     }
 }
 
-public class VehicleUpgradesTests
+public class VehicleUpgradesTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
-    private void Seed(RealmTestingServerHosting hosting)
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public VehicleUpgradesTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        var vehicleUpgradesCollection = hosting.GetRequiredService<VehicleUpgradesCollection>();
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+        Seed(_hosting.GetRequiredService<VehicleUpgradesCollection>());
+    }
+
+    private void Seed(VehicleUpgradesCollection vehicleUpgradesCollection)
+    {
+        if (vehicleUpgradesCollection.HasKey(1000000))
+            return;
 
         vehicleUpgradesCollection.Add(1000000, new VehicleUpgradesCollectionItem(new VehicleUpgrade1()));
         vehicleUpgradesCollection.Add(1000001, new VehicleUpgradesCollectionItem(new VehicleUpgrade2()));
         vehicleUpgradesCollection.Add(1000002, new VehicleUpgradesCollectionItem(new VehicleUpgrade3()));
 
-        #region Assert default handling
         var handling = VehicleHandlingConstants.DefaultVehicleHandling[(ushort)VehicleModel.Perennial];
         handling.MaxVelocity.Should().Be(150);
-        #endregion
     }
 
     [InlineData(1000000, 400)]
@@ -61,20 +72,11 @@ public class VehicleUpgradesTests
     [Theory]
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
+        var vehicle = _hosting.CreateVehicle();
 
-        Seed(hosting);
-        var vehicle = hosting.CreateVehicle();
-        #endregion
-
-        #region Act
         vehicle.Upgrades.AddUpgrade(upgradeId);
-        #endregion
 
-        #region Assert
         vehicle.Handling!.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
-        #endregion
     }
 
     [InlineData(1000000, 400)]
@@ -82,55 +84,33 @@ public class VehicleUpgradesTests
     [Theory]
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
-        #region Act
-        using var hosting = new RealmTestingServerHosting();
-
-        Seed(hosting);
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         var resultA = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         var resultB = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
-        #endregion
-
-        #region Assert
         resultA.Should().BeTrue();
         resultB.Should().BeFalse();
         vehicle.Handling.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
-        #endregion
     }
 
     [Fact]
     public void UpgradesCanBeRemoved()
     {
-        #region Act
-        using var hosting = new RealmTestingServerHosting();
-
-        Seed(hosting);
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrade(1000000);
         vehicle.Upgrades.RemoveUpgrade(1000000);
-        #endregion
 
-        #region Assert
         vehicle.Handling.Value.MaxVelocity.Should().Be(150);
-        #endregion
     }
 
     [Fact]
     public void MultipleUpgradesOfSameTypeCanBeAdded()
     {
-        #region Act
-        using var hosting = new RealmTestingServerHosting();
-
-        Seed(hosting);
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
-        #endregion
 
-        #region Assert
         // 150 - base
         // ((150 * 2 + 100) * 2 + 100) * 2 + 100
         vehicle.Handling.Value.MaxVelocity.Should().Be(1900);
-        #endregion
     }
 
     [InlineData(new int[] { 1000002, 1000000, 1000000, 1000000 })]
@@ -140,18 +120,11 @@ public class VehicleUpgradesTests
     [Theory]
     public void UpgradesMiddlewareShouldBeOrderIndependent(int[] upgrades)
     {
-        #region Act
-        using var hosting = new RealmTestingServerHosting();
-
-        Seed(hosting);
-        var vehicle = hosting.CreateVehicle();
+        var vehicle = _hosting.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(upgrades);
-        #endregion
 
-        #region Assert
         // 150 - base
         // (((150 * 2 + 100) * 2 + 100) * 2 + 100) / 2
         vehicle.Handling.Value.MaxVelocity.Should().Be(950);
-        #endregion
     }
 }
