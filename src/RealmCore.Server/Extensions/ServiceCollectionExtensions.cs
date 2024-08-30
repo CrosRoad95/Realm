@@ -132,6 +132,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<VehiclesAccessService>();
         services.AddSingleton<DataEventsService>();
         services.AddSingleton<GroupsManager>();
+        services.AddSingleton<WorldHudService>();
         #endregion
 
         #region Player features

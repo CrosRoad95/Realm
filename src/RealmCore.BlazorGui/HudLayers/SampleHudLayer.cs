@@ -6,7 +6,7 @@ namespace RealmCore.BlazorGui.HudLayers;
 
 public class SampleHudState
 {
-    public string String { get; set; }
+    public string String { get; set; } = "initialValue";
 }
 
 public class SampleHudLayer : HudLayer<SampleHudState>

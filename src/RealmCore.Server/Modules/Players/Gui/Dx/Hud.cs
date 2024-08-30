@@ -1,44 +1,28 @@
-﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
+﻿using SlipeServer.Server.Elements;
 
-internal class Hud<TState> : IHud<TState> where TState : class
+namespace RealmCore.Server.Modules.Players.Gui.Dx;
+
+internal abstract class HudBase<TState> : IHud<TState> where TState : class
 {
-    private readonly Player _player;
-    private readonly IOverlayService _overlayService;
+    protected readonly IOverlayService _overlayService;
     private readonly TState? _state;
     private readonly List<DynamicHudElement>? _dynamicHudElements;
     private bool _disposed = false;
-    private Vector2 _position;
 
     public event Action<IHud>? Disposed;
 
-    public string Name { get; }
+    public string Id { get; }
 
-    public Vector2 Offset
+    public HudBase(string id, IOverlayService overlayService, TState? state = default, List<DynamicHudElement>? dynamicHudElements = null)
     {
-        get => _position; set
-        {
-            ThrowIfDisposed();
-            _overlayService.SetHudPosition(_player, Name, value);
-            _position = value;
-        }
-    }
-
-    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudElements = null)
-    {
-        Name = name;
-        _player = player;
+        Id = id;
         _overlayService = overlayService;
         _state = state;
         _dynamicHudElements = dynamicHudElements;
-        if (position != null)
-            _position = Offset;
     }
 
-    public void SetVisible(bool visible)
-    {
-        ThrowIfDisposed();
-        _overlayService.SetHudVisible(_player, Name, visible);
-    }
+    public abstract void SetVisible(bool visible);
+    protected abstract void SetState(string hudId, Dictionary<int, object?> stateChange);
 
     public void UpdateState(Action<TState> callback)
     {
@@ -55,7 +39,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         }
 
         if (stateChange.Count != 0)
-            _overlayService.SetHudState(_player, Name, stateChange);
+            SetState(Id, stateChange);
     }
 
     protected void ThrowIfDisposed()
@@ -69,5 +53,65 @@ internal class Hud<TState> : IHud<TState> where TState : class
         ThrowIfDisposed();
         _disposed = true;
         Disposed?.Invoke(this);
+    }
+}
+
+internal class Hud<TState> : HudBase<TState> where TState : class
+{
+    private Vector2 _position;
+    private readonly Player _player;
+
+    public Hud(string id, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudElements = null) : base(id, overlayService, state, dynamicHudElements)
+    {
+        if (position != null)
+            _position = position.Value;
+        _player = player;
+    }
+
+    public override void SetVisible(bool visible)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHudVisible(_player, Id, visible);
+    }
+    
+    protected override void SetState(string hudId, Dictionary<int, object?> stateChange)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHudState(_player, Id, stateChange);
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHudPosition(_player, Id, position);
+    }
+}
+
+internal class Hud3d<TState> : HudBase<TState> where TState : class
+{
+    private Vector3 _position;
+
+    public Hud3d(string id, IOverlayService overlayService, Vector3? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudElements = null) : base(id, overlayService, state, dynamicHudElements)
+    {
+        if (position != null)
+            _position = position.Value;
+    }
+
+    public override void SetVisible(bool visible)
+    {
+        ThrowIfDisposed();
+        _overlayService.Set3dHudVisible(Id, visible);
+    }
+
+    protected override void SetState(string hudId, Dictionary<int, object?> stateChange)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHud3dState(Id, stateChange);
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHud3dPosition(Id, position);
     }
 }

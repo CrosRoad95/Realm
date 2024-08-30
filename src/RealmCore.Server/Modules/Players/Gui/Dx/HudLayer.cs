@@ -13,7 +13,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
     private readonly string _id = Guid.NewGuid().ToString();
     private Hud<TState> _hud = default!;
     private TState _defaultState;
-    private readonly Vector2? _offset;
+    private Vector2 _offset;
     private bool _visible;
 
     public string Id => _id;
@@ -35,20 +35,18 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 
     public Vector2 Offset
     {
-        get
-        {
-            return _hud.Offset;
-        }
+        get => _offset;
         set
         {
-            _hud.Offset = value;
+            _offset = value;
+            _hud.SetPosition(value);
         }
     }
 
     public HudLayer(TState defaultState, Vector2? offset = null)
     {
         _defaultState = defaultState;
-        _offset = offset;
+        _offset = offset ?? Vector2.Zero;
     }
 
     public HudLayer(Vector2? offset = null) : this(new(), offset) { }

@@ -18,11 +18,11 @@ public interface IOverlayService
     internal Action<Player, string, int, float, float, float, double, float, float, int, int>? BlipAdded { get; set; }
     internal Action<Player, string>? BlipRemoved { get; set; }
     internal Action<Player>? AllBlipsRemoved { get; set; }
+    Action<string, float, float, float>? Hud3dPositionChanged { get; set; }
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
     void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class;
-    void CreateHud3d<TState>(string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, TState state, Vector3? position = null) where TState : class;
     void RemoveHudLayer(Player player, string hudId);
     void RemoveHud3d(string hudId);
     void RemoveRing3dDisplay(Player player, string id);
@@ -33,6 +33,9 @@ public interface IOverlayService
     void AddBlip(Player player, string id, int icon, Vector3 position, Color color, float visibleDistance, float size, int interior, int dimension);
     void RemoveBlip(Player player, string id);
     void RemoveAllBlips(Player player);
+    void Set3dHudVisible(string hudId, bool visible);
+    void SetHud3dPosition(string hudId, Vector3 position);
+    void CreateHud3d<TState>(string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector3? position, TState? defaultState = null) where TState : class;
 }
 
 internal sealed class OverlayService : IOverlayService
@@ -53,7 +56,9 @@ internal sealed class OverlayService : IOverlayService
     public Action<Player, string>? HudRemoved { get; set; }
     public Action<string>? Hud3dRemoved { get; set; }
     public Action<Player, string, bool>? HudVisibilityChanged { get; set; }
+    public Action<string, bool>? Hud3dVisibilityChanged { get; set; }
     public Action<Player, string, float, float>? HudPositionChanged { get; set; }
+    public Action<string, float, float, float>? Hud3dPositionChanged { get; set; }
     public Action<Player, string, Dictionary<int, object?>>? HudStateChanged { get; set; }
     public Action<string, Dictionary<int, object?>>? Hud3dStateChanged { get; set; }
     public Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
@@ -78,10 +83,20 @@ internal sealed class OverlayService : IOverlayService
     {
         HudVisibilityChanged?.Invoke(player, hudId, visible);
     }
+    
+    public void Set3dHudVisible(string hudId, bool visible)
+    {
+        Hud3dVisibilityChanged?.Invoke(hudId, visible);
+    }
 
     public void SetHudPosition(Player player, string hudId, Vector2 position)
     {
         HudPositionChanged?.Invoke(player, hudId, position.X, position.Y);
+    }
+    
+    public void SetHud3dPosition(string hudId, Vector3 position)
+    {
+        Hud3dPositionChanged?.Invoke(hudId, position.X, position.Y, position.Z);
     }
 
     public void SetHudState(Player player, string hudId, Dictionary<int, object?> state)
@@ -94,9 +109,9 @@ internal sealed class OverlayService : IOverlayService
         Hud3dStateChanged?.Invoke(hudId, state);
     }
 
-    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, TState state, Vector3? position = null) where TState : class
+    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector3? position, TState? defaultState = null) where TState : class
     {
-        var hudBuilder = new HudBuilder(state, _assetsService);
+        var hudBuilder = new HudBuilder(_assetsService, defaultState);
         var context = new HudBuilderContext(Vector2.Zero);
         hudBuilderCallback(hudBuilder, context);
         Hud3dCreated?.Invoke(hudId, position ?? Vector3.Zero, hudBuilder.HudElementsDefinitions);
@@ -104,7 +119,7 @@ internal sealed class OverlayService : IOverlayService
 
     public void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class
     {
-        var hudBuilder = new HudBuilder(defaultState, _assetsService);
+        var hudBuilder = new HudBuilder(_assetsService, defaultState);
         var context = new HudBuilderContext(screenSize);
         hudBuilderCallback(hudBuilder, context);
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);

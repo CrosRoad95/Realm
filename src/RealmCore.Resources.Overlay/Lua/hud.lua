@@ -50,8 +50,10 @@ local function calculateBoundingBox(position, elements)
 	local x,y = unpack(position)
 	local maxX, maxY = 0,0
 	for i,v in ipairs(elements)do
-		maxX = math.max(maxX, v[4] + x, v[4] + v[6] + x)
-		maxY = math.max(maxY, v[5] + y, v[5] + v[7] + y)
+		if(v.position and v.size)then
+			maxX = math.max(maxX, x + v.position[1] + v.size[1])
+			maxY = math.max(maxY, x + v.position[2] + v.size[2])
+		end
 	end
 	return maxX + x, maxY + y
 end
@@ -157,12 +159,12 @@ local function renderHud3d(elements, oldrt)
 			rt = oldrt
 		else
 			destroyElement(oldrt)
-			rt = dxCreateRenderTarget(sx, sy, false)
+			rt = dxCreateRenderTarget(sx, sy, true)
 		end
 	else
-		rt = dxCreateRenderTarget(sx, sy, false)
+		rt = dxCreateRenderTarget(sx, sy, true)
 	end
-    dxSetRenderTarget(rt)
+    dxSetRenderTarget(rt, true)
 	renderHud({0,0}, elements)
     dxSetRenderTarget()
 	return rt, sx, sy;
@@ -183,14 +185,16 @@ end
 local function renderHuds3d()
 	local h;
 	for i,v in pairs(huds3d)do
-		h = v.size[2] / hud3dResolution;
-		if(v.dirtyState or not isElement(v.element))then
-			local newrt, sx, sy = renderHud3d(v.elements, v.element)
-			v.element = newrt;
-			v.size = {sx, sy}
-			v.dirtyState = false;
+		if(v.visible)then
+			h = v.size[2] / hud3dResolution;
+			if(v.dirtyState or not isElement(v.element))then
+				local newrt, sx, sy = renderHud3d(v.elements, v.element)
+				v.element = newrt;
+				v.size = {sx, sy}
+				v.dirtyState = false;
+			end
+			dxDrawMaterialLine3D(v.position[1], v.position[2], v.position[3] + h/2, v.position[1], v.position[2], v.position[3] - h/2, false, v.element, v.size[1] / hud3dResolution)
 		end
-		dxDrawMaterialLine3D(v.position[1], v.position[2], v.position[3] + h/2, v.position[1], v.position[2], v.position[3] - h/2, false, v.element, v.size[1] / hud3dResolution)
 	end
 end
 
@@ -219,11 +223,27 @@ local function handleSetHudVisible(hudId, enabled)
 	end
 end
 
+local function handleSetHud3dVisible(hudId, enabled)
+	if(huds3d[hudId])then
+		huds3d[hudId].visible = enabled;
+	else
+		outputDebugString("Failed to setHud3dVisible, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
 local function handleSetHudPosition(hudId, x, y)
 	if(huds[hudId])then
 		huds[hudId].position = {x, y};
 	else
 		outputDebugString("Failed to setHudPosition, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
+local function handleSetHud3dPosition(hudId, x, y, z)
+	if(huds3d[hudId])then
+		huds3d[hudId].position = {x, y, z};
+	else
+		outputDebugString("Failed to setHud3dPosition, hud of id: '"..tostring(hudId).."' not found.", 1);
 	end
 end
 
@@ -271,6 +291,7 @@ local function handleCreateHud3d(hudId, x, y, z, elements)
 		size = {-1, -1},
 		element = nil,
 		dirtyState = true,
+		visible = true,
 	}
 end
 
@@ -329,7 +350,9 @@ end
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification)
 	hubBind("SetHudVisible", handleSetHudVisible)
+	hubBind("SetHud3dVisible", handleSetHud3dVisible)
 	hubBind("SetHudPosition", handleSetHudPosition)
+	hubBind("SetHud3dPosition", handleSetHud3dPosition)
 	hubBind("SetHudState", handleSetHudState)
 	hubBind("SetHud3dState", handleSetHud3dState)
 	hubBind("CreateHud", handleCreateHud)

@@ -5,6 +5,7 @@ internal interface IHudEventHub
     void AddNotification(string message);
     void SetHudVisible(string hudId, bool visible);
     void SetHudPosition(string hudId, float px, float py);
+    void SetHud3dPosition(string hudId, float px, float py, float pz);
     void SetHudState(string hudId, LuaValue state);
     void SetHud3dState(string hudId, LuaValue state);
     void CreateHud(string hudId, float px, float py, IEnumerable<LuaValue> hudElementsDefinitions);

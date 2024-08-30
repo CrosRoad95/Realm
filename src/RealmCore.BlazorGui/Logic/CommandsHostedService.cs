@@ -29,11 +29,12 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly GroupsService _groupsService;
     private readonly MapsService _mapsService;
     private readonly MtaServer _mtaServer;
+    private readonly WorldHudService _worldHudService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer, WorldHudService worldHudService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -53,6 +54,7 @@ internal sealed class CommandsHostedService : IHostedService
         _groupsService = groupsService;
         _mapsService = mapsService;
         _mtaServer = mtaServer;
+        _worldHudService = worldHudService;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -1351,5 +1353,37 @@ internal sealed class CommandsHostedService : IHostedService
         {
             player.Hud.RemoveLayer<SampleHudLayer>();
         });
+
+        _commandService.Add("createHud3d", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var hud3d = _worldHudService.Create<SampleHud3d>(player.Position);
+            await Task.Delay(1000);
+            hud3d.Update();
+            _chatBox.OutputTo(player, "Hud3d created");
+        });
     }
+
+    public class SampleHud3d : WorldHud<SampleHudState>
+    {
+        private readonly AssetsCollection _assetsCollection;
+
+        public SampleHud3d(AssetsCollection assetsCollection) : base(new())
+        {
+            _assetsCollection = assetsCollection;
+        }
+
+        protected override void Build(IHudBuilder builder, IHudBuilderContext context)
+        {
+            builder.Add(new TextHudElement(CreateStatePropertyTextHudElement(x => $"string = {x.String}"), new Vector2(0, 0), new Size(400, 20), font: BuildInFonts.Sans, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center));
+        }
+
+        public void Update()
+        {
+            UpdateState(x =>
+            {
+                x.String = Guid.NewGuid().ToString();
+            });
+        }
+    }
+
 }

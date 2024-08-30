@@ -37,12 +37,12 @@ public enum PositioningMode
 public interface IHudElement
 {
     internal IHudElementContent? Content { get; }
-    internal LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService);
+    internal LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService);
 }
 
 public interface IHudElementContent
 {
-    internal LuaValue CreateLuaValue(object state);
+    internal LuaValue CreateLuaValue(object? state);
 }
 
 public interface ITextHudElementContent : IHudElementContent;
@@ -74,7 +74,7 @@ public readonly struct RectangleHudElement : IHudElement
         _positioningMode = positioningMode;
     }
 
-    public LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService)
+    public LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService)
     {
         return new LuaTable
         {
@@ -117,7 +117,7 @@ public readonly struct TextHudElement : IHudElement
 
     public TextHudElement(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top, PositioningMode positioningMode = PositioningMode.Relative) : this(new ConstantTextHudElementContent(text), position, size, color, scale, font, alignX, alignY, positioningMode) { }
 
-    public LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService)
+    public LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService)
     {
         var font = assetsService.Map(_font);
         LuaValue content = _content.CreateLuaValue(state);
@@ -156,7 +156,7 @@ public readonly struct RadarHudElement : IHudElement
         _positioningMode = positioningMode;
     }
 
-    public LuaValue CreateLuaValue(object state, int id, IAssetsService assetsService)
+    public LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService)
     {
         var image = assetsService.Map(_content.ImageAsset);
 
@@ -182,7 +182,7 @@ public readonly struct ConstantTextHudElementContent : ITextHudElementContent
         Content = content;
     }
 
-    public LuaValue CreateLuaValue(object state) => new LuaTable
+    public LuaValue CreateLuaValue(object? state) => new LuaTable
     {
         ["type"] = HudElementContentType.Constant,
         ["value"] = Content
@@ -201,7 +201,7 @@ public readonly struct ImageHudElementContent : IImageHudElementContent
         _imageAsset = imageAsset;
     }
 
-    public LuaValue CreateLuaValue(object state)
+    public LuaValue CreateLuaValue(object? state)
     {
         if (_imageAsset is IRemoteImageAsset)
         {
@@ -223,7 +223,7 @@ public readonly struct ImageHudElementContent : IImageHudElementContent
 
 public readonly struct CurrentVehicleSpeedTextHudElementContent : ITextHudElementContent
 {
-    public LuaValue CreateLuaValue(object state) => new LuaTable
+    public LuaValue CreateLuaValue(object? state) => new LuaTable
     {
         ["type"] = HudElementContentType.Computed,
         ["value"] = HudElementContentComputedType.VehicleSpeed
@@ -232,7 +232,7 @@ public readonly struct CurrentVehicleSpeedTextHudElementContent : ITextHudElemen
 
 public readonly struct CurrentFPSTextHudElementContent : ITextHudElementContent
 {
-    public LuaValue CreateLuaValue(object state) => new LuaTable
+    public LuaValue CreateLuaValue(object? state) => new LuaTable
     {
         ["type"] = HudElementContentType.Computed,
         ["value"] = HudElementContentComputedType.FPS
@@ -260,7 +260,7 @@ public readonly struct StatePropertyTextHudElementContent : IComputedTextHudElem
         return new StatePropertyTextHudElementContent(expression);
     }
 
-    public LuaValue CreateLuaValue(object state)
+    public LuaValue CreateLuaValue(object? state)
     {
         var value = Factory.DynamicInvoke(state)?.ToString() ?? "";
         return new LuaTable

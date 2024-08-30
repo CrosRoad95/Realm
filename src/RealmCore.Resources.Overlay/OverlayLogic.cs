@@ -30,6 +30,7 @@ internal class OverlayLogic
         _overlayService.Hud3dRemoved = HandleHud3dRemoved;
         _overlayService.HudVisibilityChanged = HandleHudVisibilityChanged;
         _overlayService.HudPositionChanged = HandleHudPositionChanged;
+        _overlayService.Hud3dPositionChanged = HandleHud3dPositionChanged;
         _overlayService.HudStateChanged = HandleHudStateChanged;
         _overlayService.Hud3dStateChanged = HandleHud3dStateChanged;
         _overlayService.Display3dRingAdded = HandleDisplay3dRingAdded;
@@ -52,6 +53,11 @@ internal class OverlayLogic
     public void HandleHudPositionChanged(Player player, string hudId, float px, float py)
     {
         _luaEventHub.Invoke(player, x => x.SetHudPosition(hudId, px, py), player);
+    }
+    
+    public void HandleHud3dPositionChanged(string hudId, float px, float py, float pz)
+    {
+        _luaEventHub.Broadcast(x => x.SetHud3dPosition(hudId, px, py, pz));
     }
 
     public void HandleHud3dStateChanged(string hudId, Dictionary<int, object?> keyValuePairs)

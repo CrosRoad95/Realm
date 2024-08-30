@@ -3,17 +3,17 @@
 internal sealed class HudBuilder : IHudBuilder
 {
     private readonly List<LuaValue> _luaValues = [];
-    private readonly object _state;
+    private readonly object? _state;
     private readonly IAssetsService _assetsService;
     private int _id = 0;
 
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
     public Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
-    public HudBuilder(object defaultState, IAssetsService assetsService)
+    public HudBuilder(IAssetsService assetsService, object? defaultState = null)
     {
-        _state = defaultState;
         _assetsService = assetsService;
+        _state = defaultState;
     }
 
     private void AddLuaValue(LuaValue luaValue, AddElementLocation addElementLocation = AddElementLocation.Default)
