@@ -42,8 +42,8 @@ internal sealed class PlayerJoinedPipelineHostedService : IHostedService
 
         try
         {
-            var serial = player.Client.GetSerial();
-            if (!Regexes.ValidSerial().IsMatch(serial))
+            var serial = player.Client.Serial;
+            if (serial != null && !Regexes.ValidSerial().IsMatch(serial))
             {
                 _antiCheat.ReportViolation(player, KnownAntiCheatViolation.InvalidSerial, new AntiCheatViolationDetails(serial));
                 player.Kick("Nie udało się wejść na serwer.");

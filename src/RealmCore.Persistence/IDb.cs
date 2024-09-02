@@ -64,7 +64,7 @@ public interface IDb
     DbSet<GroupJoinRequestData> GroupsJoinRequests { get; }
     DbSet<TimeBaseOperationData> TimeBaseOperations { get; }
     DbSet<TimeBaseOperationGroupData> TimeBaseOperationsGroups { get; }
-    DbSet<TimeBaseOperationDataGroupUserData> TimeBaseOperationsGroupsUsers { get; }
+    DbSet<TimeBaseOperationGroupUserData> TimeBaseOperationsGroupsUsers { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

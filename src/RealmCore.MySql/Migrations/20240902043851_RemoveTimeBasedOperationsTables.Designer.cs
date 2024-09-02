@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealmCore.MySql;
 
@@ -10,9 +11,11 @@ using RealmCore.MySql;
 namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20240902043851_RemoveTimeBasedOperationsTables")]
+    partial class RemoveTimeBasedOperationsTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -596,78 +599,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .IsUnique();
 
                     b.ToTable("Tags", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Input")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Output")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.ToTable("TimeBaseOperations", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationGroupData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("Category")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Limit")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TimeBaseOperationsGroups", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationGroupUserData", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("GroupId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TimeBaseOperationsGroupsUsers", (string)null);
                 });
 
             modelBuilder.Entity("RealmCore.Persistence.Data.UploadFileData", b =>
@@ -1858,36 +1789,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.TimeBaseOperationGroupData", "Group")
-                        .WithMany("Operations")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationGroupUserData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.TimeBaseOperationGroupData", "Group")
-                        .WithMany("GroupUserOperations")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RealmCore.Persistence.Data.UserData", "User")
-                        .WithMany("TimeBaseOperations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("RealmCore.Persistence.Data.UserAchievementData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", null)
@@ -2231,13 +2132,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("NewsTags");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistence.Data.TimeBaseOperationGroupData", b =>
-                {
-                    b.Navigation("GroupUserOperations");
-
-                    b.Navigation("Operations");
-                });
-
             modelBuilder.Entity("RealmCore.Persistence.Data.UploadFileData", b =>
                 {
                     b.Navigation("UserUploadFiles");
@@ -2296,8 +2190,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("Settings");
 
                     b.Navigation("Stats");
-
-                    b.Navigation("TimeBaseOperations");
 
                     b.Navigation("Upgrades");
 

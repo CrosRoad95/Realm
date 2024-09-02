@@ -2,9 +2,9 @@
 
 public sealed class TimeBaseOperationGroupDto : IEqualityComparer<TimeBaseOperationGroupDto>
 {
-    private TimeBaseOperationGroupData? Data { get; init; }
+    private TimeBaseOperationGroupData Data { get; init; }
+    private IEnumerable<TimeBaseOperationDto> Operations => Data.Operations?.Select(TimeBaseOperationDto.Map);
     public required int Id { get; init; }
-    public required int Category { get; init; }
     public required int Limit { get; init; }
     public required object? Metadata { get; init; }
 
@@ -22,52 +22,73 @@ public sealed class TimeBaseOperationGroupDto : IEqualityComparer<TimeBaseOperat
         {
             Data = timeBaseOperationGroupData,
             Id = timeBaseOperationGroupData.Id,
-            Category = timeBaseOperationGroupData.Category,
             Limit = timeBaseOperationGroupData.Limit,
             Metadata = timeBaseOperationGroupData.Metadata != null ? JsonConvert.DeserializeObject(timeBaseOperationGroupData.Metadata, TimeBaseOperationsService._jsonSerializerSettings) : null,
         };
     }
 }
 
-public sealed class TimeBaseOperationForUserDto : IEqualityComparer<TimeBaseOperationForUserDto>
+public sealed class TimeBaseOperationGroupUserDto : IEqualityComparer<TimeBaseOperationGroupUserDto>
 {
-    public required TimeBaseOperationDataGroupUserData? Data { get; init; }
-    public required int Id { get; init; }
+    private TimeBaseOperationGroupUserData? Data { get; init; }
+    public TimeBaseOperationGroupDto? Group => TimeBaseOperationGroupDto.Map(Data?.Group);
     public required int UserId { get; init; }
-    public required int Category { get; init; }
+    public required int GroupId { get; init; }
+    public required object? Metadata { get; init; }
+
+    public bool Equals(TimeBaseOperationGroupUserDto? x, TimeBaseOperationGroupUserDto? y) => x?.UserId == y?.UserId && x?.GroupId == y?.GroupId;
+
+    public int GetHashCode([DisallowNull] TimeBaseOperationGroupUserDto obj) => HashCode.Combine(obj.UserId, obj.GroupId);
+
+    [return: NotNullIfNotNull(nameof(timeBaseOperationGroupUserData))]
+    public static TimeBaseOperationGroupUserDto? Map(TimeBaseOperationGroupUserData? timeBaseOperationGroupUserData)
+    {
+        if (timeBaseOperationGroupUserData == null)
+            return null;
+
+        return new()
+        {
+            Data = timeBaseOperationGroupUserData,
+            UserId = timeBaseOperationGroupUserData.UserId,
+            GroupId = timeBaseOperationGroupUserData.GroupId,
+            Metadata = timeBaseOperationGroupUserData.Metadata != null ? JsonConvert.DeserializeObject(timeBaseOperationGroupUserData.Metadata, TimeBaseOperationsService._jsonSerializerSettings) : null,
+        };
+    }
+}
+
+public sealed class TimeBaseOperationDto : IEqualityComparer<TimeBaseOperationDto>
+{
+    public required TimeBaseOperationData? Data { get; init; }
+    public required int Id { get; init; }
     public required int Type { get; init; }
     public required int Status { get; init; }
     public required DateTime StartDateTime { get; init; }
     public required DateTime EndDateTime { get; init; }
     public required object? Input { get; init; }
     public required object? Output { get; init; }
-    public required object? Metadata { get; init; }
 
     public bool IsCompleted(IDateTimeProvider dateTimeProvider) => dateTimeProvider.Now >= EndDateTime;
 
-    public bool Equals(TimeBaseOperationForUserDto? x, TimeBaseOperationForUserDto? y) => x?.Id == y?.Id;
+    public bool Equals(TimeBaseOperationDto? x, TimeBaseOperationDto? y) => x?.Id == y?.Id;
 
-    public int GetHashCode([DisallowNull] TimeBaseOperationForUserDto obj) => obj.Id;
+    public int GetHashCode([DisallowNull] TimeBaseOperationDto obj) => obj.Id;
 
-    [return: NotNullIfNotNull(nameof(timeBaseOperationDataGroupUser))]
-    public static TimeBaseOperationForUserDto? Map(TimeBaseOperationDataGroupUserData? timeBaseOperationDataGroupUser)
+    [return: NotNullIfNotNull(nameof(timeBaseOperation))]
+    public static TimeBaseOperationDto? Map(TimeBaseOperationData? timeBaseOperation)
     {
-        if (timeBaseOperationDataGroupUser == null || timeBaseOperationDataGroupUser.Operation == null || timeBaseOperationDataGroupUser.Group == null)
+        if (timeBaseOperation == null)
             return null;
 
         return new()
         {
-            Data = timeBaseOperationDataGroupUser,
-            UserId = timeBaseOperationDataGroupUser.UserId,
-            Id = timeBaseOperationDataGroupUser.TimeBasedOperationId,
-            Category = timeBaseOperationDataGroupUser.Group!.Category,
-            EndDateTime = timeBaseOperationDataGroupUser.Operation.EndDateTime,
-            StartDateTime = timeBaseOperationDataGroupUser.Operation.StartDateTime,
-            Type = timeBaseOperationDataGroupUser.Operation.Type,
-            Status = timeBaseOperationDataGroupUser.Operation.Status,
-            Input = timeBaseOperationDataGroupUser.Operation?.Input != null ? JsonConvert.DeserializeObject(timeBaseOperationDataGroupUser.Operation.Input, TimeBaseOperationsService._jsonSerializerSettings) : null,
-            Output = timeBaseOperationDataGroupUser.Operation?.Output != null ? JsonConvert.DeserializeObject(timeBaseOperationDataGroupUser.Operation.Output, TimeBaseOperationsService._jsonSerializerSettings) : null,
-            Metadata = timeBaseOperationDataGroupUser.Metadata != null ? JsonConvert.DeserializeObject(timeBaseOperationDataGroupUser.Metadata, TimeBaseOperationsService._jsonSerializerSettings) : null,
+            Data = timeBaseOperation,
+            Id = timeBaseOperation.Id,
+            EndDateTime = timeBaseOperation.EndDateTime,
+            StartDateTime = timeBaseOperation.StartDateTime,
+            Type = timeBaseOperation.Type,
+            Status = timeBaseOperation.Status,
+            Input = timeBaseOperation?.Input != null ? JsonConvert.DeserializeObject(timeBaseOperation.Input, TimeBaseOperationsService._jsonSerializerSettings) : null,
+            Output = timeBaseOperation?.Output != null ? JsonConvert.DeserializeObject(timeBaseOperation.Output, TimeBaseOperationsService._jsonSerializerSettings) : null,
         };
     }
 }
@@ -90,43 +111,43 @@ public sealed class TimeBaseOperationsService
         _timeBaseOperationRepository = _serviceProvider.GetRequiredService<TimeBaseOperationRepository>();
     }
 
-    public async Task<TimeBaseOperationGroupDto> CreateGroup(int category, int limit, object? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationGroupUserDto> CreateGroupForUser(int userId, int category, int limit, object? groupUserMetadata = null, object? groupMetadata = null, CancellationToken cancellationToken = default)
     {
-        TimeBaseOperationGroupData timeBaseOperationGroup;
-        var metadataString = JsonConvert.SerializeObject(metadata, _jsonSerializerSettings);
+        TimeBaseOperationGroupUserData timeBaseOperationGroup;
+        var groupUserMetadataString = JsonConvert.SerializeObject(groupUserMetadata, _jsonSerializerSettings);
+        var groupMetadataString = JsonConvert.SerializeObject(groupMetadata, _jsonSerializerSettings);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            timeBaseOperationGroup = await _timeBaseOperationRepository.CreateGroup(category, limit, metadataString, cancellationToken);
+            timeBaseOperationGroup = await _timeBaseOperationRepository.CreateGroupForUser(userId, category, limit, groupUserMetadataString, groupMetadataString, cancellationToken);
         }
         finally
         {
             _semaphore.Release();
         }
-        return TimeBaseOperationGroupDto.Map(timeBaseOperationGroup);
+        return TimeBaseOperationGroupUserDto.Map(timeBaseOperationGroup);
     }
 
-    public async Task<TimeBaseOperationForUserDto?> CreateForUser(int groupId, int userId, int type, int status, DateTime startDateTime, DateTime endDateTime, object? input = null, object? output = null, object? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationDto?> CreateForUser(int groupId, int userId, int type, int status, DateTime startDateTime, DateTime endDateTime, object? input = null, object? output = null, object? metadata = null, CancellationToken cancellationToken = default)
     {
         if (startDateTime >= endDateTime)
             throw new ArgumentException(null, nameof(startDateTime));
 
-        TimeBaseOperationDataGroupUserData? timeBaseOperationDataGroupUser;
+        TimeBaseOperationData? operation;
         var inputString = JsonConvert.SerializeObject(input, _jsonSerializerSettings);
         var outputString = JsonConvert.SerializeObject(output, _jsonSerializerSettings);
         var metadataString = JsonConvert.SerializeObject(metadata, _jsonSerializerSettings);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            timeBaseOperationDataGroupUser = await _timeBaseOperationRepository.CreateOperationForUser(groupId, userId, type, status, startDateTime, endDateTime, inputString, outputString, metadataString, cancellationToken);
-
+            operation = await _timeBaseOperationRepository.CreateOperationForUser(groupId, userId, type, status, startDateTime, endDateTime, inputString, outputString, metadataString, cancellationToken);
         }
         finally
         {
             _semaphore.Release();
         }
 
-        return TimeBaseOperationForUserDto.Map(timeBaseOperationDataGroupUser);
+        return TimeBaseOperationDto.Map(operation);
     }
     
     public async Task<bool> DeleteOperation(int id, CancellationToken cancellationToken = default)
@@ -143,9 +164,9 @@ public sealed class TimeBaseOperationsService
         }
     }
 
-    public async Task<TimeBaseOperationForUserDto[]> GetByUserIdAndCategory(int userId, int category, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationDto[]> GetOperationsByUserIdAndCategory(int userId, int category, CancellationToken cancellationToken = default)
     {
-        TimeBaseOperationDataGroupUserData[] timeBaseOperations;
+        TimeBaseOperationGroupUserData[] timeBaseOperations;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
@@ -156,7 +177,7 @@ public sealed class TimeBaseOperationsService
             _semaphore.Release();
         }
 
-        return timeBaseOperations.Select(TimeBaseOperationForUserDto.Map).ToArray();
+        return timeBaseOperations.SelectMany(x => x.Group?.Operations?.Select(TimeBaseOperationDto.Map)).ToArray();
     }
     
     public async Task<int> CountOperationsByGroupId(int id, CancellationToken cancellationToken = default)

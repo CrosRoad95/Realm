@@ -159,7 +159,7 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
 
         inventory.Number.Should().Be(1);
     }
-
+    
     [Fact]
     public void YouShouldNotBeAbleToRemoveMoreItemsThanYouHave3()
     {

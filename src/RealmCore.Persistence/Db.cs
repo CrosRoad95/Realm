@@ -107,7 +107,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserSecretsData> UserSecrets => Set<UserSecretsData>();
     public DbSet<TimeBaseOperationData> TimeBaseOperations => Set<TimeBaseOperationData>();
     public DbSet<TimeBaseOperationGroupData> TimeBaseOperationsGroups => Set<TimeBaseOperationGroupData>();
-    public DbSet<TimeBaseOperationDataGroupUserData> TimeBaseOperationsGroupsUsers => Set<TimeBaseOperationDataGroupUserData>();
+    public DbSet<TimeBaseOperationGroupUserData> TimeBaseOperationsGroupsUsers => Set<TimeBaseOperationGroupUserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -1035,6 +1035,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => x.Id);
         });
 
+        //modelBuilder.Ignore<TimeBaseOperationData>();
+        //modelBuilder.Ignore<TimeBaseOperationGroupData>();
+        //modelBuilder.Ignore<TimeBaseOperationGroupUserData>();
+        //modelBuilder.Ignore<TimeBaseOperationDataGroupOperationData>();
+
         modelBuilder.Entity<TimeBaseOperationData>(entityBuilder =>
         {
             entityBuilder
@@ -1047,13 +1052,19 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(TimeBaseOperationsGroups))
                 .HasKey(x => x.Id);
+
+            entityBuilder.HasMany(x => x.Operations)
+                .WithOne(x => x.Group)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
+
         });
 
-        modelBuilder.Entity<TimeBaseOperationDataGroupUserData>(entityBuilder =>
+        modelBuilder.Entity<TimeBaseOperationGroupUserData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(TimeBaseOperationsGroupsUsers))
-                .HasKey(x => new { x.UserId, x.GroupId, x.TimeBasedOperationId });
+                .HasKey(x => new { x.GroupId, x.UserId });
 
             entityBuilder.HasOne(x => x.User)
                 .WithMany(x => x.TimeBaseOperations)
@@ -1061,14 +1072,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasPrincipalKey(x => x.Id);
 
             entityBuilder.HasOne(x => x.Group)
-                .WithMany(x => x.TimeBasedOperationDataGroupUser)
+                .WithMany(x => x.GroupUserOperations)
                 .HasForeignKey(x => x.GroupId)
                 .HasPrincipalKey(x => x.Id);
-
-            entityBuilder.HasOne(x => x.Operation)
-                .WithOne(x => x.TimeBasedOperationDataGroupUser)
-                .HasForeignKey<TimeBaseOperationDataGroupUserData>(x => x.TimeBasedOperationId)
-                .IsRequired();
         });
     }
 
