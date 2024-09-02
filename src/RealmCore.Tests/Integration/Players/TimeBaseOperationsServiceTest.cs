@@ -41,16 +41,25 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
     {
         int kind = 1;
         int status = 1;
+        int categoryId = 1;
         DateTime startDateTime = _dateTimeProvider.Now;
         DateTime endDateTime = _dateTimeProvider.Now.AddDays(3);
 
-        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 3, _sampleMetadata);
+        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, categoryId, 3, _sampleMetadata);
+
+        var foundGroup = await _timeBaseOperationsService.GetGroupById(groupUser.GroupId);
+        var foundGroups1 = await _timeBaseOperationsService.GetGroupsByUserId(_player.UserId);
+        var foundGroups2 = await _timeBaseOperationsService.GetGroupsByCategoryId(categoryId);
 
         var timeBasedOperation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
         var operations = await _timeBaseOperationsService.GetOperationsByUserIdAndCategory(_player.UserId, 1);
         var count = await _timeBaseOperationsService.CountOperationsByGroupId(groupUser.GroupId);
 
         using var _ = new AssertionScope();
+        foundGroup.Should().NotBeNull();
+        foundGroups1.Should().HaveCount(1);
+        foundGroups2.Where(x => x.Id == groupUser.GroupId).Should().HaveCount(1);
+
         count.Should().Be(1);
         operations.Should().HaveCount(1);
         var operation = operations[0];
@@ -77,6 +86,19 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         timeBasedOperation1.Should().NotBeNull();
         timeBasedOperation2.Should().NotBeNull();
         timeBasedOperation3.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task YouCanNotCreateOperationForNonExistingGroup()
+    {
+        int kind = 1;
+        int status = 1;
+        DateTime startDateTime = _dateTimeProvider.Now;
+        DateTime endDateTime = _dateTimeProvider.Now.AddDays(3);
+
+        var timeBasedOperation = await _timeBaseOperationsService.CreateForUser(-1, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+
+        timeBasedOperation.Should().BeNull();
     }
     
     [Fact]

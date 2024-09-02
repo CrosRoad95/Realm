@@ -3,7 +3,7 @@
 public sealed class TimeBaseOperationGroupDto : IEqualityComparer<TimeBaseOperationGroupDto>
 {
     private TimeBaseOperationGroupData Data { get; init; }
-    private IEnumerable<TimeBaseOperationDto> Operations => Data.Operations?.Select(TimeBaseOperationDto.Map);
+    public IEnumerable<TimeBaseOperationDto> Operations => Data.Operations?.Select(TimeBaseOperationDto.Map);
     public required int Id { get; init; }
     public required int Limit { get; init; }
     public required object? Metadata { get; init; }
@@ -126,6 +126,66 @@ public sealed class TimeBaseOperationsService
             _semaphore.Release();
         }
         return TimeBaseOperationGroupUserDto.Map(timeBaseOperationGroup);
+    }
+    
+    public async Task<TimeBaseOperationGroupDto?> GetGroupById(int id, CancellationToken cancellationToken = default)
+    {
+        TimeBaseOperationGroupData? group;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            group = await _timeBaseOperationRepository.GetGroupById(id, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        return TimeBaseOperationGroupDto.Map(group);
+    }
+    
+    public async Task<TimeBaseOperationGroupDto[]> GetGroupsByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        TimeBaseOperationGroupData[] groups;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groups = await _timeBaseOperationRepository.GetGroupsByUserId(userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        return groups.Select(TimeBaseOperationGroupDto.Map).ToArray();
+    }
+    
+    public async Task<TimeBaseOperationGroupDto[]> GetGroupsByCategoryId(int categoryId, CancellationToken cancellationToken = default)
+    {
+        TimeBaseOperationGroupData[] groups;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groups = await _timeBaseOperationRepository.GetGroupsByCategoryId(categoryId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        return groups.Select(TimeBaseOperationGroupDto.Map).ToArray();
+    }
+    
+    public async Task<int?> GetGroupLimitById(int id, CancellationToken cancellationToken = default)
+    {
+        int? limit;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            limit = await _timeBaseOperationRepository.GetGroupLimitById(id, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        return limit;
     }
 
     public async Task<TimeBaseOperationDto?> CreateForUser(int groupId, int userId, int type, int status, DateTime startDateTime, DateTime endDateTime, object? input = null, object? output = null, object? metadata = null, CancellationToken cancellationToken = default)
