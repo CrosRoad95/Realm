@@ -50,6 +50,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         var foundGroup = await _timeBaseOperationsService.GetGroupById(groupUser.GroupId);
         var foundGroups1 = await _timeBaseOperationsService.GetGroupsByUserId(_player.UserId);
         var foundGroups2 = await _timeBaseOperationsService.GetGroupsByCategoryId(categoryId);
+        var foundGroups3 = await _timeBaseOperationsService.GetGroupsByUserIdAndCategoryId(_player.UserId, categoryId);
 
         var timeBasedOperation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
         var operations = await _timeBaseOperationsService.GetOperationsByUserIdAndCategory(_player.UserId, 1);
@@ -59,6 +60,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         foundGroup.Should().NotBeNull();
         foundGroups1.Should().HaveCount(1);
         foundGroups2.Where(x => x.Id == groupUser.GroupId).Should().HaveCount(1);
+        foundGroups3.Should().HaveCount(1);
 
         count.Should().Be(1);
         operations.Should().HaveCount(1);

@@ -173,6 +173,21 @@ public sealed class TimeBaseOperationsService
         return groups.Select(TimeBaseOperationGroupDto.Map).ToArray();
     }
     
+    public async Task<TimeBaseOperationGroupDto[]> GetGroupsByUserIdAndCategoryId(int userId, int categoryId, CancellationToken cancellationToken = default)
+    {
+        TimeBaseOperationGroupData[] groups;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groups = await _timeBaseOperationRepository.GetGroupsByUserIdAndCategoryId(userId, categoryId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+        return groups.Select(TimeBaseOperationGroupDto.Map).ToArray();
+    }
+    
     public async Task<int?> GetGroupLimitById(int id, CancellationToken cancellationToken = default)
     {
         int? limit;

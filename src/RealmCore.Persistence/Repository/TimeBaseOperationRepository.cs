@@ -45,6 +45,25 @@ public sealed class TimeBaseOperationRepository
         return await query.ToArrayAsync(cancellationToken);
     }
     
+    public async Task<TimeBaseOperationGroupData[]> GetGroupsByUserIdAndCategoryId(int userId, int categoryId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetGroupsByUserIdAndCategoryId));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("CategoryId", categoryId);
+        }
+
+        var query = _db.TimeBaseOperationsGroups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Operations)
+            .Where(x => x.Category == categoryId && x.GroupUserOperations != null && x.GroupUserOperations.Any(y => y.UserId == userId));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+    
     public async Task<int?> GetGroupLimitById(int id, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupLimitById));
