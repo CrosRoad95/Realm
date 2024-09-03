@@ -12,6 +12,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
     private readonly SampleMetadata _sampleInputMetadata;
     private readonly SampleMetadata _sampleOutputMetadata;
     private readonly SampleMetadata _sampleMetadata;
+    private readonly SampleMetadata _sampleMetadata2;
 
     public TimeBaseOperationsServiceTest(RealmTestingServerHostingFixtureWithUniquePlayer fixture)
     {
@@ -22,6 +23,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         _sampleInputMetadata = new SampleMetadata(1, "input");
         _sampleOutputMetadata = new SampleMetadata(2, "output");
         _sampleMetadata = new SampleMetadata(3, "metadata");
+        _sampleMetadata2 = new SampleMetadata(4, "new metadata");
     }
 
     public class SampleMetadata
@@ -65,8 +67,8 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         count.Should().Be(1);
         operations.Should().HaveCount(1);
         var operation = operations[0];
-        operation.Input.Should().BeOfType<SampleMetadata>();
-        operation.Input.Should().BeEquivalentTo(_sampleInputMetadata);
+        operation.GetInput<SampleMetadata>().Should().BeOfType<SampleMetadata>();
+        operation.GetInput<SampleMetadata>().Should().BeEquivalentTo(_sampleInputMetadata);
     }
     
     [Fact]
@@ -158,6 +160,21 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         using var _ = new AssertionScope();
         updated.Should().BeTrue();
         operations.Where(x => x.Id == operation!.Id).First().Status.Should().Be(2);
+    }
+    
+    [Fact]
+    public async Task YouCanChangeGroupMetadata()
+    {
+        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 2, null, _sampleMetadata);
+        var metadata1 = await _timeBaseOperationsService.GetGroupMetadata<SampleMetadata>(groupUser.GroupId);
+        var changedMetadata = await _timeBaseOperationsService.SetGroupMetadata(groupUser.GroupId, _sampleMetadata2);
+        var metadata2 = await _timeBaseOperationsService.GetGroupMetadata<SampleMetadata>(groupUser.GroupId);
+
+        using var _ = new AssertionScope();
+        groupUser.GetMetadata<SampleMetadata>().Should().BeEquivalentTo(_sampleMetadata);
+        metadata1.Should().BeEquivalentTo(_sampleMetadata);
+        changedMetadata.Should().BeTrue();
+        metadata2.Should().BeEquivalentTo(_sampleMetadata2);
     }
 
     public async ValueTask DisposeAsync()

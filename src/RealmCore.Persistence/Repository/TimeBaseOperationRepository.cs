@@ -255,5 +255,40 @@ public sealed class TimeBaseOperationRepository
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
 
+    public async Task<string?> GetGroupMetadata(int groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetGroupMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.TimeBaseOperationsGroups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == groupId)
+            .Select(x => x.Metadata);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<bool> SetGroupMetadata(int groupId, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetGroupMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.TimeBaseOperationsGroups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == groupId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
+    }
+
     public static readonly ActivitySource Activity = new("RealmCore.TimeBaseOperationRepository", "1.0.0");
 }
