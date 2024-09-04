@@ -10,6 +10,7 @@ public sealed class TimeBaseOperationData
     public DateTime EndDateTime { get; set; }
     public string? Input { get; set; }
     public string? Output { get; set; }
+    public string? Metadata { get; set; }
 
     public TimeBaseOperationGroupData? Group { get; set; }
 }

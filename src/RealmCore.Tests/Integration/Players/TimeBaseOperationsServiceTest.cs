@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace RealmCore.Tests.Integration.Players;
+﻿namespace RealmCore.Tests.Integration.Players;
 
 public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IAsyncDisposable
 {
@@ -44,21 +42,24 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         int kind = 1;
         int status = 1;
         int categoryId = 1;
+        int limit = 3;
         DateTime startDateTime = _dateTimeProvider.Now;
         DateTime endDateTime = _dateTimeProvider.Now.AddDays(3);
 
-        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, categoryId, 3, _sampleMetadata);
+        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, categoryId, limit, _sampleMetadata);
 
+        var foundLimit = await _timeBaseOperationsService.GetGroupLimitById(groupUser.GroupId);
         var foundGroup = await _timeBaseOperationsService.GetGroupById(groupUser.GroupId);
         var foundGroups1 = await _timeBaseOperationsService.GetGroupsByUserId(_player.UserId);
         var foundGroups2 = await _timeBaseOperationsService.GetGroupsByCategoryId(categoryId);
         var foundGroups3 = await _timeBaseOperationsService.GetGroupsByUserIdAndCategoryId(_player.UserId, categoryId);
 
-        var timeBasedOperation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var timeBasedOperation = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
         var operations = await _timeBaseOperationsService.GetOperationsByUserIdAndCategory(_player.UserId, 1);
         var count = await _timeBaseOperationsService.CountOperationsByGroupId(groupUser.GroupId);
 
         using var _ = new AssertionScope();
+        foundLimit.Should().Be(limit);
         foundGroup.Should().NotBeNull();
         foundGroups1.Should().HaveCount(1);
         foundGroups2.Where(x => x.Id == groupUser.GroupId).Should().HaveCount(1);
@@ -72,6 +73,44 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
     }
     
     [Fact]
+    public async Task OperationEndDateShouldBeAfterStartDate()
+    {
+        int kind = 1;
+        int status = 1;
+        DateTime startDateTime = _dateTimeProvider.Now;
+        DateTime endDateTime = _dateTimeProvider.Now.AddDays(-3);
+
+        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 1, new SampleMetadata(1337, "foobar"));
+
+        var act = async () => await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata, _sampleMetadata);
+
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
+    
+    [Fact]
+    public async Task OperationMetadataShouldWork()
+    {
+        int kind = 1;
+        int status = 1;
+        DateTime startDateTime = _dateTimeProvider.Now;
+        DateTime endDateTime = _dateTimeProvider.Now.AddDays(3);
+
+        var limit = 2;
+        var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, limit, new SampleMetadata(1337, "foobar"));
+
+        var timeBasedOperation = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata, _sampleMetadata);
+        var foundMetadata1 = await _timeBaseOperationsService.GetOperationMetadata<SampleMetadata>(timeBasedOperation!.Id);
+        var setMetadata = await _timeBaseOperationsService.SetOperationMetadata(timeBasedOperation.Id, _sampleMetadata2);
+        var foundMetadata2 = await _timeBaseOperationsService.GetOperationMetadata<SampleMetadata>(timeBasedOperation!.Id);
+
+        using var _ = new AssertionScope();
+        timeBasedOperation!.GetMetadata<SampleMetadata>().Should().BeEquivalentTo(_sampleMetadata);
+        foundMetadata1.Should().BeEquivalentTo(_sampleMetadata);
+        setMetadata.Should().BeTrue();
+        foundMetadata2.Should().BeEquivalentTo(_sampleMetadata2);
+    }
+    
+    [Fact]
     public async Task GroupLimitShouldWork()
     {
         int kind = 1;
@@ -82,9 +121,9 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         var limit = 2;
         var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, limit, new SampleMetadata(1337, "foobar"));
 
-        var timeBasedOperation1 = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
-        var timeBasedOperation2 = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
-        var timeBasedOperation3 = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var timeBasedOperation1 = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var timeBasedOperation2 = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var timeBasedOperation3 = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
 
         using var _ = new AssertionScope();
         timeBasedOperation1.Should().NotBeNull();
@@ -100,7 +139,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
         DateTime startDateTime = _dateTimeProvider.Now;
         DateTime endDateTime = _dateTimeProvider.Now.AddDays(3);
 
-        var timeBasedOperation = await _timeBaseOperationsService.CreateForUser(-1, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var timeBasedOperation = await _timeBaseOperationsService.CreateOperationForUser(-1, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
 
         timeBasedOperation.Should().BeNull();
     }
@@ -115,7 +154,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
 
         var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 2, _sampleMetadata);
 
-        var operation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var operation = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
         await _timeBaseOperationsService.DeleteOperation(operation!.Id);
         var operations = await _timeBaseOperationsService.GetOperationsByUserIdAndCategory(_player.UserId, 1);
         var count = await _timeBaseOperationsService.CountOperationsByGroupId(groupUser.GroupId);
@@ -135,7 +174,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
 
         var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 2, _sampleMetadata);
 
-        var operation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var operation = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
 
         using var _ = new AssertionScope();
         operation!.IsCompleted(_dateTimeProvider).Should().BeFalse();
@@ -153,7 +192,7 @@ public class TimeBaseOperationsServiceTest : IClassFixture<RealmTestingServerHos
 
         var groupUser = await _timeBaseOperationsService.CreateGroupForUser(_player.UserId, 1, 2, _sampleMetadata);
 
-        var operation = await _timeBaseOperationsService.CreateForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
+        var operation = await _timeBaseOperationsService.CreateOperationForUser(groupUser.GroupId, _player.UserId, kind, status, startDateTime, endDateTime, _sampleInputMetadata, _sampleOutputMetadata);
         var updated = await _timeBaseOperationsService.SetStatus(operation!.Id, 2);
         var operations = await _timeBaseOperationsService.GetOperationsByUserIdAndCategory(_player.UserId, 1);
 

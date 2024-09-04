@@ -82,7 +82,7 @@ public sealed class TimeBaseOperationRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
     
-    public async Task<TimeBaseOperationGroupData[]> GetGroupsByUserId(int userId, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationGroupData[]> GetGroupsByUserId(int userId, bool withOperations = true, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupsByUserId));
 
@@ -91,15 +91,29 @@ public sealed class TimeBaseOperationRepository
             activity.AddTag("UserId", userId);
         }
 
-        var query = _db.TimeBaseOperationsGroupsUsers
-            .TagWithSource(nameof(GroupRepository))
-            .AsNoTrackingWithIdentityResolution()
-            .Include(x => x.Group)
-            .ThenInclude(x => x!.Operations)
+        IQueryable<TimeBaseOperationGroupUserData> query;
+
+        if (withOperations)
+        {
+            query = _db.TimeBaseOperationsGroupsUsers
+                .TagWithSource(nameof(GroupRepository))
+                .AsNoTrackingWithIdentityResolution()
+                .Include(x => x.Group)
+                .ThenInclude(x => x!.Operations);
+        }
+        else
+        {
+            query = _db.TimeBaseOperationsGroupsUsers
+                .TagWithSource(nameof(GroupRepository))
+                .AsNoTrackingWithIdentityResolution()
+                .Include(x => x.Group);
+        }
+
+        var query2 = query
             .Where(x => x.UserId == userId)
             .Select(x => x.Group);
 
-        return await query.ToArrayAsync(cancellationToken);
+        return await query2.ToArrayAsync(cancellationToken);
     }
 
     public async Task<TimeBaseOperationGroupUserData> CreateGroupForUser(int userId, int category, int limit, string? groupUserMetadata = null, string? groupMetadata = null, CancellationToken cancellationToken = default)
@@ -168,6 +182,7 @@ public sealed class TimeBaseOperationRepository
             EndDateTime = endDateTime,
             Input = input,
             Output = output,
+            Metadata = metadata,
         };
 
         try
@@ -286,6 +301,41 @@ public sealed class TimeBaseOperationRepository
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == groupId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
+    }
+
+    public async Task<string?> GetOperationMetadata(int operationId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetGroupMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("OperationId", operationId);
+        }
+
+        var query = _db.TimeBaseOperations
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == operationId)
+            .Select(x => x.Metadata);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<bool> SetOperationMetadata(int operationId, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetOperationMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("OperationId", operationId);
+        }
+
+        var query = _db.TimeBaseOperations
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == operationId);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
     }

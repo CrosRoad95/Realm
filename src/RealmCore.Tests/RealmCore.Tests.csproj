@@ -127,6 +127,7 @@
 		<Using Include="RealmCore.Server.Modules.Players.DailyVisits" />
 		<Using Include="FluentAssertions.Extensions" />
 		<Using Include="RealmCore.Server.Modules.TimeBaseOperations" />
+		<Using Include="Microsoft.EntityFrameworkCore" />
 	</ItemGroup>
 
 </Project>
