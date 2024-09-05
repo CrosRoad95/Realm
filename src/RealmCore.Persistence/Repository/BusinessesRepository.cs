@@ -1,0 +1,216 @@
+﻿using System.Text.RegularExpressions;
+
+namespace RealmCore.Persistence.Repository;
+
+public sealed class BusinessesRepository
+{
+    private readonly IDb _db;
+
+    public BusinessesRepository(IDb db)
+    {
+        _db = db;
+    }
+
+    public async Task<BusinessData> Create(int category, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(Create));
+
+        if (activity != null)
+        {
+            activity.AddTag("Category", category);
+        }
+
+        var business = new BusinessData
+        {
+            Category = category,
+            Metadata = metadata,
+        };
+
+        try
+        {
+            _db.Businesses.Add(business);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return business;
+    }
+
+    public async Task<bool> AddTimeBaseOperationGroup(int businessId, int groupId, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(AddTimeBaseOperationGroup));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var timeBaseOperationGroupBusiness = new TimeBaseOperationGroupBusinessData
+        {
+            BusinessId = businessId,
+            OperationGroupId = groupId
+        };
+
+        try
+        {
+            _db.TimeBaseOperationGroupBusinesses.Add(timeBaseOperationGroupBusiness);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return true;
+    }
+
+    public async Task<bool> AddUser(int businessId, int userId, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(AddUser));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var businessUser = new BusinessUserData
+        {
+            BusinessId = businessId,
+            UserId = userId,
+            Metadata = metadata
+        };
+
+        try
+        {
+            _db.BusinessesUsers.Add(businessUser);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch(DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return true;
+    }
+
+    public async Task<BusinessData?> GetById(int businessId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetById));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+        }
+
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == businessId);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<int[]> GetUsersById(int businessId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetUsersById));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+        }
+
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == businessId)
+            .SelectMany(x => x.Users.Select(y => y.UserId));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+    
+    public async Task<BusinessData[]> GetByUserId(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByUserId));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Users.Any(y => y.UserId == userId));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+    
+    public async Task<BusinessData[]> GetByUserIdAndCategory(int userId, int categoryId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByUserIdAndCategory));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Users.Any(y => y.UserId == userId) && x.Category == categoryId);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+    
+    public async Task<bool> SetMetadata(int businessId, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+        }
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == businessId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
+    }
+    
+    public async Task<bool> SetUserMetadata(int businessId, int userId, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetUserMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.BusinessesUsers
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.BusinessId == businessId && x.UserId == userId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
+    }
+
+    public static readonly ActivitySource Activity = new("RealmCore.TimeBaseOperationRepository", "1.0.0");
+}

@@ -45,25 +45,6 @@ public sealed class TimeBaseOperationRepository
         return await query.ToArrayAsync(cancellationToken);
     }
     
-    public async Task<TimeBaseOperationGroupData[]> GetGroupsByUserIdAndCategoryId(int userId, int categoryId, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetGroupsByUserIdAndCategoryId));
-
-        if (activity != null)
-        {
-            activity.AddTag("UserId", userId);
-            activity.AddTag("CategoryId", categoryId);
-        }
-
-        var query = _db.TimeBaseOperationsGroups
-            .TagWithSource(nameof(GroupRepository))
-            .AsNoTrackingWithIdentityResolution()
-            .Include(x => x.Operations)
-            .Where(x => x.Category == categoryId && x.GroupUserOperations != null && x.GroupUserOperations.Any(y => y.UserId == userId));
-
-        return await query.ToArrayAsync(cancellationToken);
-    }
-    
     public async Task<int?> GetGroupLimitById(int id, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupLimitById));
@@ -82,56 +63,60 @@ public sealed class TimeBaseOperationRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
     
-    public async Task<TimeBaseOperationGroupData[]> GetGroupsByUserId(int userId, bool withOperations = true, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationGroupData[]> GetGroupsByBusinessId(int businessId, bool withOperations = true, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetGroupsByUserId));
+        using var activity = Activity.StartActivity(nameof(GetGroupsByBusinessId));
 
         if (activity != null)
         {
-            activity.AddTag("UserId", userId);
+            activity.AddTag("BusinessId", businessId);
         }
 
-        IQueryable<TimeBaseOperationGroupUserData> query;
+        IQueryable<TimeBaseOperationGroupBusinessData> query;
 
         if (withOperations)
         {
-            query = _db.TimeBaseOperationsGroupsUsers
+            query = _db.TimeBaseOperationGroupBusinesses
                 .TagWithSource(nameof(GroupRepository))
                 .AsNoTrackingWithIdentityResolution()
-                .Include(x => x.Group)
+                .Include(x => x.OperationGroup)
+                .ThenInclude(x => x!.Businesses)
+                .ThenInclude(x => x!.Business)
+                .Include(x => x.OperationGroup)
                 .ThenInclude(x => x!.Operations);
         }
         else
         {
-            query = _db.TimeBaseOperationsGroupsUsers
+            query = _db.TimeBaseOperationGroupBusinesses
                 .TagWithSource(nameof(GroupRepository))
                 .AsNoTrackingWithIdentityResolution()
-                .Include(x => x.Group);
+                .Include(x => x.OperationGroup)
+                .ThenInclude(x => x!.Businesses)
+                .ThenInclude(x => x!.Business);
         }
 
         var query2 = query
-            .Where(x => x.UserId == userId)
-            .Select(x => x.Group);
+            .Where(x => x.BusinessId == businessId)
+            .Select(x => x.OperationGroup);
 
         return await query2.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<TimeBaseOperationGroupUserData> CreateGroupForUser(int userId, int category, int limit, string? groupUserMetadata = null, string? groupMetadata = null, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationGroupBusinessData> CreateGroupForBusiness(int businessId, int category, int limit, string? groupMetadata = null, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(CreateGroupForUser));
+        using var activity = Activity.StartActivity(nameof(CreateGroupForBusiness));
 
         if (activity != null)
         {
-            activity.AddTag("UserId", userId);
+            activity.AddTag("BusinessId", businessId);
             activity.AddTag("Category", category);
             activity.AddTag("Limit", limit);
         }
 
-        var timeBaseOperationGroup = new TimeBaseOperationGroupUserData
+        var baseOperationGroupBusinessData = new TimeBaseOperationGroupBusinessData
         {
-            UserId = userId,
-            Metadata = groupUserMetadata,
-            Group = new TimeBaseOperationGroupData
+            BusinessId = businessId,
+            OperationGroup = new TimeBaseOperationGroupData
             {
                 Category = category,
                 Limit = limit,
@@ -141,7 +126,37 @@ public sealed class TimeBaseOperationRepository
 
         try
         {
-            _db.TimeBaseOperationsGroupsUsers.Add(timeBaseOperationGroup);
+            _db.TimeBaseOperationGroupBusinesses.Add(baseOperationGroupBusinessData);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return baseOperationGroupBusinessData;
+    }
+    
+    public async Task<TimeBaseOperationGroupData> CreateGroup(int category, int limit, string? groupMetadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(CreateGroup));
+
+        if (activity != null)
+        {
+            activity.AddTag("Category", category);
+            activity.AddTag("Limit", limit);
+        }
+
+        var timeBaseOperationGroup = new TimeBaseOperationGroupData
+        {
+            Category = category,
+            Limit = limit,
+            Metadata = groupMetadata,
+        };
+
+        try
+        {
+            _db.TimeBaseOperationsGroups.Add(timeBaseOperationGroup);
             await _db.SaveChangesAsync(cancellationToken);
         }
         finally
@@ -152,14 +167,13 @@ public sealed class TimeBaseOperationRepository
         return timeBaseOperationGroup;
     }
 
-    public async Task<TimeBaseOperationData?> CreateOperationForUser(int groupId, int userId, int type, int status, DateTime startDateTime, DateTime endDateTime, string? input = null, string? output = null, string? metadata = null, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationData?> CreateOperation(int groupId, int type, int status, DateTime startDateTime, DateTime endDateTime, string? input = null, string? output = null, string? metadata = null, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(CreateOperationForUser));
+        using var activity = Activity.StartActivity(nameof(CreateOperation));
 
         if (activity != null)
         {
             activity.AddTag("GroupId", groupId);
-            activity.AddTag("UserId", userId);
             activity.AddTag("Type", type);
             activity.AddTag("StartDateTime", startDateTime);
             activity.AddTag("EndDateTime", endDateTime);
@@ -215,22 +229,41 @@ public sealed class TimeBaseOperationRepository
         return await query.CountAsync(cancellationToken);
     }
 
-    public async Task<TimeBaseOperationGroupUserData[]> GetOperationsByUserIdAndCategory(int userId, int category, CancellationToken cancellationToken = default)
+    public async Task<TimeBaseOperationGroupBusinessData[]> GetOperationsByUserIdAndBusinessCategory(int userId, int category, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetOperationsByUserIdAndCategory));
+        using var activity = Activity.StartActivity(nameof(GetOperationsByUserIdAndBusinessCategory));
 
         if (activity != null)
         {
             activity.AddTag("UserId", userId);
-            activity.AddTag("Type", category);
+            activity.AddTag("Category", category);
         }
 
-        var query = _db.TimeBaseOperationsGroupsUsers
+        var query = _db.TimeBaseOperationGroupBusinesses
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Include(x => x.Group)
+            .Include(x => x.OperationGroup)
             .ThenInclude(x => x!.Operations)
-            .Where(x => x.UserId == userId && x.Group!.Category == category);
+            .Where(x => x.Business!.Category == category && x.Business.Users.Any(x => x.UserId == userId));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<TimeBaseOperationData[]> GetOperationsByGroupId(int groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetOperationsByGroupId));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.TimeBaseOperationsGroups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.Operations)
+            .Where(x => x.Id == groupId)
+            .SelectMany(x => x.Operations);
 
         return await query.ToArrayAsync(cancellationToken);
     }

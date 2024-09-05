@@ -107,7 +107,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserSecretsData> UserSecrets => Set<UserSecretsData>();
     public DbSet<TimeBaseOperationData> TimeBaseOperations => Set<TimeBaseOperationData>();
     public DbSet<TimeBaseOperationGroupData> TimeBaseOperationsGroups => Set<TimeBaseOperationGroupData>();
-    public DbSet<TimeBaseOperationGroupUserData> TimeBaseOperationsGroupsUsers => Set<TimeBaseOperationGroupUserData>();
+    public DbSet<TimeBaseOperationGroupBusinessData> TimeBaseOperationGroupBusinesses => Set<TimeBaseOperationGroupBusinessData>();
+    public DbSet<BusinessData> Businesses => Set<BusinessData>();
+    public DbSet<BusinessUserData> BusinessesUsers => Set<BusinessUserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -1059,21 +1061,46 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasPrincipalKey(x => x.Id);
 
         });
-
-        modelBuilder.Entity<TimeBaseOperationGroupUserData>(entityBuilder =>
+        
+        modelBuilder.Entity<TimeBaseOperationGroupBusinessData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(TimeBaseOperationsGroupsUsers))
-                .HasKey(x => new { x.GroupId, x.UserId });
+                .ToTable(nameof(TimeBaseOperationGroupBusinesses))
+                .HasKey(x => new { x.OperationGroupId, x.BusinessId });
 
-            entityBuilder.HasOne(x => x.User)
-                .WithMany(x => x.TimeBaseOperations)
-                .HasForeignKey(x => x.UserId)
+            entityBuilder.HasOne(x => x.OperationGroup)
+                .WithMany(x => x.Businesses)
+                .HasForeignKey(x => x.OperationGroupId)
                 .HasPrincipalKey(x => x.Id);
 
-            entityBuilder.HasOne(x => x.Group)
-                .WithMany(x => x.GroupUserOperations)
-                .HasForeignKey(x => x.GroupId)
+            entityBuilder.HasOne(x => x.Business)
+                .WithMany(x => x.TimeBasedOperations)
+                .HasForeignKey(x => x.BusinessId)
+                .HasPrincipalKey(x => x.Id);
+
+        });
+
+        modelBuilder.Entity<BusinessData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Businesses))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<BusinessUserData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(BusinessesUsers))
+                .HasKey(x => new { x.BusinessId, x.UserId });
+
+            entityBuilder.HasOne(x => x.Business)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.BusinessId)
+                .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.User)
+                .WithMany(x => x.Businesses)
+                .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
         });
     }

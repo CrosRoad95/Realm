@@ -51,7 +51,7 @@ public class UserData : IdentityUser<int>
     public ICollection<UserActiveBoostData> ActiveBoosts { get; set; } = [];
     public ICollection<UserSecretsData> Secrets { get; set; } = [];
     public ICollection<GroupJoinRequestData> GroupsJoinRequests { get; set; } = [];
-    public ICollection<TimeBaseOperationGroupUserData> TimeBaseOperations { get; set; } = [];
+    public ICollection<BusinessUserData> Businesses { get; set; } = [];
 }
 
 public class UserEventData : EventDataBase

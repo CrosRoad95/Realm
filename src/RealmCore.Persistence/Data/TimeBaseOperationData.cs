@@ -23,15 +23,14 @@ public sealed class TimeBaseOperationGroupData
     public string? Metadata { get; set; }
 
     public ICollection<TimeBaseOperationData>? Operations { get; set; }
-    public ICollection<TimeBaseOperationGroupUserData>? GroupUserOperations { get; set; }
+    public ICollection<TimeBaseOperationGroupBusinessData>? Businesses { get; set; }
 }
 
-public sealed class TimeBaseOperationGroupUserData
+public sealed class TimeBaseOperationGroupBusinessData
 {
-    public int UserId { get; set; }
-    public int GroupId { get; set; }
-    public string? Metadata { get; set; }
+    public int OperationGroupId { get; set; }
+    public int BusinessId { get; set; }
 
-    public TimeBaseOperationGroupData? Group { get; set; }
-    public UserData User { get; set; }
+    public BusinessData? Business { get; set; }
+    public TimeBaseOperationGroupData? OperationGroup { get; set; }
 }

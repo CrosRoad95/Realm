@@ -111,6 +111,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UsersService>();
         services.AddSingleton<GroupsService>();
         services.AddSingleton<TimeBaseOperationsService>();
+        services.AddSingleton<BusinessesService>();
         services.AddSingleton<BansService>();
         services.AddSingleton<RewardsService>();
         services.AddSingleton<FeedbackService>();
