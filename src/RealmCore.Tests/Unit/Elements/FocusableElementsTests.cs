@@ -26,10 +26,11 @@ public class FocusableElementsTests : IClassFixture<RealmTestingServerHostingFix
     [Fact]
     public async Task FocusedElementShouldBeRemovedWhenItDisposes()
     {
+        var player = await _hosting.CreatePlayer();
         var obj = _hosting.CreateFocusableObject();
-        obj.AddFocusedPlayer(_player);
+        obj.AddFocusedPlayer(player);
         
-        await _hosting.DisconnectPlayer(_player);
+        await _hosting.DisconnectPlayer(player);
 
         obj.FocusedPlayerCount.Should().Be(0);
     }

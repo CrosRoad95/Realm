@@ -1,50 +1,49 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class PlayersTests
+public class PlayersTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public PlayersTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+    }
+
     //[InlineData(new string[] { }, false)]
     //[InlineData(new string[] { "SampleRole" }, true)]
     //[Theory]
     public async Task UserShouldAuthorize(string[] roles, bool expectedAuthorized)
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        var usersService = player.GetRequiredService<UsersService>();
+        var usersService = _player.GetRequiredService<UsersService>();
         foreach (var roleName in roles)
         {
-            var roleManager = player.GetRequiredService<RoleManager<RoleData>>();
+            var roleManager = _player.GetRequiredService<RoleManager<RoleData>>();
             await roleManager.CreateAsync(new RoleData
             {
                 Name = roleName
             });
-            await usersService.AddToRole(player, roleName);
+            await usersService.AddToRole(_player, roleName);
         }
-        #endregion
 
-        #region Act
-        var authorized = await usersService.AuthorizePolicy(player, "SampleRole");
-        #endregion
+        var authorized = await usersService.AuthorizePolicy(_player, "SampleRole");
 
-        #region Assert
         authorized.Should().Be(expectedAuthorized);
         if (expectedAuthorized)
-            player.User.AuthorizedPolicies.Should().BeEquivalentTo(["SampleRole"]);
+            _player.User.AuthorizedPolicies.Should().BeEquivalentTo(["SampleRole"]);
         else
-            player.User.AuthorizedPolicies.Should().BeEquivalentTo([]);
-        #endregion
+            _player.User.AuthorizedPolicies.Should().BeEquivalentTo([]);
     }
 
     [Fact]
     public async Task PlayerInvokeShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         int invokedTimes = 0;
 
-        async Task act() => await player.Invoke(() =>
+        async Task act() => await _player.Invoke(() =>
         {
             invokedTimes++;
             return Task.CompletedTask;
@@ -59,12 +58,9 @@ public class PlayersTests
     [Fact]
     public async Task PlayerInvokeShouldWorkWhenExceptionThrown()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         int invokedTimes = 0;
 
-        var act = async () => await player.Invoke(() =>
+        var act = async () => await _player.Invoke(() =>
         {
             invokedTimes++;
             throw new Exception();
@@ -79,13 +75,10 @@ public class PlayersTests
     [Fact]
     public async Task RecursiveInvokeShouldNotBlock()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         bool invoked = false;
-        await player.Invoke(async () =>
+        await _player.Invoke(async () =>
         {
-            await player.Invoke(() =>
+            await _player.Invoke(() =>
             {
                 invoked = true;
                 return Task.CompletedTask;

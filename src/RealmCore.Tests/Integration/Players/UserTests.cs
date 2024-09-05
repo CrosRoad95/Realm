@@ -1,21 +1,28 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class UserTests
+public class UserTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithUniquePlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public UserTests(RealmTestingServerHostingFixtureWithUniquePlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+    }
+
     [Fact]
     public async Task TestLogInFlow()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer(true);
+        var player = await _hosting.CreatePlayer(true);
 
         var usersService = player.GetRequiredService<UsersService>();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var login = Guid.NewGuid().ToString()[..8];
         var password = "asdASD123!@#";
-        #endregion
 
-        #region Act
         var registerResult = await usersService.Register(login, password);
         var user = await player.GetRequiredService<UsersService>().GetUserByUserName(login) ?? throw new Exception("User not found");
 
@@ -36,13 +43,10 @@ public class UserTests
 
         var userDataRepository = player.GetRequiredService<UsersRepository>();
         var lastNick = await userDataRepository.GetLastNickName(userId);
-        #endregion
 
-        #region Assert
         validPassword.Should().BeTrue();
         //lastNick.Should().StartWith("TestPlayer");
         player.User.IsLoggedIn.Should().BeTrue();
         player.UserId.Should().Be(userId);
-        #endregion
     }
 }

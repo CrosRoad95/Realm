@@ -253,13 +253,14 @@ public class PlayerSessionsTests : IClassFixture<RealmTestingServerHostingFixtur
     [Fact]
     public async Task SessionsShouldBeCleanedUpWhenPlayerDisconnect()
     {
-        var session = _sessions.Begin<TestSession>();
+        var player = await _hosting.CreatePlayer();
+        var session = player.Sessions.Begin<TestSession>();
         using var monitorSession = session.Monitor();
-        using var monitorSessions = _sessions.Monitor();
+        using var monitorSessions = player.Sessions.Monitor();
 
-        await _hosting.DisconnectPlayer(_player);
+        await _hosting.DisconnectPlayer(player);
 
-        _sessions.ToArray().Should().BeEmpty();
+        player.Sessions.ToArray().Should().BeEmpty();
 
         monitorSession.GetOccurredEvents().Should().BeEquivalentTo(["Ended"]);
         monitorSessions.GetOccurredEvents().Should().BeEquivalentTo(["Ended"]);

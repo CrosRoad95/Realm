@@ -1,75 +1,61 @@
 ﻿namespace RealmCore.Tests.Unit.Players;
 
-public class PlayersTests
+public class PlayersTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
-    [Fact]
-    public async Task DestroyingElementShouldResetCurrentInteractElement()
+    private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public PlayersTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var worldObject = hosting.CreateObject();
-
-        player.CurrentInteractElement = worldObject;
-        player.CurrentInteractElement.Should().Be(worldObject);
-        #endregion
-
-        #region Act
-        worldObject.Destroy();
-        #endregion
-
-        #region Assert
-        player.CurrentInteractElement.Should().BeNull();
-        #endregion
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
     }
 
     [Fact]
-    public async Task YouShouldBeAbleAttachObjectToPlayer()
+    public void DestroyingElementShouldResetCurrentInteractElement()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var worldObject = hosting.CreateObject();
-        #endregion
+        var worldObject = _hosting.CreateObject();
 
-        #region Act
-        var attached = player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
-        #endregion
+        _player.CurrentInteractElement = worldObject;
+        _player.CurrentInteractElement.Should().Be(worldObject);
 
-        #region Assert
+        worldObject.Destroy();
+
+        _player.CurrentInteractElement.Should().BeNull();
+    }
+
+    [Fact]
+    public void YouShouldBeAbleAttachObjectToPlayer()
+    {
+        var worldObject = _hosting.CreateObject();
+
+        var attached = _player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
+
         attached.Should().BeTrue();
-        player.AttachedBoneElementsCount.Should().Be(1);
-        #endregion
+        _player.AttachedBoneElementsCount.Should().Be(1);
     }
 
     [Fact]
-    public async Task AttachedElementShouldBeRemovedIfElementGetsDestroyed()
+    public void AttachedElementShouldBeRemovedIfElementGetsDestroyed()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var worldObject = hosting.CreateObject();
-        #endregion
+        var worldObject = _hosting.CreateObject();
 
-        #region Act
-        player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
+        _player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
         worldObject.Destroy();
-        #endregion
 
-        #region Assert
-        player.AttachedBoneElementsCount.Should().Be(0);
-        #endregion
+        _player.AttachedBoneElementsCount.Should().Be(0);
     }
 
     [Fact]
     public async Task ElementOwnerShouldWorkTests()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var worldObject = hosting.CreateObject();
+        var player = await _hosting.CreatePlayer();
+        var worldObject = _hosting.CreateObject();
 
         worldObject.TrySetOwner(player);
-        await hosting.DisconnectPlayer(player);
+        await _hosting.DisconnectPlayer(player);
 
         worldObject.Owner.Should().BeNull();
     }
@@ -77,176 +63,105 @@ public class PlayersTests
     [Fact]
     public async Task TestAsyncBindsCooldown()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
         int executionCount = 0;
-        player.SetBind("x", (player, keyState) =>
+        _player.SetBind("y", (player, keyState) =>
         {
             executionCount++;
         });
-        #endregion
 
-        #region Act
-        await player.InternalHandleBindExecuted("x", KeyState.Down);
-        await player.InternalHandleBindExecuted("x", KeyState.Down);
-        #endregion
+        await _player.InternalHandleBindExecuted("y", KeyState.Down);
+        await _player.InternalHandleBindExecuted("y", KeyState.Down);
 
-        #region Assert
         executionCount.Should().Be(1);
-        player.IsCooldownActive("x").Should().BeTrue();
-        #endregion
+        _player.IsCooldownActive("y").Should().BeTrue();
     }
 
     [Fact]
     public async Task TestAsyncBindsThrowingException()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        player.SetBindAsync("x", (player, keyState, token) =>
+        _player.SetBindAsync("x", (player, keyState, token) =>
         {
             throw new Exception("test123");
         });
-        #endregion
 
-        #region Act
-        var action = async () => await player.InternalHandleBindExecuted("x", KeyState.Down);
-        #endregion
+        var action = async () => await _player.InternalHandleBindExecuted("x", KeyState.Down);
 
-        #region Assert
         await action.Should().ThrowAsync<Exception>().WithMessage("test123");
-        player.IsCooldownActive("x").Should().BeTrue();
-        #endregion
+        _player.IsCooldownActive("x").Should().BeTrue();
     }
 
     [Fact]
-    public async Task PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
+    public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        #endregion
+        _player.AddEnableFightFlag(1);
 
-        #region Act
-        player.AddEnableFightFlag(1);
-        #endregion
-
-        #region Assert
-        player.Controls.FireEnabled.Should().BeTrue();
-        #endregion
+        _player.Controls.FireEnabled.Should().BeTrue();
     }
 
     [Fact]
-    public async Task PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
+    public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        #endregion
+        _player.AddEnableFightFlag(1);
+        _player.RemoveEnableFightFlag(1);
 
-        #region Act
-        player.AddEnableFightFlag(1);
-        player.RemoveEnableFightFlag(1);
-        #endregion
-
-        #region Assert
-        player.Controls.FireEnabled.Should().BeFalse();
-        #endregion
+        _player.Controls.FireEnabled.Should().BeFalse();
     }
 
     [Fact]
     public async Task FadeCameraShouldWork()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        #endregion
-
-        #region Act & Assert
-        await player.FadeCameraAsync(CameraFade.Out, 0.1f);
-        await player.FadeCameraAsync(CameraFade.In, 0.1f);
-        #endregion
+        await _player.FadeCameraAsync(CameraFade.Out, 0.1f);
+        await _player.FadeCameraAsync(CameraFade.In, 0.1f);
     }
 
     [Fact]
     public async Task FadeCameraShouldBeCancelable()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
         var cancellationTokenSource = new CancellationTokenSource(100);
-        #endregion
 
-        #region Act
-        var act = async () => await player.FadeCameraAsync(CameraFade.Out, 10.0f, cancellationTokenSource.Token);
-        #endregion
+        var act = async () => await _player.FadeCameraAsync(CameraFade.Out, 10.0f, cancellationTokenSource.Token);
 
-        #region Asset
         await act.Should().ThrowAsync<OperationCanceledException>();
-        #endregion
     }
 
     [Fact]
     public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var player = await _hosting.CreatePlayer();
 
         var _ = Task.Run(async () =>
         {
             await Task.Delay(200);
 
-            await hosting.DisconnectPlayer(player);
+            await _hosting.DisconnectPlayer(player);
         });
-        #endregion
 
-        #region Act
         var act = async () => await player.FadeCameraAsync(CameraFade.Out, 2.0f);
-        #endregion
 
-        #region Asset
         await act.Should().ThrowAsync<OperationCanceledException>();
-        #endregion
     }
 
     [Fact]
-    public async Task SettingsShouldWork()
+    public void SettingsShouldWork()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        #endregion
-
-        #region Act
-        var settings = player.Settings;
+        var settings = _player.Settings;
         settings.Set(1, "foo");
         bool hasSetting = settings.TryGet(1, out var settingValue);
         settings.TryGet(1, out var gotSettingValue);
         bool removedSetting = settings.TryRemove(1);
         bool exists = settings.Has(1);
-        #endregion
 
-        #region Assert
         hasSetting.Should().BeTrue();
         settingValue.Should().Be("foo");
         gotSettingValue.Should().Be("foo");
         removedSetting.Should().BeTrue();
         exists.Should().BeFalse();
-        #endregion
     }
 
     [Fact]
-    public async Task UpgradesShouldWork()
+    public void UpgradesShouldWork()
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        #endregion
-
-        #region Act
-        var upgrades = player.Upgrades;
+        var upgrades = _player.Upgrades;
         var hasSomeUpgrade1 = upgrades.Has(1);
         var added1 = upgrades.TryAdd(1);
         var added2 = upgrades.TryAdd(1);
@@ -254,9 +169,7 @@ public class PlayersTests
         var removed1 = upgrades.TryRemove(1);
         var removed2 = upgrades.TryRemove(1);
         var hasSomeUpgrade3 = upgrades.Has(1);
-        #endregion
 
-        #region Assert
         hasSomeUpgrade1.Should().BeFalse();
         added1.Should().BeTrue();
         added2.Should().BeFalse();
@@ -264,75 +177,54 @@ public class PlayersTests
         removed1.Should().BeTrue();
         removed2.Should().BeFalse();
         hasSomeUpgrade3.Should().BeFalse();
-        #endregion
     }
 
 
     [InlineData("TestPlayer1", true)]
     [InlineData("FooPlayer", false)]
     [Theory]
-    public async Task TryGetPlayerByNameTests(string nick, bool shouldExists)
+    public void TryGetPlayerByNameTests(string nick, bool shouldExists)
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var elementSearchService = _player.GetRequiredService<PlayerSearchService>();
 
-        var elementSearchService = player.GetRequiredService<PlayerSearchService>();
-        #endregion
-
-        #region Act
         bool found = elementSearchService.TryGetPlayerByName(nick, out var foundPlayer, PlayerSearchOption.None);
-        #endregion
 
-        #region Assert
         if (shouldExists)
         {
             found.Should().BeTrue();
-            (player == foundPlayer).Should().BeTrue();
+            (_player == foundPlayer).Should().BeTrue();
         }
         else
         {
             found.Should().BeFalse();
             foundPlayer.Should().BeNull();
         }
-        #endregion
     }
 
     [InlineData("test", true)]
     [InlineData("asd", false)]
     [Theory]
-    public async Task SearchPlayersByNameTests(string pattern, bool shouldExists)
+    public void SearchPlayersByNameTests(string pattern, bool shouldExists)
     {
-        #region Arrange
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var searchService = _player.GetRequiredService<PlayerSearchService>();
 
-        var searchService = player.GetRequiredService<PlayerSearchService>();
-        #endregion
-
-        #region Act
         var found = searchService.SearchPlayers(pattern, new(PlayerSearchOption.None));
-        #endregion
 
-        #region Assert
         if (shouldExists)
         {
             var foundPlayer = found.First();
-            (player == foundPlayer).Should().BeTrue();
+            (_player == foundPlayer).Should().BeTrue();
         }
         else
         {
             found.Should().BeEmpty();
         }
-        #endregion
     }
 
     [Fact]
-    public async Task UserVersionShouldWorkAsExpected()
+    public void UserVersionShouldWorkAsExpected()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-        var user = player.User;
+        var user = _player.User;
 
         user.GetVersion().Should().Be(0);
 
@@ -341,5 +233,11 @@ public class PlayersTests
         user.TryFlushVersion(1).Should().BeTrue();
         user.GetVersion().Should().Be(0);
         user.TryFlushVersion(1).Should().BeFalse();
+    }
+
+    public void Dispose()
+    {
+        _player.User.TryFlushVersion(0);
+        _player.Upgrades.Clear();
     }
 }

@@ -1,12 +1,22 @@
 ﻿namespace RealmCore.Tests.Unit.Elements;
 
-public class ElementFactoryTests
+public class ElementFactoryTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>
 {
+    private readonly RealmTestingServerHostingFixtureWithUniquePlayer _fixture;
+    private readonly RealmTestingServerHosting<RealmTestingPlayer> _hosting;
+    private readonly RealmTestingPlayer _player;
+
+    public ElementFactoryTests(RealmTestingServerHostingFixtureWithUniquePlayer fixture)
+    {
+        _fixture = fixture;
+        _player = _fixture.Player;
+        _hosting = fixture.Hosting;
+    }
+
     [Fact]
     public async Task ScopedElementFactoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var player = await _hosting.CreatePlayer();
 
         bool wasDestroyed = false;
         void handleDestroyed(Element element)
@@ -19,17 +29,14 @@ public class ElementFactoryTests
         obj.Destroyed += handleDestroyed;
         obj.Id.Value.Should().Be(30001);
 
-        await hosting.DisconnectPlayer(player);
+        await _hosting.DisconnectPlayer(player);
 
         wasDestroyed.Should().BeTrue();
     }
 
     [Fact]
-    public async Task InnerScopesForScopedElementFactoryShouldWork()
+    public void InnerScopesForScopedElementFactoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
         bool wasDestroyed = false;
         void handleDestroyed(Element element)
         {
@@ -37,7 +44,7 @@ public class ElementFactoryTests
         }
 
         {
-            using var scope = player.ElementFactory.CreateScope();
+            using var scope = _player.ElementFactory.CreateScope();
             var obj = scope.CreateObject(Location.Zero, (ObjectModel)1337);
             obj.Destroyed += handleDestroyed;
         }
@@ -48,8 +55,7 @@ public class ElementFactoryTests
     [Fact]
     public async Task RootAndInnerScopesForScopedElementFactoryShouldWork()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var player = await _hosting.CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
@@ -59,7 +65,7 @@ public class ElementFactoryTests
         scope.CreatedElements.Should().BeEquivalentTo([obj2]);
         rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1, obj2]);
 
-        await hosting.DisconnectPlayer(player);
+        await _hosting.DisconnectPlayer(player);
 
         rootElementFactory.CreatedElements.Should().BeEmpty();
     }
@@ -67,8 +73,7 @@ public class ElementFactoryTests
     [Fact]
     public async Task RootAndInnerScopesForScopedElementFactoryShouldWork2()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
+        var player = await _hosting.CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
@@ -81,20 +86,17 @@ public class ElementFactoryTests
         }
         rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1]);
 
-        await hosting.DisconnectPlayer(player);
+        await _hosting.DisconnectPlayer(player);
 
         rootElementFactory.CreatedElements.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task ElementsShouldBeCreatedInTheSameDimensionAndInterior()
+    public void ElementsShouldBeCreatedInTheSameDimensionAndInterior()
     {
-        using var hosting = new RealmTestingServerHosting();
-        var player = await hosting.CreatePlayer();
-
-        player.Interior = 13;
-        player.Dimension = 56;
-        var rootElementFactory = player.ElementFactory;
+        _player.Interior = 13;
+        _player.Dimension = 56;
+        var rootElementFactory = _player.ElementFactory;
 
         var obj = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
         obj.Interior.Should().Be(13);

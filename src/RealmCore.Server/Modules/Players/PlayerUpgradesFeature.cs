@@ -67,6 +67,14 @@ public sealed class PlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>, IU
         }
     }
 
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _upgrades.Clear();
+        }
+    }
+
     public IEnumerator<int> GetEnumerator()
     {
         int[] view;

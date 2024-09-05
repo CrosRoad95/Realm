@@ -83,14 +83,15 @@ public class LiftableWorldObjectTests : IClassFixture<RealmTestingServerHostingF
     [Fact]
     public async Task ElementShouldBeDroppedUponDispose2()
     {
+        var player = await _hosting.CreatePlayer();
         var worldObject = _hosting.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
         using var monitored = interaction.Monitor();
-        interaction.TryLift(_player);
+        interaction.TryLift(player);
 
-        await _hosting.DisconnectPlayer(_player);
+        await _hosting.DisconnectPlayer(player);
 
         using var _ = new AssertionScope();
         interaction.Owner.Should().BeNull();
