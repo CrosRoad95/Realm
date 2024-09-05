@@ -8,6 +8,11 @@ public sealed class BusinessDto : IEqualityComparer<BusinessDto>
 
     public bool Equals(BusinessDto? x, BusinessDto? y) => x?.Id == y?.Id;
 
+    public T? GetMetadata<T>() where T : class
+    {
+        return Data?.Metadata != null ? JsonConvert.DeserializeObject<T>(Data.Metadata, BusinessesService._jsonSerializerSettings) : null;
+    }
+
     public int GetHashCode([DisallowNull] BusinessDto obj) => obj.Id;
 
     [return: NotNullIfNotNull(nameof(businessData))]
