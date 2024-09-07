@@ -1092,7 +1092,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.HasMany(x => x.Statistics)
                 .WithOne(x => x.Business)
-                .HasForeignKey(x => x.StatisticId)
+                .HasForeignKey(x => x.BusinessId)
                 .HasPrincipalKey(x => x.Id);
 
             entityBuilder
