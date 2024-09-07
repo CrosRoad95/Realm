@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.TimeBaseOperations;
+﻿using Org.BouncyCastle.Asn1.Cms;
+
+namespace RealmCore.Server.Modules.TimeBaseOperations;
 
 public sealed class BusinessDto : IEqualityComparer<BusinessDto>
 {
@@ -161,6 +163,32 @@ public sealed class BusinessesService
         try
         {
             return await _businessesRepository.SetMetadata(businessId, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> IncreaseStatistic(int businessId, int statisticId, float value, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _businessesRepository.IncreaseStatistic(businessId, statisticId, value, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<IReadOnlyDictionary<int, float>> GetStatistics(int businessId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _businessesRepository.GetStatistics(businessId, cancellationToken);
         }
         finally
         {

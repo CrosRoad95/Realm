@@ -72,6 +72,26 @@ public class BusinessesServiceTest : IClassFixture<RealmTestingServerHostingFixt
         businesses2.Select(x => x.Id).Should().BeEquivalentTo([business.Id]);
     }
 
+    [Fact]
+    public async Task StatisticsShouldWork()
+    {
+        var business = await _businessesService.Create(1, _sampleMetadata);
+        var result1 = await _businessesService.IncreaseStatistic(business.Id, 1, 1);
+        var result2 = await _businessesService.IncreaseStatistic(business.Id, 1, 1);
+        var result3 = await _businessesService.IncreaseStatistic(business.Id, 2, 1);
+        var results = await _businessesService.GetStatistics(business.Id);
+
+        using var _ = new AssertionScope();
+        result1.Should().BeTrue();
+        result2.Should().BeTrue();
+        result3.Should().BeTrue();
+        results.Should().BeEquivalentTo(new Dictionary<int, float>
+        {
+            [1] = 2,
+            [2] = 1
+        });
+    }
+
     public async ValueTask DisposeAsync()
     {
         await _fixture.Hosting.GetRequiredService<IDb>().Businesses.ExecuteDeleteAsync();

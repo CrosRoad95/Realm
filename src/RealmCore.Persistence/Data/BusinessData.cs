@@ -7,6 +7,7 @@ public class BusinessData
     public string? Metadata { get; set; }
 
     public ICollection<TimeBaseOperationGroupBusinessData> TimeBasedOperations { get; set; } = [];
+    public ICollection<BusinessStatisticData> Statistics { get; set; } = [];
     public ICollection<BusinessUserData> Users { get; set; } = [];
 }
 
@@ -18,4 +19,13 @@ public class BusinessUserData
 
     public BusinessData? Business { get; set; }
     public UserData? User { get; set; }
+}
+
+public class BusinessStatisticData
+{
+    public int BusinessId { get; set; }
+    public int StatisticId { get; set; }
+    public float Value { get; set; }
+
+    public BusinessData? Business { get; set; }
 }

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public sealed class BusinessesRepository
 {
@@ -117,7 +115,7 @@ public sealed class BusinessesRepository
 
 
         var query = _db.Businesses
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == businessId);
 
@@ -135,7 +133,7 @@ public sealed class BusinessesRepository
 
 
         var query = _db.Businesses
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == businessId)
             .SelectMany(x => x.Users.Select(y => y.UserId));
@@ -153,7 +151,7 @@ public sealed class BusinessesRepository
         }
 
         var query = _db.Businesses
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Users.Any(y => y.UserId == userId));
 
@@ -170,7 +168,7 @@ public sealed class BusinessesRepository
         }
 
         var query = _db.Businesses
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Users.Any(y => y.UserId == userId) && x.Category == categoryId);
 
@@ -187,7 +185,7 @@ public sealed class BusinessesRepository
         }
 
         var query = _db.Businesses
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == businessId);
 
@@ -205,11 +203,68 @@ public sealed class BusinessesRepository
         }
 
         var query = _db.BusinessesUsers
-            .TagWithSource(nameof(GroupRepository))
+            .TagWithSource(nameof(BusinessesRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.BusinessId == businessId && x.UserId == userId);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) == 1;
+    }
+
+    public async Task<bool> IncreaseStatistic(int businessId, int statisticId, float value, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(IncreaseStatistic));
+        if (value < 0)
+            return false;
+
+        var query = _db.BusinessStatistics
+            .TagWithSource(nameof(BusinessesRepository))
+            .Where(x => x.BusinessId == businessId && x.StatisticId == statisticId);
+
+        var statistic = await query.FirstOrDefaultAsync(cancellationToken);
+        
+        try
+        {
+            if (statistic == null)
+            {
+                _db.BusinessStatistics.Add(new BusinessStatisticData
+                {
+                    BusinessId = businessId,
+                    StatisticId = statisticId,
+                    Value = value
+                });
+            }
+            else
+            {
+                statistic.Value += value;
+            }
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+
+    public async Task<IReadOnlyDictionary<int, float>> GetStatistics(int businessId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+        }
+
+        var query = _db.BusinessStatistics
+            .TagWithSource(nameof(BusinessesRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.BusinessId == businessId);
+
+        return await query.ToDictionaryAsync(x => x.StatisticId, y => y.Value, cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.TimeBaseOperationRepository", "1.0.0");

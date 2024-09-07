@@ -110,6 +110,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<TimeBaseOperationGroupBusinessData> TimeBaseOperationGroupBusinesses => Set<TimeBaseOperationGroupBusinessData>();
     public DbSet<BusinessData> Businesses => Set<BusinessData>();
     public DbSet<BusinessUserData> BusinessesUsers => Set<BusinessUserData>();
+    public DbSet<BusinessStatisticData> BusinessStatistics => Set<BusinessStatisticData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -1077,7 +1078,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithMany(x => x.TimeBasedOperations)
                 .HasForeignKey(x => x.BusinessId)
                 .HasPrincipalKey(x => x.Id);
-
         });
 
         modelBuilder.Entity<BusinessData>(entityBuilder =>
@@ -1085,6 +1085,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(Businesses))
                 .HasKey(x => x.Id);
+
+            entityBuilder.HasMany(x => x.Statistics)
+                .WithOne(x => x.Business)
+                .HasForeignKey(x => x.StatisticId)
+                .HasPrincipalKey(x => x.Id);
         });
 
         modelBuilder.Entity<BusinessUserData>(entityBuilder =>
@@ -1102,6 +1107,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithMany(x => x.Businesses)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<BusinessStatisticData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(BusinessStatistics))
+                .HasKey(x => new { x.BusinessId, x.StatisticId });
         });
     }
 
