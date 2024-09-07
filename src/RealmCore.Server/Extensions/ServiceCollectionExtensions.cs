@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Modules.Businesses;
+using RealmCore.Server.Modules.Players.Avatars;
 using RealmCore.Server.Modules.Players.Discord;
 using RealmCore.Server.Modules.Players.Integrations;
 using RealmCore.Server.Modules.TimeBaseOperations;
@@ -169,6 +170,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<PlayerBoostsFeature>();
         services.AddPlayerScopedFeature<PlayerSecretsFeature>();
         services.AddPlayerScopedFeature<DiscordRichPresenceFeature>();
+        services.AddPlayerScopedFeature<PlayerAvatarFeature>();
         #endregion
 
         #region Vehicle features

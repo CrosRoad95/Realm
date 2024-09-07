@@ -345,6 +345,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.GroupsJoinRequests)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
+
+            entityBuilder.Property(x => x.Avatar)
+                .HasMaxLength(512);
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>

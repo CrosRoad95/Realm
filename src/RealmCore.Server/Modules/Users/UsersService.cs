@@ -203,7 +203,7 @@ public sealed class UsersService
         }
     }
 
-    public async Task<bool> TryUpdateLastNicknameCore(int userId, string nick, CancellationToken cancellationToken = default)
+    private async Task<bool> TryUpdateLastNicknameCore(int userId, string nick, CancellationToken cancellationToken = default)
     {
         return await _usersRepository.TryUpdateLastNickname(userId, nick, cancellationToken);
     }
@@ -214,6 +214,32 @@ public sealed class UsersService
         try
         {
             return await TryUpdateLastNicknameCore(userId, nick, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<string?> GetAvatar(int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetAvatar(userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetSetting(userId, settingId, cancellationToken);
         }
         finally
         {

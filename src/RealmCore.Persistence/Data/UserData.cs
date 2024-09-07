@@ -16,6 +16,7 @@ public class UserData : IdentityUser<int>
     public uint Experience { get; set; }
     public bool IsDisabled { get; set; }
     public bool QuickLogin { get; set; }
+    public string? Avatar { get; set; }
     public DateTime? LastNewsReadDateTime { get; set; }
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 

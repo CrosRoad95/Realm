@@ -118,6 +118,42 @@ public sealed class UsersRepository
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken) == 1;
     }
+    
+    public async Task<string?> GetAvatar(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetAvatar));
+
+        if(activity != null)
+        {
+            activity.SetTag("UserId", userId);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .Select(x => x.Avatar);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetSetting));
+
+        if(activity != null)
+        {
+            activity.SetTag("UserId", userId);
+            activity.SetTag("SettingId", settingId);
+        }
+
+        var query = _db.UserSettings
+            .TagWithSource(nameof(UsersRepository))
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && x.SettingId == settingId)
+            .Select(x => x.Value);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
 
     private IQueryable<UserData> CreateQueryBase() => _db.Users
         .TagWithSource(nameof(UsersRepository));

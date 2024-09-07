@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Discord;
+﻿using RealmCore.Server.Modules.Players.Avatars;
+using RealmCore.Server.Modules.Players.Discord;
 using RealmCore.Server.Modules.Players.Integrations;
 
 namespace RealmCore.Server.Modules.Elements;
@@ -198,6 +199,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     public PlayerBoostsFeature Boosts { get; init; }
     public PlayerSecretsFeature Secrets { get; init; }
     public DiscordRichPresenceFeature DiscordRichPresence { get; init; }
+    public PlayerAvatarFeature Avatar { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
@@ -246,6 +248,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         Integrations = GetRequiredService<PlayerIntegrationsFeature>();
         Secrets = GetRequiredService<PlayerSecretsFeature>();
         DiscordRichPresence = GetRequiredService<DiscordRichPresenceFeature>();
+        Avatar = GetRequiredService<PlayerAvatarFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

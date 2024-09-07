@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Tests.Integration;
 
-public class GroupServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
+public class UsersServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
     private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;
     private readonly RealmTestingPlayer _player;
     private readonly PlayerGroupsFeature _groups;
     private readonly UsersService _usersService;
 
-    public GroupServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
+    public UsersServiceTests(RealmTestingServerHostingFixtureWithPlayer fixture)
     {
         _fixture = fixture;
         _player = _fixture.Player;
