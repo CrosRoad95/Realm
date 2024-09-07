@@ -30,7 +30,7 @@ public class UserData : IdentityUser<int>
     public ICollection<GroupMemberData> GroupMembers { get; set; } = new List<GroupMemberData>();
     public DiscordIntegrationData? DiscordIntegration { get; set; }
     public ICollection<UserUpgradeData> Upgrades { get; set; } = new List<UserUpgradeData>();
-    public ICollection<UserStatData> Stats { get; set; } = new List<UserStatData>();
+    public ICollection<UserStatisticData> Stats { get; set; } = new List<UserStatisticData>();
     public ICollection<UserGtaStatData> GtaSaStats { get; set; } = new List<UserGtaStatData>();
     public ICollection<UserRewardData> Rewards { get; set; } = new List<UserRewardData>();
     public ICollection<UserSettingData> Settings { get; set; } = new List<UserSettingData>();

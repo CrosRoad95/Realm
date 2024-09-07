@@ -3,7 +3,7 @@
 public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
-    private ICollection<UserStatData> _stats = [];
+    private ICollection<UserStatisticData> _stats = [];
     private ICollection<UserGtaStatData> _gtaSaStats = [];
 
     public event Action<PlayerStatisticsFeature, int, float>? Decreased;
@@ -53,12 +53,12 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
         }
     }
 
-    private UserStatData GetStatById(int id)
+    private UserStatisticData GetStatById(int id)
     {
         var stat = _stats.FirstOrDefault(x => x.StatId == id);
         if (stat == null)
         {
-            stat = new UserStatData
+            stat = new UserStatisticData
             {
                 StatId = id,
                 Value = 0
@@ -91,7 +91,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
-        UserStatData stat;
+        UserStatisticData stat;
 
         lock (_lock)
         {
@@ -107,7 +107,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
     {
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
-        UserStatData stat;
+        UserStatisticData stat;
 
         lock (_lock)
         {
@@ -121,7 +121,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
 
     public void Set(int statId, float value)
     {
-        UserStatData stat;
+        UserStatisticData stat;
         float old;
         lock (_lock)
         {
@@ -181,7 +181,7 @@ public sealed class PlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserSt
 
     public IEnumerator<UserStatDto> GetEnumerator()
     {
-        UserStatData[] view;
+        UserStatisticData[] view;
         lock (_lock)
             view = [.. _stats];
 

@@ -59,7 +59,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<VehicleUpgradeData> VehicleUpgrades => Set<VehicleUpgradeData>();
     public DbSet<VehicleFuelData> VehicleFuels => Set<VehicleFuelData>();
     public DbSet<UserDailyVisitsData> DailyVisits => Set<UserDailyVisitsData>();
-    public DbSet<UserStatData> UserStats => Set<UserStatData>();
+    public DbSet<UserStatisticData> UserStats => Set<UserStatisticData>();
     public DbSet<UserGtaStatData> UserGtaStats => Set<UserGtaStatData>();
     public DbSet<JobStatisticsData> JobPoints => Set<JobStatisticsData>();
     public DbSet<JobUpgradeData> JobUpgrades => Set<JobUpgradeData>();
@@ -411,7 +411,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasDefaultValue(DateTime.MinValue);
         });
 
-        modelBuilder.Entity<UserStatData>(entityBuilder =>
+        modelBuilder.Entity<UserStatisticData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserStats))

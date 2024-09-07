@@ -23,7 +23,7 @@ public interface IDb
     DbSet<VehicleUpgradeData> VehicleUpgrades { get; }
     DbSet<VehicleFuelData> VehicleFuels { get; }
     DbSet<UserDailyVisitsData> DailyVisits { get; }
-    DbSet<UserStatData> UserStats { get; }
+    DbSet<UserStatisticData> UserStats { get; }
     DbSet<UserGtaStatData> UserGtaStats { get; }
     DbSet<JobUpgradeData> JobUpgrades { get; }
     DbSet<UserAchievementData> Achievements { get; }

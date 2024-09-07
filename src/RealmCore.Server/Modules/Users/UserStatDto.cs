@@ -15,7 +15,7 @@ public sealed class UserStatDto
     }
 
     [return: NotNullIfNotNull(nameof(userStatData))]
-    public static UserStatDto? Map(UserStatData? userStatData)
+    public static UserStatDto? Map(UserStatisticData? userStatData)
     {
         if (userStatData == null)
             return null;
