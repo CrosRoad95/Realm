@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.TimeBaseOperations;
+﻿using RealmCore.Server.Modules.Businesses;
+
+namespace RealmCore.Server.Modules.TimeBaseOperations;
 
 public sealed class TimeBaseOperationGroupDto : IEqualityComparer<TimeBaseOperationGroupDto>
 {

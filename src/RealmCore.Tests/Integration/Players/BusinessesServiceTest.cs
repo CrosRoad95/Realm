@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Integration.Players;
+﻿using RealmCore.Server.Modules.Businesses;
+
+namespace RealmCore.Tests.Integration.Players;
 
 public class BusinessesServiceTest : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IAsyncDisposable
 {

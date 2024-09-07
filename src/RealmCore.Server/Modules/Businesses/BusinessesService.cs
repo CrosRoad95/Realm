@@ -1,6 +1,6 @@
 ﻿using Org.BouncyCastle.Asn1.Cms;
 
-namespace RealmCore.Server.Modules.TimeBaseOperations;
+namespace RealmCore.Server.Modules.Businesses;
 
 public sealed class BusinessDto : IEqualityComparer<BusinessDto>
 {
@@ -65,7 +65,7 @@ public sealed class BusinessesService
         }
         return BusinessDto.Map(business);
     }
-    
+
     public async Task<bool> AddBusinessToTimeBaseGroup(int businessId, int groupId, string? metadata = null, CancellationToken cancellationToken = default)
     {
         var metadataString = Serialize(metadata);
@@ -79,7 +79,7 @@ public sealed class BusinessesService
             _semaphore.Release();
         }
     }
-    
+
     public async Task<bool> AddUser(int businessId, int userId, string? metadata = null, CancellationToken cancellationToken = default)
     {
         var metadataString = Serialize(metadata);
@@ -93,7 +93,7 @@ public sealed class BusinessesService
             _semaphore.Release();
         }
     }
-    
+
     public async Task<BusinessDto?> GetById(int businessId, CancellationToken cancellationToken = default)
     {
         BusinessData? business;
@@ -109,7 +109,7 @@ public sealed class BusinessesService
 
         return BusinessDto.Map(business);
     }
-    
+
     public async Task<int[]> GetUsersById(int businessId, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
@@ -122,7 +122,7 @@ public sealed class BusinessesService
             _semaphore.Release();
         }
     }
-    
+
     public async Task<BusinessDto[]> GetByUserId(int userId, CancellationToken cancellationToken = default)
     {
         BusinessData[] businesses;
@@ -138,7 +138,7 @@ public sealed class BusinessesService
 
         return businesses.Select(BusinessDto.Map).ToArray();
     }
-    
+
     public async Task<BusinessDto[]> GetByUserIdAndCategory(int userId, int categoryId, CancellationToken cancellationToken = default)
     {
         BusinessData[] businesses;
@@ -154,8 +154,8 @@ public sealed class BusinessesService
 
         return businesses.Select(BusinessDto.Map).ToArray();
     }
-    
-    
+
+
     public async Task<bool> SetMetadata(int businessId, object? metadata, CancellationToken cancellationToken = default)
     {
         var metadataString = Serialize(metadata);
