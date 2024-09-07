@@ -9,6 +9,7 @@ public class BusinessData
     public ICollection<TimeBaseOperationGroupBusinessData> TimeBasedOperations { get; set; } = [];
     public ICollection<BusinessStatisticData> Statistics { get; set; } = [];
     public ICollection<BusinessUserData> Users { get; set; } = [];
+    public ICollection<BusinessEventData> Events { get; set; } = [];
 }
 
 public class BusinessUserData
@@ -28,4 +29,9 @@ public class BusinessStatisticData
     public float Value { get; set; }
 
     public BusinessData? Business { get; set; }
+}
+
+public sealed class BusinessEventData : EventDataBase
+{
+    public int BusinessId { get; set; }
 }

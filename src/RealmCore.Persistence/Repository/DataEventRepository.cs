@@ -5,6 +5,7 @@ public enum DataEventType
     Player,
     Vehicle,
     Group,
+    Business,
 }
 
 public record struct DataEvent(DataEventType dataEventType, int entityId, int eventType, string? metadata = null);
@@ -66,6 +67,17 @@ public sealed class DataEventRepository
                 _db.GroupsEvents.Add(groupEventData);
                 eventDataBase = groupEventData;
                 break;
+            case DataEventType.Business:
+                var businessEventData = new BusinessEventData
+                {
+                    BusinessId = dataEvent.entityId,
+                    EventType = dataEvent.eventType,
+                    DateTime = dateTime,
+                    Metadata = dataEvent.metadata
+                };
+                _db.BusinessEvents.Add(businessEventData);
+                eventDataBase = businessEventData;
+                break;
             default:
                 throw new NotSupportedException();
         }
@@ -90,6 +102,7 @@ public sealed class DataEventRepository
             DataEventType.Player => _db.UserEvents.AsNoTracking().TagWithSource(nameof(DataEventRepository)).Where(x => x.UserId == entityId),
             DataEventType.Vehicle => _db.VehicleEvents.AsNoTracking().TagWithSource(nameof(DataEventRepository)).Where(x => x.VehicleId == entityId),
             DataEventType.Group => _db.GroupsEvents.AsNoTracking().TagWithSource(nameof(DataEventRepository)).Where(x => x.GroupId == entityId),
+            DataEventType.Business => _db.BusinessEvents.AsNoTracking().TagWithSource(nameof(DataEventRepository)).Where(x => x.BusinessId == entityId),
             _ => throw new NotSupportedException(),
         };
 
