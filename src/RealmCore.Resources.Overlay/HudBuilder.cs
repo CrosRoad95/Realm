@@ -1,5 +1,33 @@
 ﻿namespace RealmCore.Resources.Overlay;
 
+public interface IHudBuilder
+{
+    Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
+
+    IHudBuilderElement Add(IHudElement hudElement, AddElementLocation addElementLocation = AddElementLocation.Default);
+}
+
+public interface IHudBuilderElement : IHudBuilder
+{
+    int Id { get; }
+}
+
+internal sealed class HudBuilderElement : IHudBuilderElement
+{
+    private readonly IHudBuilder _hudBuilder;
+
+    public Action<DynamicHudElement>? DynamicHudElementAdded { get => _hudBuilder.DynamicHudElementAdded; set => _hudBuilder.DynamicHudElementAdded = value; }
+    public int Id { get; }
+
+    public HudBuilderElement(IHudBuilder hudBuilder, int id)
+    {
+        _hudBuilder = hudBuilder;
+        Id = id;
+    }
+
+    public IHudBuilderElement Add(IHudElement hudElement, AddElementLocation addElementLocation = AddElementLocation.Default) => _hudBuilder.Add(hudElement, addElementLocation);
+}
+
 internal sealed class HudBuilder : IHudBuilder
 {
     private readonly List<LuaValue> _luaValues = [];
@@ -36,7 +64,7 @@ internal sealed class HudBuilder : IHudBuilder
 
     public int AllocateId() => Interlocked.Increment(ref _id);
 
-    public IHudBuilder Add(IHudElement hudElement, AddElementLocation addElementLocation = AddElementLocation.Default)
+    public IHudBuilderElement Add(IHudElement hudElement, AddElementLocation addElementLocation = AddElementLocation.Default)
     {
         var id = AllocateId();
         var luaValue = hudElement.CreateLuaValue(_state, id, _assetsService);
@@ -51,6 +79,6 @@ internal sealed class HudBuilder : IHudBuilder
             });
         }
 
-        return this;
+        return new HudBuilderElement(this, id);
     }
 }

@@ -38,6 +38,7 @@ internal class OverlayLogic
         _overlayService.BlipAdded = HandleAddBlip;
         _overlayService.BlipRemoved = HandleRemoveBlip;
         _overlayService.AllBlipsRemoved = HandleRemoveAllBlips;
+        _overlayService.ElementSizeChanged = HandleElementSizeChanged;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -128,5 +129,10 @@ internal class OverlayLogic
     private void HandleRemoveAllBlips(Player player)
     {
         _luaEventHub.Broadcast(x => x.RemoveAllBlips());
+    }
+
+    private void HandleElementSizeChanged(Player player, string hudId, int elementId, Vector2 size)
+    {
+        _luaEventHub.Invoke(player, x => x.ElementSetSize(hudId, elementId, size.X, size.Y));
     }
 }

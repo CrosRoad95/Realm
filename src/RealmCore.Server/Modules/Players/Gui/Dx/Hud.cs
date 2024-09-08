@@ -42,6 +42,8 @@ internal abstract class HudBase<TState> : IHud<TState> where TState : class
             SetState(Id, stateChange);
     }
 
+    public abstract bool SetSize(int elementId, Vector2 size);
+
     protected void ThrowIfDisposed()
     {
         if (_disposed)
@@ -85,6 +87,12 @@ internal class Hud<TState> : HudBase<TState> where TState : class
         ThrowIfDisposed();
         _overlayService.SetHudPosition(_player, Id, position);
     }
+
+    public override bool SetSize(int elementId, Vector2 size)
+    {
+        _overlayService.SizeChanged(_player, Id, elementId, size);
+        return true;
+    }
 }
 
 internal class Hud3d<TState> : HudBase<TState> where TState : class
@@ -113,5 +121,10 @@ internal class Hud3d<TState> : HudBase<TState> where TState : class
     {
         ThrowIfDisposed();
         _overlayService.SetHud3dPosition(Id, position);
+    }
+
+    public override bool SetSize(int elementId, Vector2 size)
+    {
+        throw new NotSupportedException();
     }
 }

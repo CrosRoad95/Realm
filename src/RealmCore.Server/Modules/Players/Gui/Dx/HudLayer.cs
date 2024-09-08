@@ -68,6 +68,11 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         return null;
     }
 
+    protected bool SetSize(int elementId, Vector2 size)
+    {
+        return _hud.SetSize(elementId, size);
+    }
+
     protected abstract void Build(IHudBuilder hudBuilderCallback, IHudBuilderContext hudBuilderContext);
 
     protected virtual void HudCreated() { }

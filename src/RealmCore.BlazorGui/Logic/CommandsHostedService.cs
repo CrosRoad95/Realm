@@ -1348,6 +1348,14 @@ internal sealed class CommandsHostedService : IHostedService
                 layer.Update();
             }
         });
+        
+        _commandService.Add("hudresizerectangle", ([CallingPlayer] RealmPlayer player) =>
+        {
+            if (player.Hud.TryGetLayer(out SampleHudLayer layer))
+            {
+                layer.Resize();
+            }
+        });
 
         _commandService.Add("destroyhud", ([CallingPlayer] RealmPlayer player) =>
         {

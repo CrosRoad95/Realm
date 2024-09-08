@@ -19,6 +19,7 @@ public interface IOverlayService
     internal Action<Player, string>? BlipRemoved { get; set; }
     internal Action<Player>? AllBlipsRemoved { get; set; }
     Action<string, float, float, float>? Hud3dPositionChanged { get; set; }
+    Action<Player, string, int, Vector2>? ElementSizeChanged { get; set; }
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
@@ -36,6 +37,7 @@ public interface IOverlayService
     void Set3dHudVisible(string hudId, bool visible);
     void SetHud3dPosition(string hudId, Vector3 position);
     void CreateHud3d<TState>(string hudId, Action<IHudBuilder, IHudBuilderContext> hudBuilderCallback, Vector3? position, TState? defaultState = null) where TState : class;
+    void SizeChanged(Player player, string hudId, int elementId, Vector2 size);
 }
 
 internal sealed class OverlayService : IOverlayService
@@ -66,6 +68,7 @@ internal sealed class OverlayService : IOverlayService
     public Action<Player, string, int, float, float, float, double, float, float, int, int>? BlipAdded { get; set; }
     public Action<Player, string>? BlipRemoved { get; set; }
     public Action<Player>? AllBlipsRemoved { get; set; }
+    public Action<Player, string, int, Vector2>? ElementSizeChanged { get; set; }
 
     private readonly IAssetsService _assetsService;
 
@@ -160,5 +163,10 @@ internal sealed class OverlayService : IOverlayService
     public void RemoveAllBlips(Player player)
     {
         AllBlipsRemoved?.Invoke(player);
+    }
+
+    public void SizeChanged(Player player, string hudId, int elementId, Vector2 size)
+    {
+        ElementSizeChanged?.Invoke(player, hudId, elementId, size);
     }
 }

@@ -347,23 +347,38 @@ function handleRemoveAllBlips()
 	blipsList = {}
 end
 
+local function handleElementSetSize(hudId, elementId, sx, sy)
+	if(huds[hudId])then
+		for i,v in ipairs(huds[hudId].elements)do
+			if(v.id == elementId)then
+				v.size = {sx, sy};
+				return;
+			end
+		end
+		outputDebugString("Failed to elementSetSize, hud element of id: '"..tostring(elementId).."' not found.", 1);
+	else
+		outputDebugString("Failed to elementSetSize, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	hubBind("AddNotification", handleAddNotification)
-	hubBind("SetHudVisible", handleSetHudVisible)
-	hubBind("SetHud3dVisible", handleSetHud3dVisible)
-	hubBind("SetHudPosition", handleSetHudPosition)
-	hubBind("SetHud3dPosition", handleSetHud3dPosition)
-	hubBind("SetHudState", handleSetHudState)
-	hubBind("SetHud3dState", handleSetHud3dState)
-	hubBind("CreateHud", handleCreateHud)
-	hubBind("CreateHud3d", handleCreateHud3d)
-	hubBind("RemoveHud", handleRemoveHud)
-	hubBind("RemoveHud3d", handleRemoveHud3d)
-	hubBind("AddDisplay3dRing", handleAddDisplay3dRing)
-	hubBind("RemoveDisplay3dRing", handleRemoveDisplay3dRing)
-	hubBind("AddBlip", handleAddBlip)
-	hubBind("RemoveBlip", handleRemoveBlip)
-	hubBind("RemoveAllBlips", handleRemoveAllBlips)
+	hubBind("AddNotification", handleAddNotification);
+	hubBind("SetHudVisible", handleSetHudVisible);
+	hubBind("SetHud3dVisible", handleSetHud3dVisible);
+	hubBind("SetHudPosition", handleSetHudPosition);
+	hubBind("SetHud3dPosition", handleSetHud3dPosition);
+	hubBind("SetHudState", handleSetHudState);
+	hubBind("SetHud3dState", handleSetHud3dState);
+	hubBind("CreateHud", handleCreateHud);
+	hubBind("CreateHud3d", handleCreateHud3d);
+	hubBind("RemoveHud", handleRemoveHud);
+	hubBind("RemoveHud3d", handleRemoveHud3d);
+	hubBind("AddDisplay3dRing", handleAddDisplay3dRing);
+	hubBind("RemoveDisplay3dRing", handleRemoveDisplay3dRing);
+	hubBind("AddBlip", handleAddBlip);
+	hubBind("RemoveBlip", handleRemoveBlip);
+	hubBind("RemoveAllBlips", handleRemoveAllBlips);
+	hubBind("ElementSetSize", handleElementSetSize);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)
