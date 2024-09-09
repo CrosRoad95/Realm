@@ -246,6 +246,19 @@ public sealed class UsersService
             _semaphoreSlim.Release();
         }
     }
+    
+    public async Task<UserData?> GetByDiscordUserId(ulong discordUserId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.GetByDiscordUserId(discordUserId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
 
     private async Task<string?> AuthorizePolicies(RealmPlayer player)
     {
