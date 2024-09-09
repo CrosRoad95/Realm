@@ -23,6 +23,21 @@ public sealed class UsersRepository
             .Where(x => x.RegisterSerial == serial);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
+    
+    public async Task<UserData?> GetByDiscordUserId(ulong discordUserId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetByDiscordUserId));
+
+        if (activity != null)
+        {
+            activity.SetTag("DiscordUserId", discordUserId);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.DiscordIntegration!.DiscordUserId == discordUserId);
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
 
     public async Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default)
     {
