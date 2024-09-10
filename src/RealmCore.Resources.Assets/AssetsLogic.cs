@@ -2,6 +2,7 @@
 using SlipeServer.Server.Events;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RealmCore.Resources.Base.Extensions;
 
 namespace RealmCore.Resources.Assets;
 
@@ -40,7 +41,7 @@ internal class AssetsLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to start assets resource");
+            _logger.ResourceFailedToStart<AssetsResource>(ex);
         }
     }
 

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Resources.ClientInterface;
+﻿using RealmCore.Resources.Base.Extensions;
+
+namespace RealmCore.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {
@@ -99,7 +101,7 @@ internal class ClientInterfaceLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to start ClientInterface resource for player: {playerName}, serial: {playerSerial}", player.Name, player.Client.Serial);
+            _logger.ResourceFailedToStart<ClientInterfaceResource>(ex);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using RealmCore.Resources.Base.Interfaces;
+﻿using RealmCore.Resources.Base.Extensions;
+using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
 
@@ -34,7 +35,7 @@ internal sealed class BrowserLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial ?? "<no serial>");
+            _logger.ResourceFailedToStart<BrowserResource>(ex);
         }
     }
 

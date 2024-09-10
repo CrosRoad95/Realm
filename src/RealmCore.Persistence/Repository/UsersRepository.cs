@@ -163,7 +163,7 @@ public sealed class UsersRepository
 
         var query = CreateQueryBase()
             .AsNoTracking()
-            .Where(x => x.Id == userId && x.ava);
+            .Where(x => x.Id == userId && x.Avatar == avatar);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Avatar, avatar), cancellationToken) == 1;
     }

@@ -9,7 +9,6 @@ public sealed class BanRepository
         _db = db;
     }
 
-    #region Write
     public async Task<UserBanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(CreateForSerial));
@@ -220,9 +219,7 @@ public sealed class BanRepository
         await _db.SaveChangesAsync(cancellationToken);
         return [.. deletedBansIds];
     }
-    #endregion
 
-    #region Read
     public async Task<UserBanData[]> GetBySerial(string serial, DateTime now, int? type = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetBySerial));
@@ -282,7 +279,6 @@ public sealed class BanRepository
     }
 
     private IQueryable<UserBanData> CreateQueryBase() => _db.Bans.TagWithSource(nameof(BanRepository));
-    #endregion
 
     public static readonly ActivitySource Activity = new("RealmCore.BanRepository", "1.0.0");
 }

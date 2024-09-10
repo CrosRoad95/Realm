@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Resources.MapNames;
+﻿using RealmCore.Resources.Base.Extensions;
+
+namespace RealmCore.Resources.MapNames;
 
 internal sealed class MapNamesLogic
 {
@@ -83,7 +85,7 @@ internal sealed class MapNamesLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial ?? "<no serial>");
+            _logger.ResourceFailedToStart<MapNamesResource>(ex);
         }
     }
 }

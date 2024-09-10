@@ -27,7 +27,6 @@ public sealed class GroupRepository
         _db = db;
     }
 
-    #region Create
     public async Task<GroupData?> Create(string name, DateTime createdAt, string? shortcut = null, byte kind = 1, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
@@ -186,9 +185,7 @@ public sealed class GroupRepository
 
         return true;
     }
-    #endregion
 
-    #region Read
     public async Task<GroupMemberData?> GetGroupMemberByUserIdAndGroupId(GroupId groupId, int userId, int[]? kinds = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetGroupMemberByUserIdAndGroupId));
@@ -525,9 +522,7 @@ public sealed class GroupRepository
 
         return permissions;
     }
-    #endregion
 
-    #region Update
     public async Task<bool> SetMemberRole(GroupId groupId, int userId, GroupRoleId? roleId = null, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupsMembers
@@ -592,9 +587,7 @@ public sealed class GroupRepository
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Name, name), cancellationToken) == 1;
     }
-    #endregion
 
-    #region Delete
     public async Task<bool> RemoveMember(GroupId groupId, int userId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(RemoveMember));
@@ -926,7 +919,6 @@ public sealed class GroupRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    #endregion
 
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));
 

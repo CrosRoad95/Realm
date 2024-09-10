@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RealmCore.Resources.Base.Extensions;
 using SlipeServer.Resources.Base;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
@@ -49,7 +50,7 @@ internal class ElementOutlineLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to start OutlineResource resource for player: {playerName}, serial: {playerSerial}", player.Name, player.Client.Serial);
+            _logger.ResourceFailedToStart<ElementOutlineResource>(ex);
         }
     }
 

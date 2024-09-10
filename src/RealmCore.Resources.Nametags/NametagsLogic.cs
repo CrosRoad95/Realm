@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RealmCore.Resources.Base.Extensions;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Resources.Base;
 
@@ -100,7 +101,7 @@ internal class NametagsLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to start nametags resource for player: {playerName}, serial: {playerSerial}", player.Name, player.Client.Serial);
+            _logger.ResourceFailedToStart<NametagsResource>(ex);
         }
     }
 
