@@ -151,6 +151,23 @@ public sealed class UsersRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
     
+    public async Task<bool> SetAvatar(int userId, string avatar, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetAvatar));
+
+        if(activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Avatar", avatar);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.Id == userId && x.ava);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Avatar, avatar), cancellationToken) == 1;
+    }
+    
     public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetSetting));
