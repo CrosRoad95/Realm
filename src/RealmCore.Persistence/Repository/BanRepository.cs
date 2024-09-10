@@ -229,7 +229,6 @@ public sealed class BanRepository
         if (activity != null)
         {
             activity.AddTag("Serial", serial);
-            activity.AddTag("Now", now);
             activity.AddTag("Type", type);
         }
 
@@ -249,7 +248,6 @@ public sealed class BanRepository
         if (activity != null)
         {
             activity.AddTag("UserId", userId);
-            activity.AddTag("Now", now);
             activity.AddTag("Type", type);
         }
 
@@ -270,7 +268,6 @@ public sealed class BanRepository
         {
             activity.AddTag("UserId", userId);
             activity.AddTag("Serial", serial);
-            activity.AddTag("Now", now);
             activity.AddTag("Type", type);
         }
 

@@ -17,7 +17,7 @@ public sealed class RatingRepository
         {
             activity.AddTag("UserId", userId);
             activity.AddTag("RatingId", ratingId);
-            activity.AddTag("rating", rating);
+            activity.AddTag("Rating", rating);
             activity.AddTag("DateTime", dateTime);
         }
 
@@ -40,7 +40,7 @@ public sealed class RatingRepository
         {
             activity.AddTag("UserId", userId);
             activity.AddTag("RatingId", ratingId);
-            activity.AddTag("rating", rating);
+            activity.AddTag("Rating", rating);
             activity.AddTag("DateTime", dateTime);
         }
 

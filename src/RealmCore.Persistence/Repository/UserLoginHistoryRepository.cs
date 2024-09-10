@@ -16,7 +16,6 @@ public sealed class UserLoginHistoryRepository
         if (activity != null)
         {
             activity.AddTag("UserId", userId);
-            activity.AddTag("now", now);
             activity.AddTag("Ip", ip);
             activity.AddTag("Serial", serial);
         }

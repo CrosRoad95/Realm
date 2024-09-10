@@ -55,7 +55,6 @@ public sealed class NewsRepository
 
         if (activity != null)
         {
-            activity.AddTag("Now", now);
             activity.AddTag("Limit", limit);
         }
 

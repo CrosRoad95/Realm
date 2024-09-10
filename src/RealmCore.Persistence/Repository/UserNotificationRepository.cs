@@ -53,7 +53,6 @@ public sealed class UserNotificationRepository
         if (activity != null)
         {
             activity.AddTag("UserId", userId);
-            activity.AddTag("Now", now);
             activity.AddTag("Title", title);
             activity.AddTag("Content", content);
             activity.AddTag("Excerpt", excerpt);
@@ -96,7 +95,6 @@ public sealed class UserNotificationRepository
         if (activity != null)
         {
             activity.AddTag("Id", id);
-            activity.AddTag("Now", now);
         }
 
         var query = _db.UserNotifications

@@ -15,7 +15,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("serial", serial);
+            activity.AddTag("Serial", serial);
         }
 
         var query = CreateQueryBase()
@@ -30,7 +30,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("DiscordUserId", discordUserId);
+            activity.AddTag("DiscordUserId", discordUserId);
         }
 
         var query = CreateQueryBase()
@@ -45,7 +45,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("userId", userId);
+            activity.AddTag("UserId", userId);
         }
 
         var query = CreateQueryBase()
@@ -61,7 +61,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("userId", userId);
+            activity.AddTag("UserId", userId);
         }
 
         var subQuery = _db.UserRoles
@@ -85,7 +85,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("UserId", userId);
+            activity.AddTag("UserId", userId);
         }
 
         var query = CreateQueryBase()
@@ -104,7 +104,7 @@ public sealed class UsersRepository
 
         if (activity != null)
         {
-            activity.SetTag("UserName", userName);
+            activity.AddTag("UserName", userName);
         }
 
         var query = CreateQueryBase()
@@ -123,8 +123,8 @@ public sealed class UsersRepository
 
         if(activity != null)
         {
-            activity.SetTag("userId", userId);
-            activity.SetTag("nick", nick);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("Nick", nick);
         }
 
         var query = CreateQueryBase()
@@ -140,7 +140,7 @@ public sealed class UsersRepository
 
         if(activity != null)
         {
-            activity.SetTag("UserId", userId);
+            activity.AddTag("UserId", userId);
         }
 
         var query = CreateQueryBase()
@@ -157,8 +157,8 @@ public sealed class UsersRepository
 
         if(activity != null)
         {
-            activity.SetTag("UserId", userId);
-            activity.SetTag("SettingId", settingId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("SettingId", settingId);
         }
 
         var query = _db.UserSettings

@@ -16,7 +16,6 @@ public sealed class VehicleRepository
         if (activity != null)
         {
             activity.AddTag("Model", model);
-            activity.AddTag("Now", now);
         }
 
         var vehicle = new VehicleData

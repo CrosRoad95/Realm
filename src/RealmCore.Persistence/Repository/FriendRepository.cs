@@ -17,7 +17,6 @@ public sealed class FriendRepository
         {
             activity.AddTag("UserId1", userId1);
             activity.AddTag("UserId2", userId2);
-            activity.AddTag("Now", now);
         }
 
         var friendData = new FriendData
@@ -42,7 +41,6 @@ public sealed class FriendRepository
         {
             activity.AddTag("UserId1", userId1);
             activity.AddTag("UserId2", userId2);
-            activity.AddTag("Now", now);
         }
 
         var pendingFriendRequestData = new PendingFriendRequestData
