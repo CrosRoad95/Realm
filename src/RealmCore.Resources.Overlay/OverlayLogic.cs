@@ -141,7 +141,9 @@ internal class OverlayLogic
 
     private void HandleElementSizeChanged(Player player, string hudId, int elementId, Size size)
     {
-        _luaEventHub.Invoke(player, x => x.ElementSetSize(hudId, elementId, size.Width, size.Height));
+        var width = size.Width;
+        var height = size.Height;
+        _luaEventHub.Invoke(player, x => x.ElementSetSize(hudId, elementId, width, height));
     }
 
     private void HandleElementVisibleChanged(Player player, string hudId, int elementId, bool visible)
