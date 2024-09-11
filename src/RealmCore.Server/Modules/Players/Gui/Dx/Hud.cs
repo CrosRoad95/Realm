@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Modules.Players.Gui.Dx;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
 internal abstract class HudBase<TState> : IHud<TState> where TState : class
 {
@@ -21,6 +19,7 @@ internal abstract class HudBase<TState> : IHud<TState> where TState : class
         _dynamicHudElements = dynamicHudElements;
     }
 
+    internal TState? GetState() => _state;
     public abstract void SetVisible(bool visible);
     protected abstract void SetState(string hudId, Dictionary<int, object?> stateChange);
 
@@ -45,6 +44,7 @@ internal abstract class HudBase<TState> : IHud<TState> where TState : class
     public abstract bool SetPosition(int elementId, Vector2 position);
     public abstract bool SetSize(int elementId, Size size);
     public abstract bool SetVisible(int elementId, bool visible);
+    public abstract void SetContent(int elementId, IHudElementContent hudElementContent);
 
     protected void ThrowIfDisposed()
     {
@@ -107,6 +107,12 @@ internal class Hud<TState> : HudBase<TState> where TState : class
         _overlayService.VisibleChanged(_player, Id, elementId, visible);
         return true;
     }
+
+    public override void SetContent(int elementId, IHudElementContent hudElementContent)
+    {
+        ThrowIfDisposed();
+        _overlayService.SetHudContent(_player, Id, elementId, hudElementContent, GetState());
+    }
 }
 
 internal class Hud3d<TState> : HudBase<TState> where TState : class
@@ -148,6 +154,11 @@ internal class Hud3d<TState> : HudBase<TState> where TState : class
     }
 
     public override bool SetVisible(int elementId, bool visible)
+    {
+        throw new NotSupportedException();
+    }
+
+    public override void SetContent(int elementId, IHudElementContent hudElementContent)
     {
         throw new NotSupportedException();
     }

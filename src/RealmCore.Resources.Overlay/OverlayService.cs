@@ -22,6 +22,7 @@ public interface IOverlayService
     Action<Player, string, int, Size>? ElementSizeChanged { get; set; }
     Action<Player, string, int, Vector2>? ElementPositionChanged { get; set; }
     Action<Player, string, int, bool>? ElementVisibleChanged { get; set; }
+    Action<Player, string, int, LuaValue>? ElementContentChanged { get; set; }
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
@@ -42,6 +43,7 @@ public interface IOverlayService
     void PositionChanged(Player player, string hudId, int elementId, Vector2 position);
     void SizeChanged(Player player, string hudId, int elementId, Size size);
     void VisibleChanged(Player player, string hudId, int elementId, bool visible);
+    void SetHudContent(Player player, string hudId, int elementId, IHudElementContent hudElementContent, object? state);
 }
 
 internal sealed class OverlayService : IOverlayService
@@ -75,6 +77,7 @@ internal sealed class OverlayService : IOverlayService
     public Action<Player, string, int, Vector2>? ElementPositionChanged { get; set; }
     public Action<Player, string, int, Size>? ElementSizeChanged { get; set; }
     public Action<Player, string, int, bool>? ElementVisibleChanged { get; set; }
+    public Action<Player, string, int, LuaValue>? ElementContentChanged { get; set; }
 
     private readonly IAssetsService _assetsService;
 
@@ -92,7 +95,7 @@ internal sealed class OverlayService : IOverlayService
     {
         HudVisibilityChanged?.Invoke(player, hudId, visible);
     }
-    
+
     public void Set3dHudVisible(string hudId, bool visible)
     {
         Hud3dVisibilityChanged?.Invoke(hudId, visible);
@@ -184,5 +187,10 @@ internal sealed class OverlayService : IOverlayService
     public void VisibleChanged(Player player, string hudId, int elementId, bool visible)
     {
         ElementVisibleChanged?.Invoke(player, hudId, elementId, visible);
+    }
+
+    public void SetHudContent(Player player, string hudId, int elementId, IHudElementContent hudElementContent, object? state)
+    {
+        ElementContentChanged?.Invoke(player, hudId, elementId, hudElementContent.CreateLuaValue(state));
     }
 }

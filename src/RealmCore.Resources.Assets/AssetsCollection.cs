@@ -1,4 +1,5 @@
 ﻿using RenderWareBuilders;
+using System.IO;
 
 namespace RealmCore.Resources.Assets;
 
@@ -116,6 +117,11 @@ public class AssetsCollection
     {
         lock (_lock)
             return (TAsset)InternalGetAsset(assetName);
+    }
+    
+    public IRemoteImageAsset GetDynamicRemoteImage(string url)
+    {
+        return new RemoteImageAsset(url, url, Path.GetFileNameWithoutExtension(url), "");
     }
 
     public IFont GetFont(string assetName)

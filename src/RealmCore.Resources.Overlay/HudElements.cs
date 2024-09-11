@@ -5,6 +5,7 @@ internal static class HudElementType
     public const string Rectangle = "rectangle";
     public const string Text = "text";
     public const string Radar = "radar";
+    public const string Image = "image";
 }
 
 internal static class HudElementContentType
@@ -84,6 +85,37 @@ public readonly struct RectangleHudElement : IHudElement
             ["positioningMode"] = _positioningMode.ToString(),
             ["size"] = _size.ToLuaArray(),
             ["color"] = _color.ToLuaColor(),
+        };
+    }
+}
+
+public readonly struct ImageHudElement : IHudElement
+{
+    private readonly Vector2 _position;
+    private readonly Size _size;
+    private readonly PositioningMode _positioningMode;
+
+    public IHudElementContent Content { get; init; }
+
+    public ImageHudElement(Vector2 position, Size size, IImageHudElementContent content, PositioningMode positioningMode = PositioningMode.Relative)
+    {
+        _position = position;
+        _size = size;
+        Content = content;
+        _positioningMode = positioningMode;
+    }
+
+    public LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService)
+    {
+        var content = Content.CreateLuaValue(state);
+        return new LuaTable
+        {
+            ["type"] = HudElementType.Image,
+            ["id"] = id,
+            ["position"] = LuaValue.ArrayFromVector(_position),
+            ["positioningMode"] = _positioningMode.ToString(),
+            ["size"] = _size.ToLuaArray(),
+            ["content"] = content
         };
     }
 }

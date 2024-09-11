@@ -13,6 +13,7 @@ public class SampleHudState
 public class SampleHudLayer : HudLayer<SampleHudState>
 {
     private readonly AssetsCollection _assetsCollection;
+    private int? _imageId;
     private int? _id;
     public SampleHudLayer(AssetsCollection assetsCollection) : base(new())
     {
@@ -27,7 +28,9 @@ public class SampleHudLayer : HudLayer<SampleHudState>
             [43] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg")
         }, PositioningMode.Absolute));
         builder.Add(new TextHudElement(new CurrentFPSTextHudElementContent(), new Vector2(0, context.Bottom - 20), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center, positioningMode: PositioningMode.Absolute));
+        var imageElement = builder.Add(new ImageHudElement(new Vector2(700, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg"))));
         var element = builder.Add(new RectangleHudElement(new Vector2(context.Right - 400, 600), new Size(400, 20), Color.DarkBlue));
+        _imageId = imageElement.Id;
         _id = element.Id;
         builder.Add(new TextHudElement(new ConstantTextHudElementContent("default font"), new Vector2(context.Right - 200, 600), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center));
         builder.Add(new TextHudElement(new ConstantTextHudElementContent("sans font"), new Vector2(context.Right - 400, 600), new Size(200, 20), font: BuildInFonts.Sans, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center));
@@ -50,6 +53,20 @@ public class SampleHudLayer : HudLayer<SampleHudState>
     {
         _visible = !_visible;
         SetVisible(_id.Value, _visible);
+    }
+
+    private bool _content = false;
+    public void ToggleContent()
+    {
+        _content = !_content;
+        if (_content)
+        {
+            SetContent(_imageId.Value, new ImageHudElementContent(_assetsCollection.GetDynamicRemoteImage("assets/map.jpg")));
+        }
+        else
+        {
+            SetContent(_imageId.Value, new ImageHudElementContent(_assetsCollection.GetDynamicRemoteImage("assets/blip43.jpg")));
+        }
     }
 
     public void Update()

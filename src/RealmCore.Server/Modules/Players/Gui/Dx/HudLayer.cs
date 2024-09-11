@@ -82,6 +82,11 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
     {
         return _hud.SetVisible(elementId, visible);
     }
+    
+    protected void SetContent(int elementId, IHudElementContent content)
+    {
+        _hud.SetContent(elementId, content);
+    }
 
     protected abstract void Build(IHudBuilder hudBuilderCallback, IHudBuilderContext hudBuilderContext);
 

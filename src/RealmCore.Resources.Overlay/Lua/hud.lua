@@ -94,6 +94,10 @@ local function renderHud(position, elements)
 				if(text)then
 					dxDrawText(text, ex, ey, ex + element.size[1], ey + element.size[2], element.color, element.scale[1], element.scale[2], element.font or "sans", element.align[1], element.align[2])
 				end
+			elseif(element.type == "image")then
+				if(element.image.isLoaded)then
+					dxDrawImage(ex, ey, element.size[1], element.size[2], element.image.data);
+				end
 			elseif(element.type == "rectangle")then
 				dxDrawRectangle(ex, ey, element.size[1], element.size[2], element.color)
 			elseif(element.type == "radar")then
@@ -101,6 +105,29 @@ local function renderHud(position, elements)
 			end
 		end
 	end
+end
+
+function prepareAsset2(content)
+	if(content.type == "remoteImage")then
+		local data = requestAsset(content.path);
+		local lazy = {
+			isLoaded = data ~= nil,
+			data = data
+		}
+		if(not lazy.isLoaded and not lazy.requesting)then
+			lazy.requesting = true
+			setTimer(function()
+				local data = requestAsset(content.path);
+				if(data)then
+					lazy.isLoaded = true;
+					lazy.data = data;
+					killTimer(sourceTimer);
+				end
+			end, 250, 10);
+		end
+		return lazy;
+	end
+	return content;
 end
 
 function prepareAsset(assetInfo)
@@ -137,6 +164,8 @@ local function prepareElements(elements, hud)
 	for i,element in ipairs(elements)do
 		if(element.type == "text" or element.type == "computedValue")then
 			element.font = prepareAsset(element.font);
+		elseif(element.type == "image")then
+			element.image = prepareAsset2(element.content);
 		elseif(element.type == "radar")then
 			if(element.data == nil)then
 				element.map = prepareAsset(element.image);
@@ -391,6 +420,23 @@ local function handleElementSetVisible(hudId, elementId, visible)
 	end
 end
 
+local function handleElementSetContent(hudId, elementId, content)
+	if(huds[hudId])then
+		for i,element in ipairs(huds[hudId].elements)do
+			if(element.id == elementId)then
+				if(element.type == "image")then
+					element.content = content;
+					element.image = prepareAsset2(element.content);
+					return;
+				end
+			end
+		end
+		outputDebugString("Failed to elementSetContent, hud element of id: '"..tostring(elementId).."' not found.", 1);
+	else
+		outputDebugString("Failed to elementSetContent, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification);
 	hubBind("SetHudVisible", handleSetHudVisible);
@@ -411,6 +457,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ElementSetSize", handleElementSetSize);
 	hubBind("ElementSetPosition", handleElementSetPosition);
 	hubBind("ElementSetVisible", handleElementSetVisible);
+	hubBind("ElementSetContent", handleElementSetContent);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)

@@ -20,4 +20,5 @@ internal interface IHudEventHub
     void ElementSetPosition(string hudId, int elementId, float x, float y);
     void ElementSetSize(string hudId, int elementId, float sizeX, float sizeY);
     void ElementSetVisible(string hudId, int elementId, bool visible);
+    void ElementSetContent(string hudId, int elementId, LuaValue content);
 }

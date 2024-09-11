@@ -41,6 +41,7 @@ internal class OverlayLogic
         _overlayService.ElementPositionChanged = HandleElementPositionChanged;
         _overlayService.ElementSizeChanged = HandleElementSizeChanged;
         _overlayService.ElementVisibleChanged = HandleElementVisibleChanged;
+        _overlayService.ElementContentChanged = HandleElementContentChanged;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -146,5 +147,10 @@ internal class OverlayLogic
     private void HandleElementVisibleChanged(Player player, string hudId, int elementId, bool visible)
     {
         _luaEventHub.Invoke(player, x => x.ElementSetVisible(hudId, elementId, visible));
+    }
+
+    private void HandleElementContentChanged(Player player, string hudId, int elementId, LuaValue content)
+    {
+        _luaEventHub.Invoke(player, x => x.ElementSetContent(hudId, elementId, content));
     }
 }
