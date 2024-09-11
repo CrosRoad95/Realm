@@ -204,7 +204,15 @@ public class RealmPlayer : Player, IAsyncDisposable
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements => _selectedElements;
 
+    public byte[] DetectedACList { get; private set; } = [];
+    public uint? D3D9Size { get; private set; }
+    public string? D3D9MD5 { get; private set; }
+    public string? D3D9SHA256 { get; private set; }
+
     public Nametag Nametag { get; init; }
+
+    internal HashSet<int> StartedResources { get; } = [];
+
     // For test purpuse
     // TODO: Make it better
     public RealmPlayer() { }
@@ -255,17 +263,24 @@ public class RealmPlayer : Player, IAsyncDisposable
 
         IsNametagShowing = false;
         UpdateFight();
-        Wasted += HandleWasted;
 
         var maxCalls = 10;
         var timeSpan = TimeSpan.FromSeconds(5);
         _invokePolicy = Policy.RateLimitAsync(maxCalls, timeSpan, maxCalls);
         Nametag = new(this);
 
+        Wasted += HandleWasted;
         ResourceStarted += HandleResourceStarted;
+        AcInfoReceived += HandleAcInfoReceived;
     }
 
-    internal HashSet<int> StartedResources { get; } = [];
+    private void HandleAcInfoReceived(Player sender, PlayerACInfoArgs e)
+    {
+        DetectedACList = e.DetectedACList.ToArray();
+        D3D9Size = e.D3D9Size;
+        D3D9MD5 = e.D3D9MD5;
+        D3D9SHA256 = e.D3D9SHA256;
+    }
 
     private void HandleResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
     {
