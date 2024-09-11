@@ -361,6 +361,20 @@ local function handleElementSetSize(hudId, elementId, sx, sy)
 	end
 end
 
+local function handleElementSetPosition(hudId, elementId, px, py)
+	if(huds[hudId])then
+		for i,v in ipairs(huds[hudId].elements)do
+			if(v.id == elementId)then
+				v.position = {px, py};
+				return;
+			end
+		end
+		outputDebugString("Failed to elementSetPosition, hud element of id: '"..tostring(elementId).."' not found.", 1);
+	else
+		outputDebugString("Failed to elementSetPosition, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification);
 	hubBind("SetHudVisible", handleSetHudVisible);
@@ -379,6 +393,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("RemoveBlip", handleRemoveBlip);
 	hubBind("RemoveAllBlips", handleRemoveAllBlips);
 	hubBind("ElementSetSize", handleElementSetSize);
+	hubBind("ElementSetPosition", handleElementSetPosition);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)

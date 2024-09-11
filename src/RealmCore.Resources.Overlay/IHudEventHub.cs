@@ -17,5 +17,6 @@ internal interface IHudEventHub
     void AddBlip(string id, int icon, float x, float y, float z, double color, float visibleDistance, float size, int interior, int dimension);
     void RemoveBlip(string id);
     void RemoveAllBlips();
+    void ElementSetPosition(string hudId, int elementId, float x, float y);
     void ElementSetSize(string hudId, int elementId, float sizeX, float sizeY);
 }

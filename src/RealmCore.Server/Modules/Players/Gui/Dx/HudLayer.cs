@@ -68,6 +68,11 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         return null;
     }
 
+    protected bool SetPosition(int elementId, Vector2 position)
+    {
+        return _hud.SetPosition(elementId, position);
+    }
+    
     protected bool SetSize(int elementId, Size size)
     {
         return _hud.SetSize(elementId, size);

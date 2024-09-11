@@ -38,6 +38,7 @@ internal class OverlayLogic
         _overlayService.BlipAdded = HandleAddBlip;
         _overlayService.BlipRemoved = HandleRemoveBlip;
         _overlayService.AllBlipsRemoved = HandleRemoveAllBlips;
+        _overlayService.ElementPositionChanged = HandleElementPositionChanged;
         _overlayService.ElementSizeChanged = HandleElementSizeChanged;
     }
 
@@ -129,6 +130,11 @@ internal class OverlayLogic
     private void HandleRemoveAllBlips(Player player)
     {
         _luaEventHub.Broadcast(x => x.RemoveAllBlips());
+    }
+
+    private void HandleElementPositionChanged(Player player, string hudId, int elementId, Vector2 size)
+    {
+        _luaEventHub.Invoke(player, x => x.ElementSetPosition(hudId, elementId, size.X, size.Y));
     }
 
     private void HandleElementSizeChanged(Player player, string hudId, int elementId, Size size)

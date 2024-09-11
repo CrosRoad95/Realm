@@ -39,6 +39,11 @@ public class SampleHudLayer : HudLayer<SampleHudState>
     {
         SetSize(_id.Value, new Size(Random.Shared.Next(20, 40), Random.Shared.Next(20, 40)));
     }
+    
+    public void SetPosition()
+    {
+        SetPosition(_id.Value, new Vector2(Random.Shared.Next(20, 40), Random.Shared.Next(20, 40)));
+    }
 
     public void Update()
     {
