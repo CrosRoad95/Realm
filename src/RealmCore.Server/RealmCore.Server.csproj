@@ -221,6 +221,7 @@
 		<Using Include="System.Collections.Immutable" />
 		<Using Include="RealmCore.Persistence.Data.Bases" />
 		<Using Include="RealmCore.Persistence.Context" />
+		<Using Include="SlipeServer.Resources.DiscordRichPresence" />
 	</ItemGroup>
 
 </Project>

@@ -1,31 +1,13 @@
-﻿using SlipeServer.Resources.DiscordRichPresence;
+﻿namespace RealmCore.Server.Modules.Players.Discord;
 
-namespace RealmCore.Server.Modules.Players.Discord;
-
-public interface IDiscordRichPresenceFeature : IPlayerFeature
-{
-    bool IsReady { get; }
-    ulong? UserId { get; }
-
-    event Action<IDiscordRichPresenceFeature>? Ready;
-
-    void SetAsset(string asset, string assetName);
-    void SetButton(DiscordRichPresenceButton discordRichPresenceButton, string text, Uri uri);
-    void SetDetails(string details);
-    void SetPartySize(int size, int max);
-    void SetSmallAsset(string asset, string assetName);
-    void SetStartTime(int seconds);
-    void SetState(string state);
-}
-
-public sealed class DiscordRichPresenceFeature : IDiscordRichPresenceFeature
+public sealed class DiscordRichPresenceFeature : IPlayerFeature
 {
     private readonly object _lock = new();
     private readonly DiscordRichPresenceService _discordRichPresenceService;
 
     public bool IsReady { get;private set; }
     public ulong? UserId { get; private set; }
-    public event Action<IDiscordRichPresenceFeature>? Ready;
+    public event Action<DiscordRichPresenceFeature>? Ready;
     public RealmPlayer Player { get; init; }
 
     public DiscordRichPresenceFeature(PlayerContext playerContext, DiscordRichPresenceService discordRichPresenceService)

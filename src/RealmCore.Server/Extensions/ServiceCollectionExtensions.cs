@@ -2,6 +2,8 @@
 using RealmCore.Server.Modules.Players.Avatars;
 using RealmCore.Server.Modules.Players.Discord;
 using RealmCore.Server.Modules.Players.Integrations;
+using RealmCore.Server.Modules.Players.Rewards;
+using RealmCore.Server.Modules.Players.Secrets;
 using RealmCore.Server.Modules.TimeBaseOperations;
 using RealmCore.Server.Modules.World.WorldNodes;
 
@@ -9,18 +11,6 @@ namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, ISeederProvider
-    {
-        services.AddSingleton<ISeederProvider, TSeederProvider>();
-        return services;
-    }
-
-    public static IServiceCollection AddAsyncSeederProvider<TSeederProvider>(this IServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
-    {
-        services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
-        return services;
-    }
-
     public static IServiceCollection AddPlayerScopedFeature<T1>(this IServiceCollection services)
         where T1 : class, IPlayerFeature
     {

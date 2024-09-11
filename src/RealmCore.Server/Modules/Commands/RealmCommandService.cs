@@ -63,7 +63,7 @@ public sealed class RealmCommandService : PlayerLifecycle
     {
         if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new CommandExistsException($"Command with name '{commandName}' already exists");
+            throw new CommandAlreadyExistsException($"Command with name '{commandName}' already exists");
         }
     }
 

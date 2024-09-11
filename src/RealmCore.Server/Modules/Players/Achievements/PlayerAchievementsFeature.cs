@@ -146,6 +146,11 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<User
         }
     }
 
+    public void Clear()
+    {
+        lock (_lock)
+            _achievements.Clear();
+    }
     public IEnumerator<UserAchievementDto> GetEnumerator()
     {
         UserAchievementData[] view;

@@ -64,7 +64,7 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
         player.DiscordRichPresence.Ready += HandleDiscordRichPresenceReady;
     }
 
-    private void HandleDiscordRichPresenceReady(IDiscordRichPresenceFeature discordRichPresence)
+    private void HandleDiscordRichPresenceReady(DiscordRichPresenceFeature discordRichPresence)
     {
         _logger.LogInformation("Discord ready: {discordUserId}", discordRichPresence.UserId);
     }

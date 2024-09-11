@@ -1,6 +1,7 @@
 ﻿using RealmCore.Server.Modules.Players.Avatars;
 using RealmCore.Server.Modules.Players.Discord;
 using RealmCore.Server.Modules.Players.Integrations;
+using RealmCore.Server.Modules.Players.Secrets;
 
 namespace RealmCore.Server.Modules.Elements;
 

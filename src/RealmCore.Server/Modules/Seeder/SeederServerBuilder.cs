@@ -10,32 +10,19 @@ internal sealed class SeederServerBuilder : IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly UsersService _playersUsersService;
     private readonly IServiceScope _serviceScope;
-    private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
-    private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
     private readonly ILogger<SeederServerBuilder> _logger;
     private readonly Dictionary<string, UserData> _createdUsers = [];
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders, GroupRepository groupRepository, IServiceProvider serviceProvider, UsersService playersUsersService)
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, GroupRepository groupRepository, IServiceProvider serviceProvider, UsersService playersUsersService)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
-        _serviceProvider = serviceProvider;
-        _playersUsersService = playersUsersService;
         _serviceScope = serviceProvider.CreateScope();
-        foreach (var seederProvider in seederProviders)
-        {
-            _seederProviders[seederProvider.SeedKey] = seederProvider;
-            logger.LogInformation("Using {seederProvider} for seed key {seedKey}", seederProvider, seederProvider.SeedKey);
-        }
-
-        foreach (var seederProvider in asyncSeederProviders)
-        {
-            _asyncSeederProviders[seederProvider.SeedKey] = seederProvider;
-            logger.LogInformation("Using async {seederProvider} for seed key {seedKey}", seederProvider, seederProvider.SeedKey);
-        }
+        _serviceProvider = _serviceScope.ServiceProvider;
+        _playersUsersService = playersUsersService;
     }
 
     private async Task BuildIdentityRoles(Dictionary<string, object> roles)
@@ -186,32 +173,6 @@ internal sealed class SeederServerBuilder : IDisposable
 
         var seedData = result.ToObject<SeedData>() ?? throw new Exception("Failed to load seed data.");
         await BuildFrom(seedData);
-
-        var seedKeyValuePairs = result.ToObject<Dictionary<string, Dictionary<string, JObject>>>();
-        if (seedKeyValuePairs != null)
-        {
-            foreach (var seedKeyValuePair in seedKeyValuePairs)
-            {
-                if (_seederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
-                {
-                    foreach (var keyValuePair in seedKeyValuePair.Value)
-                    {
-                        value.Seed(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
-                    }
-                }
-            }
-
-            foreach (var seedKeyValuePair in seedKeyValuePairs)
-            {
-                if (_asyncSeederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
-                {
-                    foreach (var keyValuePair in seedKeyValuePair.Value)
-                    {
-                        await value.SeedAsync(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
-                    }
-                }
-            }
-        }
     }
 
     private async Task BuildFrom(SeedData seedData)

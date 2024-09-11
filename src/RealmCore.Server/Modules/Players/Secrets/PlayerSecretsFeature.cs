@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.Secrets;
 
 public sealed class PlayerSecretsFeature : IPlayerFeature, IUsesUserPersistentData
 {
