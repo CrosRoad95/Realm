@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20240816-144453" />
+		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20240910-125735" />
 	</ItemGroup>
 
 	<ItemGroup>
