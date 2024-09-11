@@ -1,6 +1,8 @@
 # What is this project?
 
-This is a framework to create mainly RPG like server for game MTA:SA using Slipe-Server.
+High level, general purpose gamemode written in C# using SlipeServer.
+
+The goal of this repository is to provide easy to use set of high level functions to manage any mta gamemode therefore you don't need to deal with annoyance such a saving state of the server, managing state.
 
 # Discord
 
