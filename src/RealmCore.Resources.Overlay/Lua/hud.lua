@@ -72,31 +72,33 @@ local function renderHud(position, elements)
 	local ex, ey, position;
 	local content;
 	for i,element in ipairs(elements)do
-		ex, ey = calculateElementPosition(element, x, y);
-		if(element.type == "text")then
-			content = element.content;
-			local text = nil;
-			if(content.type == "constant")then
-				text = content.value;
-			elseif(content.type == "computed")then
-				if(content.value == "vehicleSpeed")then
-					local vehicle = getPedOccupiedVehicle(localPlayer);
-					if(vehicle and getVehicleController(vehicle) == localPlayer)then
-						local speed = getElementSpeed(vehicle, "km/s");
-						text = string.format("%ikm/h", speed);
+		if(not element.hidden)then
+			ex, ey = calculateElementPosition(element, x, y);
+			if(element.type == "text")then
+				content = element.content;
+				local text = nil;
+				if(content.type == "constant")then
+					text = content.value;
+				elseif(content.type == "computed")then
+					if(content.value == "vehicleSpeed")then
+						local vehicle = getPedOccupiedVehicle(localPlayer);
+						if(vehicle and getVehicleController(vehicle) == localPlayer)then
+							local speed = getElementSpeed(vehicle, "km/s");
+							text = string.format("%ikm/h", speed);
+						end
+					elseif(content.value == "fps")then
+						text = string.format("FPS: %i", fps);
 					end
-				elseif(content.value == "fps")then
-					text = string.format("FPS: %i", fps);
 				end
-			end
 
-			if(text)then
-				dxDrawText(text, ex, ey, ex + element.size[1], ey + element.size[2], element.color, element.scale[1], element.scale[2], element.font or "sans", element.align[1], element.align[2])
+				if(text)then
+					dxDrawText(text, ex, ey, ex + element.size[1], ey + element.size[2], element.color, element.scale[1], element.scale[2], element.font or "sans", element.align[1], element.align[2])
+				end
+			elseif(element.type == "rectangle")then
+				dxDrawRectangle(ex, ey, element.size[1], element.size[2], element.color)
+			elseif(element.type == "radar")then
+				radarRender(element);
 			end
-		elseif(element.type == "rectangle")then
-			dxDrawRectangle(ex, ey, element.size[1], element.size[2], element.color)
-		elseif(element.type == "radar")then
-			radarRender(element);
 		end
 	end
 end
@@ -375,6 +377,20 @@ local function handleElementSetPosition(hudId, elementId, px, py)
 	end
 end
 
+local function handleElementSetVisible(hudId, elementId, visible)
+	if(huds[hudId])then
+		for i,v in ipairs(huds[hudId].elements)do
+			if(v.id == elementId)then
+				v.hidden = not visible;
+				return;
+			end
+		end
+		outputDebugString("Failed to elementSetVisible, hud element of id: '"..tostring(elementId).."' not found.", 1);
+	else
+		outputDebugString("Failed to elementSetVisible, hud of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("AddNotification", handleAddNotification);
 	hubBind("SetHudVisible", handleSetHudVisible);
@@ -394,6 +410,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("RemoveAllBlips", handleRemoveAllBlips);
 	hubBind("ElementSetSize", handleElementSetSize);
 	hubBind("ElementSetPosition", handleElementSetPosition);
+	hubBind("ElementSetVisible", handleElementSetVisible);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)

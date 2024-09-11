@@ -19,4 +19,5 @@ internal interface IHudEventHub
     void RemoveAllBlips();
     void ElementSetPosition(string hudId, int elementId, float x, float y);
     void ElementSetSize(string hudId, int elementId, float sizeX, float sizeY);
+    void ElementSetVisible(string hudId, int elementId, bool visible);
 }

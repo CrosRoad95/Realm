@@ -45,6 +45,13 @@ public class SampleHudLayer : HudLayer<SampleHudState>
         SetPosition(_id.Value, new Vector2(Random.Shared.Next(20, 40), Random.Shared.Next(20, 40)));
     }
 
+    private bool _visible = true;
+    public void ToggleVisible()
+    {
+        _visible = !_visible;
+        SetVisible(_id.Value, _visible);
+    }
+
     public void Update()
     {
         UpdateState(x =>

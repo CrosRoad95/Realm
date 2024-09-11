@@ -44,6 +44,7 @@ internal abstract class HudBase<TState> : IHud<TState> where TState : class
 
     public abstract bool SetPosition(int elementId, Vector2 position);
     public abstract bool SetSize(int elementId, Size size);
+    public abstract bool SetVisible(int elementId, bool visible);
 
     protected void ThrowIfDisposed()
     {
@@ -100,6 +101,12 @@ internal class Hud<TState> : HudBase<TState> where TState : class
         _overlayService.SizeChanged(_player, Id, elementId, size);
         return true;
     }
+
+    public override bool SetVisible(int elementId, bool visible)
+    {
+        _overlayService.VisibleChanged(_player, Id, elementId, visible);
+        return true;
+    }
 }
 
 internal class Hud3d<TState> : HudBase<TState> where TState : class
@@ -136,6 +143,11 @@ internal class Hud3d<TState> : HudBase<TState> where TState : class
     }
 
     public override bool SetSize(int elementId, Size size)
+    {
+        throw new NotSupportedException();
+    }
+
+    public override bool SetVisible(int elementId, bool visible)
     {
         throw new NotSupportedException();
     }
