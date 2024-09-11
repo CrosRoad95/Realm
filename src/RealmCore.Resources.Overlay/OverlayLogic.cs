@@ -131,8 +131,8 @@ internal class OverlayLogic
         _luaEventHub.Broadcast(x => x.RemoveAllBlips());
     }
 
-    private void HandleElementSizeChanged(Player player, string hudId, int elementId, Vector2 size)
+    private void HandleElementSizeChanged(Player player, string hudId, int elementId, Size size)
     {
-        _luaEventHub.Invoke(player, x => x.ElementSetSize(hudId, elementId, size.X, size.Y));
+        _luaEventHub.Invoke(player, x => x.ElementSetSize(hudId, elementId, size.Width, size.Height));
     }
 }

@@ -37,7 +37,7 @@ public class SampleHudLayer : HudLayer<SampleHudState>
 
     public void Resize()
     {
-        SetSize(_id.Value, new Vector2(Random.Shared.Next(20, 40), Random.Shared.Next(20, 40)));
+        SetSize(_id.Value, new Size(Random.Shared.Next(20, 40), Random.Shared.Next(20, 40)));
     }
 
     public void Update()
