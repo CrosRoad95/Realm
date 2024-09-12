@@ -4,6 +4,16 @@ local modelsToReplace = {}
 local replacedModels = {}
 local downloadingOrDownloadedRemoteAssets = {}
 
+function requestRemoteImageAsset(url)
+	if(not downloadingOrDownloadedRemoteAssets[url])then
+		fetchRemote(url, function(response)
+			loadedAssets[url] = dxCreateTexture(response, "argb", false);
+		end)
+		downloadingOrDownloadedRemoteAssets[url] = true
+	end
+	return loadedAssets[url]
+end
+
 function requestAsset(name)
 	local assetInfo = assetsList[name];
 	if(not assetsList[name])then

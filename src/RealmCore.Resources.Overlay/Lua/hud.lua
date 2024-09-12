@@ -109,7 +109,7 @@ end
 
 function prepareAsset2(content)
 	if(content.type == "remoteImage")then
-		local data = requestAsset(content.path);
+		local data = requestRemoteImageAsset(content.path);
 		local lazy = {
 			isLoaded = data ~= nil,
 			data = data
@@ -117,7 +117,7 @@ function prepareAsset2(content)
 		if(not lazy.isLoaded and not lazy.requesting)then
 			lazy.requesting = true
 			setTimer(function()
-				local data = requestAsset(content.path);
+				local data = requestRemoteImageAsset(content.path);
 				if(data)then
 					lazy.isLoaded = true;
 					lazy.data = data;

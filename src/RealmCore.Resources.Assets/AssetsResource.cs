@@ -43,6 +43,7 @@ end
         : base(server, server.RootElement, "Assets")
     {
         Exports.Add("requestAsset");
+        Exports.Add("requestRemoteImageAsset");
     }
 
     public void AddFiles(IAssetEncryptionProvider assetEncryptionProvider, AssetsCollection assetsCollection, IHostEnvironment hostEnvironment)

@@ -2,6 +2,7 @@
 using Color = System.Drawing.Color;
 using RealmCore.Resources.Assets.AssetsTypes;
 using System.Security.Cryptography;
+using RealmCore.Resources.Browser;
 
 namespace RealmCore.BlazorGui.HudLayers;
 
@@ -13,11 +14,13 @@ public class SampleHudState
 public class SampleHudLayer : HudLayer<SampleHudState>
 {
     private readonly AssetsCollection _assetsCollection;
+    private readonly IOptions<BrowserOptions> _browserOptions;
     private int? _imageId;
     private int? _id;
-    public SampleHudLayer(AssetsCollection assetsCollection) : base(new())
+    public SampleHudLayer(AssetsCollection assetsCollection, IOptions<BrowserOptions> browserOptions) : base(new())
     {
         _assetsCollection = assetsCollection;
+        _browserOptions = browserOptions;
     }
 
     protected override void Build(IHudBuilder builder, IHudBuilderContext context)
@@ -28,6 +31,7 @@ public class SampleHudLayer : HudLayer<SampleHudState>
             [43] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg")
         }, PositioningMode.Absolute));
         builder.Add(new TextHudElement(new CurrentFPSTextHudElementContent(), new Vector2(0, context.Bottom - 20), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center, positioningMode: PositioningMode.Absolute));
+        builder.Add(new ImageHudElement(new Vector2(600, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetDynamicRemoteImage(_browserOptions.Value.BaseRemoteUrl + "/assets/dynamic.jpg"))));
         var imageElement = builder.Add(new ImageHudElement(new Vector2(700, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg"))));
         var element = builder.Add(new RectangleHudElement(new Vector2(context.Right - 400, 600), new Size(400, 20), Color.DarkBlue));
         _imageId = imageElement.Id;
