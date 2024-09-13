@@ -234,6 +234,19 @@ public sealed class UsersService
         }
     }
     
+    public async Task<bool> SetAvatar(int userId, string? avatar, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.SetAvatar(userId, avatar, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
     public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);

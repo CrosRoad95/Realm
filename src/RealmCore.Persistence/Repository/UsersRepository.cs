@@ -150,12 +150,12 @@ public sealed class UsersRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-    
-    public async Task<bool> SetAvatar(int userId, string avatar, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetAvatar));
 
-        if(activity != null)
+    public async Task<bool> SetAvatar(int userId, string? avatar, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetAvatar));
+
+        if (activity != null)
         {
             activity.AddTag("UserId", userId);
             activity.AddTag("Avatar", avatar);
@@ -163,7 +163,7 @@ public sealed class UsersRepository
 
         var query = CreateQueryBase()
             .AsNoTracking()
-            .Where(x => x.Id == userId && x.Avatar == avatar);
+            .Where(u => u.Id == userId);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Avatar, avatar), cancellationToken) == 1;
     }
