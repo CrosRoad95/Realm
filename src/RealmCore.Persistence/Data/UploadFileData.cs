@@ -11,6 +11,7 @@ public sealed class UploadFileData
     public DateTime UploadedAt { get; set; }
 
     public ICollection<UserUploadFileData> UserUploadFiles { get; set; } = [];
+    public ICollection<MapData> Maps { get; set; } = [];
 }
 
 public sealed class UserUploadFileData

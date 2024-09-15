@@ -267,5 +267,5 @@ public sealed class BusinessesRepository
         return await query.ToDictionaryAsync(x => x.StatisticId, y => y.Value, cancellationToken);
     }
 
-    public static readonly ActivitySource Activity = new("RealmCore.TimeBaseOperationRepository", "1.0.0");
+    public static readonly ActivitySource Activity = new("RealmCore.BusinessesRepository", "1.0.0");
 }

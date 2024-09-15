@@ -1,12 +1,25 @@
-﻿namespace RealmCore.Server.Modules.World;
+﻿using Org.BouncyCastle.Asn1.Cms;
+using RealmCore.Server.Modules.Domain;
+
+namespace RealmCore.Server.Modules.World;
 
 public sealed class MapsService
 {
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;
     private readonly IElementCollection _elementCollection;
     private readonly MapsCollection _mapsCollection;
+    private readonly MapsRepository _mapsRepository;
     private readonly List<string> _loadedMaps = [];
+    private readonly IServiceScope _serviceScope;
+    private readonly IServiceProvider _serviceProvider;
+
+    private readonly JsonSerializerSettings _jsonSerializerSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.All,
+        Formatting = Formatting.None,
+    };
 
     public IReadOnlyList<string> LoadedMaps
     {
@@ -17,14 +30,17 @@ public sealed class MapsService
         }
     }
 
-    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapsCollection mapsCollection)
+    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapsCollection mapsCollection, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _elementCollection = elementCollection;
         _mapsCollection = mapsCollection;
+        _serviceScope = serviceProvider.CreateScope();
+        _serviceProvider = _serviceScope.ServiceProvider;
+        _mapsRepository = _serviceProvider.GetRequiredService<MapsRepository>();
     }
 
-    public bool IsLoaded(string name)
+    public bool IsLoaded(string name) 
     {
         lock (_lock)
         {
@@ -75,4 +91,46 @@ public sealed class MapsService
             return true;
         }
     }
+
+    public async Task<bool> CreatePersistentMapFromFileUploadForUser(int fileUploadId, int userId, int locationId, object? metadata, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            var metadataString = Serialize(metadata);
+            return await _mapsRepository.CreatePersistentMapFromFileUploadForUser(fileUploadId, userId, locationId, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> LoadPersistentMap(int mapId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _mapsRepository.SetMapLoaded(mapId, true, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> UnloadPersistentMap(int mapId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _mapsRepository.SetMapLoaded(mapId, false, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    private string Serialize(object? data) => JsonConvert.SerializeObject(data, _jsonSerializerSettings);
 }

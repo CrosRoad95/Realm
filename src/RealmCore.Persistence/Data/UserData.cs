@@ -53,6 +53,7 @@ public class UserData : IdentityUser<int>
     public ICollection<UserSecretsData> Secrets { get; set; } = [];
     public ICollection<GroupJoinRequestData> GroupsJoinRequests { get; set; } = [];
     public ICollection<BusinessUserData> Businesses { get; set; } = [];
+    public ICollection<MapUserData> Maps { get; set; } = [];
 }
 
 public class UserEventData : EventDataBase

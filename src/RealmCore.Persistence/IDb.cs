@@ -69,6 +69,8 @@ public interface IDb
     DbSet<TimeBaseOperationGroupBusinessData> TimeBaseOperationGroupBusinesses { get; }
     DbSet<BusinessStatisticData> BusinessStatistics { get; }
     DbSet<BusinessEventData> BusinessEvents { get; }
+    DbSet<MapData> Maps { get; }
+    DbSet<MapUserData> MapsUsers { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

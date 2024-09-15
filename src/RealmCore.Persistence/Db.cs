@@ -112,6 +112,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<BusinessUserData> BusinessesUsers => Set<BusinessUserData>();
     public DbSet<BusinessStatisticData> BusinessStatistics => Set<BusinessStatisticData>();
     public DbSet<BusinessEventData> BusinessEvents => Set<BusinessEventData>();
+    public DbSet<MapData> Maps => Set<MapData>();
+    public DbSet<MapUserData> MapsUsers => Set<MapUserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -348,6 +350,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.Property(x => x.Avatar)
                 .HasMaxLength(512);
+
+            entityBuilder.HasMany(x => x.Maps)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -994,6 +1001,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.Property(x => x.Metadata)
                 .HasMaxLength(10000);
+
+            entityBuilder.HasMany(x => x.Maps)
+                .WithOne(x => x.UploadFile)
+                .HasForeignKey(x => x.FileUploadId)
+                .HasPrincipalKey(x => x.Id);
         });
         
         modelBuilder.Entity<UserUploadFileData>(entityBuilder =>
@@ -1131,6 +1143,30 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(BusinessEvents))
                 .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<MapData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Maps))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<MapUserData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(MapsUsers))
+                .HasKey(x => new { x.MapId, x.UserId });
+
+            entityBuilder.HasOne(x => x.Map)
+                .WithMany(x => x.MapsUsers)
+                .HasForeignKey(x => x.MapId)
+                .HasPrincipalKey(x => x.Id);
+
+            entityBuilder.HasOne(x => x.User)
+                .WithMany(x => x.Maps)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
         });
     }
 
