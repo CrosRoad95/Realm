@@ -99,7 +99,7 @@ public sealed class VehiclesService
         await vehicleService.Destroy(cancellationToken);
 
         using var scope = _serviceProvider.CreateScope();
-        var vehicleLoader = scope.ServiceProvider.GetRequiredService<VehicleLoader>();
+        var vehicleLoader = scope.ServiceProvider.GetRequiredService<VehiclesLoader>();
         var persistentVehicle = await vehicleLoader.LoadVehicleById(vehicleData.Id, cancellationToken);
         persistentVehicle.SetLocation(location);
         foreach (var pair in occupants)

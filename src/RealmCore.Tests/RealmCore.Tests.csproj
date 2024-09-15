@@ -128,6 +128,7 @@
 		<Using Include="FluentAssertions.Extensions" />
 		<Using Include="RealmCore.Server.Modules.TimeBaseOperations" />
 		<Using Include="Microsoft.EntityFrameworkCore" />
+		<Using Include="RealmCore.Server.Modules.Players.Settings" />
 	</ItemGroup>
 
 </Project>

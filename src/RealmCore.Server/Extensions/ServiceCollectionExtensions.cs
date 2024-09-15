@@ -5,6 +5,7 @@ using RealmCore.Server.Modules.Players.Integrations;
 using RealmCore.Server.Modules.Players.Rewards;
 using RealmCore.Server.Modules.Players.Secrets;
 using RealmCore.Server.Modules.TimeBaseOperations;
+using RealmCore.Server.Modules.Vehicles.Settings;
 using RealmCore.Server.Modules.World.WorldNodes;
 
 namespace RealmCore.Server.Extensions;
@@ -96,7 +97,7 @@ public static class ServiceCollectionExtensions
 
         #region Services
         services.AddScoped<ElementSaveService>();
-        services.AddScoped<VehicleLoader>();
+        services.AddScoped<VehiclesLoader>();
         services.AddScoped<VehicleService>();
         services.AddScoped<PlayerSearchService>();
         services.AddSingleton<UsersService>();
@@ -173,6 +174,7 @@ public static class ServiceCollectionExtensions
         services.AddVehicleScopedFeature<VehicleEventsFeature>();
         services.AddVehicleScopedFeature<VehicleFuelFeature>();
         services.AddVehicleScopedFeature<VehicleInventoryFeature>();
+        services.AddVehicleScopedFeature<VehicleSettingsFeature>();
         #endregion
 
         #region Elements features

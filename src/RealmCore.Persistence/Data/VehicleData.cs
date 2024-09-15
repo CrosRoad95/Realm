@@ -36,10 +36,16 @@ public sealed class VehicleData
     public ICollection<VehicleEngineData> VehicleEngines { get; set; } = new List<VehicleEngineData>();
     public ICollection<VehicleInventoryData> VehicleInventories { get; set; } = new List<VehicleInventoryData>();
     public ICollection<VehicleEventData> VehicleEvents { get; set; } = new List<VehicleEventData>();
+    public ICollection<VehicleSettingData> Settings { get; set; } = [];
 #pragma warning restore CS8618
 }
 
 public class VehicleEventData : EventDataBase
+{
+    public int VehicleId { get; set; }
+}
+
+public sealed class VehicleSettingData : SettingDataBase
 {
     public int VehicleId { get; set; }
 }

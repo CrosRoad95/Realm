@@ -76,7 +76,7 @@ internal sealed class TestHostedService : PlayerLifecycle, IHostedService
 
     private void HandleFocusedVehiclePartChanged(RealmPlayer player, string? arg2, string? arg3)
     {
-        _chatBox.OutputTo(player, $"Changed focused vehicle part from {arg2 ?? "<brak>"} to: {arg3 ?? "<brak>"}");
+        //_chatBox.OutputTo(player, $"Changed focused vehicle part from {arg2 ?? "<brak>"} to: {arg3 ?? "<brak>"}");
     }
 
     private void SchedulerTests()

@@ -114,6 +114,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<BusinessEventData> BusinessEvents => Set<BusinessEventData>();
     public DbSet<MapData> Maps => Set<MapData>();
     public DbSet<MapUserData> MapsUsers => Set<MapUserData>();
+    public DbSet<VehicleSettingData> VehicleSettings => Set<VehicleSettingData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -449,9 +450,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(UserSettings))
                 .HasKey(x => new { x.UserId, x.SettingId });
-
-            entityBuilder.Property(x => x.SettingId)
-                .HasMaxLength(255);
         });
 
         modelBuilder.Entity<UserNotificationData>(entityBuilder =>
@@ -684,6 +682,10 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne()
                 .HasForeignKey(x => x.VehicleId);
 
+            entityBuilder
+                .HasMany(x => x.Settings)
+                .WithOne()
+                .HasForeignKey(x => x.VehicleId);
         });
 
         modelBuilder.Entity<VehicleUserAccessData>(entityBuilder =>
@@ -1168,6 +1170,14 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
         });
+
+        modelBuilder.Entity<VehicleSettingData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleSettings))
+                .HasKey(x => new { x.VehicleId, x.SettingId });
+        });
+
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

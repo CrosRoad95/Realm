@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using RealmCore.Server.Modules.Vehicles.Settings;
+
+namespace RealmCore.Server.Modules.Elements;
 
 public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
 {
@@ -45,6 +47,7 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
     public VehiclePartDamageFeature PartDamage { get; init; }
     public VehicleEnginesFeature Engines { get; init; }
     public VehicleEventsFeature Events { get; init; }
+    public VehicleSettingsFeature Settings { get; init; }
     public VehicleFuelFeature Fuel { get; init; }
     public IVehicleInventoryFeature Inventory { get; init; }
 
@@ -85,6 +88,7 @@ public class RealmVehicle : Vehicle, IFocusableElement, IAsyncDisposable
         Events = GetRequiredService<VehicleEventsFeature>();
         Fuel = GetRequiredService<VehicleFuelFeature>();
         Inventory = GetRequiredService<VehicleInventoryFeature>();
+        Settings = GetRequiredService<VehicleSettingsFeature>();
         #endregion
     }
 

@@ -1,4 +1,5 @@
-﻿using Color = System.Drawing.Color;
+﻿using RealmCore.Server.Modules.Persistence;
+using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
 
@@ -264,7 +265,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("spawnvehhere", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
         {
-            var vehicleLoader = player.GetRequiredService<VehicleLoader>();
+            var vehicleLoader = player.GetRequiredService<VehiclesLoader>();
             var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
             var location = player.GetLocation(player.GetPointFromDistanceRotationOffset(3));
             vehicle.SetLocation(location);
@@ -273,7 +274,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("spawnveh", async ([CallingPlayer] RealmPlayer player, int vehicleId) =>
         {
-            var vehicleLoader = player.GetRequiredService<VehicleLoader>();
+            var vehicleLoader = player.GetRequiredService<VehiclesLoader>();
             var vehicle = await vehicleLoader.LoadVehicleById(vehicleId);
             _chatBox.OutputTo(player, $"Załadowano pojazd na pozycji: {vehicle.GetLocation()}");
         });
@@ -282,10 +283,25 @@ internal sealed class CommandsHostedService : IHostedService
         {
             if (player.Vehicle == null)
             {
-                _chatBox.OutputTo(player, "Wejdź do pojazdu.");
+                _chatBox.OutputTo(player, "Enter vehicle.");
                 return;
             }
             await _vehiclesService.Destroy(player.Vehicle);
+        });
+        
+        _commandService.Add("respawnvehicle", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            if (player.FocusedElement is not RealmVehicle vehicle)
+            {
+                _chatBox.OutputTo(player, "You are not focused on vehicle.");
+                return;
+            }
+
+            var vehicleLoader = player.GetRequiredService<VehiclesLoader>();
+            var vehicleId = vehicle.Persistence.Id;
+            await _vehiclesService.Destroy(vehicle);
+            await vehicleLoader.LoadVehicleById(vehicleId);
+            _chatBox.OutputTo(player, $"Vehicle of id {vehicleId} respawned.");
         });
 
         _commandService.Add("vehiclesinuse", ([CallingPlayer] RealmPlayer player) =>
@@ -498,24 +514,6 @@ internal sealed class CommandsHostedService : IHostedService
             var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             worldObject.Interaction = new LiftableInteraction();
             worldObject.TrySetOwner(player);
-        });
-
-        _commandService.Add("setsetting", ([CallingPlayer] RealmPlayer player, string argument) =>
-        {
-            player.Settings.Set(1, argument);
-            _chatBox.OutputTo(player, "set");
-        });
-
-        _commandService.Add("removesetting", ([CallingPlayer] RealmPlayer player) =>
-        {
-            player.Settings.TryRemove(1);
-            _chatBox.OutputTo(player, "remove");
-        });
-
-        _commandService.Add("getsetting", ([CallingPlayer] RealmPlayer player) =>
-        {
-            player.Settings.TryGet(1, out var value);
-            _chatBox.OutputTo(player, $"Setting1: {value}");
         });
 
         _commandService.Add("spawncolshapeforme", ([CallingPlayer] RealmPlayer player) =>
@@ -1081,6 +1079,7 @@ internal sealed class CommandsHostedService : IHostedService
         AddInventoryCommands();
         AddCommandGroups();
         AddHudCommands();
+        AddSettingsCommands();
     }
 
     internal sealed class TestSession : Session
@@ -1393,6 +1392,61 @@ internal sealed class CommandsHostedService : IHostedService
             hud3d.Update();
             _chatBox.OutputTo(player, "Hud3d created");
         });
+    }
+
+    void AddSettingsCommands()
+    {
+        _commandService.Add("setsetting", ([CallingPlayer] RealmPlayer player, string argument) =>
+        {
+            player.Settings.Set(1, argument);
+            _chatBox.OutputTo(player, "Setting for vehicle changed");
+        });
+
+        _commandService.Add("removesetting", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Settings.TryRemove(1);
+            _chatBox.OutputTo(player, "Setting removed");
+        });
+
+        _commandService.Add("getsetting", ([CallingPlayer] RealmPlayer player) =>
+        {
+            player.Settings.TryGet(1, out var value);
+            _chatBox.OutputTo(player, $"Value of setting id 1: {value}");
+        });
+
+        _commandService.Add("vehiclesetsetting", ([CallingPlayer] RealmPlayer player, string argument) =>
+        {
+            if(player.FocusedElement is not RealmVehicle vehicle)
+            {
+                _chatBox.OutputTo(player, "You are not focused on vehicle.");
+                return;
+            }
+            vehicle.Settings.Set(1, argument);
+            _chatBox.OutputTo(player, "Setting for vehicle changed");
+        });
+
+        _commandService.Add("vehicleremovesetting", ([CallingPlayer] RealmPlayer player) =>
+        {
+            if (player.FocusedElement is not RealmVehicle vehicle)
+            {
+                _chatBox.OutputTo(player, "You are not focused on vehicle.");
+                return;
+            }
+            vehicle.Settings.TryRemove(1);
+            _chatBox.OutputTo(player, "Setting removed");
+        });
+
+        _commandService.Add("vehiclegetsetting", ([CallingPlayer] RealmPlayer player) =>
+        {
+            if (player.FocusedElement is not RealmVehicle vehicle)
+            {
+                _chatBox.OutputTo(player, "You are not focused on vehicle.");
+                return;
+            }
+            vehicle.Settings.TryGet(1, out var value);
+            _chatBox.OutputTo(player, $"Value of setting id 1: {value}");
+        });
+
     }
 
     public class SampleHud3d : WorldHud<SampleHudState>

@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Persistence;
 
-public sealed class VehicleLoader
+public sealed class VehiclesLoader
 {
     private readonly VehicleRepository _vehicleRepository;
-    private readonly ILogger<VehicleLoader> _logger;
+    private readonly ILogger<VehiclesLoader> _logger;
     private readonly IElementFactory _elementFactory;
     private readonly VehiclesInUse _vehiclesInUse;
 
-    public VehicleLoader(VehicleRepository vehicleRepository, ILogger<VehicleLoader> logger, IElementFactory elementFactory, VehiclesInUse vehiclesInUse)
+    public VehiclesLoader(VehicleRepository vehicleRepository, ILogger<VehiclesLoader> logger, IElementFactory elementFactory, VehiclesInUse vehiclesInUse)
     {
         _vehicleRepository = vehicleRepository;
         _logger = logger;

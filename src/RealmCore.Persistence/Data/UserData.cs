@@ -60,3 +60,8 @@ public class UserEventData : EventDataBase
 {
     public int UserId { get; set; }
 }
+
+public sealed class UserSettingData : SettingDataBase
+{
+    public int UserId { get; set; }
+}
