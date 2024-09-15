@@ -21,7 +21,7 @@ public class UserData : IdentityUser<int>
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 
     public ICollection<UserLicenseData> Licenses { get; set; } = new List<UserLicenseData>();
-    public ICollection<VehicleUserAccessData> VehicleUserAccesses { get; set; } = new List<VehicleUserAccessData>();
+    public ICollection<VehicleUserAccessData> UserAccesses { get; set; } = [];
     public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
     public UserDailyVisitsData? DailyVisits { get; set; }
     public ICollection<UserAchievementData> Achievements { get; set; } = new List<UserAchievementData>();

@@ -29,7 +29,8 @@ public sealed class VehicleData
     public bool IsRemoved { get; set; }
 
     public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
-    public ICollection<VehicleUserAccessData> UserAccesses { get; set; } = new List<VehicleUserAccessData>();
+    public ICollection<VehicleUserAccessData> UserAccesses { get; set; } = [];
+    public ICollection<VehicleGroupAccessData> GroupAccesses { get; set; } = [];
     public ICollection<VehicleUpgradeData> Upgrades { get; set; } = new List<VehicleUpgradeData>();
     public ICollection<VehicleFuelData> Fuels { get; set; } = new List<VehicleFuelData>();
     public ICollection<VehiclePartDamageData> PartDamages { get; set; } = new List<VehiclePartDamageData>();

@@ -80,6 +80,7 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
     public int GetHashCode([DisallowNull] GroupDto obj) => obj.Id;
 
     [return: NotNullIfNotNull(nameof(groupData))]
+    public static GroupDto? Map(GroupData? groupData) => Map(groupData, false);
     public static GroupDto? Map(GroupData? groupData, bool mapMembers = true)
     {
         if (groupData == null)

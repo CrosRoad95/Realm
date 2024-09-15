@@ -1,12 +1,17 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-public sealed class VehicleUserAccessDto
+public abstract class VehicleAccessDto
 {
     public required int Id { get; init; }
     public required int VehicleId { get; init; }
+    public required int AccessType { get; init; }
+    public required string? Metadata { get; init; }
+    public T? GetMetadata<T>() where T : class => JsonHelpers.Deserialize<T>(Metadata);
+}
+
+public sealed class VehicleUserAccessDto : VehicleAccessDto
+{
     public required int UserId { get; init; }
-    public required byte AccessType { get; init; }
-    public required string? CustomValue { get; init; }
     public bool IsOwner => AccessType == 0;
 
     [return: NotNullIfNotNull(nameof(vehicleUserAccessData))]
@@ -21,7 +26,28 @@ public sealed class VehicleUserAccessDto
             VehicleId = vehicleUserAccessData.VehicleId,
             UserId = vehicleUserAccessData.UserId,
             AccessType = vehicleUserAccessData.AccessType,
-            CustomValue = vehicleUserAccessData.CustomValue,
+            Metadata = vehicleUserAccessData.Metadata,
+        };
+    }
+}
+
+public sealed class VehicleGroupAccessDto : VehicleAccessDto
+{
+    public required int GroupId { get; init; }
+
+    [return: NotNullIfNotNull(nameof(vehicleGroupAccessData))]
+    public static VehicleGroupAccessDto? Map(VehicleGroupAccessData? vehicleGroupAccessData)
+    {
+        if (vehicleGroupAccessData == null)
+            return null;
+
+        return new VehicleGroupAccessDto
+        {
+            Id = vehicleGroupAccessData.Id,
+            VehicleId = vehicleGroupAccessData.VehicleId,
+            GroupId = vehicleGroupAccessData.GroupId,
+            AccessType = vehicleGroupAccessData.AccessType,
+            Metadata = vehicleGroupAccessData.Metadata,
         };
     }
 }

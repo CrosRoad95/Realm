@@ -60,6 +60,7 @@ public static class QueryableExtensions
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
             .Include(x => x.UserAccesses)
+            .Include(x => x.GroupAccesses)
             .Include(x => x.Settings)
             .AsSplitQuery();
     }

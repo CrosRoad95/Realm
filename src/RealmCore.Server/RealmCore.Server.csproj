@@ -222,6 +222,7 @@
 		<Using Include="RealmCore.Persistence.Data.Bases" />
 		<Using Include="RealmCore.Persistence.Context" />
 		<Using Include="SlipeServer.Resources.DiscordRichPresence" />
+		<Using Include="RealmCore.Server.Json" />
 	</ItemGroup>
 
 </Project>

@@ -919,6 +919,27 @@ public sealed class GroupRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
+    
+    public async Task<GroupData[]> GetAll(int page, int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetAll));
+
+        if (activity != null)
+        {
+            activity.AddTag("Page", page);
+            activity.AddTag("PageSize", pageSize);
+        }
+
+        page = Math.Max(page, 1);
+
+        var query = _db.Groups
+            .TagWithSource(nameof(GroupRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
 
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));
 

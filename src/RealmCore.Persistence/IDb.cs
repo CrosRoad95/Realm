@@ -18,6 +18,7 @@ public interface IDb
     DbSet<UserLicenseData> UserLicenses { get; }
     DbSet<VehicleData> Vehicles { get; }
     DbSet<VehicleUserAccessData> VehicleUserAccess { get; }
+    DbSet<VehicleGroupAccessData> VehicleGroupAccesses { get; }
     DbSet<InventoryData> Inventories { get; }
     DbSet<InventoryItemData> InventoryItems { get; }
     DbSet<VehicleUpgradeData> VehicleUpgrades { get; }

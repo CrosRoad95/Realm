@@ -1,4 +1,6 @@
 ﻿using RealmCore.Server.Modules.Persistence;
+using RealmCore.Server.Modules.Vehicles.Access;
+using SlipeServer.Server.Elements;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
@@ -243,11 +245,6 @@ internal sealed class CommandsHostedService : IHostedService
             });
         });
 
-        _commandService.Add("removeowner", ([CallingPlayer] RealmPlayer player) =>
-        {
-            player.Vehicle!.Access.TryRemoveAccess(player);
-        });
-
         _commandService.Add("converttopersistent", async ([CallingPlayer] RealmPlayer player) =>
         {
             if (player.Vehicle == null)
@@ -319,11 +316,6 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.OutputTo(player, player.Vehicle?.ToString() ?? "brak");
         });
 
-        _commandService.Add("showaccess", ([CallingPlayer] RealmPlayer player) =>
-        {
-            _chatBox.OutputTo(player, player.Vehicle?.AccessController?.ToString() ?? "brak");
-        });
-
         _commandService.Add("savemyveh", async ([CallingPlayer] RealmPlayer player) =>
         {
             var vehicle = player.Vehicle ?? throw new InvalidOperationException();
@@ -342,48 +334,6 @@ internal sealed class CommandsHostedService : IHostedService
             var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.AccessController = VehicleNoAccessController.Instance;
-        });
-
-        _commandService.Add("addmeasowner", ([CallingPlayer] RealmPlayer player) =>
-        {
-            var vehicle = player.Vehicle;
-            if (vehicle != null)
-                vehicle.Access.TryAddAsOwner(player);
-        });
-
-        _commandService.Add("accessinfo", ([CallingPlayer] RealmPlayer player) =>
-        {
-            if (player.Vehicle is not RealmVehicle vehicle)
-            {
-                _chatBox.OutputTo(player, "Enter vehicle!");
-                return;
-            }
-
-            _chatBox.OutputTo(player, "Access info:");
-
-            foreach (var vehicleAccess in vehicle.Access)
-            {
-                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.IsOwner}");
-            }
-        });
-
-        _commandService.Add("accessinfobyid", async ([CallingPlayer] RealmPlayer player, int id) =>
-        {
-            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
-            var access = await vehicleRepository.GetAllVehicleAccesses(id);
-            if (access == null)
-            {
-                _chatBox.OutputTo(player, "Vehicle not found");
-                return;
-            }
-
-
-            _chatBox.OutputTo(player, "Access info:");
-
-            foreach (var vehicleAccess in access)
-            {
-                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
-            }
         });
 
         _commandService.Add("testachievement", ([CallingPlayer] RealmPlayer player) =>
@@ -1080,6 +1030,7 @@ internal sealed class CommandsHostedService : IHostedService
         AddCommandGroups();
         AddHudCommands();
         AddSettingsCommands();
+        AddVehicleAccessCommands();
     }
 
     internal sealed class TestSession : Session
@@ -1244,14 +1195,24 @@ internal sealed class CommandsHostedService : IHostedService
 
     private void AddCommandGroups()
     {
-        _commandService.Add("groupstest", async ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("groupcreate", async ([CallingPlayer] RealmPlayer player) =>
         {
             var group = await _groupsService.Create(Guid.NewGuid().ToString());
             await _groupsService.AddMember(player.UserId, group!.Id);
             var role = await _groupsService.CreateRole(group!.Id, "test", []);
             var changed = await _groupsService.SetMemberRole(group.Id, player.UserId, role.Id);
             await _groupsService.SetRolePermissions(role.Id, [1, 3, 5]);
-            _chatBox.OutputTo(player, "Created group with role.");
+            _chatBox.OutputTo(player, $"Created group {group.Id} with role.");
+        });
+        
+        _commandService.Add("grouplist", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var groups = await _groupsService.GetAll(1);
+            _chatBox.OutputTo(player, "Groups:");
+            foreach (var group in groups)
+            {
+                _chatBox.OutputTo(player, $"ID: {(int)group.Id}, Name: {group.Name}");
+            }
         });
         
         _commandService.Add("listmygroups", ([CallingPlayer] RealmPlayer player) =>
@@ -1446,7 +1407,99 @@ internal sealed class CommandsHostedService : IHostedService
             vehicle.Settings.TryGet(1, out var value);
             _chatBox.OutputTo(player, $"Value of setting id 1: {value}");
         });
+    }
 
+
+    void AddVehicleAccessCommands()
+    {
+        _commandService.Add("vehicleaccessinfo", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var vehicle = GetVehicle(player);
+            if (vehicle == null) return;
+
+            _chatBox.OutputTo(player, "Access info:");
+
+            foreach (var vehicleAccess in vehicle.Access)
+            {
+                if (vehicleAccess is VehicleUserAccessDto access)
+                    _chatBox.OutputTo(player, $"User access: ({access.UserId}) = Ownership={access.IsOwner}");
+                if (vehicleAccess is VehicleGroupAccessDto groupAccess)
+                    _chatBox.OutputTo(player, $"Group access: ({groupAccess.GroupId})");
+            }
+        });
+
+        _commandService.Add("vehicleaccessinfobyid", async ([CallingPlayer] RealmPlayer player, int id) =>
+        {
+            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
+            var access = await vehicleRepository.GetAllVehicleAccesses(id);
+            if (access == null)
+            {
+                _chatBox.OutputTo(player, "Vehicle not found");
+                return;
+            }
+
+            _chatBox.OutputTo(player, "Access info:");
+
+            foreach (var vehicleAccess in access)
+            {
+                if (vehicleAccess is VehicleUserAccessData userAccess)
+                    _chatBox.OutputTo(player, $"User access: ({userAccess.UserId}) = Ownership={userAccess.AccessType == 0}");
+                if (vehicleAccess is VehicleGroupAccessData groupAccess)
+                    _chatBox.OutputTo(player, $"Group access: ({groupAccess.GroupId})");
+            }
+        });
+
+        _commandService.Add("removeowner", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var vehicle = GetVehicle(player);
+            if (vehicle == null) return;
+
+            player.Vehicle!.Access.TryRemoveAccess(player);
+        });
+
+        _commandService.Add("showaccesscontroller", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var vehicle = GetVehicle(player);
+            if (vehicle == null) return;
+
+            _chatBox.OutputTo(player, vehicle?.AccessController?.ToString() ?? "brak");
+        });
+
+        _commandService.Add("addmeasowner", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var vehicle = GetVehicle(player);
+            if (vehicle == null) return;
+
+            vehicle.Access.TryAddAsOwner(player);
+        });
+
+        _commandService.Add("accessaddgroup", ([CallingPlayer] RealmPlayer player, int groupId) =>
+        {
+            var vehicle = GetVehicle(player);
+            if (vehicle == null) return;
+
+            var added = vehicle.Access.TryAddGroupAccess(groupId, 1);
+            if(added != null)
+            {
+                _chatBox.OutputTo(player, "Group added.");
+            }
+            else
+            {
+                _chatBox.OutputTo(player, "Failed to add group.");
+            }
+        });
+    }
+
+    private RealmVehicle? GetVehicle(RealmPlayer player)
+    {
+        if (player.Vehicle != null)
+            return player.Vehicle;
+
+        if (player.FocusedElement is RealmVehicle vehicle)
+            return vehicle;
+
+        _chatBox.OutputTo(player, "You are not focused on vehicle or not in vehicle.");
+        return null;
     }
 
     public class SampleHud3d : WorldHud<SampleHudState>

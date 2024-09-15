@@ -600,4 +600,20 @@ public sealed class GroupsService
             _semaphore.Release();
         }
     }
+
+    public async Task<GroupDto[]> GetAll(int page, int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        GroupData[] groups;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            groups = await _groupRepository.GetAll(page, pageSize, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return groups.Select(GroupDto.Map).ToArray();
+    }
 }

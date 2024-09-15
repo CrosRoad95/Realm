@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealmCore.MySql;
 
@@ -10,9 +11,11 @@ using RealmCore.MySql;
 namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20240915112739_VehicleGroupAccessesTable")]
+    partial class VehicleGroupAccessesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1580,11 +1583,12 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<int>("AccessType")
                         .HasColumnType("int");
 
+                    b.Property<string>("CustomValue")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("longtext");
 
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -1668,8 +1672,9 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<int>("AccessType")
                         .HasColumnType("int");
 
-                    b.Property<string>("Metadata")
-                        .HasColumnType("longtext");
+                    b.Property<string>("CustomValue")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

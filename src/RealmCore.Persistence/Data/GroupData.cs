@@ -15,6 +15,7 @@ public sealed class GroupData
     public ICollection<GroupEventData> Events { get; set; } = [];
     public ICollection<GroupSettingData> Settings { get; set; } = [];
     public ICollection<GroupJoinRequestData> JoinRequests { get; set; } = [];
+    public ICollection<VehicleGroupAccessData> VehicleAccesses { get; set; } = [];
 }
 
 public sealed class GroupMemberData

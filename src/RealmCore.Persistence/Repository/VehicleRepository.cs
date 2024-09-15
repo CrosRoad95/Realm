@@ -226,7 +226,7 @@ public sealed class VehicleRepository
         return result > 0;
     }
 
-    public async Task<VehicleUserAccessData[]> GetAllVehicleAccesses(int id, CancellationToken cancellationToken = default)
+    public async Task<VehicleAccessDataBase[]> GetAllVehicleAccesses(int id, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllVehicleAccesses));
 
@@ -235,16 +235,27 @@ public sealed class VehicleRepository
             activity.AddTag("Id", id);
         }
 
-        var query = _db.VehicleUserAccess
+        var query1 = _db.VehicleUserAccess
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Include(x => x.User)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == id);
-        return await query.ToArrayAsync(cancellationToken);
+        
+        var query2 = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTracking()
+            .Include(x => x.Group)
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
+            .Where(x => x.VehicleId == id);
+
+        var userAccesses = await query1.ToArrayAsync(cancellationToken);
+        var groupAccesses = await query2.ToArrayAsync(cancellationToken);
+
+        return [.. userAccesses, .. groupAccesses];
     }
 
-    public async Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default)
+    public async Task<bool> HasUserAccessTo(int userId, int vehicleId, int[]? accessType = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(HasUserAccessTo));
 

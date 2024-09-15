@@ -54,6 +54,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserLicenseData> UserLicenses => Set<UserLicenseData>();
     public DbSet<VehicleData> Vehicles => Set<VehicleData>();
     public DbSet<VehicleUserAccessData> VehicleUserAccess => Set<VehicleUserAccessData>();
+    public DbSet<VehicleGroupAccessData> VehicleGroupAccesses => Set<VehicleGroupAccessData>();
     public DbSet<InventoryData> Inventories => Set<InventoryData>();
     public DbSet<InventoryItemData> InventoryItems => Set<InventoryItemData>();
     public DbSet<VehicleUpgradeData> VehicleUpgrades => Set<VehicleUpgradeData>();
@@ -155,11 +156,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .HasMany(x => x.Licenses)
                 .WithOne()
-                .HasForeignKey(x => x.UserId);
-
-            entityBuilder
-                .HasMany(x => x.VehicleUserAccesses)
-                .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
@@ -641,11 +637,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .IsRequired();
 
             entityBuilder
-                .HasMany(x => x.UserAccesses)
-                .WithOne(x => x.Vehicle)
-                .HasForeignKey(x => x.VehicleId);
-
-            entityBuilder
                 .HasMany(x => x.Upgrades)
                 .WithOne()
                 .HasForeignKey(x => x.VehicleId);
@@ -695,17 +686,23 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => x.Id);
 
             entityBuilder
-                .Property(x => x.VehicleId)
-                .ValueGeneratedOnAdd();
-
-            entityBuilder
-                .Property(x => x.CustomValue)
-                .HasMaxLength(255);
-
-            entityBuilder
                 .HasOne(x => x.User)
-                .WithMany(x => x.VehicleUserAccesses)
-                .HasForeignKey(x => x.UserId);
+                .WithMany(x => x.UserAccesses)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<VehicleGroupAccessData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleGroupAccesses))
+                .HasKey(x => x.Id);
+
+            entityBuilder
+                .HasOne(x => x.Group)
+                .WithMany(x => x.VehicleAccesses)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
         });
 
         modelBuilder.Entity<VehicleFuelData>(entityBuilder =>
