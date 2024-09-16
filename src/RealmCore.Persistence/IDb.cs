@@ -72,6 +72,7 @@ public interface IDb
     DbSet<BusinessEventData> BusinessEvents { get; }
     DbSet<MapData> Maps { get; }
     DbSet<MapUserData> MapsUsers { get; }
+    DbSet<VehicleSettingData> VehicleSettings { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

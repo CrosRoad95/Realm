@@ -247,6 +247,20 @@ public sealed class UsersService
         }
     }
     
+    public async Task<bool> SetSetting(int userId, int settingId, object? value, CancellationToken cancellationToken = default)
+    {
+        var stringValue = JsonHelpers.Serialize(value);
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _usersRepository.SetSetting(userId, settingId, stringValue, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
     public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);

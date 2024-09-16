@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-public sealed class VehicleRepository
+public sealed class VehiclesRepository
 {
     private readonly IDb _db;
 
-    public VehicleRepository(IDb db)
+    public VehiclesRepository(IDb db)
     {
         _db = db;
     }
@@ -236,14 +236,14 @@ public sealed class VehicleRepository
         }
 
         var query1 = _db.VehicleUserAccess
-            .TagWithSource(nameof(VehicleRepository))
+            .TagWithSource(nameof(VehiclesRepository))
             .AsNoTracking()
             .Include(x => x.User)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == id);
         
         var query2 = _db.VehicleGroupAccesses
-            .TagWithSource(nameof(VehicleRepository))
+            .TagWithSource(nameof(VehiclesRepository))
             .AsNoTracking()
             .Include(x => x.Group)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
@@ -267,7 +267,7 @@ public sealed class VehicleRepository
         }
 
         var query = _db.VehicleUserAccess
-            .TagWithSource(nameof(VehicleRepository))
+            .TagWithSource(nameof(VehiclesRepository))
             .AsNoTracking()
             .Where(x => x.VehicleId == vehicleId && x.UserId == userId && (accessType == null || accessType.Contains(x.AccessType)))
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
@@ -285,7 +285,7 @@ public sealed class VehicleRepository
         }
 
         var query = _db.VehicleUserAccess
-            .TagWithSource(nameof(VehicleRepository))
+            .TagWithSource(nameof(VehiclesRepository))
             .AsNoTracking()
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
@@ -313,10 +313,47 @@ public sealed class VehicleRepository
         }
     }
 
+    public async Task<bool> SetSetting(int vehicleId, int settingId, string? value, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetSetting));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.VehicleSettings
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.SettingId == settingId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Value, value), cancellationToken) == 1;
+    }
+
+    public async Task<string?> GetSetting(int vehicleId, int settingId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetSetting));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.VehicleSettings
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.SettingId == settingId)
+            .Select(x => x.Value);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
     private IQueryable<VehicleData> CreateQueryBase()
     {
         var query = _db.Vehicles
-            .TagWithSource(nameof(VehicleRepository))
+            .TagWithSource(nameof(VehiclesRepository))
             .Where(x => !x.IsRemoved);
 
         return query;

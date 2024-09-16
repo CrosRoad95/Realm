@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace RealmCore.Persistence.Repository;
 
 public sealed class UsersRepository
 {
@@ -166,6 +168,24 @@ public sealed class UsersRepository
             .Where(u => u.Id == userId);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Avatar, avatar), cancellationToken) == 1;
+    }
+    
+    public async Task<bool> SetSetting(int userId, int settingId, string? value, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetSetting));
+
+        if(activity != null)
+        {
+            activity.AddTag("UserId", userId);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.UserSettings
+            .TagWithSource(nameof(UsersRepository))
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && x.SettingId == settingId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Value, value), cancellationToken) == 1;
     }
     
     public async Task<string?> GetSetting(int userId, int settingId, CancellationToken cancellationToken = default)

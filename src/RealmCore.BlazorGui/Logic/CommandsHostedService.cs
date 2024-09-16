@@ -1430,7 +1430,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("vehicleaccessinfobyid", async ([CallingPlayer] RealmPlayer player, int id) =>
         {
-            var vehicleRepository = player.GetRequiredService<VehicleRepository>();
+            var vehicleRepository = player.GetRequiredService<VehiclesRepository>();
             var access = await vehicleRepository.GetAllVehicleAccesses(id);
             if (access == null)
             {

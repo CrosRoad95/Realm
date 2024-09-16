@@ -2,12 +2,12 @@
 
 public sealed class VehiclesLoader
 {
-    private readonly VehicleRepository _vehicleRepository;
+    private readonly VehiclesRepository _vehicleRepository;
     private readonly ILogger<VehiclesLoader> _logger;
     private readonly IElementFactory _elementFactory;
     private readonly VehiclesInUse _vehiclesInUse;
 
-    public VehiclesLoader(VehicleRepository vehicleRepository, ILogger<VehiclesLoader> logger, IElementFactory elementFactory, VehiclesInUse vehiclesInUse)
+    public VehiclesLoader(VehiclesRepository vehicleRepository, ILogger<VehiclesLoader> logger, IElementFactory elementFactory, VehiclesInUse vehiclesInUse)
     {
         _vehicleRepository = vehicleRepository;
         _logger = logger;
@@ -33,7 +33,7 @@ public sealed class VehiclesLoader
         {
             var vehicle = await _elementFactory.CreateVehicle(Location.Zero, VehicleModel.Perennial, async (vehicle) =>
             {
-                var vehicleData = await vehicle.GetRequiredService<VehicleRepository>().GetById(id, cancellationToken) ?? throw new Exception("VehicleData not found");
+                var vehicleData = await vehicle.GetRequiredService<VehiclesRepository>().GetById(id, cancellationToken) ?? throw new Exception("VehicleData not found");
 
                 if (vehicleData.IsRemoved)
                      throw new Exception("Vehicle removed");

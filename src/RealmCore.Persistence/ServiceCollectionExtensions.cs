@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPersistence<T>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> dbOptions) where T : DbContext, IDb
     {
-        services.AddScoped<VehicleRepository>();
+        services.AddScoped<VehiclesRepository>();
         services.AddScoped<GroupRepository>();
         services.AddScoped<BusinessesRepository>();
         services.AddScoped<TimeBaseOperationRepository>();

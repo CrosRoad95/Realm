@@ -6,11 +6,11 @@
 public sealed class VehicleService
 {
     private readonly RealmVehicle _vehicle;
-    private readonly VehicleRepository _vehicleRepository;
+    private readonly VehiclesRepository _vehicleRepository;
     private readonly VehiclesInUse _vehiclesInUse;
     private readonly ElementSaveService _saveService;
 
-    public VehicleService(VehicleContext vehicleContext, VehicleRepository vehicleRepository, IDateTimeProvider dateTimeProvider, VehiclesInUse vehiclesInUse, ElementSaveService saveService)
+    public VehicleService(VehicleContext vehicleContext, VehiclesRepository vehicleRepository, IDateTimeProvider dateTimeProvider, VehiclesInUse vehiclesInUse, ElementSaveService saveService)
     {
         _vehicle = vehicleContext.Vehicle;
         _vehicleRepository = vehicleRepository;
