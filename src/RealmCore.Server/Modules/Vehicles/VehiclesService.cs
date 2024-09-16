@@ -163,6 +163,46 @@ public sealed class VehiclesService
             _semaphoreSlim.Release();
         }
     }
+    
+    public async Task<bool> SetSetting(int[] vehiclesIds, int settingId, object? value, CancellationToken cancellationToken = default)
+    {
+        var stringValue = JsonHelpers.Serialize(value);
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.SetSetting(vehiclesIds, settingId, stringValue, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<bool> RemoveAllSettings(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveAllSettings(vehicleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<bool> RemoveAllSettings(int[] vehiclesIds, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveAllSettings(vehiclesIds, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
 
     public async Task<string?> GetSetting(int vehicleId, int settingId, CancellationToken cancellationToken = default)
     {

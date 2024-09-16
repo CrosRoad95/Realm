@@ -330,6 +330,58 @@ public sealed class VehiclesRepository
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Value, value), cancellationToken) == 1;
     }
+    
+    public async Task<bool> SetSetting(int[] vehiclesIds, int settingId, string? value, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetSetting));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehiclesIds", vehiclesIds);
+            activity.AddTag("SettingId", settingId);
+        }
+
+        var query = _db.VehicleSettings
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => vehiclesIds.Contains(x.VehicleId) && x.SettingId == settingId);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Value, value), cancellationToken) > 0;
+    }
+    
+    public async Task<bool> RemoveAllSettings(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllSettings));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+        }
+
+        var query = _db.VehicleSettings
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
+    }
+    
+    public async Task<bool> RemoveAllSettings(int[] vehiclesIds, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllSettings));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehiclesIds);
+        }
+
+        var query = _db.VehicleSettings
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => vehiclesIds.Contains(x.VehicleId));
+
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
+    }
 
     public async Task<string?> GetSetting(int vehicleId, int settingId, CancellationToken cancellationToken = default)
     {

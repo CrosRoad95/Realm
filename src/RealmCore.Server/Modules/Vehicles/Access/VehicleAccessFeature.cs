@@ -62,40 +62,27 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
         return vehicleAccess != null;
     }
 
-    public bool TryGetUserAccess(int userId, out VehicleUserAccessDto vehicleAccess)
+    public VehicleUserAccessDto[] GetUserAccess(int userId)
     {
         lock (_lock)
         {
-            var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
-            if (vehicleUserAccessData != null)
-            {
-                vehicleAccess = VehicleUserAccessDto.Map(vehicleUserAccessData);
-                return true;
-            }
+            var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId);
+            return vehicleUserAccessData.Select(VehicleUserAccessDto.Map).ToArray();
         }
-        vehicleAccess = default!;
-        return false;
     }
     
-    public bool TryGetGroupAccess(int groupId, out VehicleGroupAccessDto vehicleAccess)
+    public VehicleGroupAccessDto[] GetGroupAccess(int groupId)
     {
         lock (_lock)
         {
-            var vehicleGroupAccessData = _groupAccesses.Where(x => x.GroupId == groupId).FirstOrDefault();
-            if (vehicleGroupAccessData != null)
-            {
-                vehicleAccess = VehicleGroupAccessDto.Map(vehicleGroupAccessData);
-                return true;
-            }
+            var vehicleGroupAccessData = _groupAccesses.Where(x => x.GroupId == groupId);
+            return vehicleGroupAccessData.Select(VehicleGroupAccessDto.Map).ToArray();
         }
-        vehicleAccess = default!;
-        return false;
     }
 
-    public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess)
+    public VehicleUserAccessDto[] GetUserAccess(RealmPlayer player)
     {
-        var userId = player.UserId;
-        return TryGetUserAccess(userId, out vehicleAccess);
+        return GetUserAccess(player.UserId);
     }
 
     public bool HasAccess(RealmPlayer player)
@@ -179,9 +166,7 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
 
     public bool IsUserOwner(int userId)
     {
-        if (TryGetUserAccess(userId, out var access))
-            return access.AccessType == 0;
-        return false;
+        return GetUserAccess(userId).Any(x => x.AccessType == 0);
     }
 
     public bool IsOwner(RealmPlayer player) => IsUserOwner(player.UserId);
