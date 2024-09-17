@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Access;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace RealmCore.Server.Modules.Vehicles.Access;
 
 public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleAccessDto>, IUsesVehiclePersistentData
 {
@@ -44,22 +46,32 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
         }
     }
 
-    private bool InternalHasUserAccess(int userId, int? accessType = null)
+    private VehicleUserAccessData? InternalGetUserAccess(int userId, int? accessType = null)
     {
         var vehicleAccess = _userAccesses
             .Where(x => x.UserId == userId && (accessType == null || x.AccessType == accessType))
             .FirstOrDefault();
 
-        return vehicleAccess != null;
+        return vehicleAccess;
     }
     
-    private bool InternalHasGroupAccess(int groupId, int? accessType = null)
+    private VehicleGroupAccessData? InternalGetGroupAccess(int groupId, int? accessType = null)
     {
         var vehicleAccess = _groupAccesses
             .Where(x => x.GroupId == groupId && (accessType == null || x.AccessType == accessType))
             .FirstOrDefault();
 
-        return vehicleAccess != null;
+        return vehicleAccess;
+    }
+    
+    private bool InternalHasUserAccess(int userId, int? accessType = null)
+    {
+        return InternalGetUserAccess(userId, accessType) != null;
+    }
+    
+    private bool InternalHasGroupAccess(int groupId, int? accessType = null)
+    {
+        return InternalGetGroupAccess(groupId, accessType) != null;
     }
 
     public VehicleUserAccessDto[] GetUserAccess(int userId)
@@ -84,7 +96,7 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
     {
         return GetUserAccess(player.UserId);
     }
-
+    
     public bool HasAccess(RealmPlayer player)
     {
         lock (_lock)
@@ -115,7 +127,7 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
 
         lock (_lock)
         {
-            if (InternalHasUserAccess(userId))
+            if (InternalHasUserAccess(userId, accessType))
                 return null;
 
             _userAccesses.Add(vehicleAccess);
@@ -138,7 +150,7 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
 
         lock (_lock)
         {
-            if (InternalHasGroupAccess(groupId))
+            if (InternalHasGroupAccess(groupId, accessType))
                 return null;
 
             _groupAccesses.Add(vehicleAccess);
@@ -157,6 +169,36 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
     public VehicleUserAccessDto? TryAddAsOwner(RealmPlayer player, object? metadata = null)
     {
         return TryAddAccess(player, 0, metadata);
+    }
+
+    public bool SetUserAccessMetadata(int userId, int accessType, object? metadata = null)
+    {
+        lock (_lock)
+        {
+            var userAccess = InternalGetUserAccess(userId, accessType);
+            if (userAccess == null)
+                return false;
+
+            userAccess.Metadata = JsonHelpers.Serialize(metadata);
+        }
+
+        VersionIncreased?.Invoke();
+        return true;
+    }
+    
+    public bool SetGroupAccessMetadata(int groupId, int accessType, object? metadata = null)
+    {
+        lock (_lock)
+        {
+            var groupAccess = InternalGetGroupAccess(groupId, accessType);
+            if (groupAccess == null)
+                return false;
+
+            groupAccess.Metadata = JsonHelpers.Serialize(metadata);
+        }
+
+        VersionIncreased?.Invoke();
+        return true;
     }
 
     public VehicleUserAccessDto? TryAddUserAsOwner(int userId, object? metadata = null)

@@ -1,4 +1,5 @@
-﻿using RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistence.MySql.Migrations;
+using RealmCore.Persistence.Repository;
 using SlipeServer.Server.Elements;
 using System.Threading;
 namespace RealmCore.Server.Modules.Vehicles;
@@ -216,5 +217,84 @@ public sealed class VehiclesService
             _semaphoreSlim.Release();
         }
     }
+    
+    public async Task<VehicleAccessDataBase[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.GetAllVehicleAccesses(vehicleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
 
+    public async Task<VehicleUserAccessDto?> TryAddUserAccess(int vehicleId, int userId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
+    {
+        var metadataString = JsonHelpers.Serialize(metadata);
+        VehicleUserAccessData? vehicleUserAccessData;
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            if (await _vehicleRepository.HasUserAccess(vehicleId, userId, accessType, cancellationToken))
+                return null;
+
+            vehicleUserAccessData = await _vehicleRepository.TryAddUserAccess(vehicleId, userId, accessType, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return VehicleUserAccessDto.Map(vehicleUserAccessData);
+    }
+    
+    public async Task<VehicleGroupAccessDto?> TryAddGroupAccess(int vehicleId, int groupId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
+    {
+        var metadataString = JsonHelpers.Serialize(metadata);
+        VehicleGroupAccessData? vehicleGroupAccessData;
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            if (await _vehicleRepository.HasUserAccess(vehicleId, groupId, accessType, cancellationToken))
+                return null;
+
+            vehicleGroupAccessData = await _vehicleRepository.TryAddGroupAccess(vehicleId, groupId, accessType, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return VehicleGroupAccessDto.Map(vehicleGroupAccessData);
+    }
+    public async Task<bool> SetUserAccessMetadata(int vehicleId, int userId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
+    {
+        var metadataString = JsonHelpers.Serialize(metadata);
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.SetUserAccessMetadata(vehicleId, userId, accessType, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<bool> SetGroupAccessMetadata(int vehicleId, int groupId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
+    {
+        var metadataString = JsonHelpers.Serialize(metadata);
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.SetGroupAccessMetadata(vehicleId, groupId, accessType, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
 }

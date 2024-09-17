@@ -1,4 +1,11 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using RealmCore.Persistence.Data;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Xml.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public sealed class VehiclesRepository
 {
@@ -400,6 +407,154 @@ public sealed class VehiclesRepository
             .Select(x => x.Value);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<VehicleUserAccessData?> TryAddUserAccess(int vehicleId, int userId, int accessType, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(TryAddUserAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var vehicleUserAccessData = new VehicleUserAccessData
+        {
+            VehicleId = vehicleId,
+            UserId = userId,
+            AccessType = accessType,
+            Metadata = metadata,
+        };
+
+        try
+        {
+            _db.VehicleUserAccess.Add(vehicleUserAccessData);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return vehicleUserAccessData;
+    }
+    
+    public async Task<VehicleGroupAccessData?> TryAddGroupAccess(int vehicleId, int groupId, int accessType, string? metadata = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(TryAddGroupAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var vehicleGroupAccessData = new VehicleGroupAccessData
+        {
+            VehicleId = vehicleId,
+            GroupId = groupId,
+            AccessType = accessType,
+            Metadata = metadata,
+        };
+
+        try
+        {
+            _db.VehicleGroupAccesses.Add(vehicleGroupAccessData);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        return vehicleGroupAccessData;
+    }
+
+    public async Task<bool> SetUserAccessMetadata(int vehicleId, int userId, int accessType, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetUserAccessMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.UserId == userId && x.AccessType == accessType);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) > 0;
+    }
+    
+    public async Task<bool> SetGroupAccessMetadata(int vehicleId, int groupId, int accessType, string? metadata, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetUserAccessMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.GroupId == groupId && x.AccessType == accessType);
+
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) > 0;
+    }
+
+    public async Task<bool> HasUserAccess(int vehicleId, int userId, int accessType, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(HasUserAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.UserId == userId && x.AccessType == accessType);
+
+        return await query.AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> HasGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(SetUserAccessMetadata));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.GroupId == groupId && x.AccessType == accessType);
+
+        return await query.AnyAsync(cancellationToken);
     }
 
     private IQueryable<VehicleData> CreateQueryBase()
