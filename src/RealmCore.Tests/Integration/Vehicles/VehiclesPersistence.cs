@@ -43,14 +43,14 @@ public class VehiclesPersistence
         if (vehicle == null)
             throw new NullReferenceException();
 
-        var id = vehicle.VehicleId;
-        activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
-        activeVehicles.IsActive(id).Should().BeTrue();
-        activeVehicles.TryGetVehicleById(id, out var foundVehicle).Should().BeTrue();
+        var vehicleId = vehicle.VehicleId;
+        activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([vehicleId]);
+        activeVehicles.IsActive(vehicleId).Should().BeTrue();
+        activeVehicles.TryGetVehicleById(vehicleId, out var foundVehicle).Should().BeTrue();
         foundVehicle.Should().Be(vehicle);
         await vehiclesService.Destroy(vehicle);
 
-        var spawn = async () => await loadService.LoadVehicleById(id);
+        var spawn = async () => await loadService.LoadVehicleById(vehicleId);
         await spawn.Should().NotThrowAsync();
         await spawn.Should().ThrowAsync<Exception>();
     }

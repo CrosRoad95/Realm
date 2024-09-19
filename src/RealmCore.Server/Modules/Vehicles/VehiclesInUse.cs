@@ -33,5 +33,5 @@ public sealed class VehiclesInUse
         return false;
     }
 
-    public bool TryGetVehicleById(int userId, out RealmVehicle? vehicle) => _activeVehicles.TryGetValue(userId, out vehicle);
+    public bool TryGetVehicleById(int vehicleId, out RealmVehicle? vehicle) => _activeVehicles.TryGetValue(vehicleId, out vehicle);
 }

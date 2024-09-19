@@ -262,7 +262,7 @@ public sealed class VehiclesRepository
         return [.. userAccesses, .. groupAccesses];
     }
 
-    public async Task<bool> HasUserAccessTo(int userId, int vehicleId, int[]? accessType = null, CancellationToken cancellationToken = default)
+    public async Task<bool> HasUserAccessTo(int vehicleId, int userId, int[]? accessType = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(HasUserAccessTo));
 
@@ -502,7 +502,7 @@ public sealed class VehiclesRepository
     
     public async Task<bool> SetGroupAccessMetadata(int vehicleId, int groupId, int accessType, string? metadata, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(SetUserAccessMetadata));
+        using var activity = Activity.StartActivity(nameof(SetGroupAccessMetadata));
 
         if (activity != null)
         {
@@ -517,6 +517,44 @@ public sealed class VehiclesRepository
             .Where(x => x.VehicleId == vehicleId && x.GroupId == groupId && x.AccessType == accessType);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Metadata, metadata), cancellationToken) > 0;
+    }
+    
+    public async Task<bool> RemoveUserAccess(int vehicleId, int userId, int accessType, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveUserAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.UserId == userId && x.AccessType == accessType);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) == 1;
+    }
+    
+    public async Task<bool> RemoveGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveGroupAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("AccessType", accessType);
+        }
+
+        var query = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.GroupId == groupId && x.AccessType == accessType);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
 
     public async Task<bool> HasUserAccess(int vehicleId, int userId, int accessType, CancellationToken cancellationToken = default)

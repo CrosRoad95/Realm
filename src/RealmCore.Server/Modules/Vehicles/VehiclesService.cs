@@ -217,18 +217,24 @@ public sealed class VehiclesService
             _semaphoreSlim.Release();
         }
     }
-    
-    public async Task<VehicleAccessDataBase[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
+
+    public async Task<VehicleAccessDto[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
     {
+        VehicleAccessDataBase[] results;
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            return await _vehicleRepository.GetAllVehicleAccesses(vehicleId, cancellationToken);
+            results = await _vehicleRepository.GetAllVehicleAccesses(vehicleId, cancellationToken);
         }
         finally
         {
             _semaphoreSlim.Release();
         }
+
+        var users = results.OfType<VehicleUserAccessData>().Select(VehicleUserAccessDto.Map);
+        var groups = results.OfType<VehicleGroupAccessData>().Select(VehicleGroupAccessDto.Map);
+
+        return [.. users, .. groups];
     }
 
     public async Task<VehicleUserAccessDto?> TryAddUserAccess(int vehicleId, int userId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
@@ -270,6 +276,7 @@ public sealed class VehiclesService
 
         return VehicleGroupAccessDto.Map(vehicleGroupAccessData);
     }
+
     public async Task<bool> SetUserAccessMetadata(int vehicleId, int userId, int accessType, object? metadata = null, CancellationToken cancellationToken = default)
     {
         var metadataString = JsonHelpers.Serialize(metadata);
@@ -291,6 +298,58 @@ public sealed class VehiclesService
         try
         {
             return await _vehicleRepository.SetGroupAccessMetadata(vehicleId, groupId, accessType, metadataString, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> HasUserAccessTo(int vehicleId, int userId, int[]? accessType = null, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.HasUserAccessTo(vehicleId, userId, accessType, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> HasGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.HasGroupAccess(vehicleId, groupId, accessType, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> RemoveUserAccess(int vehicleId, int userId, int accessType, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveUserAccess(vehicleId, userId, accessType, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> RemoveGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveGroupAccess(vehicleId, groupId, accessType, cancellationToken);
         }
         finally
         {
