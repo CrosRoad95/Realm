@@ -556,6 +556,42 @@ public sealed class VehiclesRepository
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
+    
+    public async Task<bool> RemoveAllUserAccess(int vehicleId, int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllUserAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.UserId == userId);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
+    }
+    
+    public async Task<bool> RemoveAllGroupAccess(int vehicleId, int groupId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(RemoveAllGroupAccess));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+            activity.AddTag("GroupId", groupId);
+        }
+
+        var query = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Where(x => x.VehicleId == vehicleId && x.GroupId == groupId);
+
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
+    }
 
     public async Task<bool> HasUserAccess(int vehicleId, int userId, int accessType, CancellationToken cancellationToken = default)
     {

@@ -12,6 +12,18 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Added;
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Removed;
     public event Action<PlayerGroupsFeature, int, int?>? GroupRoleChanged;
+
+    public int[] Ids
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _groupMembers.Select(x => x.Id).ToArray();
+            }
+        }
+    }
+
     public PlayerGroupsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;

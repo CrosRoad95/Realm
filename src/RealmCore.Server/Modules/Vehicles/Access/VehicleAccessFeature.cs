@@ -275,10 +275,15 @@ public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleA
         VehicleId = vehicleData.Id;
     }
 
-    public void Unloaded()
+    public void Clear()
     {
         _userAccesses = [];
         _groupAccesses = [];
+    }
+
+    public void Unloaded()
+    {
+        Clear();
         VehicleId = null;
     }
 }

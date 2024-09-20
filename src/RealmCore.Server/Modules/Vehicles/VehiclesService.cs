@@ -356,4 +356,30 @@ public sealed class VehiclesService
             _semaphoreSlim.Release();
         }
     }
+
+    public async Task<bool> RemoveAllUserAccess(int vehicleId, int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveAllUserAccess(vehicleId, userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task<bool> RemoveAllGroupAccess(int vehicleId, int groupId, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.RemoveAllGroupAccess(vehicleId, groupId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
 }
