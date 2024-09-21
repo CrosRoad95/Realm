@@ -218,13 +218,45 @@ public sealed class VehiclesService
         }
     }
 
-    public async Task<VehicleAccessDto[]> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    public async Task<VehicleUserAccessDto[]> GetUserAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        VehicleUserAccessData[] results;
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            results = await _vehicleRepository.GetUserAccesses(vehicleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return [.. results.Select(VehicleUserAccessDto.Map)];
+    }
+    
+    public async Task<VehicleGroupAccessDto[]> GetGroupAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        VehicleGroupAccessData[] results;
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            results = await _vehicleRepository.GetGroupAccesses(vehicleId, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return [.. results.Select(VehicleGroupAccessDto.Map)];
+    }
+
+    public async Task<VehicleAccessDto[]> GetAllAccesses(int vehicleId, CancellationToken cancellationToken = default)
     {
         VehicleAccessDataBase[] results;
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            results = await _vehicleRepository.GetAllVehicleAccesses(vehicleId, cancellationToken);
+            results = await _vehicleRepository.GetAllAccesses(vehicleId, cancellationToken);
         }
         finally
         {
@@ -264,7 +296,7 @@ public sealed class VehiclesService
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            if (await _vehicleRepository.HasUserAccess(vehicleId, groupId, accessType, cancellationToken))
+            if (await _vehicleRepository.HasGroupAccessTo(vehicleId, groupId, accessType, cancellationToken))
                 return null;
 
             vehicleGroupAccessData = await _vehicleRepository.TryAddGroupAccess(vehicleId, groupId, accessType, metadataString, cancellationToken);
@@ -318,12 +350,12 @@ public sealed class VehiclesService
         }
     }
 
-    public async Task<bool> HasGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    public async Task<bool> HasGroupAccessTo(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            return await _vehicleRepository.HasGroupAccess(vehicleId, groupId, accessType, cancellationToken);
+            return await _vehicleRepository.HasGroupAccessTo(vehicleId, groupId, accessType, cancellationToken);
         }
         finally
         {

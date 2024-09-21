@@ -1431,7 +1431,7 @@ internal sealed class CommandsHostedService : IHostedService
         _commandService.Add("vehicleaccessinfobyid", async ([CallingPlayer] RealmPlayer player, int id) =>
         {
             var vehicleRepository = player.GetRequiredService<VehiclesRepository>();
-            var access = await vehicleRepository.GetAllVehicleAccesses(id);
+            var access = await vehicleRepository.GetAllAccesses(id);
             if (access == null)
             {
                 _chatBox.OutputTo(player, "Vehicle not found");

@@ -116,22 +116,6 @@ public sealed class VehiclesRepository
         return await query.CountAsync(cancellationToken);
     }
 
-    public async Task<VehicleData?> GetReadOnlyById(int id, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(GetReadOnlyById));
-
-        if (activity != null)
-        {
-            activity.AddTag("Id", id);
-        }
-
-        var query = CreateQueryBase()
-            .AsNoTracking()
-            .Where(x => x.Id == id);
-
-        return await query.FirstOrDefaultAsync(cancellationToken);
-    }
-
     public async Task<int[]> GetAllSpawnedVehiclesIds(CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetAllSpawnedVehiclesIds));
@@ -143,34 +127,34 @@ public sealed class VehiclesRepository
         return await query.ToArrayAsync(cancellationToken);
     }
     
-    public async Task<VehicleData?> GetById(int id, CancellationToken cancellationToken = default)
+    public async Task<VehicleData?> GetById(int vehicleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetById));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
         }
 
         var query = CreateQueryBase()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == vehicleId)
             .IncludeAll();
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> TrySetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
+    public async Task<bool> TrySetSpawned(int vehicleId, bool spawned, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TrySetSpawned));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
             activity.AddTag("Spawned", spawned);
         }
 
         var query = CreateQueryBase()
-            .Where(x => x.Id == id);
+            .Where(x => x.Id == vehicleId);
 
         var vehicle = await query.FirstAsync(cancellationToken);
         if (vehicle.Spawned == spawned)
@@ -181,65 +165,107 @@ public sealed class VehiclesRepository
         return true;
     }
 
-    public async Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default)
+    public async Task<bool> SetKind(int vehicleId, byte kind, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(SetKind));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
             activity.AddTag("Kind", kind);
         }
 
         var query = CreateQueryBase()
             .AsNoTracking()
-            .Where(x => x.Id == id);
+            .Where(x => x.Id == vehicleId);
 
         var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind), cancellationToken);
         return result > 0;
     }
 
-    public async Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default)
+    public async Task<bool> IsSpawned(int vehicleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(IsSpawned));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
         }
 
         var query = CreateQueryBase()
             .AsNoTracking()
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == vehicleId)
             .Select(x => x.Spawned);
 
         return await query.FirstAsync(cancellationToken);
     }
 
-    public async Task<bool> SoftRemove(int id, CancellationToken cancellationToken = default)
+    public async Task<bool> SoftRemove(int vehicleId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(SoftRemove));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
         }
 
         var query = CreateQueryBase()
             .AsNoTracking()
-            .Where(x => x.Id == id);
+            .Where(x => x.Id == vehicleId);
 
         var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true), cancellationToken);
         return result > 0;
     }
 
-    public async Task<VehicleAccessDataBase[]> GetAllVehicleAccesses(int id, CancellationToken cancellationToken = default)
+    public async Task<VehicleGroupAccessData[]> GetGroupAccesses(int vehicleId, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetAllVehicleAccesses));
+        using var activity = Activity.StartActivity(nameof(GetGroupAccesses));
 
         if (activity != null)
         {
-            activity.AddTag("Id", id);
+            activity.AddTag("VehicleId", vehicleId);
+        }
+
+        var query = _db.VehicleGroupAccesses
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Include(x => x.Group)
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
+            .Where(x => x.VehicleId == vehicleId);
+
+        var groupAccesses = await query.ToArrayAsync(cancellationToken);
+
+        return groupAccesses;
+    }
+
+    public async Task<VehicleUserAccessData[]> GetUserAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetUserAccesses));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
+        }
+
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehiclesRepository))
+            .AsNoTracking()
+            .Include(x => x.User)
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
+            .Where(x => x.VehicleId == vehicleId);
+
+        var userAccesses = await query.ToArrayAsync(cancellationToken);
+
+        return userAccesses;
+    }
+
+    public async Task<VehicleAccessDataBase[]> GetAllAccesses(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetAllAccesses));
+
+        if (activity != null)
+        {
+            activity.AddTag("VehicleId", vehicleId);
         }
 
         var query1 = _db.VehicleUserAccess
@@ -247,14 +273,14 @@ public sealed class VehiclesRepository
             .AsNoTracking()
             .Include(x => x.User)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
-            .Where(x => x.VehicleId == id);
+            .Where(x => x.VehicleId == vehicleId);
         
         var query2 = _db.VehicleGroupAccesses
             .TagWithSource(nameof(VehiclesRepository))
             .AsNoTracking()
             .Include(x => x.Group)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
-            .Where(x => x.VehicleId == id);
+            .Where(x => x.VehicleId == vehicleId);
 
         var userAccesses = await query1.ToArrayAsync(cancellationToken);
         var groupAccesses = await query2.ToArrayAsync(cancellationToken);
@@ -379,7 +405,7 @@ public sealed class VehiclesRepository
 
         if (activity != null)
         {
-            activity.AddTag("VehicleId", vehiclesIds);
+            activity.AddTag("VehiclesIds", vehiclesIds);
         }
 
         var query = _db.VehicleSettings
@@ -612,7 +638,7 @@ public sealed class VehiclesRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> HasGroupAccess(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
+    public async Task<bool> HasGroupAccessTo(int vehicleId, int groupId, int accessType, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(SetUserAccessMetadata));
 
