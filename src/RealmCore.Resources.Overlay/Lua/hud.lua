@@ -549,6 +549,7 @@ end
 
 function radarRenderBlip(data, blip, px, py, pz, blipsIcons)
     local bx, by, bz = getElementPosition(blip)
+	local rotation = (getElementData(blip, "Rotation") or 0) + -data.cameraRotation;
     local dist = getDistanceBetweenPoints2D(px, py, bx, by) / 2 * data.zoom
     local rot = math.atan2(bx - px, by - py) + math.rad(data.cameraRotation)
     local icon = getBlipIcon(blip);
@@ -558,7 +559,7 @@ function radarRenderBlip(data, blip, px, py, pz, blipsIcons)
 	local x, y = radarGetPositionFromWorld(data, bx, by, rot, dist, blipsScale)
 	local blipIcon = blipsIcons[icon];
     if blipIcon and blipIcon.isLoaded and getBlipVisibleDistance(blip) >= dist then
-        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, 0, 0, 0, iconColor)
+        dxDrawImage(x, y - blipsScale, blipsScale, blipsScale, blipIcon.data, -rotation, 0, 0, iconColor)
     else
 		dxDrawRectangle(x, y - blipsScale, blipsScale, blipsScale, iconColor);
 	end

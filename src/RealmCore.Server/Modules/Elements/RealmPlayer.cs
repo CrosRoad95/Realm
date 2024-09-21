@@ -836,6 +836,7 @@ public class RealmPlayer : Player, IAsyncDisposable
         if(_blip != null)
         {
             _blip.Position = Position;
+            _blip.SetData("Rotation", Rotation.Z, DataSyncType.Broadcast);
             _blip.Interior = Interior;
             _blip.Dimension = Dimension;
         }
