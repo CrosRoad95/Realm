@@ -126,8 +126,6 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _playerResources[player] = new Latch(_realmResourcesProvider.Count - player.StartedResources.Count, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
 
-        player.Destroyed += HandlePlayerDestroyed;
-
         if (player.ScreenSize.X == 0)
         {
             using var activity = Activity.StartActivity("FetchClientData");
@@ -161,11 +159,34 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
         _playersEventManager.RelaySpawned((RealmPlayer)e.Source);
     }
 
-    private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)
+    private async void HandleDisconnected(Player plr, PlayerQuitEventArgs playerQuitEventArgs)
     {
-        _logger.LogInformation("Player {playerName} disconnected", player.Name);
-        player.Disconnected -= HandleDisconnected;
-        player.Spawned -= HandleSpawned;
+        var player = (RealmPlayer)plr;
+        try
+        {
+            _logger.LogInformation("Player {playerName} disconnected", player.Name);
+            player.Disconnected -= HandleDisconnected;
+            player.Spawned -= HandleSpawned;
+            _playerResources.TryRemove(player, out var _);
+            if (player.User.IsLoggedIn)
+            {
+                if (_activeUsers.TrySetInactive(player.UserId))
+                    _playersEventManager.RelayUnloading(player);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
+
+        try
+        {
+            await player.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
     }
 
     private async Task PlayerJoinedCore(RealmPlayer player)
@@ -229,34 +250,6 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
     {
         if (_playerResources.TryGetValue((RealmPlayer)player, out var latch))
             latch.Decrement();
-    }
-
-    private async void HandlePlayerDestroyed(Element plr)
-    {
-        var player = (RealmPlayer)plr;
-        try
-        {
-            plr.Destroyed -= HandlePlayerDestroyed;
-            _playerResources.TryRemove(player, out var _);
-            if (player.User.IsLoggedIn)
-            {
-                if (_activeUsers.TrySetInactive(player.UserId))
-                    _playersEventManager.RelayUnloading(player);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
-
-        try
-        {
-            await player.DisposeAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.Players", "1.0.0");

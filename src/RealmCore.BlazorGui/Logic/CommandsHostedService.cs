@@ -1248,6 +1248,7 @@ internal sealed class CommandsHostedService : IHostedService
                 return;
             }
             _chatBox.OutputTo(player, $"Name: {group.Name}");
+            _chatBox.OutputTo(player, $"Members: {string.Join(", ", group.Members.Select(x => x.UserId))}");
             _chatBox.OutputTo(player, $"Roles: {string.Join(", ", group.Roles.Select(x => new { x.Id, x.Name }))}");
         });
 

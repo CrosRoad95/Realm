@@ -60,40 +60,40 @@ public sealed class GroupMemberDto : IEqualityComparer<GroupMemberDto>
             Permissions = groupMemberData.Role != null ? groupMemberData.Role.Permissions.Select(x => x.PermissionId).ToArray() : [],
             Metadata = groupMemberData.Metadata,
             CreatedAt = groupMemberData.CreatedAt,
-            Group = GroupDto.Map(groupMemberData.Group, false)
+            Group = GroupDto.Map(groupMemberData.Group)
         };
     }
 }
 
 public sealed class GroupDto : IEqualityComparer<GroupDto>
 {
+    private GroupData? Data { get; init; }
     public required GroupId Id { get; init; }
     public required string Name { get; init; }
     public required string? Shortcut { get; init; }
     public required byte? Kind { get; init; }
     public required DateTime? CreatedAt { get; init; }
-    public required GroupMemberDto[] Members { get; init; }
     public required GroupRoleDto[] Roles { get; init; }
     public required IReadOnlyDictionary<int, string> Settings { get; init; }
+    public IEnumerable<GroupMemberDto> Members => Data != null ? Data.Members.Select(GroupMemberDto.Map) : Enumerable.Empty<GroupMemberDto>();
     public bool Equals(GroupDto? x, GroupDto? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] GroupDto obj) => obj.Id;
 
     [return: NotNullIfNotNull(nameof(groupData))]
-    public static GroupDto? Map(GroupData? groupData) => Map(groupData, false);
-    public static GroupDto? Map(GroupData? groupData, bool mapMembers = true)
+    public static GroupDto? Map(GroupData? groupData)
     {
         if (groupData == null)
             return null;
 
         return new()
         {
+            Data = groupData,
             Id = groupData.Id,
             Name = groupData.Name,
             Shortcut = groupData.Shortcut,
             Kind = groupData.Kind,
             CreatedAt = groupData.CreatedAt,
-            Members = mapMembers ? groupData.Members.Select(GroupMemberDto.Map).ToArray() : [],
             Roles = groupData.Roles.Select(GroupRoleDto.Map).ToArray(),
             Settings = groupData.Settings.ToDictionary(x => x.SettingId, x => x.Value),
         };
