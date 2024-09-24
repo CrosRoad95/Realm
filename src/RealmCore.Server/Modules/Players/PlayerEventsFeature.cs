@@ -2,7 +2,7 @@
 
 public class PlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto>, IUsesUserPersistentData
 {
-    private readonly SemaphoreSlim _lock = new(1);
+    private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
     private ICollection<UserEventData> _userEventData = [];

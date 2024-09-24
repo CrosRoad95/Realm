@@ -76,7 +76,7 @@ public sealed class ReaderWriterLockSlimScopedAsync
 
     public ReaderWriterLockSlimScopedAsync()
     {
-        _lock = new(1);
+        _lock = new(1, 1);
     }
 
     public IDisposable Begin(CancellationToken cancellationToken = default)

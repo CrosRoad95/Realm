@@ -36,7 +36,7 @@ public class RealmPlayer : Player, IAsyncDisposable
     private readonly AtomicBool _inToggleControlScopeFlag = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly AsyncServiceScope _serviceScope;
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private Element? _focusedElement;
     private string? _focusedVehiclePart;
@@ -48,9 +48,9 @@ public class RealmPlayer : Player, IAsyncDisposable
     private RealmBlip? _blip = null;
 
     private readonly Dictionary<string, BindHandlerBase> _binds = [];
-    private readonly SemaphoreSlim _bindsLock = new(1);
-    private readonly SemaphoreSlim _bindsUpLock = new(1);
-    private readonly SemaphoreSlim _bindsDownLock = new(1);
+    private readonly SemaphoreSlim _bindsLock = new(1, 1);
+    private readonly SemaphoreSlim _bindsUpLock = new(1, 1);
+    private readonly SemaphoreSlim _bindsDownLock = new(1, 1);
     private readonly object _bindsCooldownLock = new();
 
     private readonly Dictionary<string, DateTime> _bindsDownCooldown = [];

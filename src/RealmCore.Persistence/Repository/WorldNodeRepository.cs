@@ -2,7 +2,7 @@
 
 public sealed class WorldNodeRepository
 {
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     private readonly IDb _db;
 
     private readonly JsonSerializerSettings _jsonSerializerSettings = new()

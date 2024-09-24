@@ -2,7 +2,7 @@
 
 public class DbSynchronizationContex
 {
-    private readonly SemaphoreSlim _semaphoreSlim = new(1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
     public void Execute(Action action)
     {
         _semaphoreSlim.Wait();

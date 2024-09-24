@@ -2,7 +2,7 @@
 
 public abstract class DurationBasedHoldInteraction : Interaction
 {
-    private readonly SemaphoreSlim _semaphore = new(1);
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     public RealmPlayer? Owner { get; private set; }
     private TaskCompletionSource? _interactionTaskCompletionSource;
     private Task? _interactionTask;

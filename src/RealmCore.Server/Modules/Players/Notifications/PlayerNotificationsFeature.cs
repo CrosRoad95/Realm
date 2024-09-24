@@ -2,7 +2,7 @@
 
 public sealed class PlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserNotificationDto>, IUsesUserPersistentData
 {
-    private readonly SemaphoreSlim _lock = new(1);
+    private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly UserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserNotificationData> _userNotificationDataCollection = [];

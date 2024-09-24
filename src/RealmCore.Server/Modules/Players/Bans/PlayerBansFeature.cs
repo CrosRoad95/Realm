@@ -4,7 +4,7 @@ namespace RealmCore.Server.Modules.Players.Bans;
 
 public sealed class PlayerBansFeature : IPlayerFeature, IEnumerable<UserBanDto>, IUsesUserPersistentData
 {
-    private readonly SemaphoreSlim _lock = new(1);
+    private readonly SemaphoreSlim _lock = new(1, 1);
     private ICollection<UserBanData> _bans = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
