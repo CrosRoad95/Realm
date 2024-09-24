@@ -27,4 +27,16 @@ public sealed class NewsService
             _semaphore.Release();
         }
     }
+    public async Task<string[]> GetRecentNewsTitles(DateTime since, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _newsRepository.GetRecentNewsTitles(since, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 }

@@ -69,6 +69,25 @@ public sealed class NewsRepository
 
         return await query.ToArrayAsync(cancellationToken);
     }
+    
+    public async Task<string[]> GetRecentNewsTitles(DateTime since, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetRecentNewsTitles));
+
+        if (activity != null)
+        {
+            activity.AddTag("Since", since);
+        }
+
+        var query = _db.News
+            .TagWithSource(nameof(UserNotificationRepository))
+            .AsNoTracking()
+            .OrderByDescending(x => x.PublishTime)
+            .Where(x => since >= x.PublishTime)
+            .Select(x => x.Title);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
 
     public static readonly ActivitySource Activity = new("RealmCore.NewsRepository", "1.0.0");
 }
