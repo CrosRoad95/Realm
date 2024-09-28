@@ -12,7 +12,8 @@ internal sealed class ServerListHostedService : IHostedLifecycleService
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IOptionsMonitor<ServerListOptions> _serverListOptions;
     private readonly ILogger<ServerListHostedService> _logger;
-    private readonly IDebounce _debounce;
+    private readonly IDebounce _gameplayOptionsDebounce;
+    private readonly IDebounce _serverListOptionsDebounce;
 
     public ServerListHostedService(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerListHostedService> logger, IDebounceFactory debounceFactory)
     {
@@ -20,7 +21,8 @@ internal sealed class ServerListHostedService : IHostedLifecycleService
         _gameplayOptions = gameplayOptions;
         _serverListOptions = serverListOptions;
         _logger = logger;
-        _debounce = debounceFactory.Create(500);
+        _gameplayOptionsDebounce = debounceFactory.Create(500);
+        _serverListOptionsDebounce = debounceFactory.Create(500);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -83,7 +85,7 @@ internal sealed class ServerListHostedService : IHostedLifecycleService
 
     private void GameplayOptionsChanged(GameplayOptions gameplayOptions)
     {
-        _debounce.Invoke(() =>
+        _gameplayOptionsDebounce.Invoke(() =>
         {
             UpdateGameplayOptions(gameplayOptions);
         });
@@ -91,7 +93,7 @@ internal sealed class ServerListHostedService : IHostedLifecycleService
 
     private void ServerListOptionsChanged(ServerListOptions serverListOptions)
     {
-        _debounce.Invoke(() =>
+        _serverListOptionsDebounce.Invoke(() =>
         {
             UpdateServerListOptions(serverListOptions);
         });
