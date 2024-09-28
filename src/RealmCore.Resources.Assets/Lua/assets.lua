@@ -4,6 +4,8 @@ local modelsToReplace = {}
 local replacedModels = {}
 local downloadingOrDownloadedRemoteAssets = {}
 
+setOcclusionsEnabled(false);
+
 function requestRemoteImageAsset(url)
 	if(not downloadingOrDownloadedRemoteAssets[url])then
 		fetchRemote(url, function(response)

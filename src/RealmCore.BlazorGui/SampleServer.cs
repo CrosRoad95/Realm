@@ -36,7 +36,6 @@ public static class SampleServerExtensions
         services.AddHostedService<PlayerGameplayHostedService>();
         services.AddHostedService<CommandsHostedService>();
         services.AddHostedService<MapsHostedService>();
-        services.AddHostedService<ProceduralObjectsHostedService>();
         services.AddHostedService<AssetsManager>();
         services.AddHostedService<DefaultChatHostedService>();
         services.AddHostedService<TestHostedService>();

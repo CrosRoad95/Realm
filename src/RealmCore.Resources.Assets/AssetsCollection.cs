@@ -7,6 +7,7 @@ public class AssetsCollection
 {
     private readonly object _lock = new();
     private readonly string _basePath = "Server/Assets";
+    private readonly string _modelsBasePath = "Models";
     private readonly Dictionary<string, IAsset> _assets = [];
 
     public string BasePath => _basePath;
@@ -33,49 +34,50 @@ public class AssetsCollection
         {
             var fileName = Path.GetRelativePath(_basePath, fullFileName);
             var name = Path.GetFileNameWithoutExtension(fileName);
-            switch (Path.GetDirectoryName(fileName))
+            var directoryName = Path.GetDirectoryName(fileName);
+            if(directoryName == _modelsBasePath)
             {
-                case "Models":
-                    switch (Path.GetExtension(fileName))
-                    {
-                        case ".obj":
-                            var wavefrontLoader = new RenderWareIo.Wavefront.WavefrontLoader(fullFileName);
-                            var groups = wavefrontLoader.GetAllGroups();
-                            var options = new RenderWareIo.Wavefront.WavefrontLoaderOptions
+                switch (Path.GetExtension(fileName))
+                {
+                    case ".obj":
+                        var wavefrontLoader = new RenderWareIo.Wavefront.WavefrontLoader(fullFileName);
+                        var groups = wavefrontLoader.GetAllGroups();
+                        var options = new RenderWareIo.Wavefront.WavefrontLoaderOptions
+                        {
+                            DayNightColor = new RenderWareBuilders.DayNightColors
                             {
-                                DayNightColor = new RenderWareBuilders.DayNightColors
-                                {
-                                    day = System.Drawing.Color.FromArgb(100, 100, 100),
-                                    night = System.Drawing.Color.FromArgb(45, 45, 45),
-                                },
-                                //CollisionMaterials = groups.ToDictionary(wavefrontLoader.GetGroupTextureName, y => MaterialId.WoodBench)
-                            };
+                                day = System.Drawing.Color.FromArgb(100, 100, 100),
+                                night = System.Drawing.Color.FromArgb(45, 45, 45),
+                            },
+                            //CollisionMaterials = groups.ToDictionary(wavefrontLoader.GetGroupTextureName, y => MaterialId.WoodBench)
+                        };
 
-                            {
-                                var dff = wavefrontLoader.CreateDff(groups, options);
-                                using var stream = new MemoryStream();
-                                dff.Write(stream);
-                                stream.Position = 0;
-                                AddDFF($"{name}Model", stream);
-                            }
+                        {
+                            var dff = wavefrontLoader.CreateDff(groups, options);
+                            using var stream = new MemoryStream();
+                            dff.Write(stream);
+                            stream.Position = 0;
+                            AddDFF($"{name}Model", stream);
+                        }
 
-                            {
-                                var col = wavefrontLoader.CreateCol(groups, options);
-                                using var stream = new MemoryStream();
-                                col.Write(stream);
-                                stream.Position = 0;
-                                AddCOL($"{name}Collision", stream);
-                            }
-                            break;
-                    }
-                    break;
-                case "ModelsTextures":
-                    txdBuilder ??= new TxdBuilder();
-                    txdBuilder.AddImage(name, fullFileName);
-                    break;
-                case "Fonts":
-                    AddFont(name, fileName);
-                    break;
+                        {
+                            var col = wavefrontLoader.CreateCol(groups, options);
+                            using var stream = new MemoryStream();
+                            col.Write(stream);
+                            stream.Position = 0;
+                            AddCOL($"{name}Collision", stream);
+                        }
+                        break;
+                }
+            }
+            else if(directoryName == "ModelsTextures")
+            {
+                txdBuilder ??= new TxdBuilder();
+                txdBuilder.AddImage(name, fullFileName);
+            }
+            else if(directoryName == "Fonts")
+            {
+                AddFont(name, fileName);
             }
         }
 
@@ -130,6 +132,29 @@ public class AssetsCollection
             return (IFont)InternalGetAsset(assetName);
     }
 
+    public (IAssetDFF,IAssetCOL) AddModelFromFile(string name, string dffFileName, string colFileName)
+    {
+        lock (_lock)
+        {
+            if (_assets.ContainsKey(name))
+                throw new Exception($"Name '{name}' already in use");
+
+            dffFileName = Path.ChangeExtension(Path.Join(_modelsBasePath, dffFileName), ".dff").Replace("\\", "/");
+            colFileName = Path.ChangeExtension(Path.Join(_modelsBasePath, colFileName), ".col").Replace("\\", "/");
+
+            var dffFullFileName = Path.Combine(_basePath, dffFileName).Replace("\\", "/");
+            var colFullFileName = Path.Combine(_basePath, colFileName).Replace("\\", "/");
+            var dffChecksum = File.ReadAllBytes(dffFullFileName).CalculateChecksum();
+            var colChecksum = File.ReadAllBytes(colFullFileName).CalculateChecksum();
+            var assetDFF = new AssetDFF(name, dffFileName, dffChecksum);
+            _assets.Add($"{name}Model", assetDFF);
+            var assetCOL = new AssetCOL(name, colFileName, colChecksum);
+            _assets.Add($"{name}Collision", assetCOL);
+            return (assetDFF, assetCOL);
+        }
+
+    }
+
     public IAssetDFF AddDFF(string name, Stream stream)
     {
         lock (_lock)
@@ -137,7 +162,7 @@ public class AssetsCollection
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = $"Models/{name}.dff";
+            var fileName = $"{_modelsBasePath}/{name}.dff";
             var fullFileName = Path.Combine(_basePath, fileName);
 
             CreateDirectoryForFile(fullFileName);
@@ -163,7 +188,7 @@ public class AssetsCollection
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = $"Models/{name}.col";
+            var fileName = $"{_modelsBasePath}/{name}.col";
             var fullFileName = Path.Combine(_basePath, fileName);
 
             CreateDirectoryForFile(fullFileName);
@@ -189,7 +214,7 @@ public class AssetsCollection
             if (_assets.ContainsKey(name))
                 throw new Exception($"Name '{name}' already in use");
 
-            var fileName = $"Models/{name}.txd";
+            var fileName = $"{_modelsBasePath}/{name}.txd";
             var fullFileName = Path.Combine(_basePath, fileName);
 
             CreateDirectoryForFile(fullFileName);

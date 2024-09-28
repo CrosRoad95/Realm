@@ -95,8 +95,7 @@ public sealed partial class ElementSaveService : IAsyncDisposable
 
         var userData = player.User.UserData;
 
-        if(player.IsSpawned)
-            userData.LastTransformAndMotion = player.GetTransformAndMotion();
+        userData.LastTransformAndMotion = player.GetTransformAndMotion();
 
         player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;

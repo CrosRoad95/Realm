@@ -23,8 +23,11 @@ public sealed class VehicleService
         return await _vehicleRepository.TrySetSpawned(_vehicle.Persistence.Id, spawned, cancellationToken);
     }
 
-    public async Task Destroy(CancellationToken cancellationToken = default)
+    public async Task<bool> Destroy(CancellationToken cancellationToken = default)
     {
+        if (_vehicle.IsDestroyed)
+            return false;
+
         if (_vehicle.Persistence.IsLoaded)
         {
             await _saveService.Save(cancellationToken);
@@ -38,6 +41,9 @@ public sealed class VehicleService
         {
             occupants.RemoveFromVehicle();
         }
+
         await _vehicle.DisposeAsync();
+
+        return true;
     }
 }

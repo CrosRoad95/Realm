@@ -23,7 +23,7 @@ internal class AssetEncryptionProvider : IAssetEncryptionProvider
 
     public bool ShouldEncryptByExtension(string extension) => IsEncryptionEnabled() && !_excludedExtensions.Contains(extension);
 
-    public bool IsEncryptionEnabled() => _hostEnvironment.IsProduction() || _assetsOptions.Value.AlwaysEncryptModels;
+    public bool IsEncryptionEnabled() => false;// _hostEnvironment.IsProduction() || _assetsOptions.Value.AlwaysEncryptModels;
 
     public byte[] Encrypt(byte[] data) => _aesCrypto.PerformAES(data);
 
