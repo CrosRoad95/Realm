@@ -24,6 +24,7 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly UsersService _usersService;
     private readonly VehiclesService _vehiclesService;
     private readonly IElementOutlineService _elementOutlineService;
+    private readonly IOverlayService _overlayService;
     private readonly IMapNamesService _mapNamesService;
     private readonly VehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
@@ -49,6 +50,7 @@ internal sealed class CommandsHostedService : IHostedService
         _usersService = usersService;
         _vehiclesService = vehiclesService;
         _elementOutlineService = elementOutlineService;
+        _overlayService = overlayService;
         _mapNamesService = mapNamesService;
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;
@@ -1031,6 +1033,7 @@ internal sealed class CommandsHostedService : IHostedService
         AddHudCommands();
         AddSettingsCommands();
         AddVehicleAccessCommands();
+        AddOverlayCommands();
     }
 
     internal sealed class TestSession : Session
@@ -1488,6 +1491,17 @@ internal sealed class CommandsHostedService : IHostedService
             {
                 _chatBox.OutputTo(player, "Failed to add group.");
             }
+        });
+    }
+
+    private void AddOverlayCommands()
+    {
+        _commandService.Add("overlayCreateLine3d", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var id = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 0, 0), Color.Red, 2);
+            _chatBox.OutputTo(player, $"Line3d created of id: {id}");
+            await Task.Delay(2000);
+            _overlayService.RemoveLine3d([player], [id]);
         });
     }
 

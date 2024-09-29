@@ -2,6 +2,7 @@
 using SlipeServer.Server;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Resources.Base;
+using System.Numerics;
 
 namespace RealmCore.Resources.Overlay;
 
@@ -42,6 +43,27 @@ internal class OverlayLogic
         _overlayService.ElementSizeChanged = HandleElementSizeChanged;
         _overlayService.ElementVisibleChanged = HandleElementVisibleChanged;
         _overlayService.ElementContentChanged = HandleElementContentChanged;
+        _overlayService.MessageHandler = HandleMessage;
+    }
+
+    private void HandleMessage(IMessage message)
+    {
+        switch (message)
+        {
+            case CreateLine3dMessage createLine3dMessage:
+                {
+                    var from = createLine3dMessage.from;
+                    var to = createLine3dMessage.to;
+                    var color = createLine3dMessage.color.ToLuaColor();
+                    var fromLuaValue = from.AsLuaValue();
+                    var toLuaValue = to.AsLuaValue();
+                    _luaEventHub.Invoke(createLine3dMessage.Target, x => x.CreateLine3d(createLine3dMessage.id, fromLuaValue, toLuaValue, color, createLine3dMessage.width), _rootElement);
+                }
+                break;
+            case RemoveLine3dMessage removeLine3dMessage:
+                _luaEventHub.Invoke(removeLine3dMessage.Target, x => x.RemoveLine3d(removeLine3dMessage.lines), _rootElement);
+                break;
+        }
     }
 
     private void HandleNotificationAdded(Player player, string message)

@@ -1,4 +1,6 @@
-local displays = {}
+local displays = {};
+local ringd3dMaxDistance = 20;
+local lines3d = {};
 
 local function dxDrawRing (posX, posY, radius, width, startAngle, amount, color, postGUI, absoluteAmount, anglesPerLine)
 	if (type (posX) ~= "number") or (type (posY) ~= "number") or (type (startAngle) ~= "number") or (type (amount) ~= "number") then
@@ -28,8 +30,13 @@ local function dxDrawRing (posX, posY, radius, width, startAngle, amount, color,
 	return math.floor ((stopAngle - startAngle)/anglesPerLine)
 end
 
-local ringd3dMaxDistance = 20;
 addEventHandler("onClientRender", root, function()
+	for id,v in pairs(lines3d)do
+		local sx,sy,sz = getPositionFromContext(v[2]);
+		local ex,ey,ez = getPositionFromContext(v[3]);
+		dxDrawLine3D(sx,sy,sz, ex,ey,ez, v[4], v[5])
+	end
+
 	local displaysToRemove = {}
 	for id,v in pairs(displays)do
 		if(v.start + v.time < getTickCount())then
@@ -71,5 +78,15 @@ function handleRemoveDisplay3dRing(id)
 		displays[id] = nil
 	else
 		outputDebugString("Failed to removeDisplay3dRing of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end
+
+function handleCreateLine3d(id, from, to, color, width)
+	lines3d[id] = {id, from, to, color, width};
+end
+
+function handleRemoveLine3d(ids)
+	for i,v in ipairs(ids)do
+		lines3d[v] = nil;
 	end
 end

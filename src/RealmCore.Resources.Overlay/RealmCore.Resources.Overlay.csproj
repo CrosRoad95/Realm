@@ -45,6 +45,7 @@
 		<Using Include="RealmCore.Resources.Overlay.Extensions" />
 		<Using Include="System.Reflection" />
 		<Using Include="RealmCore.Resources.Assets.AssetsTypes" />
+		<Using Include="RealmCore.Resources.Base.Interfaces" />
 	</ItemGroup>
 
 </Project>

@@ -5,5 +5,8 @@ namespace RealmCore.Resources.Overlay;
 
 internal class OverlayResource : Resource
 {
-    internal OverlayResource(MtaServer server) : base(server, server.RootElement, "Overlay") { }
+    internal OverlayResource(MtaServer server) : base(server, server.RootElement, "Overlay")
+    {
+        this.AddCommonCode();
+    }
 }

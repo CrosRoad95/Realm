@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server.Elements;
+﻿using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Overlay;
 
@@ -23,6 +24,7 @@ public interface IOverlayService
     Action<Player, string, int, Vector2>? ElementPositionChanged { get; set; }
     Action<Player, string, int, bool>? ElementVisibleChanged { get; set; }
     Action<Player, string, int, LuaValue>? ElementContentChanged { get; set; }
+    Action<IMessage>? MessageHandler { get; set; }
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
@@ -44,10 +46,13 @@ public interface IOverlayService
     void SizeChanged(Player player, string hudId, int elementId, Size size);
     void VisibleChanged(Player player, string hudId, int elementId, bool visible);
     void SetHudContent(Player player, string hudId, int elementId, IHudElementContent hudElementContent, object? state);
+    int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width);
+    void RemoveLine3d(IEnumerable<Player> players, int[] lines);
 }
 
 internal sealed class OverlayService : IOverlayService
 {
+    private int _id;
     private struct HudElement
     {
         public string type;
@@ -81,9 +86,23 @@ internal sealed class OverlayService : IOverlayService
 
     private readonly IAssetsService _assetsService;
 
+    public Action<IMessage>? MessageHandler { get; set; }
+
     public OverlayService(IAssetsService assetsService)
     {
         _assetsService = assetsService;
+    }
+
+    public int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width)
+    {
+        var id = Interlocked.Increment(ref _id);
+        MessageHandler?.Invoke(new CreateLine3dMessage(players, id, from, to, color, width));
+        return id;
+    }
+
+    public void RemoveLine3d(IEnumerable<Player> players, int[] lines)
+    {
+        MessageHandler?.Invoke(new RemoveLine3dMessage(players, lines));
     }
 
     public void AddNotification(Player player, string message)

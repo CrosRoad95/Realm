@@ -21,4 +21,6 @@ internal interface IHudEventHub
     void ElementSetSize(string hudId, int elementId, int sizeX, int sizeY);
     void ElementSetVisible(string hudId, int elementId, bool visible);
     void ElementSetContent(string hudId, int elementId, LuaValue content);
+    void CreateLine3d(int id, LuaValue from, LuaValue to, double color, float width);
+    void RemoveLine3d(int[] lines);
 }

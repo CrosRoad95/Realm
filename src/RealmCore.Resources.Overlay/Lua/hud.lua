@@ -458,6 +458,8 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ElementSetPosition", handleElementSetPosition);
 	hubBind("ElementSetVisible", handleElementSetVisible);
 	hubBind("ElementSetContent", handleElementSetContent);
+	hubBind("CreateLine3d", handleCreateLine3d);
+	hubBind("RemoveLine3d", handleRemoveLine3d);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)
