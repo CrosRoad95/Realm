@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Persistence;
+﻿using RealmCore.Resources.Base;
+using RealmCore.Server.Modules.Persistence;
 using RealmCore.Server.Modules.Vehicles.Access;
 using SlipeServer.Server.Elements;
 using Color = System.Drawing.Color;
@@ -1502,6 +1503,21 @@ internal sealed class CommandsHostedService : IHostedService
             var id2 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 3, -3), Color.Red, 2, Line3dEffect.Gravity(2));
             var id3 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 6, -6), Color.Red, 2, Line3dEffect.Gravity(3));
             _chatBox.OutputTo(player, $"Line3d created of id: {id1}, {id2}, {id3}");
+        });
+        
+        _commandService.Add("overlayCreateLine3dOffset", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var id = _overlayService.CreateLine3d([player], new PositionContext(player, new(0,1,0)), player.Position + new Vector3(10, 0, 0), Color.Red, 2, Line3dEffect.Gravity(1));
+            _chatBox.OutputTo(player, $"Line3dOffset created of id: {id}");
+        });
+        
+        _commandService.Add("overlayCreateLine3dOffsetAttachedElement", ([CallingPlayer] RealmPlayer player) =>
+        {
+            var worldObject = _elementFactory.CreateObject(new Location(), ObjectModel.Gunbox);
+            player.Attach(worldObject, BoneId.LeftHand, new Vector3(0.2f, 1.0f, -0), new Vector3(0, -20, 0));
+            var id = _overlayService.CreateLine3d([player], new PositionContext(worldObject, new(0.3f,0.3f,0)), player.Position + new Vector3(10, 0, 0), Color.Red, 2, Line3dEffect.Gravity(1));
+
+            _chatBox.OutputTo(player, $"Line3dOffsetElement created of id: {id}");
         });
 
         _commandService.Add("overlayCreateAndDestroyLine3d", async ([CallingPlayer] RealmPlayer player) =>
