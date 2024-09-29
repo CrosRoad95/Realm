@@ -1498,7 +1498,15 @@ internal sealed class CommandsHostedService : IHostedService
     {
         _commandService.Add("overlayCreateLine3d", async ([CallingPlayer] RealmPlayer player) =>
         {
-            var id = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 0, 0), Color.Red, 2);
+            var id1 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 0, 0), Color.Red, 2, Line3dEffect.Gravity(1));
+            var id2 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 3, -3), Color.Red, 2, Line3dEffect.Gravity(2));
+            var id3 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 6, -6), Color.Red, 2, Line3dEffect.Gravity(3));
+            _chatBox.OutputTo(player, $"Line3d created of id: {id1}, {id2}, {id3}");
+        });
+
+        _commandService.Add("overlayCreateAndDestroyLine3d", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var id = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 0, 0), Color.Red, 2, Line3dEffect.Gravity());
             _chatBox.OutputTo(player, $"Line3d created of id: {id}");
             await Task.Delay(2000);
             _overlayService.RemoveLine3d([player], [id]);

@@ -32,9 +32,45 @@ end
 
 addEventHandler("onClientRender", root, function()
 	for id,v in pairs(lines3d)do
-		local sx,sy,sz = getPositionFromContext(v[2]);
-		local ex,ey,ez = getPositionFromContext(v[3]);
-		dxDrawLine3D(sx,sy,sz, ex,ey,ez, v[4], v[5])
+		local sx,sy,sz = getPositionFromContext(v.from);
+		local ex,ey,ez = getPositionFromContext(v.to);
+		local effect = v.effect;
+		if(effect.type == "none")then
+			dxDrawLine3D(sx,sy,sz, ex,ey,ez, v.color, v.width)
+		elseif(effect.type == "gravity")then
+			local magnitude = effect.magnitude / 2
+			local segments = effect.segments
+			local sineAmplitude = 1  -- Amplitude of the sine wave (height of peaks/valleys)
+
+			-- Calculate the direction vector for each segment
+			local dx = (ex - sx) / segments
+			local dy = (ey - sy) / segments
+			local dz = (ez - sz) / segments
+
+			-- Draw each segment
+			for i = 0, segments do
+				local t = i / segments  -- Normalized position along the line (0 to 1)
+
+				-- Start point for this segment
+				local currentX = sx + i * dx
+				local currentY = sy + i * dy
+				local currentZ = sz + i * dz
+
+				-- Apply sine wave adjustment to the Z-axis based on position `t`
+				local sineAdjustment = sineAmplitude * math.sin(t * math.pi) * magnitude
+
+				-- Lower or raise the Z-coordinate according to the sine wave
+				currentZ = currentZ - sineAdjustment
+
+				-- Draw the line from the previous point to the current point (starting from the second iteration)
+				if i > 0 then
+					dxDrawLine3D(prevX, prevY, prevZ, currentX, currentY, currentZ, v.color, v.width)
+				end
+
+				-- Store the current point as the previous point for the next iteration
+				prevX, prevY, prevZ = currentX, currentY, currentZ
+			end
+		end
 	end
 
 	local displaysToRemove = {}
@@ -81,8 +117,15 @@ function handleRemoveDisplay3dRing(id)
 	end
 end
 
-function handleCreateLine3d(id, from, to, color, width)
-	lines3d[id] = {id, from, to, color, width};
+function handleCreateLine3d(id, from, to, color, width, effect)
+	lines3d[id] = {
+		id = id,
+		from = from,
+		to = to,
+		color = color,
+		width = width,
+		effect = effect
+	};
 end
 
 function handleRemoveLine3d(ids)

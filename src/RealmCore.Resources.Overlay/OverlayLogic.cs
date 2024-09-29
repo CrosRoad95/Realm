@@ -57,7 +57,7 @@ internal class OverlayLogic
                     var color = createLine3dMessage.color.ToLuaColor();
                     var fromLuaValue = from.AsLuaValue();
                     var toLuaValue = to.AsLuaValue();
-                    _luaEventHub.Invoke(createLine3dMessage.Target, x => x.CreateLine3d(createLine3dMessage.id, fromLuaValue, toLuaValue, color, createLine3dMessage.width), _rootElement);
+                    _luaEventHub.Invoke(createLine3dMessage.Target, x => x.CreateLine3d(createLine3dMessage.id, fromLuaValue, toLuaValue, color, createLine3dMessage.width, createLine3dMessage.effect), _rootElement);
                 }
                 break;
             case RemoveLine3dMessage removeLine3dMessage:

@@ -1,7 +1,33 @@
-﻿using RealmCore.Resources.Base.Interfaces;
-using SlipeServer.Server.Elements;
+﻿using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Overlay;
+
+public class Line3dEffect
+{
+    private readonly LuaValue _luaValue;
+
+    public Line3dEffect(LuaValue luaValue)
+    {
+        _luaValue = luaValue;
+    }
+
+    public static Line3dEffect None = new Line3dEffect(new Dictionary<LuaValue, LuaValue>
+    {
+        ["type"] = "none"
+    });
+
+    public static Line3dEffect Gravity(float magnitude = 1, int segments = 12)
+    {
+        return new Line3dEffect(new Dictionary<LuaValue, LuaValue>
+        {
+            ["type"] = "gravity",
+            ["magnitude"] = magnitude,
+            ["segments"] = segments
+        });
+    }
+
+    internal LuaValue AsLuaValue() => _luaValue;
+}
 
 public interface IOverlayService
 {
@@ -46,7 +72,7 @@ public interface IOverlayService
     void SizeChanged(Player player, string hudId, int elementId, Size size);
     void VisibleChanged(Player player, string hudId, int elementId, bool visible);
     void SetHudContent(Player player, string hudId, int elementId, IHudElementContent hudElementContent, object? state);
-    int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width);
+    int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width, Line3dEffect effect);
     void RemoveLine3d(IEnumerable<Player> players, int[] lines);
 }
 
@@ -93,10 +119,10 @@ internal sealed class OverlayService : IOverlayService
         _assetsService = assetsService;
     }
 
-    public int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width)
+    public int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width, Line3dEffect effect)
     {
         var id = Interlocked.Increment(ref _id);
-        MessageHandler?.Invoke(new CreateLine3dMessage(players, id, from, to, color, width));
+        MessageHandler?.Invoke(new CreateLine3dMessage(players, id, from, to, color, width, effect.AsLuaValue()));
         return id;
     }
 
