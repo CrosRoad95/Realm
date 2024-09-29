@@ -2,12 +2,12 @@
 local webBrowser = nil;
 local browser = nil;
 local isRemote = false;
-local trace = false;
+local trace = true;
 local baseRemoteUrl = "";
 
 local function itrace(...)
 	if(trace)then
-		iprint(getTickCount(), ...)
+		iprint("[BROWSER]", getTickCount(), ...)
 	end
 end
 
@@ -24,26 +24,8 @@ function handleSetVisible(visible)
 end
 
 function handleSetPath(path)
-	itrace("handleSetPath", path)
+	itrace("handleSetPath", string.sub(path, 0, 100))
 	loadBrowserURL(webBrowser, path)
-end
-
-local function createLocalBrowser(x, y)
-	browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, true, true, false)
-	webBrowser = guiGetBrowser( browser )
-	handleSetVisible(false)
-	setAjaxHandlers(webBrowser)
-	
-	addEventHandler( "onClientBrowserCreated", webBrowser, 
-		function()	
-			if(fileExists("index.html"))then
-				triggerServerEvent("internalBrowserCreated", resourceRoot)
-				loadBrowserURL(source, "http://mta/local/index.html" )
-			else
-				loadBrowserURL(source, "http://mta/local/error.html" )
-			end
-		end
-	)
 end
 
 local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
@@ -51,23 +33,24 @@ local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 		error("Remote url is invalid, got: "..tostring(remoteUrl))
 	end
 	browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, false, true, false)
+	itrace("gui created:", browser);
 	webBrowser = guiGetBrowser( browser )
 	handleSetVisible(false)
 
 	addEventHandler( "onClientBrowserCreated", webBrowser, 
 		function( )
-			itrace("onClientBrowserCreated")
+			itrace("created")
 			local sourceBrowser = source;
 			local function handleClientBrowserDocumentReady(url)
 				if(string.find(url, remoteUrl))then
-					itrace("handleClientBrowserDocumentReady", url);
+					itrace("document ready", url);
 					triggerServerEvent("internalBrowserDocumentReady", resourceRoot)
 					removeEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, handleClientBrowserDocumentReady)
 				end
 			end
 
 			addEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, handleClientBrowserDocumentReady)
-			itrace("Request: ",requestWhitelistUrl)
+			itrace("request whitelist url: ",requestWhitelistUrl)
 			if(isBrowserDomainBlocked ( requestWhitelistUrl ))then
 				requestBrowserDomains({ requestWhitelistUrl })
 				local function handleClientBrowserWhitelistChange(newDomains)
@@ -81,7 +64,7 @@ local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 				addEventHandler("onClientBrowserWhitelistChange", root, handleClientBrowserWhitelistChange);
 			else
 				triggerServerEvent("internalBrowserCreated", resourceRoot)
-				itrace("loadurl", remoteUrl)
+				itrace("loadurl, url already whitelisted", remoteUrl)
 				loadBrowserURL( sourceBrowser, remoteUrl )
 			end
 		end
@@ -89,10 +72,16 @@ local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 end
 
 local function handleLoad(x, y, remoteUrl, requestWhitelistUrl)
-	itrace("handleLoad, x, y, remoteUrl", x, y, remoteUrl)
+	itrace("load, x, y, remoteUrl", x, y, remoteUrl)
 	baseRemoteUrl = remoteUrl;
 	createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 end
+
+addEventHandler("onClientBrowserLoadingFailed", root,
+	function(url, errorCode, errorDescription)
+		itrace("This webpage is not available", url, "Unknown", errorCode, "Unknown", errorDescription)
+	end
+)
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("Load", handleLoad)
