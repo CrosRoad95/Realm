@@ -1,6 +1,45 @@
 ﻿using SlipeServer.Server.Elements;
+using System.ComponentModel;
 
 namespace RealmCore.Resources.Overlay;
+
+public enum ParticleEffect
+{
+    [Description("blood")]
+    Blood,
+    [Description("boat_splash")]
+    BoatSplash,
+    [Description("bubble")]
+    Bubble,
+    [Description("car_debris")]
+    CarDebris,
+    [Description("collision_smoke")]
+    CollisionSmoke,
+    [Description("gunshell")]
+    Gunshell,
+    [Description("sand")]
+    Sand,
+    [Description("sand2")]
+    Sand2,
+    [Description("huge_smoke")]
+    HugeSmoke,
+    [Description("smoke")]
+    Smoke,
+    [Description("spark")]
+    Spark,
+    [Description("spark2")]
+    Spark2,
+    [Description("splash")]
+    Splash,
+    [Description("wake")]
+    Wake,
+    [Description("water_splash")]
+    WaterSplash,
+    [Description("wheel_dirt")]
+    WheelDirt,
+    [Description("glass")]
+    Glass,
+}
 
 public class Line3dEffect
 {
@@ -74,6 +113,7 @@ public interface IOverlayService
     void SetHudContent(Player player, string hudId, int elementId, IHudElementContent hudElementContent, object? state);
     int CreateLine3d(IEnumerable<Player> players, PositionContext from, PositionContext to, Color color, float width, Line3dEffect effect);
     void RemoveLine3d(IEnumerable<Player> players, int[] lines);
+    void AddEffect(IEnumerable<Player> players, ParticleEffect effect, PositionContext position, Vector3 direction, Color color, bool randomizeColors, int count = 1, float brightness = 1, float size = 0.3F, bool randomSizes = false, float life = 1);
 }
 
 internal sealed class OverlayService : IOverlayService
@@ -129,6 +169,11 @@ internal sealed class OverlayService : IOverlayService
     public void RemoveLine3d(IEnumerable<Player> players, int[] lines)
     {
         MessageHandler?.Invoke(new RemoveLine3dMessage(players, lines));
+    }
+
+    public void AddEffect(IEnumerable<Player> players, ParticleEffect effect, PositionContext position, Vector3 direction, Color color, bool randomizeColors, int count = 1, float brightness = 1.0f, float size = 0.3f, bool randomSizes = false, float life = 1.0f)
+    {
+        MessageHandler?.Invoke(new AddEffect3dMessage(players, effect, position, direction, color, randomizeColors, count, brightness, size, randomSizes, life));
     }
 
     public void AddNotification(Player player, string message)

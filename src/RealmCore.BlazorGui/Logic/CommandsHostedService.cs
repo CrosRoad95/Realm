@@ -1511,6 +1511,12 @@ internal sealed class CommandsHostedService : IHostedService
             await Task.Delay(2000);
             _overlayService.RemoveLine3d([player], [id]);
         });
+
+        _commandService.Add("overlayAddEffect", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            _overlayService.AddEffect([player], ParticleEffect.BoatSplash, player.Position + new Vector3(2, 0, 0), Vector3.UnitZ, Color.Red, false, 8, 1, 0.3f, false, 1);
+            _chatBox.OutputTo(player, "Effect created");
+        });
     }
 
     private RealmVehicle? GetVehicle(RealmPlayer player)

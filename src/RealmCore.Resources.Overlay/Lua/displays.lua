@@ -40,34 +40,27 @@ addEventHandler("onClientRender", root, function()
 		elseif(effect.type == "gravity")then
 			local magnitude = effect.magnitude / 2
 			local segments = effect.segments
-			local sineAmplitude = 1  -- Amplitude of the sine wave (height of peaks/valleys)
+			local sineAmplitude = 1
 
-			-- Calculate the direction vector for each segment
 			local dx = (ex - sx) / segments
 			local dy = (ey - sy) / segments
 			local dz = (ez - sz) / segments
 
-			-- Draw each segment
 			for i = 0, segments do
-				local t = i / segments  -- Normalized position along the line (0 to 1)
+				local t = i / segments
 
-				-- Start point for this segment
 				local currentX = sx + i * dx
 				local currentY = sy + i * dy
 				local currentZ = sz + i * dz
 
-				-- Apply sine wave adjustment to the Z-axis based on position `t`
 				local sineAdjustment = sineAmplitude * math.sin(t * math.pi) * magnitude
 
-				-- Lower or raise the Z-coordinate according to the sine wave
 				currentZ = currentZ - sineAdjustment
 
-				-- Draw the line from the previous point to the current point (starting from the second iteration)
 				if i > 0 then
 					dxDrawLine3D(prevX, prevY, prevZ, currentX, currentY, currentZ, v.color, v.width)
 				end
 
-				-- Store the current point as the previous point for the next iteration
 				prevX, prevY, prevZ = currentX, currentY, currentZ
 			end
 		end
@@ -132,4 +125,18 @@ function handleRemoveLine3d(ids)
 	for i,v in ipairs(ids)do
 		lines3d[v] = nil;
 	end
+end
+
+function tocolor2rgba(color)
+    local b = bitExtract ( color, 0, 8 ) 
+    local g = bitExtract ( color, 8, 8 ) 
+    local r = bitExtract ( color, 16, 8 ) 
+    local a = bitExtract ( color, 24, 8 )
+    return r, g, b, a
+end
+
+function handleAddEffect(effect, position, directionX, directionY, directionZ, color, randomizeColors, count, brightness, size, randomSizes, life)
+	local px,py,pz = getPositionFromContext(position);
+	local r,g,b,a = tocolor2rgba(color)
+	fxCreateParticle(effect, px,py,pz, directionX, directionY, directionZ, r, g, b, a, randomizeColors, count, brightness, size, randomSizes, life);
 end

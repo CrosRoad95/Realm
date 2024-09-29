@@ -63,6 +63,15 @@ internal class OverlayLogic
             case RemoveLine3dMessage removeLine3dMessage:
                 _luaEventHub.Invoke(removeLine3dMessage.Target, x => x.RemoveLine3d(removeLine3dMessage.lines), _rootElement);
                 break;
+            case AddEffect3dMessage addEffect3dMessage:
+                {
+                    var effect = addEffect3dMessage.effect.GetDescription();
+                    var position = addEffect3dMessage.position.AsLuaValue();
+                    var direction = addEffect3dMessage.direction;
+                    var color = addEffect3dMessage.color.ToLuaColor();
+                    _luaEventHub.Invoke(addEffect3dMessage.Target, x => x.AddEffect(effect, position, direction.X, direction.Y, direction.Z, color, addEffect3dMessage.randomizeColors, addEffect3dMessage.count, addEffect3dMessage.brightness, addEffect3dMessage.size, addEffect3dMessage.randomSizes, addEffect3dMessage.life), _rootElement);
+                }
+                break;
         }
     }
 

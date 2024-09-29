@@ -460,6 +460,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ElementSetContent", handleElementSetContent);
 	hubBind("CreateLine3d", handleCreateLine3d);
 	hubBind("RemoveLine3d", handleRemoveLine3d);
+	hubBind("AddEffect", handleAddEffect);
 	
 	addEventHandler("onClientRender", root, renderHuds3d); -- TODO:
 end)

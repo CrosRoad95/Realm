@@ -23,4 +23,5 @@ internal interface IHudEventHub
     void ElementSetContent(string hudId, int elementId, LuaValue content);
     void CreateLine3d(int id, LuaValue from, LuaValue to, double color, float width, LuaValue effect);
     void RemoveLine3d(int[] lines);
+    void AddEffect(string effect, LuaValue position, float directionX, float directionY, float directionZ, double color, bool randomizeColors, int count, float brightness, float size, bool randomSizes, float life);
 }
