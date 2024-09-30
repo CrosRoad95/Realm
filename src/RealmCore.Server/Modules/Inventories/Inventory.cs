@@ -256,7 +256,7 @@ public class Inventory
         }
         else
         {
-            return _items.Remove(item);
+            return _items.RemoveAll(x => x.LocalId == item.LocalId) == 1;
         }
     }
 

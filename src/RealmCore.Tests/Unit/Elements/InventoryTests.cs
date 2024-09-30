@@ -352,6 +352,29 @@ public class InventoryTests : IClassFixture<RealmTestingServerHostingFixtureWith
         inventory2.Number.Should().Be(0);
     }
 
+    [Fact]
+    public void RemovingLastItemShouldRemoveThisStack()
+    {
+        var inventory = new Inventory(20, _itemsCollection);
+
+        using (var access = inventory.Open())
+        {
+            access.TryAddItem(1, 6);
+            access.TryAddItem(1, 1, tryStack: false);
+        }
+        var before = inventory.Number;
+
+        using (var access = inventory.Open())
+        {
+            var item = access.Items.Where(x => x.Number == 1).Single();
+            access.RemoveItem(item, 1);
+        }
+
+        using var _ = new AssertionScope();
+        before.Should().Be(7);
+        inventory.Number.Should().Be(6);
+    }
+
     public void Dispose()
     {
         using (var access = _inventory.Open())
