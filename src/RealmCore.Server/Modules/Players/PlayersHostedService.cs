@@ -144,10 +144,14 @@ internal sealed class PlayersHostedService : PlayerLifecycle, IHostedService
 
         var stop = Stopwatch.GetTimestamp();
         double milliseconds = (stop - start) / (float)Stopwatch.Frequency * 1000;
-        _logger.LogInformation("Player joined in {elapsedMilliseconds}ms", (ulong)milliseconds);
 
         if (player.IsDestroyed)
+        {
+            _logger.LogInformation("Player joined in {elapsedMilliseconds}ms but player is destroyed", (ulong)milliseconds);
             return;
+        }
+
+        _logger.LogInformation("Player joined in {elapsedMilliseconds}ms", (ulong)milliseconds);
         player.Disconnected += HandleDisconnected;
         player.Spawned += HandleSpawned;
 

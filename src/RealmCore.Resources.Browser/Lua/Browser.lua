@@ -2,7 +2,7 @@
 local webBrowser = nil;
 local browser = nil;
 local isRemote = false;
-local trace = true;
+local trace = false;
 local baseRemoteUrl = "";
 
 local function itrace(...)
