@@ -14,12 +14,51 @@ public sealed class RewardsService
         _userRewardRepository = _serviceProvider.GetRequiredService<UserRewardRepository>();
     }
 
+    public async Task<int[]> GetRewards(RealmPlayer player, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _userRewardRepository.GetRewards(player.UserId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
+    public async Task<int[]> GetRewards(int userId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _userRewardRepository.GetRewards(userId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     public async Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
             return await _userRewardRepository.TryAddReward(player.UserId, rewardId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> TryGiveReward(int userId, int rewardId, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _userRewardRepository.TryAddReward(userId, rewardId, cancellationToken);
         }
         finally
         {

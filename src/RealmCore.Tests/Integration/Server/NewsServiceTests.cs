@@ -1,5 +1,4 @@
 ﻿namespace RealmCore.Tests.Integration.Server;
-
 public class NewsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>
 {
     private readonly RealmTestingServerHostingFixtureWithPlayer _fixture;

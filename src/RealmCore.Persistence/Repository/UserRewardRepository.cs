@@ -9,6 +9,23 @@ public sealed class UserRewardRepository
         _db = db;
     }
 
+    public async Task<int[]> GetRewards(int userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetRewards));
+
+        if (activity != null)
+        {
+            activity.AddTag("UserId", userId);
+        }
+
+        var query = _db.UserRewards
+            .AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .Select(x => x.RewardId);
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
     public async Task<bool> TryAddReward(int userId, int rewardId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddReward));
