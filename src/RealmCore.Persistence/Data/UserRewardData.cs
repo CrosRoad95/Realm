@@ -4,4 +4,5 @@ public sealed class UserRewardData
 {
     public int UserId { get; set; }
     public int RewardId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

@@ -26,7 +26,7 @@ public sealed class UserRewardRepository
         return await query.ToArrayAsync(cancellationToken);
     }
 
-    public async Task<bool> TryAddReward(int userId, int rewardId, CancellationToken cancellationToken = default)
+    public async Task<bool> TryAddReward(int userId, int rewardId, DateTime createdAt, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(TryAddReward));
 
@@ -41,7 +41,8 @@ public sealed class UserRewardRepository
             _db.UserRewards.Add(new UserRewardData
             {
                 RewardId = rewardId,
-                UserId = userId
+                UserId = userId,
+                CreatedAt = createdAt,
             });
             await _db.SaveChangesAsync(cancellationToken);
             return true;

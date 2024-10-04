@@ -6,12 +6,14 @@ public sealed class RewardsService
     private readonly IServiceScope _serviceScope;
     private readonly IServiceProvider _serviceProvider;
     private readonly UserRewardRepository _userRewardRepository;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RewardsService(IServiceProvider serviceProvider)
+    public RewardsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
         _userRewardRepository = _serviceProvider.GetRequiredService<UserRewardRepository>();
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<int[]> GetRewards(RealmPlayer player, CancellationToken cancellationToken = default)
@@ -45,7 +47,7 @@ public sealed class RewardsService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _userRewardRepository.TryAddReward(player.UserId, rewardId, cancellationToken);
+            return await _userRewardRepository.TryAddReward(player.UserId, rewardId, _dateTimeProvider.Now, cancellationToken);
         }
         finally
         {
@@ -58,7 +60,7 @@ public sealed class RewardsService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            return await _userRewardRepository.TryAddReward(userId, rewardId, cancellationToken);
+            return await _userRewardRepository.TryAddReward(userId, rewardId, _dateTimeProvider.Now, cancellationToken);
         }
         finally
         {
