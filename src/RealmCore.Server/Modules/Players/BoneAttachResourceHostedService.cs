@@ -11,7 +11,8 @@ internal sealed class BoneAttachResourceHostedService : PlayerLifecycle, IHosted
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _boneAttachService.ToggleCollisions(false);
+        if(_boneAttachService != null)
+            _boneAttachService.ToggleCollisions(false);
         return Task.CompletedTask;
     }
 
