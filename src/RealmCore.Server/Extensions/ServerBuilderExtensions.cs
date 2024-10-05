@@ -28,7 +28,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddText3dResource();
         serverBuilder.AddNametagsResource();
         serverBuilder.AddWatermarkResource();
-        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_3);
         serverBuilder.AddDiscordRichPresenceResource(new DiscordRichPresenceOptions
         {
             ApplicationId = 997855189132398613
@@ -51,7 +51,7 @@ public static class ServerBuilderExtensions
         services.AddText3dServices();
         services.AddNametagsServices();
         services.AddWatermarkServices();
-        services.AddBoneAttachServices();
+        services.AddBoneAttachServices(BoneAttachVersion.Release_1_2_3);
         services.AddDiscordRichPresenceServices();
         return services;
     }

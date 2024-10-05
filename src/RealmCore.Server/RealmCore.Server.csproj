@@ -19,11 +19,11 @@
 		<PackageReference Include="Polly" Version="8.3.0" />
 		<PackageReference Include="Quartz" Version="3.8.1" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-		<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20240910-125735" />
-		<PackageReference Include="SlipeServer.Resources.DiscordRichPresence" Version="0.1.0-CI-20240910-125735" />
-		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20240910-125735" />
-		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20240910-125735" />
-		<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20240910-125735" />
+		<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20241005-050212" />
+		<PackageReference Include="SlipeServer.Resources.DiscordRichPresence" Version="0.1.0-CI-20241005-050212" />
+		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20241005-050212" />
+		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20241005-050212" />
+		<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20241005-050212" />
 		<PackageReference Include="SlipeServer.Hosting" Version="0.1.0-CI-20240908-154023" />
 	</ItemGroup>
 

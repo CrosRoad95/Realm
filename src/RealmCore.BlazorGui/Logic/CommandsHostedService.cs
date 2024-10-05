@@ -1,6 +1,7 @@
 ﻿using RealmCore.Resources.Base;
 using RealmCore.Server.Modules.Persistence;
 using RealmCore.Server.Modules.Vehicles.Access;
+using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Server.Elements;
 using Color = System.Drawing.Color;
 
@@ -35,11 +36,12 @@ internal sealed class CommandsHostedService : IHostedService
     private readonly MapsService _mapsService;
     private readonly MtaServer _mtaServer;
     private readonly WorldHudService _worldHudService;
+    private readonly BoneAttachService _boneAttachService;
 
     public CommandsHostedService(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsHostedService> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, UsersService usersService, VehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer, WorldHudService worldHudService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, SpawnMarkersService spawnMarkersService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IMapNamesService mapNamesService, VehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, IElementCollection elementCollection, IDebounceFactory debounceFactory, WorldNodesService worldNodesService, GroupsService groupsService, MapsService mapsService, MtaServer mtaServer, WorldHudService worldHudService, BoneAttachService boneAttachService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -61,6 +63,7 @@ internal sealed class CommandsHostedService : IHostedService
         _mapsService = mapsService;
         _mtaServer = mtaServer;
         _worldHudService = worldHudService;
+        _boneAttachService = boneAttachService;
         var debounce = debounceFactory.Create(500);
         var debounceCounter = 0;
 
@@ -430,9 +433,25 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("spawnbox", ([CallingPlayer] RealmPlayer player) =>
         {
+            void handleCollisionEnabledChanged(Element sender, ElementChangedEventArgs<bool> args)
+            {
+                ;
+            }
+
             var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
+            worldObject.AreCollisionsEnabled = false;
+            worldObject.CollisionEnabledChanged += handleCollisionEnabledChanged;
             worldObject.Interaction = new LiftableInteraction();
             _chatBox.OutputTo(player, "spawned box");
+        });
+        
+        _commandService.Add("spawnbox2", async ([CallingPlayer] RealmPlayer player) =>
+        {
+            var bin = new WorldObject(1339, player.Position).AssociateWith(mtaServer);
+            bin.AreCollisionsEnabled = false;
+            _boneAttachService.Attach(bin, player, BoneId.Spine1, Vector3.Zero);
+            await Task.Delay(1000);
+            _boneAttachService.Detach(bin);
         });
 
         _commandService.Add("durationinteractionbox", ([CallingPlayer] RealmPlayer player) =>

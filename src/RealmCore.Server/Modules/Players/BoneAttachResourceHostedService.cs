@@ -11,6 +11,7 @@ internal sealed class BoneAttachResourceHostedService : PlayerLifecycle, IHosted
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        _boneAttachService.ToggleCollisions(false);
         return Task.CompletedTask;
     }
 
@@ -37,7 +38,6 @@ internal sealed class BoneAttachResourceHostedService : PlayerLifecycle, IHosted
             throw new NotSupportedException();
 
         _boneAttachService.Attach(attachedBoneWorldObject.WorldObject, player, attachedBoneWorldObject.BoneId, attachedBoneWorldObject.PositionOffset, attachedBoneWorldObject.RotationOffset);
-        attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = false; // TODO: remember previous state
     }
 
     private void HandleWorldObjectDetached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
@@ -48,7 +48,10 @@ internal sealed class BoneAttachResourceHostedService : PlayerLifecycle, IHosted
         if (_boneAttachService.IsAttached(attachedBoneWorldObject.WorldObject))
         {
             _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);
-            attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = true;
+            if(attachedBoneWorldObject.WorldObject.AreCollisionsEnabled)
+            {
+                ;
+            }
         }
     }
 }
