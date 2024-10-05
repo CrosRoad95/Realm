@@ -16,6 +16,7 @@ public class RewardsServiceTests : IClassFixture<RealmTestingServerHostingFixtur
     [Fact]
     public async Task RewardsShouldWork()
     {
+        using var monitor = _rewardsService.Monitor();
         var added1 = await _rewardsService.TryGiveReward(_player, 1);
         var added2 = await _rewardsService.TryGiveReward(_player, 1);
         var rewards = await _rewardsService.GetRewards(_player);
@@ -24,5 +25,6 @@ public class RewardsServiceTests : IClassFixture<RealmTestingServerHostingFixtur
         added1.Should().BeTrue();
         added2.Should().BeFalse();
         rewards.Should().BeEquivalentTo([1]);
+        monitor.GetOccurredEvents().Should().BeEquivalentTo(["RewardGiven"]);
     }
 }
