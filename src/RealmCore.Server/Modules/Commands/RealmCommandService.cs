@@ -163,7 +163,6 @@ public sealed class RealmCommandService : PlayerLifecycle
             ["commandArguments"] = arguments
         });
 
-        _logger.LogInformation("Begin command {command} execution", command);
         if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
             var authorized = player.User.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
@@ -173,7 +172,7 @@ public sealed class RealmCommandService : PlayerLifecycle
                 return;
             }
         }
-        _logger.LogInformation("{playerName} executed command {command} with arguments {commandArguments}.", player.Name, command, arguments);
+
         try
         {
             var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<PlayerSearchService>(), arguments);
