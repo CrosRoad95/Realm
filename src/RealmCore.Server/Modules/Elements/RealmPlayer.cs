@@ -409,9 +409,9 @@ public class RealmPlayer : Player, IAsyncDisposable
         return false;
     }
 
-    public void Spawn(Vector3 position, Vector3? rotation = null)
+    public void Spawn(Vector3 position, Vector3? rotation = null, ushort? model = null, byte? interior = null, ushort? dimension = null)
     {
-        Spawn(position, rotation?.X ?? 0, 0, 0, 0);
+        Spawn(position, rotation?.X ?? 0, model ?? 0, interior ?? 0, dimension ?? 0);
         Camera.Target = this;
         UpdateFight();
         IsSpawned = true;
