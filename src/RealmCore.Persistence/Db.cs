@@ -116,6 +116,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<MapData> Maps => Set<MapData>();
     public DbSet<MapUserData> MapsUsers => Set<MapUserData>();
     public DbSet<VehicleSettingData> VehicleSettings => Set<VehicleSettingData>();
+    public DbSet<SerialDiscordUserIdData> SerialDiscordUserId => Set<SerialDiscordUserIdData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -1053,11 +1054,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => x.Id);
         });
 
-        //modelBuilder.Ignore<TimeBaseOperationData>();
-        //modelBuilder.Ignore<TimeBaseOperationGroupData>();
-        //modelBuilder.Ignore<TimeBaseOperationGroupUserData>();
-        //modelBuilder.Ignore<TimeBaseOperationDataGroupOperationData>();
-
         modelBuilder.Entity<TimeBaseOperationData>(entityBuilder =>
         {
             entityBuilder
@@ -1174,7 +1170,16 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .ToTable(nameof(VehicleSettings))
                 .HasKey(x => new { x.VehicleId, x.SettingId });
         });
+        
+        modelBuilder.Entity<SerialDiscordUserIdData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(SerialDiscordUserId))
+                .HasKey(x => new { x.Serial, x.DiscordId });
 
+            entityBuilder.Property(x => x.Serial)
+                .HasMaxLength(32);
+        });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

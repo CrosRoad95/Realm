@@ -73,6 +73,7 @@ public interface IDb
     DbSet<MapData> Maps { get; }
     DbSet<MapUserData> MapsUsers { get; }
     DbSet<VehicleSettingData> VehicleSettings { get; }
+    DbSet<SerialDiscordUserIdData> SerialDiscordUserId { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
