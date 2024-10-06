@@ -14,7 +14,6 @@ public class MapsCollection
     private readonly Dictionary<string, MapBase> _maps = [];
     private readonly object _lock = new();
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<MapsCollection> _logger;
 
     public event Action<string, MapEventType>? MapChanged;
 
@@ -30,53 +29,53 @@ public class MapsCollection
     public event Action<string, MapBase>? MapAdded;
     public event Action<string, MapBase>? MapRemoved;
 
-    public MapsCollection(IServiceProvider serviceProvider, ILogger<MapsCollection> logger, MapIdGenerator mapIdGenerator, MtaServer mtaServer, GameWorld gameWorld)
+    public MapsCollection(IServiceProvider serviceProvider, MapIdGenerator mapIdGenerator, MtaServer mtaServer, GameWorld gameWorld)
     {
         _serviceProvider = serviceProvider;
-        _logger = logger;
         _mapIdGenerator = mapIdGenerator;
         _mtaServer = mtaServer;
         _gameWorld = gameWorld;
     }
 
-    public void AddMap(string name, MapBase map)
+    public bool AddMap(string name, MapBase map)
     {
         lock (_lock)
         {
             if (_maps.ContainsKey(name))
-            {
-                throw new Exception($"Map of name '{name}' already exists");
-            }
+                return false;
+
             _maps.Add(name, map);
         }
 
         MapAdded?.Invoke(name, map);
+        return true;
     }
 
-    public void RemoveMapByName(string name)
+    public bool RemoveMapByName(string name)
     {
         MapBase? map;
         lock (_lock)
         {
-            if (_maps.TryGetValue(name, out map))
-            {
-                map.Dispose();
-                _maps.Remove(name);
-            }
-            else
-                throw new Exception($"Map of name '{name}' doesn't exists");
+            if (!_maps.TryGetValue(name, out map))
+                return false;
+
+            map.Dispose();
+            _maps.Remove(name);
         }
 
         MapRemoved?.Invoke(name, map);
+        return true;
     }
 
-    internal void UnregisterWatcher(MapsDirectoryWatcher mapsDirectoryWatcher)
+    internal bool UnregisterWatcher(MapsDirectoryWatcher mapsDirectoryWatcher)
     {
         if (_mapsDirectoryWatchers.Remove(mapsDirectoryWatcher))
         {
             mapsDirectoryWatcher.MapChanged -= HandleMapChanged;
             mapsDirectoryWatcher.Dispose();
+            return true;
         }
+        return false;
     }
 
     public MapsWatcherRegistration RegisterMapsPath(string path)
@@ -95,15 +94,13 @@ public class MapsCollection
         MapChanged?.Invoke(arg1, arg2);
     }
 
-    public MapBase GetByName(string name)
+    public MapBase? GetByName(string name)
     {
         lock (_lock)
         {
             if (_maps.TryGetValue(name, out var map))
-            {
                 return map;
-            }
-            throw new MapNotFoundException(name);
         }
+        return null;
     }
 }

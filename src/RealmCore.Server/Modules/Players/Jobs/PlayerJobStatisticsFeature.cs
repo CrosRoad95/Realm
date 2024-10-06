@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Players.Jobs;
 
 public record struct JobStatisticsSummary(ulong points, ulong timePlayed);
 
@@ -26,12 +28,13 @@ public sealed class PlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<Use
             _jobStatistics = userData.JobStatistics;
     }
 
-    private JobStatisticsData GetJobStatisticsData(short jobId)
+    private JobStatisticsData? GetJobStatisticsData(short jobId)
     {
+        JobStatisticsData? jobStatisticsData;
         var today = DateOnly.FromDateTime(_dateTimeProvider.Now);
         lock (_lock)
         {
-            var jobStatisticsData = _jobStatistics.Where(x => x.JobId == jobId && x.Date == today).FirstOrDefault();
+            jobStatisticsData = _jobStatistics.Where(x => x.JobId == jobId && x.Date == today).FirstOrDefault();
             if (jobStatisticsData == null)
             {
                 jobStatisticsData = new JobStatisticsData
@@ -39,54 +42,73 @@ public sealed class PlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<Use
                     JobId = jobId,
                     Date = today,
                 };
-                VersionIncreased?.Invoke();
                 _jobStatistics.Add(jobStatisticsData);
             }
 
-            return jobStatisticsData;
         }
+        VersionIncreased?.Invoke();
+        return jobStatisticsData;
     }
 
-    public void AddPoints(short jobId, ulong points)
+    public bool AddPoints(short jobId, ulong points)
     {
         ArgumentOutOfRangeException.ThrowIfZero(points);
 
+        JobStatisticsData? jobStatisticsData;
+
         lock (_lock)
         {
-            var jobStatisticsData = GetJobStatisticsData(jobId);
+            jobStatisticsData = GetJobStatisticsData(jobId);
+            if (jobStatisticsData == null)
+                return false;
             jobStatisticsData.Points += points;
-            VersionIncreased?.Invoke();
-            PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
         }
+
+        VersionIncreased?.Invoke();
+        PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
+        return true;
     }
 
-    public void AddTimePlayed(short jobId, ulong timePlayed)
+    public bool AddTimePlayed(short jobId, ulong timePlayed)
     {
         ArgumentOutOfRangeException.ThrowIfZero(timePlayed);
 
+        JobStatisticsData? jobStatisticsData;
+
         lock (_lock)
         {
-            var jobStatisticsData = GetJobStatisticsData(jobId);
+            jobStatisticsData = GetJobStatisticsData(jobId);
+            if (jobStatisticsData == null)
+                return false;
+
             jobStatisticsData.TimePlayed += timePlayed;
-            VersionIncreased?.Invoke();
-            TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }
+        VersionIncreased?.Invoke();
+        TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
+        return true;
     }
 
-    public void AddPointsAndTimePlayed(short jobId, ulong points, ulong timePlayed)
+    public bool AddPointsAndTimePlayed(short jobId, ulong points, ulong timePlayed)
     {
         ArgumentOutOfRangeException.ThrowIfZero(points);
         ArgumentOutOfRangeException.ThrowIfZero(timePlayed);
 
+        JobStatisticsData? jobStatisticsData;
+
         lock (_lock)
         {
-            var jobStatisticsData = GetJobStatisticsData(jobId);
+            jobStatisticsData = GetJobStatisticsData(jobId);
+            if (jobStatisticsData == null)
+                return false;
+
             jobStatisticsData.Points += points;
             jobStatisticsData.TimePlayed += timePlayed;
-            VersionIncreased?.Invoke();
-            PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
-            TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }
+
+        VersionIncreased?.Invoke();
+        PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
+        TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
+        return true;
     }
 
     public JobStatisticsSummary GetSummary(short jobId)

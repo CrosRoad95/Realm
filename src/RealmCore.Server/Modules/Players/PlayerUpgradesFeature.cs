@@ -46,11 +46,11 @@ public sealed class PlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>, IU
             {
                 UpgradeId = upgradeId,
             });
-
-            VersionIncreased?.Invoke();
-            Added?.Invoke(this, upgradeId, false);
-            return true;
         }
+
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, upgradeId, false);
+        return true;
     }
 
     public bool TryRemove(int upgradeId)
@@ -61,10 +61,11 @@ public sealed class PlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>, IU
             if (upgrade == null)
                 return false;
             _upgrades.Remove(upgrade);
-            VersionIncreased?.Invoke();
-            Removed?.Invoke(this, upgradeId);
-            return true;
         }
+
+        VersionIncreased?.Invoke();
+        Removed?.Invoke(this, upgradeId);
+        return true;
     }
 
     public void Clear()

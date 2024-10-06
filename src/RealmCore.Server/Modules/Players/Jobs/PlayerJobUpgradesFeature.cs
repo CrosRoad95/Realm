@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Players.Jobs;
 
 public sealed class PlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgradeDto>, IUsesUserPersistentData
 {
@@ -46,35 +48,40 @@ public sealed class PlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUp
 
     public bool TryAdd(short jobId, int upgradeId)
     {
+        JobUpgradeData jobUpgradeData;
         lock (_lock)
         {
             if (InternalHasUpgrade(jobId, upgradeId))
                 return false;
-            var jobUpgradeData = new JobUpgradeData
+            jobUpgradeData = new JobUpgradeData
             {
                 JobId = jobId,
                 UpgradeId = upgradeId
             };
 
             _jobUpgrades.Add(jobUpgradeData);
-            VersionIncreased?.Invoke();
-            Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData), false);
-            return true;
         }
+
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData), false);
+        return true;
     }
 
     public bool TryRemove(short jobId, int upgradeId)
     {
+        JobUpgradeData? jobUpgradeData;
+        bool removed;
         lock (_lock)
         {
-            var jobUpgradeData = InternalGetUpgrade(jobId, upgradeId);
+            jobUpgradeData = InternalGetUpgrade(jobId, upgradeId);
             if (jobUpgradeData == null)
                 return false;
-            _jobUpgrades.Remove(jobUpgradeData);
-            VersionIncreased?.Invoke();
-            Removed?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
-            return true;
+            removed = _jobUpgrades.Remove(jobUpgradeData);
         }
+
+        VersionIncreased?.Invoke();
+        Removed?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
+        return true;
     }
 
     public IEnumerator<JobUpgradeDto> GetEnumerator()

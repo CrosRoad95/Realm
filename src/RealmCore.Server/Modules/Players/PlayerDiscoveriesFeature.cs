@@ -33,10 +33,11 @@ public sealed class PlayerDiscoveriesFeature : IPlayerFeature, IEnumerable<int>,
                 DiscoveryId = discoveryId
             };
             _discoveries.Add(discoveryData);
-            VersionIncreased?.Invoke();
-            Discovered?.Invoke(this, discoveryId);
-            return true;
         }
+
+        VersionIncreased?.Invoke();
+        Discovered?.Invoke(this, discoveryId);
+        return true;
     }
 
     public bool IsDiscovered(int discoveryId)

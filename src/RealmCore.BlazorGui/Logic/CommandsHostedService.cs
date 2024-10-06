@@ -1,8 +1,6 @@
 ﻿using RealmCore.Resources.Base;
-using RealmCore.Server.Modules.Persistence;
 using RealmCore.Server.Modules.Vehicles.Access;
 using SlipeServer.Resources.BoneAttach;
-using SlipeServer.Server.Elements;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.BlazorGui.Logic;
@@ -77,7 +75,7 @@ internal sealed class CommandsHostedService : IHostedService
             _chatBox.Output("Ok");
         }, ["Admin"]);
 
-        _commandService.Add("testpolicy2", async ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("testpolicy2", ([CallingPlayer] RealmPlayer player) =>
         {
             _chatBox.OutputTo(player, $"authorized: {player.User.HasAuthorizedPolicies(["Admin"])}");
         });
@@ -1367,7 +1365,7 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("destroyhud", ([CallingPlayer] RealmPlayer player) =>
         {
-            player.Hud.RemoveLayer<SampleHudLayer>();
+            player.Hud.TryRemoveLayer<SampleHudLayer>();
         });
 
         _commandService.Add("createHud3d", async ([CallingPlayer] RealmPlayer player) =>
@@ -1517,7 +1515,7 @@ internal sealed class CommandsHostedService : IHostedService
 
     private void AddOverlayCommands()
     {
-        _commandService.Add("overlayCreateLine3d", async ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("overlayCreateLine3d", ([CallingPlayer] RealmPlayer player) =>
         {
             var id1 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 0, 0), Color.Red, 2, Line3dEffect.Gravity(1));
             var id2 = _overlayService.CreateLine3d([player], player.Position, player.Position + new Vector3(10, 3, -3), Color.Red, 2, Line3dEffect.Gravity(2));
@@ -1548,7 +1546,7 @@ internal sealed class CommandsHostedService : IHostedService
             _overlayService.RemoveLine3d([player], [id]);
         });
 
-        _commandService.Add("overlayAddEffect", async ([CallingPlayer] RealmPlayer player) =>
+        _commandService.Add("overlayAddEffect", ([CallingPlayer] RealmPlayer player) =>
         {
             _overlayService.AddEffect([player], ParticleEffect.BoatSplash, player.Position + new Vector3(2, 0, 0), Vector3.UnitZ, Color.Red, false, 8, 1, 0.3f, false, 1);
             _chatBox.OutputTo(player, "Effect created");

@@ -1,7 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.Cms;
-using RealmCore.Server.Modules.Domain;
-
-namespace RealmCore.Server.Modules.World;
+﻿namespace RealmCore.Server.Modules.World;
 
 public sealed class MapsService
 {
@@ -53,6 +50,9 @@ public sealed class MapsService
     public bool Load(string name)
     {
         var map = _mapsCollection.GetByName(name);
+        if (map == null)
+            return false;
+
         lock (_lock)
         {
             if (_loadedMaps.Contains(name))
@@ -66,6 +66,9 @@ public sealed class MapsService
     public bool LoadFor(string name)
     {
         var map = _mapsCollection.GetByName(name);
+        if (map == null)
+            return false;
+
         lock (_lock)
         {
             if (_loadedMaps.Contains(name))
@@ -82,6 +85,9 @@ public sealed class MapsService
     public bool Unload(string name)
     {
         var map = _mapsCollection.GetByName(name);
+        if (map == null)
+            return false;
+
         lock (_lock)
         {
             if (!_loadedMaps.Contains(name))

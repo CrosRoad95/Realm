@@ -33,7 +33,7 @@ public class PlayerAFKServiceTests : IClassFixture<RealmTestingServerHostingFixt
 
         var debounce = _debounceFactory.LastDebounce;
         afkService.HandleAFKStarted();
-        await debounce.Release();
+        await debounce!.Release();
         _elapsed.Should().Be(TimeSpan.Zero);
         _isAfk.Should().BeTrue();
         afkService.IsAFK.Should().BeTrue();

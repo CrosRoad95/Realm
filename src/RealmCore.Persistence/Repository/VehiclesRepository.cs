@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using RealmCore.Persistence.Data;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Xml.Linq;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public sealed class VehiclesRepository
 {

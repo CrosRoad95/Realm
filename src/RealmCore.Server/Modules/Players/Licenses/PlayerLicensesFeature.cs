@@ -50,21 +50,23 @@ public sealed class PlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLi
 
     public bool TryAdd(int licenseId)
     {
-        var userLicenseData = new UserLicenseData
-        {
-            LicenseId = licenseId,
-        };
-
+        UserLicenseData userLicenseData;
         lock (_lock)
         {
             if (InternalHas(licenseId, true))
                 return false;
 
+            userLicenseData = new UserLicenseData
+            {
+                LicenseId = licenseId,
+            };
+
             _licenses.Add(userLicenseData);
-            VersionIncreased?.Invoke();
-            Added?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
-            return true;
         }
+
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
+        return true;
     }
 
     public bool Has(int licenseId, bool includeSuspended = false)

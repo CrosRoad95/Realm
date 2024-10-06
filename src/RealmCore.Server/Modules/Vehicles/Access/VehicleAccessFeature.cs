@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace RealmCore.Server.Modules.Vehicles.Access;
+﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
 public sealed class VehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleAccessDto>, IUsesVehiclePersistentData
 {

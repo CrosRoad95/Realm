@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.Cms;
-
-namespace RealmCore.Server.Modules.Businesses;
+﻿namespace RealmCore.Server.Modules.Businesses;
 
 public sealed class BusinessDto : IEqualityComparer<BusinessDto>
 {

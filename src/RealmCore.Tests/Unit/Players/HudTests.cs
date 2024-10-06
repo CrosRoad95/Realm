@@ -25,8 +25,10 @@ public class HudTests
 
         using var monitor = player.Hud.Monitor();
         player.Hud.AddLayer(layer);
-        player.Hud.RemoveLayer<SampleLayer>();
+        var removed = player.Hud.TryRemoveLayer<SampleLayer>();
 
+        using var _ = new AssertionScope();
+        removed.Should().BeTrue();
         layer.Disposed.Should().BeTrue();
         player.Hud.Should().HaveCount(0);
         monitor.GetOccurredEvents().Should().BeEquivalentTo(["LayerAdded", "LayerRemoved"]);

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.Server.Modules.World;
+﻿namespace RealmCore.Server.Modules.World;
 
 public interface IWorldHud : IDisposable
 {

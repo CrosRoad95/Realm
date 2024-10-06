@@ -88,7 +88,7 @@ public class TestDebounce : IDebounce
 
 public class TestDebounceFactory : IDebounceFactory
 {
-    public TestDebounce LastDebounce { get; private set; }
+    public TestDebounce? LastDebounce { get; private set; }
     public IDebounce Create(int milliseconds)
     {
         LastDebounce = new TestDebounce(milliseconds);

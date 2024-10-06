@@ -1,7 +1,6 @@
 ﻿using Size = System.Drawing.Size;
 using Color = System.Drawing.Color;
 using RealmCore.Resources.Assets.AssetsTypes;
-using System.Security.Cryptography;
 using RealmCore.Resources.Browser;
 
 namespace RealmCore.BlazorGui.HudLayers;

@@ -64,16 +64,6 @@ public sealed class ReaderWriterLockSlimScopedAsync
         }
     }
     
-    private struct WriteLockScope : IDisposable
-    {
-        public SemaphoreSlim _lock;
-
-        public void Dispose()
-        {
-            _lock.Release();
-        }
-    }
-
     public ReaderWriterLockSlimScopedAsync()
     {
         _lock = new(1, 1);

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public sealed class UsersRepository
 {

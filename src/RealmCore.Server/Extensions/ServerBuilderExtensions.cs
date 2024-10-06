@@ -1,6 +1,4 @@
-﻿using SlipeServer.Resources.DiscordRichPresence;
-
-[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

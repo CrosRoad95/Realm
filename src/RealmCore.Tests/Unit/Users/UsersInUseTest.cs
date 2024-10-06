@@ -20,7 +20,7 @@ public class UsersInUseTest
         set1.Should().BeTrue();
         set2.Should().BeFalse();
         innerIsActive.Should().BeTrue();
-        set.Should().BeEquivalentTo(new List<int> { 1 });
+        set.Should().BeEquivalentTo([1]);
         set3.Should().BeTrue();
         set4.Should().BeFalse();
         afterIsActive.Should().BeFalse();

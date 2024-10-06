@@ -42,8 +42,8 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<User
         {
             var achievement = GetById(achievementId);
             achievement.Value = JsonConvert.SerializeObject(value);
-            VersionIncreased?.Invoke();
         }
+        VersionIncreased?.Invoke();
     }
 
     public T? GetValue<T>(int achievementId)
@@ -91,9 +91,9 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<User
                 return false;
 
             achievement.PrizeReceivedDateTime = now;
-            VersionIncreased?.Invoke();
-            return true;
         }
+        VersionIncreased?.Invoke();
+        return true;
     }
 
     public bool IsRewardReceived(int achievementId)
@@ -140,10 +140,9 @@ public sealed class PlayerAchievementsFeature : IPlayerFeature, IEnumerable<User
                 Unlocked?.Invoke(this, achievementId);
             else
                 Progressed?.Invoke(this, achievementId, achievement.Progress);
-
-            VersionIncreased?.Invoke();
-            return true;
         }
+        VersionIncreased?.Invoke();
+        return true;
     }
 
     public void Clear()

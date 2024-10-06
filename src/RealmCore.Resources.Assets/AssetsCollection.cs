@@ -1,5 +1,4 @@
 ﻿using RenderWareBuilders;
-using System.IO;
 
 namespace RealmCore.Resources.Assets;
 
@@ -102,11 +101,11 @@ public class AssetsCollection
 
     internal IAsset InternalGetAsset(string name)
     {
-        if (!_assets.ContainsKey(name))
+        if (!_assets.TryGetValue(name, out IAsset? value))
         {
             throw new Exception($"Asset '{name}' not found.");
         }
-        return _assets[name];
+        return value;
     }
 
     public IAsset GetAsset(string assetName)

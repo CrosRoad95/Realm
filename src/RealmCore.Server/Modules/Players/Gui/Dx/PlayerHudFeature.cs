@@ -50,33 +50,6 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
         return default;
     }
 
-    public void RemoveLayer(IHudLayer hudLayer)
-    {
-        lock (_lock)
-        {
-            if (!_hudLayers.Remove(hudLayer))
-                throw new HudLayerNotFoundException(hudLayer.GetType());
-        }
-
-        hudLayer.Dispose();
-        LayerRemoved?.Invoke(this, hudLayer);
-    }
-
-    public void RemoveLayer<THudLayer>() where THudLayer : IHudLayer
-    {
-        THudLayer? hudLayer;
-        lock (_lock)
-        {
-            hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
-
-            if (hudLayer == null || !_hudLayers.Remove(hudLayer))
-                throw new HudLayerNotFoundException(typeof(THudLayer));
-        }
-
-        hudLayer.Dispose();
-        LayerRemoved?.Invoke(this, hudLayer);
-    }
-
     public bool TryRemoveLayer<THudLayer>() where THudLayer : IHudLayer
     {
         IHudLayer? hudLayer;
@@ -153,7 +126,7 @@ public sealed class PlayerHudFeature : IPlayerFeature, IEnumerable<IHudLayer>, I
 
             foreach (var layer in view)
             {
-                RemoveLayer(layer);
+                TryRemoveLayer(layer);
             }
         }
     }

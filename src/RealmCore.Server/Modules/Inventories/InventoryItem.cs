@@ -103,7 +103,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
         return removed;
     }
 
-    public void ChangeMetadata<T>(string key, Func<T, T> callback)
+    public bool ChangeMetadata<T>(string key, Func<T, T> callback)
     {
         bool changed = false;
         lock (_lock)
@@ -120,6 +120,7 @@ public class InventoryItem : IEquatable<InventoryItem>, IEquatable<ItemMetadata>
                 changed = true;
             }
         }
+        return changed;
     }
 
     public object? GetMetadata(string key)
