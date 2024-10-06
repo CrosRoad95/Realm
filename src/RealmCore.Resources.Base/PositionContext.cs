@@ -23,9 +23,13 @@ public class PositionContext
             if(context.type == "constantPosition")then
                 return unpack(context.position);
             elseif(context.type == "element")then
-                return getElementPosition(context.element);
+                if(context.element and isElement(context.element))then
+                    return getElementPosition(context.element);
+                end
             elseif(context.type == "elementWithOffset")then
-                return getOffsetFromXYZ(getElementMatrix(context.element), context.offset);
+                if(context.element and isElement(context.element))then
+                    return getOffsetFromXYZ(getElementMatrix(context.element), context.offset);
+                end
             end
         end
         """;

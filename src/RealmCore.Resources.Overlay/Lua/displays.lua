@@ -137,6 +137,8 @@ end
 
 function handleAddEffect(effect, position, directionX, directionY, directionZ, color, randomizeColors, count, brightness, size, randomSizes, life)
 	local px,py,pz = getPositionFromContext(position);
-	local r,g,b,a = tocolor2rgba(color)
-	fxCreateParticle(effect, px,py,pz, directionX, directionY, directionZ, r, g, b, a, randomizeColors, count, brightness, size, randomSizes, life);
+	if(px)then
+		local r,g,b,a = tocolor2rgba(color)
+		fxCreateParticle(effect, px,py,pz, directionX, directionY, directionZ, r, g, b, a, randomizeColors, count, brightness, size, randomSizes, life);
+	end
 end

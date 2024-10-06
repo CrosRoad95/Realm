@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Inventories;
 
-internal sealed class InventoryHostedService : PlayerLifecycle, IHostedService
+internal sealed class InventoryLogic : PlayerLifecycle, IHostedService
 {
-    private readonly ILogger<InventoryHostedService> _logger;
+    private readonly ILogger<InventoryLogic> _logger;
 
-    public InventoryHostedService(PlayersEventManager playersEventManager, ILogger<InventoryHostedService> logger) : base(playersEventManager)
+    public InventoryLogic(PlayersEventManager playersEventManager, ILogger<InventoryLogic> logger) : base(playersEventManager)
     {
         _logger = logger;
     }

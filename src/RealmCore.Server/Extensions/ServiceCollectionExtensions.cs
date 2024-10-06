@@ -127,6 +127,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DataEventsService>();
         services.AddSingleton<GroupsManager>();
         services.AddSingleton<WorldHudService>();
+        services.AddSingleton<InventoryService>();
         #endregion
 
         #region Player features
@@ -216,7 +217,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<PlayerHudHostedService>();
         services.AddHostedService<VehiclesTuningHostedService>();
         services.AddHostedService<VehiclesInUseHostedService>();
-        services.AddHostedService<InventoryHostedService>();
+        services.AddHostedService<InventoryLogic>();
         services.AddHostedService<PlayersHostedService>();
         services.AddHostedService<ServerListHostedService>();
         services.AddHostedService<VehicleAccessControllerLogic>();

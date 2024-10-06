@@ -1372,9 +1372,10 @@ internal sealed class CommandsHostedService : IHostedService
 
         _commandService.Add("createHud3d", async ([CallingPlayer] RealmPlayer player) =>
         {
-            var hud3d = _worldHudService.Create<SampleHud3d>(player.Position);
+            var hud3d = _worldHudService.Create<SampleHud3d>(player.Position, 123);
             await Task.Delay(1000);
             hud3d.Update();
+            hud3d.Dispose();
             _chatBox.OutputTo(player, "Hud3d created");
         });
     }
@@ -1569,15 +1570,18 @@ internal sealed class CommandsHostedService : IHostedService
     public class SampleHud3d : WorldHud<SampleHudState>
     {
         private readonly AssetsCollection _assetsCollection;
+        private readonly int _parameter;
 
-        public SampleHud3d(AssetsCollection assetsCollection) : base(new())
+        public SampleHud3d(AssetsCollection assetsCollection, int parameter) : base(new())
         {
             _assetsCollection = assetsCollection;
+            _parameter = parameter;
         }
 
         protected override void Build(IHudBuilder builder, IHudBuilderContext context)
         {
-            builder.Add(new TextHudElement(CreateStatePropertyTextHudElement(x => $"string = {x.String}"), new Vector2(0, 0), new Size(400, 20), font: BuildInFonts.Sans, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center));
+            builder.Add(new RectangleHudElement(new Vector2(0,0), new Size(50, 20), Color.Red));
+            builder.Add(new TextHudElement(CreateStatePropertyTextHudElement(x => $"string = {x.String} ({_parameter})"), new Vector2(0, 0), new Size(400, 20), font: BuildInFonts.Sans, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center));
         }
 
         public void Update()
