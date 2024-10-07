@@ -20,13 +20,13 @@ public sealed class NotificationsService
         _usersInUse = usersInUse;
     }
 
-    public async Task<UserNotificationDto> Create(int userId, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationDto> Create(int userId, int type, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
     {
         UserNotificationData? notificationData;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            notificationData = await _userNotificationRepository.Create(userId, _dateTimeProvider.Now, title, content, excerpt, cancellationToken);
+            notificationData = await _userNotificationRepository.Create(userId, type, _dateTimeProvider.Now, title, content, excerpt, cancellationToken);
         }
         finally
         {

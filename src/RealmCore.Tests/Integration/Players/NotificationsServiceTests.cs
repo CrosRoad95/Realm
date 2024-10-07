@@ -18,7 +18,7 @@ public class NotificationsServiceTests : IClassFixture<RealmTestingServerHosting
     {
         using var monitor = _notificationsService.Monitor();
         var now = _fixture.Hosting.DateTimeProvider.Now;
-        var notification = await _notificationsService.Create(_player.UserId, "title", "desc", "excerpt");
+        var notification = await _notificationsService.Create(_player.UserId, 1, "title", "desc", "excerpt");
         var notifications = await _notificationsService.Get(_player.UserId);
         var notificationById = await _notificationsService.GetById(notification.Id);
 
@@ -28,6 +28,7 @@ public class NotificationsServiceTests : IClassFixture<RealmTestingServerHosting
         {
             Id = notification.Id,
             UserId = _player.UserId,
+            Type = 1,
             Content = "desc",
             Excerpt = "excerpt",
             ReadTime = null,

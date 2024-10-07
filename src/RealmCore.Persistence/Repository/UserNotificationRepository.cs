@@ -47,13 +47,14 @@ public sealed class UserNotificationRepository
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationData> Create(int userId, int type, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Create));
 
         if (activity != null)
         {
             activity.AddTag("UserId", userId);
+            activity.AddTag("Type", type);
             activity.AddTag("Title", title);
             activity.AddTag("Content", content);
             activity.AddTag("Excerpt", excerpt);
@@ -62,6 +63,7 @@ public sealed class UserNotificationRepository
         var userNotificationData = new UserNotificationData
         {
             UserId = userId,
+            Type = type,
             SentTime = now,
             Title = title,
             Content = content,
