@@ -12,21 +12,21 @@ public sealed class UserNotificationDto : IEquatable<UserNotificationDto>
 
     public bool IsRead => ReadTime != null;
 
-    [return: NotNullIfNotNull(nameof(userNotificationData))]
-    public static UserNotificationDto? Map(UserNotificationData? userNotificationData)
+    [return: NotNullIfNotNull(nameof(data))]
+    public static UserNotificationDto? Map(UserNotificationData? data)
     {
-        if (userNotificationData == null)
+        if (data == null)
             return null;
 
         return new UserNotificationDto
         {
-            Id = userNotificationData.Id,
-            UserId = userNotificationData.UserId,
-            SentTime = userNotificationData.SentTime,
-            ReadTime = userNotificationData.ReadTime,
-            Title = userNotificationData.Title,
-            Excerpt = userNotificationData.Excerpt,
-            Content = userNotificationData.Content,
+            Id = data.Id,
+            UserId = data.UserId,
+            SentTime = data.SentTime,
+            ReadTime = data.ReadTime,
+            Title = data.Title,
+            Excerpt = data.Excerpt,
+            Content = data.Content,
         };
     }
 

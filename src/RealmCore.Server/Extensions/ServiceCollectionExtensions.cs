@@ -154,7 +154,6 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<PlayerGuiFeature>();
         services.AddPlayerScopedFeature<PlayerHudFeature>();
         services.AddPlayerScopedFeature<PlayerInventoryFeature>();
-        services.AddPlayerScopedFeature<PlayerNotificationsFeature>();
         services.AddPlayerScopedFeature<PlayerSchedulerFeature>();
         services.AddPlayerScopedFeature<PlayerFriendsFeature>();
         services.AddPlayerScopedFeature<PlayerDailyTasksFeature>();

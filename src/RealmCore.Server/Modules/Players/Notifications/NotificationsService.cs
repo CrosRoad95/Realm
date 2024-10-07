@@ -9,6 +9,8 @@ public sealed class NotificationsService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly UsersInUse _usersInUse;
 
+    public event Action<UserNotificationDto>? Created;
+
     public NotificationsService(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, UsersInUse usersInUse)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -18,18 +20,52 @@ public sealed class NotificationsService
         _usersInUse = usersInUse;
     }
 
-    public async Task<UserNotificationDto> Create(int userId, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationDto> Create(int userId, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
+    {
+        UserNotificationData? notificationData;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            notificationData = await _userNotificationRepository.Create(userId, _dateTimeProvider.Now, title, content, excerpt, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        var userNotificationDto = UserNotificationDto.Map(notificationData);
+        Created?.Invoke(userNotificationDto);
+        return userNotificationDto;
+    }
+    
+    public async Task<UserNotificationDto?> GetById(int id, CancellationToken cancellationToken = default)
+    {
+        UserNotificationData? notificationData;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            notificationData = await _userNotificationRepository.GetById(id, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        if (notificationData == null)
+            return null;
+
+        var userNotificationDto = UserNotificationDto.Map(notificationData);
+        return userNotificationDto;
+    }
+    
+    public async Task<UserNotificationDto[]> Get(int userId, int skip = 0, int limit = 10, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            var notificationData = await _userNotificationRepository.Create(userId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
+            var userNotifications = await _userNotificationRepository.Get(userId, skip, limit, cancellationToken);
 
-            if (_usersInUse.TryGetPlayerByUserId(userId, out var player))
-                player.Notifications.Create(notificationData);
-
-            var userNotificationDto = UserNotificationDto.Map(notificationData);
-            return userNotificationDto;
+            return userNotifications.Select(UserNotificationDto.Map).ToArray();
         }
         finally
         {
@@ -45,9 +81,6 @@ public sealed class NotificationsService
             var now = _dateTimeProvider.Now;
             var marked = await _userNotificationRepository.MarkAsRead(notificationId, now, cancellationToken);
             var notificationData = await _userNotificationRepository.GetById(notificationId, cancellationToken);
-
-            if (notificationData != null && _usersInUse.TryGetPlayerByUserId(notificationData.UserId, out var player))
-                player.Notifications.Update(notificationData);
 
             return marked;
         }

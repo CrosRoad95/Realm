@@ -9,7 +9,7 @@ public sealed class UserNotificationRepository
         _db = db;
     }
 
-    public async Task<UserNotificationData[]> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationData[]> Get(int userId, int skip = 0, int limit = 10, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Get));
 
@@ -24,6 +24,7 @@ public sealed class UserNotificationRepository
             .AsNoTracking()
             .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.SentTime)
+            .Skip(skip)
             .Take(limit);
 
         return await query.ToArrayAsync(cancellationToken);
@@ -102,26 +103,6 @@ public sealed class UserNotificationRepository
             .Where(x => x.Id == id && x.ReadTime == null);
 
         return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.ReadTime, now), cancellationToken) == 1;
-    }
-
-    public async Task<UserNotificationData[]> FetchMore(int userId, int lastId, int number, CancellationToken cancellationToken = default)
-    {
-        using var activity = Activity.StartActivity(nameof(MarkAsRead));
-
-        if (activity != null)
-        {
-            activity.AddTag("UserId", userId);
-            activity.AddTag("LastId", lastId);
-            activity.AddTag("Number", number);
-        }
-
-        var query = _db.UserNotifications
-            .TagWithSource(nameof(UserNotificationRepository))
-            .Where(x => x.UserId == userId && x.Id < lastId)
-                .OrderByDescending(x => x.Id)
-                .Take(number);
-
-        return await query.ToArrayAsync(cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.UserNotificationRepository", "1.0.0");

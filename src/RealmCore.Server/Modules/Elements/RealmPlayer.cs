@@ -167,12 +167,12 @@ public class RealmPlayer : Player, IAsyncDisposable
     public CultureInfo Culture { get => _culture; set => _culture = value; }
     public int UserId => User.Id;
 
+    public PlayerUserFeature User { get; init; }
     public ElementSaveService Saving { get; init; }
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public new PlayerMoneyFeature Money { get; init; }
     public PlayerBrowserFeature Browser { get; init; }
     public PlayerAFKFeature AFK { get; init; }
-    public PlayerUserFeature User { get; init; }
     public PlayerDailyVisitsFeature DailyVisits { get; init; }
     public PlayerSettingsFeature Settings { get; init; }
     public PlayerBansFeature Bans { get; init; }
@@ -192,7 +192,6 @@ public class RealmPlayer : Player, IAsyncDisposable
     public PlayerGuiFeature Gui { get; init; }
     public PlayerHudFeature Hud { get; init; }
     public PlayerInventoryFeature Inventory { get; init; }
-    public PlayerNotificationsFeature Notifications { get; init; }
     public PlayerSchedulerFeature Scheduler { get; init; }
     public PlayerFriendsFeature Friends { get; init; }
     public PlayerDailyTasksFeature DailyTasks { get; init; }
@@ -226,10 +225,10 @@ public class RealmPlayer : Player, IAsyncDisposable
         Saving = GetRequiredService<ElementSaveService>();
 
         #region Initialize scope services
+        User = GetRequiredService<PlayerUserFeature>();
         Money = GetRequiredService<PlayerMoneyFeature>();
         AFK = GetRequiredService<PlayerAFKFeature>();
         Browser = GetRequiredService<PlayerBrowserFeature>();
-        User = GetRequiredService<PlayerUserFeature>();
         DailyVisits = GetRequiredService<PlayerDailyVisitsFeature>();
         Settings = GetRequiredService<PlayerSettingsFeature>();
         Bans = GetRequiredService<PlayerBansFeature>();
@@ -249,7 +248,6 @@ public class RealmPlayer : Player, IAsyncDisposable
         Gui = GetRequiredService<PlayerGuiFeature>();
         Hud = GetRequiredService<PlayerHudFeature>();
         Inventory = GetRequiredService<PlayerInventoryFeature>();
-        Notifications = GetRequiredService<PlayerNotificationsFeature>();
         Scheduler = GetRequiredService<PlayerSchedulerFeature>();
         Friends = GetRequiredService<PlayerFriendsFeature>();
         DailyTasks = GetRequiredService<PlayerDailyTasksFeature>();
