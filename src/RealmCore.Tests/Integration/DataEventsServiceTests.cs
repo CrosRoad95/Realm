@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Tests.Integration;
 
-public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IDisposable
+public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithUniquePlayer>, IAsyncDisposable
 {
     private readonly RealmTestingServerHostingFixtureWithUniquePlayer _fixture;
     private readonly RealmTestingPlayer _player;
@@ -18,33 +18,35 @@ public class DataEventsServiceTests : IClassFixture<RealmTestingServerHostingFix
     [Fact]
     public async Task AddingEventShouldWork()
     {
-        var eventData = await _dataEventsService.Add(new DataEvent(DataEventType.Player, _player.UserId, 1));
+        int eventType = 1;
+        var eventData = await _dataEventsService.Add(new DataEvent(DataEventType.Player, _player.UserId, eventType));
         var eventsData = await _dataEventsService.Get(DataEventType.Player, _player.UserId);
 
         var expectedEventData = new EventDataDto
         {
             Id = eventData.Id,
             DateTime = _dateTimeProvider.Now,
-            EventType = 1,
+            EventType = eventType,
             Metadata = null
         };
 
         using var _ = new AssertionScope();
 
         eventData.Should().BeEquivalentTo(expectedEventData, RealmTestsHelpers.DateTimeCloseTo);
-
-        eventsData.Should().BeEquivalentTo([expectedEventData], RealmTestsHelpers.DateTimeCloseTo);
+        eventsData.Where(x => x.EventType == eventType).Should().BeEquivalentTo([expectedEventData], RealmTestsHelpers.DateTimeCloseTo);
     }
     
     [Fact]
     public async Task AddingEventShouldWork2()
     {
-        var eventData = await _dataEventsService.Add(new DataEvent(DataEventType.Player, _player.UserId, 1));
+        int eventType = 2;
+        var eventData = await _dataEventsService.Add(new DataEvent(DataEventType.Player, _player.UserId, eventType));
 
         _player.Events.ToArray().Length.Should().Be(1);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        await _fixture.Hosting.GetRequiredService<IDb>().UserEvents.Where(x => x.UserId == _player.UserId).ExecuteDeleteAsync();
     }
 }

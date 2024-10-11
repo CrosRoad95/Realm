@@ -29,7 +29,7 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
     {
         lock (_lock)
         {
-            if (state < 0)
+            if (state <= 0)
                 throw new ArgumentOutOfRangeException(nameof(state));
             var exists = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
             if (exists != null)
@@ -41,9 +41,6 @@ public sealed class VehiclePartDamageFeature : IVehicleFeature, IUsesVehiclePers
                 State = state
             });
         }
-
-        if (state == 0)
-            PartRemoved?.Invoke(this, partId);
 
         VersionIncreased?.Invoke();
 

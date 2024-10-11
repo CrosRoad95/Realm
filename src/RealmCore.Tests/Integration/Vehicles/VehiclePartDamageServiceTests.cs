@@ -48,7 +48,9 @@ public class VehiclePartDamageServiceTests : IClassFixture<RealmTestingServerHos
             destroyed = true;
         }
         vehicle.PartDamage.PartRemoved += handlePartDestroyed;
-        vehicle.PartDamage.TryAddPart(1, 0);
+
+        vehicle.PartDamage.TryAddPart(1, 10);
+        vehicle.PartDamage.TryModify(1, -10);
 
         destroyed.Should().BeTrue();
     }

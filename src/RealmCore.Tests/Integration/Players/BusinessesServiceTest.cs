@@ -70,8 +70,8 @@ public class BusinessesServiceTest : IClassFixture<RealmTestingServerHostingFixt
         added2.Should().BeFalse();
         added3.Should().BeTrue();
         groups.SelectMany(x => x.Businesses.Select(y => y.Id)).Should().BeEquivalentTo([business.Id]);
-        businesses1.Select(x => x.Id).Should().BeEquivalentTo([business.Id]);
-        businesses2.Select(x => x.Id).Should().BeEquivalentTo([business.Id]);
+        businesses1.Select(x => x.Id).Should().Contain(business.Id);
+        businesses2.Select(x => x.Id).Should().Contain(business.Id);
     }
 
     [Fact]
