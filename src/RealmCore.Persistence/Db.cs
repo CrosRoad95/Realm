@@ -73,6 +73,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<GroupEventData> GroupsEvents => Set<GroupEventData>();
     public DbSet<GroupSettingData> GroupsSettings => Set<GroupSettingData>();
     public DbSet<GroupJoinRequestData> GroupsJoinRequests => Set<GroupJoinRequestData>();
+    public DbSet<GroupUpgradeData> GroupsUpgrades => Set<GroupUpgradeData>();
     public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
     public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
     public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
@@ -755,6 +756,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.Group)
                 .HasForeignKey(x => x.GroupId)
                 .HasPrincipalKey(x => x.Id);
+            
+            entityBuilder.HasMany(x => x.Upgrades)
+                .WithOne(x => x.Group)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
 
             entityBuilder
                 .HasMany(x => x.Settings)
@@ -824,6 +830,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(GroupsJoinRequests))
                 .HasKey(x => new { x.GroupId, x.UserId });
+        });
+        
+        modelBuilder.Entity<GroupUpgradeData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupsUpgrades))
+                .HasKey(x => new { x.GroupId, x.UpgradeId });
         });
 
         modelBuilder.Entity<DiscordIntegrationData>(entityBuilder =>

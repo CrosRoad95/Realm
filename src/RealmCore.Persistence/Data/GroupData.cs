@@ -8,6 +8,7 @@ public sealed class GroupData
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public string? Shortcut { get; set; }
     public byte? Kind { get; set; }
+    public decimal Money { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public ICollection<GroupMemberData> Members { get; set; } = [];
@@ -16,6 +17,7 @@ public sealed class GroupData
     public ICollection<GroupSettingData> Settings { get; set; } = [];
     public ICollection<GroupJoinRequestData> JoinRequests { get; set; } = [];
     public ICollection<VehicleGroupAccessData> VehicleAccesses { get; set; } = [];
+    public ICollection<GroupUpgradeData> Upgrades { get; set; } = [];
 }
 
 public sealed class GroupMemberData
@@ -69,6 +71,14 @@ public sealed class GroupJoinRequestData
     public int UserId { get; set; }
     public DateTime CreatedAt { get; set; }
     public string Metadata { get; set; }
+
+    public GroupData? Group { get; set; }
+}
+
+public sealed class GroupUpgradeData
+{
+    public int GroupId { get; set; }
+    public int UpgradeId { get; set; }
 
     public GroupData? Group { get; set; }
 }

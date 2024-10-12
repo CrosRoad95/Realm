@@ -1,9 +1,12 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMemberDto>, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<GroupMemberData> _groupMembers = [];
+    private HashSet<int> _upgrades = [];
 
     public event Action? VersionIncreased;
 
@@ -12,6 +15,8 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Added;
     public event Action<PlayerGroupsFeature, GroupMemberDto>? Removed;
     public event Action<PlayerGroupsFeature, int, int?>? GroupRoleChanged;
+    public event Action<PlayerGroupsFeature, int>? UpgradeAdded;
+    public event Action<PlayerGroupsFeature, int>? UpgradeRemoved;
 
     public int[] Ids
     {
@@ -23,6 +28,17 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
             }
         }
     }
+    
+    public int[] Upgrades
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return [.. _upgrades];
+            }
+        }
+    }
 
     public PlayerGroupsFeature(PlayerContext playerContext)
     {
@@ -31,27 +47,58 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
 
     public void LogIn(UserData userData)
     {
+        int[] upgrades;
         lock (_lock)
+        {
             _groupMembers = [.. userData.GroupMembers];
+            foreach (var groupMember in _groupMembers)
+            {
+                if(groupMember.Group != null)
+                {
+                    foreach (var upgrade in groupMember.Group.Upgrades)
+                    {
+                        _upgrades.Add(upgrade.UpgradeId);
+                    }
+                }
+            }
+            upgrades = [.. _upgrades];
+        }
+
+        foreach (var upgradeId in upgrades)
+        {
+            UpgradeAdded?.Invoke(this, upgradeId);
+        }
     }
 
     internal bool AddGroupMember(GroupMemberData groupMemberData)
     {
+        List<int> addedUpgrades = [];
         lock (_lock)
         {
-            var group = _groupMembers.FirstOrDefault(x => x.GroupId == groupMemberData.GroupId);
-            if (group != null)
+            var groupMember = _groupMembers.FirstOrDefault(x => x.GroupId == groupMemberData.GroupId);
+            if (groupMember != null)
                 return false;
 
             _groupMembers.Add(groupMemberData);
+            foreach (var upgrade in groupMemberData!.Group!.Upgrades)
+            {
+                if (_upgrades.Add(upgrade.UpgradeId))
+                {
+                    addedUpgrades.Add(upgrade.UpgradeId);
+                }
+            }
         }
         VersionIncreased?.Invoke();
         Added?.Invoke(this, GroupMemberDto.Map(groupMemberData));
+        foreach (var upgradeId in addedUpgrades)
+            UpgradeAdded?.Invoke(this, upgradeId);
+
         return true;
     }
 
     internal bool RemoveGroupMember(int groupId)
     {
+        List<int> removedUpgrades = [];
         GroupMemberData? groupMemberData = null;
         lock (_lock)
         {
@@ -59,9 +106,20 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
             if (groupMemberData == null)
                 return false;
             _groupMembers.Remove(groupMemberData);
+
+            var upgrades = _groupMembers.SelectMany(x => x.Group!.Upgrades).Select(x => x.UpgradeId);
+            foreach (var upgradeId in _upgrades.Except(upgrades))
+            {
+                if (_upgrades.Remove(upgradeId))
+                    removedUpgrades.Add(upgradeId);
+            }
         }
 
         VersionIncreased?.Invoke();
+
+        foreach (var upgradeId in removedUpgrades)
+            UpgradeRemoved?.Invoke(this, upgradeId);
+
         Removed?.Invoke(this, GroupMemberDto.Map(groupMemberData));
         return true;
     }
@@ -156,12 +214,36 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         }
     }
 
-    public GroupMemberDto? GetById(int id)
+    public GroupMemberDto? GetById(int groupId)
     {
         GroupMemberData? groupMemberData;
         lock (_lock)
-            groupMemberData = _groupMembers.Where(x => x.Group!.Id == id).FirstOrDefault();
+            groupMemberData = _groupMembers.Where(x => x.GroupId == groupId).FirstOrDefault();
         return GroupMemberDto.Map(groupMemberData);
+    }
+
+    public bool AddUpgrade(int groupId, int upgradeId)
+    {
+        bool added = false;
+        lock (_lock)
+        {
+            var groupMemberData = _groupMembers.Where(x => x.GroupId == groupId).FirstOrDefault();
+            if (groupMemberData!.Group!.Upgrades.Any(x => x.UpgradeId == upgradeId))
+                return false;
+
+            groupMemberData.Group.Upgrades.Add(new GroupUpgradeData
+            {
+                GroupId = groupId,
+                UpgradeId = upgradeId
+            });
+
+            added = _upgrades.Add(upgradeId);
+        }
+
+        if(added)
+            UpgradeAdded?.Invoke(this, upgradeId);
+
+        return added;
     }
 
     public IEnumerator<GroupMemberDto> GetEnumerator()

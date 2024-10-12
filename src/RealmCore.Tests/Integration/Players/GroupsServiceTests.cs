@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Integration.Players;
+﻿using RealmCore.Server.Modules.Players.Groups;
+
+namespace RealmCore.Tests.Integration.Players;
 
 public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixtureWithPlayer>, IDisposable
 {
@@ -248,6 +250,34 @@ public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixture
         isMember.Should().BeTrue();
         member.RoleId.Should().BeNull();
         member.Permissions.Should().BeEmpty();
+    }
+    
+    [Fact]
+    private async Task AddingAndRemovingUpgradesShouldWork()
+    {
+        var group1 = await _groupsService.Create(Guid.NewGuid().ToString());
+        var group2 = await _groupsService.Create(Guid.NewGuid().ToString());
+        await _groupsService.AddUpgrade(group2!.Id, 1);
+        await _groupsService.AddUpgrade(group2!.Id, 2);
+
+        await _groupsService.AddMember(_player, group1!.Id);
+        var upgradesIds1 = _groups.Upgrades;
+        
+        await _groupsService.AddMember(_player, group2!.Id);
+        var upgradesIds2 = _groups.Upgrades;
+
+        await _groupsService.AddUpgrade(group1!.Id, 2);
+        await _groupsService.AddUpgrade(group1!.Id, 3);
+        var upgradesIds3 = _groups.Upgrades;
+
+        await _groupsService.RemoveMember(_player, group2!.Id);
+        var upgradesIds4 = _groups.Upgrades;
+
+        using var _ = new AssertionScope();
+        upgradesIds1.Should().BeEmpty();
+        upgradesIds2.Should().BeEquivalentTo([1, 2]);
+        upgradesIds3.Should().BeEquivalentTo([1, 2, 3]);
+        upgradesIds4.Should().BeEquivalentTo([2, 3]);
     }
 
     public void Dispose()

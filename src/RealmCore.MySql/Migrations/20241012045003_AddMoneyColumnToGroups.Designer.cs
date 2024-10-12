@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealmCore.MySql;
 
@@ -10,9 +11,11 @@ using RealmCore.MySql;
 namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20241012045003_AddMoneyColumnToGroups")]
+    partial class AddMoneyColumnToGroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -429,19 +432,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.HasKey("GroupId", "SettingId");
 
                     b.ToTable("GroupsSettings", (string)null);
-                });
-
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupUpgradeData", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UpgradeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupId", "UpgradeId");
-
-                    b.ToTable("GroupsUpgrades", (string)null);
                 });
 
             modelBuilder.Entity("RealmCore.Persistence.Data.InventoryData", b =>
@@ -2008,17 +1998,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistence.Data.GroupUpgradeData", b =>
-                {
-                    b.HasOne("RealmCore.Persistence.Data.GroupData", "Group")
-                        .WithMany("Upgrades")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-                });
-
             modelBuilder.Entity("RealmCore.Persistence.Data.InventoryItemData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.InventoryData", "Inventory")
@@ -2522,8 +2501,6 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("Roles");
 
                     b.Navigation("Settings");
-
-                    b.Navigation("Upgrades");
 
                     b.Navigation("VehicleAccesses");
                 });

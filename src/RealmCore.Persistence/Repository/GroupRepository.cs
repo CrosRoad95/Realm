@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using System.Text.RegularExpressions;
+
+namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {
@@ -199,8 +201,10 @@ public sealed class GroupRepository
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Include(x => x.Group)
+            .ThenInclude(x => x!.Upgrades)
             .Include(x => x.Role)
             .ThenInclude(x => x!.Permissions)
+            .AsSplitQuery()
             .Where(x => x.GroupId == groupId.id && x.UserId == userId);
 
         if (kinds != null)
@@ -939,6 +943,115 @@ public sealed class GroupRepository
             .Take(pageSize);
 
         return await query.ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<bool> GiveMoney(GroupId groupId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        if (amount < 0)
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        using var activity = Activity.StartActivity(nameof(GiveMoney));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId.id);
+            activity.AddTag("Amount", amount);
+        }
+
+        var query = _db.Groups
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.Id == groupId.id);
+
+        var groupData = await query.FirstOrDefaultAsync(cancellationToken);
+        if (groupData == null)
+            return false;
+
+        try
+        {
+            groupData.Money += amount;
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+
+    public async Task<bool> TakeMoney(GroupId groupId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        if (amount < 0)
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        using var activity = Activity.StartActivity(nameof(TakeMoney));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId.id);
+            activity.AddTag("Amount", amount);
+        }
+
+        var query = _db.Groups
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.Id == groupId.id);
+
+        var groupData = await query.FirstOrDefaultAsync(cancellationToken);
+        if (groupData == null)
+            return false;
+
+        try
+        {
+            groupData.Money -= amount;
+            if (groupData.Money < 0)
+                return false;
+
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+
+    public async Task<bool> AddUpgrade(GroupId groupId, int upgradeId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(AddUpgrade));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UpgradeId", upgradeId);
+        }
+
+        var upgradeData = new GroupUpgradeData
+        {
+            GroupId = groupId.id,
+            UpgradeId = upgradeId,
+        };
+
+        try
+        {
+            _db.GroupsUpgrades.Add(upgradeData);
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
     }
 
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));

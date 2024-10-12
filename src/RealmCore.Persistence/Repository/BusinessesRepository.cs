@@ -274,7 +274,7 @@ public sealed class BusinessesRepository
         if(amount < 0)
             throw new ArgumentOutOfRangeException(nameof(amount));
 
-        using var activity = Activity.StartActivity(nameof(GetStatistics));
+        using var activity = Activity.StartActivity(nameof(GiveMoney));
 
         if (activity != null)
         {
@@ -311,7 +311,7 @@ public sealed class BusinessesRepository
         if(amount < 0)
             throw new ArgumentOutOfRangeException(nameof(amount));
 
-        using var activity = Activity.StartActivity(nameof(GetStatistics));
+        using var activity = Activity.StartActivity(nameof(TakeMoney));
 
         if (activity != null)
         {

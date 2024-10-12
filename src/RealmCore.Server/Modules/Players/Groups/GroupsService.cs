@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Groups;
+﻿using RealmCore.Persistence.Repository;
+
+namespace RealmCore.Server.Modules.Players.Groups;
 
 public sealed class GroupsService
 {
@@ -615,5 +617,56 @@ public sealed class GroupsService
         }
 
         return groups.Select(GroupDto.Map).ToArray();
+    }
+
+    public async Task<bool> GiveMoney(int groupId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.GiveMoney(groupId, amount, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> TakeMoney(GroupId groupId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.TakeMoney(groupId, amount, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> AddUpgrade(GroupId groupId, int upgradeId, CancellationToken cancellationToken = default)
+    {
+        bool added = false;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            added = await _groupRepository.AddUpgrade(groupId, upgradeId, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        if (added)
+        {
+            foreach (var player in _groupsManager.GetPlayersInGroup(groupId.id))
+            {
+                player.Groups.AddUpgrade(groupId.id, upgradeId);
+            }
+
+        }
+
+        return added;
     }
 }
