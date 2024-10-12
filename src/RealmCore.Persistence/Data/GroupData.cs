@@ -32,6 +32,17 @@ public sealed class GroupMemberData
     public UserData? User { get; set; }
     public GroupData? Group { get; set; }
     public GroupRoleData? Role { get; set; }
+    public ICollection<GroupMemberStatisticData>? Statistics { get; set; }
+}
+
+public sealed class GroupMemberStatisticData
+{
+    public int GroupMemberId { get; set; }
+    public int StatisticId { get; set; }
+    public DateOnly Date { get; set; }
+    public float Value { get; set; }
+
+    public GroupMemberData? GroupMember { get; set; }
 }
 
 public sealed class GroupRoleData

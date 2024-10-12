@@ -1,6 +1,6 @@
-﻿using RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
-namespace RealmCore.Server.Modules.Players.Groups;
+public record GroupMemberStatistic(DateOnly Date, int StatisticId, float Value);
 
 public sealed class GroupsService
 {
@@ -668,5 +668,53 @@ public sealed class GroupsService
         }
 
         return added;
+    }
+
+    public async Task<bool> IncreaseStatistic(GroupId groupId, int userId, int statisticId, DateOnly date, float value, CancellationToken cancellationToken = default)
+    {
+        if (value < 0)
+            return false;
+
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _groupRepository.IncreaseStatistic(groupId, userId, statisticId, date, value, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    {
+        GroupMemberStatisticData[] statistics;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            statistics = await _groupRepository.GetStatistics(groupId, userId, date, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return statistics.Select(x => new GroupMemberStatistic(x.Date, x.StatisticId, x.Value)).ToArray();
+    }
+
+    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    {
+        GroupMemberStatisticData[] statistics;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            statistics = await _groupRepository.GetStatistics(groupId, userId, from, to, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return statistics.Select(x => new GroupMemberStatistic(x.Date, x.StatisticId, x.Value)).ToArray();
     }
 }

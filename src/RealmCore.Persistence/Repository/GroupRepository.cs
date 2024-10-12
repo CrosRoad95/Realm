@@ -1053,6 +1053,130 @@ public sealed class GroupRepository
             _db.ChangeTracker.Clear();
         }
     }
+    
+    public async Task<bool> IncreaseStatistic(GroupId groupId, int userId, int statisticId, DateOnly date, float value, CancellationToken cancellationToken = default)
+    {
+        if (value < 0)
+            return false;
+
+        using var activity = Activity.StartActivity(nameof(IncreaseStatistic));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+            activity.AddTag("StatisticId", statisticId);
+            activity.AddTag("Date", date);
+            activity.AddTag("Value", value);
+        }
+
+        var groupMemberQuery = _db.GroupsMembers.Where(x => x.GroupId == groupId.id && x.UserId == userId)
+            .Select(x => x.Id);
+
+        var groupMemberId = await groupMemberQuery.FirstOrDefaultAsync(cancellationToken);
+        if (groupMemberId == 0)
+            return false;
+
+        GroupMemberStatisticData? statistic = null;
+
+        var query = _db.GroupsMembersStatistics.Where(x => x.GroupMemberId == groupMemberId && x.Date == date && x.StatisticId == statisticId);
+
+        statistic = await query.FirstOrDefaultAsync(cancellationToken);
+
+        try
+        {
+            if(statistic == null)
+            {
+                _db.GroupsMembersStatistics.Add(new GroupMemberStatisticData
+                {
+                    GroupMemberId = groupMemberId,
+                    Date = date,
+                    StatisticId = statisticId,
+                    Value = value
+                });
+            }
+            else
+            {
+                statistic.Value += value;
+            }
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+    
+    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var groupMemberQuery = _db.GroupsMembers.Where(x => x.GroupId == groupId.id && x.UserId == userId)
+            .Select(x => x.Id);
+
+        var groupMemberId = await groupMemberQuery.FirstOrDefaultAsync(cancellationToken);
+        if (groupMemberId == 0)
+            return [];
+
+        var query = _db.GroupsMembersStatistics.Where(x => x.GroupMemberId == groupMemberId && (date == null || x.Date == date));
+
+        try
+        {
+            return await query.ToArrayAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+    
+    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("UserId", userId);
+        }
+
+        var groupMemberQuery = _db.GroupsMembers.Where(x => x.GroupId == groupId.id && x.UserId == userId)
+            .Select(x => x.Id);
+
+        var groupMemberId = await groupMemberQuery.FirstOrDefaultAsync(cancellationToken);
+        if (groupMemberId == 0)
+            return [];
+
+        var query = _db.GroupsMembersStatistics.Where(x => x.GroupMemberId == groupMemberId && x.Date >= from && x.Date <= to);
+
+        try
+        {
+            return await query.ToArrayAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
 
     private IQueryable<GroupData> CreateQueryBase() => _db.Groups.TagWithSource(nameof(GroupRepository));
 

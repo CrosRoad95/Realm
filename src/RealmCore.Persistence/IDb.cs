@@ -75,6 +75,7 @@ public interface IDb
     DbSet<VehicleSettingData> VehicleSettings { get; }
     DbSet<SerialDiscordUserIdData> SerialDiscordUserId { get; }
     DbSet<GroupUpgradeData> GroupsUpgrades { get; }
+    DbSet<GroupMemberStatisticData> GroupsMembersStatistics { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

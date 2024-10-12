@@ -282,6 +282,24 @@ public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixture
         _groups.HasUpgrade(2).Should().BeTrue();
         _groups.HasUpgrade(1).Should().BeFalse();
     }
+    
+    [Fact]
+    private async Task GroupMemberStatisticsShouldWork()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var group = await _groupsService.Create(Guid.NewGuid().ToString());
+        await _groupsService.AddMember(_player, group!.Id);
+        await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 1, today, 10);
+        await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 1, today, 10);
+        await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 2, today, 10);
+        var statistics = await _groupsService.GetStatistics(group!.Id, _player.UserId, today);
+
+        using var _ = new AssertionScope();
+        statistics.Should().BeEquivalentTo([
+            new GroupMemberStatistic(today, 1, 20),
+            new GroupMemberStatistic(today, 2, 10),
+        ]);
+    }
 
     public void Dispose()
     {

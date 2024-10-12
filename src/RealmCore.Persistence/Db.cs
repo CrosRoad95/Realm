@@ -68,6 +68,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<DiscoveryData> Discoveries => Set<DiscoveryData>();
     public DbSet<GroupData> Groups => Set<GroupData>();
     public DbSet<GroupMemberData> GroupsMembers => Set<GroupMemberData>();
+    public DbSet<GroupMemberStatisticData> GroupsMembersStatistics => Set<GroupMemberStatisticData>();
     public DbSet<GroupRoleData> GroupsRoles => Set<GroupRoleData>();
     public DbSet<GroupRolePermissionData> GroupsRolesPermissions => Set<GroupRolePermissionData>();
     public DbSet<GroupEventData> GroupsEvents => Set<GroupEventData>();
@@ -788,6 +789,19 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.RoleId)
                 .HasPrincipalKey(x => x.Id);
+
+            entityBuilder
+                .HasMany(x => x.Statistics)
+                .WithOne(x => x.GroupMember)
+                .HasForeignKey(x => x.GroupMemberId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<GroupMemberStatisticData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupsMembersStatistics))
+                .HasKey(x => new { x.GroupMemberId, x.StatisticId, x.Date });
         });
 
         modelBuilder.Entity<GroupRoleData>(entityBuilder =>
