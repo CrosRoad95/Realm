@@ -246,6 +246,12 @@ public sealed class PlayerGroupsFeature : IPlayerFeature, IEnumerable<GroupMembe
         return added;
     }
 
+    public bool HasUpgrade(int upgradeId)
+    {
+        lock (_lock)
+            return _upgrades.Contains(upgradeId);
+    }
+
     public IEnumerator<GroupMemberDto> GetEnumerator()
     {
         GroupMemberDto[] view;

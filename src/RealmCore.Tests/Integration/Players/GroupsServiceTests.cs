@@ -274,10 +274,13 @@ public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixture
         var upgradesIds4 = _groups.Upgrades;
 
         using var _ = new AssertionScope();
+
         upgradesIds1.Should().BeEmpty();
         upgradesIds2.Should().BeEquivalentTo([1, 2]);
         upgradesIds3.Should().BeEquivalentTo([1, 2, 3]);
         upgradesIds4.Should().BeEquivalentTo([2, 3]);
+        _groups.HasUpgrade(2).Should().BeTrue();
+        _groups.HasUpgrade(1).Should().BeFalse();
     }
 
     public void Dispose()
