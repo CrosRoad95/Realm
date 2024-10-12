@@ -5,6 +5,7 @@ public class BusinessData
     public int Id { get; set; }
     public int Category { get; set; }
     public string? Metadata { get; set; }
+    public decimal Money { get; set; }
 
     public ICollection<TimeBaseOperationGroupBusinessData> TimeBasedOperations { get; set; } = [];
     public ICollection<BusinessStatisticData> Statistics { get; set; } = [];

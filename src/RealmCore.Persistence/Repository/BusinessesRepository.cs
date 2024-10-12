@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using Newtonsoft.Json.Linq;
+
+namespace RealmCore.Persistence.Repository;
 
 public sealed class BusinessesRepository
 {
@@ -265,6 +267,83 @@ public sealed class BusinessesRepository
             .Where(x => x.BusinessId == businessId);
 
         return await query.ToDictionaryAsync(x => x.StatisticId, y => y.Value, cancellationToken);
+    }
+
+    public async Task<bool> GiveMoney(int businessId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        if(amount < 0)
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+            activity.AddTag("Amount", amount);
+        }
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(BusinessesRepository))
+            .Where(x => x.Id == businessId);
+
+        var businessData = await query.FirstOrDefaultAsync(cancellationToken);
+        if (businessData == null)
+            return false;
+
+        try
+        {
+            businessData.Money += amount;
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+
+    public async Task<bool> TakeMoney(int businessId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        if(amount < 0)
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("BusinessId", businessId);
+            activity.AddTag("Amount", amount);
+        }
+
+        var query = _db.Businesses
+            .TagWithSource(nameof(BusinessesRepository))
+            .Where(x => x.Id == businessId);
+
+        var businessData = await query.FirstOrDefaultAsync(cancellationToken);
+        if (businessData == null)
+            return false;
+
+        try
+        {
+            businessData.Money -= amount;
+            if (businessData.Money < 0)
+                return false;
+
+            await _db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.BusinessesRepository", "1.0.0");

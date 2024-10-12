@@ -10,7 +10,7 @@ public sealed class BusinessDto : IEqualityComparer<BusinessDto>
 
     public T? GetMetadata<T>() where T : class
     {
-        return Data?.Metadata != null ? JsonConvert.DeserializeObject<T>(Data.Metadata, BusinessesService._jsonSerializerSettings) : null;
+        return JsonHelpers.Deserialize<T>(Data?.Metadata);
     }
 
     public int GetHashCode([DisallowNull] BusinessDto obj) => obj.Id;
@@ -51,7 +51,7 @@ public sealed class BusinessesService
     public async Task<BusinessDto> Create(int category, object? metadata = null, CancellationToken cancellationToken = default)
     {
         BusinessData business;
-        var metadataString = Serialize(metadata);
+        var metadataString = JsonHelpers.Serialize(metadata);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
@@ -66,7 +66,7 @@ public sealed class BusinessesService
 
     public async Task<bool> AddBusinessToTimeBaseGroup(int businessId, int groupId, string? metadata = null, CancellationToken cancellationToken = default)
     {
-        var metadataString = Serialize(metadata);
+        var metadataString = JsonHelpers.Serialize(metadata);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
@@ -80,7 +80,7 @@ public sealed class BusinessesService
 
     public async Task<bool> AddUser(int businessId, int userId, string? metadata = null, CancellationToken cancellationToken = default)
     {
-        var metadataString = Serialize(metadata);
+        var metadataString = JsonHelpers.Serialize(metadata);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
@@ -156,7 +156,7 @@ public sealed class BusinessesService
 
     public async Task<bool> SetMetadata(int businessId, object? metadata, CancellationToken cancellationToken = default)
     {
-        var metadataString = Serialize(metadata);
+        var metadataString = JsonHelpers.Serialize(metadata);
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
@@ -194,10 +194,29 @@ public sealed class BusinessesService
         }
     }
 
-    private string? Serialize(object? obj) => obj != null ? JsonConvert.SerializeObject(obj, _jsonSerializerSettings) : null;
-
-    internal static JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+    public async Task<bool> GiveMoney(int businessId, decimal amount, CancellationToken cancellationToken = default)
     {
-        TypeNameHandling = TypeNameHandling.All,
-    };
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _businessesRepository.GiveMoney(businessId, amount, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<bool> TakeMoney(int businessId, decimal amount, CancellationToken cancellationToken = default)
+    {
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _businessesRepository.TakeMoney(businessId, amount, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
 }
