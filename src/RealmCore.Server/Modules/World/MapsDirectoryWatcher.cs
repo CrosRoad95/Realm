@@ -41,12 +41,7 @@ internal class MapsDirectoryWatcher : IDisposable
         _fileSystemWatcher.Changed += HandleChanged;
         _fileSystemWatcher.Deleted += HandleDeleted;
         _fileSystemWatcher.Filters.Add(searchPattern);
-        _fileSystemWatcher.NotifyFilter = NotifyFilters.DirectoryName |
-                       NotifyFilters.LastAccess |
-                       NotifyFilters.LastWrite |
-                       NotifyFilters.FileName |
-                       NotifyFilters.Size |
-                       NotifyFilters.Attributes;
+        _fileSystemWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size;
         _fileSystemWatcher.EnableRaisingEvents = true;
 
         string[] files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
