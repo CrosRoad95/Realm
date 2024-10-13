@@ -25,6 +25,7 @@ public sealed class VehicleData
     public bool Spawned { get; set; }
     public float Mileage { get; set; }
     public byte Kind { get; set; }
+    public int Speedometer { get; set; }
     public DateTime? LastUsed { get; set; }
     public bool IsRemoved { get; set; }
 

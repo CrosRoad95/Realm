@@ -25,6 +25,15 @@ public sealed class VehiclePersistenceFeature : IVehicleFeature
             VehicleData.Kind = value;
         }
     }
+    
+    public int Speedometer
+    {
+        get => VehicleData.Speedometer;
+        internal set
+        {
+            VehicleData.Speedometer = value;
+        }
+    }
 
     public DateTime? LastUsed
     {

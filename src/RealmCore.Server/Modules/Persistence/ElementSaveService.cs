@@ -82,8 +82,6 @@ public sealed partial class ElementSaveService : IAsyncDisposable
         if (vehicle.Inventory.TryGetPrimary(out var inventory) && inventory is IPersistentInventory persistentInventory)
             vehicleData.Inventories = SaveInventory(vehicleData.Inventories, persistentInventory);
 
-        vehicleData.LastUsed = vehicle.Persistence.LastUsed;
-
         var savedEntities = await _db.SaveChangesAsync(cancellationToken);
         return true;
     }
