@@ -22,6 +22,18 @@ public sealed class XmlObject
     public ushort Dimension { get; set; }
     [XmlAttribute("model")]
     public ushort Model { get; set; }
+    [XmlAttribute("scale")]
+    public float Scale { get; set; } = 1;
+    [XmlAttribute("doublesided")]
+    public bool Doublesided { get; set; }
+    [XmlAttribute("collisions")]
+    public bool Collisions { get; set; }
+    [XmlAttribute("breakable")]
+    public bool Breakable { get; set; }
+    [XmlAttribute("Frozen")]
+    public bool Frozen { get; set; }
+    [XmlAttribute("alpha")]
+    public byte Alpha { get; set; }
 }
 
 public sealed class XmlRemoveWorldModel

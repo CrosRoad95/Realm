@@ -32,7 +32,12 @@ public class MapLoader
                     {
                         Rotation = new Vector3(x.RotX, x.RotY, x.RotZ),
                         Interior = x.Interior,
-                        Dimension = x.Dimension
+                        Dimension = x.Dimension,
+                        Alpha = x.Alpha,
+                        Scale = new Vector3(x.Scale, x.Scale, x.Scale),
+                        DoubleSided = x.Doublesided,
+                        IsBreakable = x.Breakable,
+                        IsFrozen = x.Frozen,
                     }) : [];
 
                     var removeWorldModels = xmlMap.RemovedWorldModels != null ? xmlMap.RemovedWorldModels.Select(x =>
