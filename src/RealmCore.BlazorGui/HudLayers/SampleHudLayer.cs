@@ -30,7 +30,7 @@ public class SampleHudLayer : HudLayer<SampleHudState>
             [43] = _assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg")
         }, PositioningMode.Absolute));
         builder.Add(new TextHudElement(new CurrentFPSTextHudElementContent(), new Vector2(0, context.Bottom - 20), new Size(200, 20), font: BuildInFonts.Default, alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center, positioningMode: PositioningMode.Absolute));
-        builder.Add(new ImageHudElement(new Vector2(600, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetDynamicRemoteImage(_browserOptions.Value.BaseRemoteUrl + "/assets/dynamic.jpg"))));
+        builder.Add(new ImageHudElement(new Vector2(600, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetDynamicRemoteImage(_browserOptions.Value.BaseRemoteUrl + "/assets/dynamic.jpg")), new CurrentVehicleSpeedNumberHudElementContent(3.0f), new Vector2(32.0f, 32.0f)));
         var imageElement = builder.Add(new ImageHudElement(new Vector2(700, 700), new Size(64, 64), new ImageHudElementContent(_assetsCollection.GetAsset<IRemoteImageAsset>("assets/blip43.jpg"))));
         var element = builder.Add(new RectangleHudElement(new Vector2(context.Right - 400, 600), new Size(400, 20), Color.DarkBlue));
         _imageId = imageElement.Id;

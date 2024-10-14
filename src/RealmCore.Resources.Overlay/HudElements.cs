@@ -11,6 +11,7 @@ internal static class HudElementType
 internal static class HudElementContentType
 {
     public const string Constant = "constant";
+    public const string ConstantNumber = "constantNumber";
     public const string Computed = "computed";
     public const string RemoteImage = "remoteImage";
     public const string Image = "image";
@@ -18,7 +19,8 @@ internal static class HudElementContentType
 
 internal static class HudElementContentComputedType
 {
-    public const string VehicleSpeed = "vehicleSpeed";
+    public const string VehicleSpeedText = "vehicleSpeedText";
+    public const string VehicleSpeedNummber = "vehicleSpeedNummber";
     public const string FPS = "fps";
 }
 
@@ -93,15 +95,19 @@ public readonly struct ImageHudElement : IHudElement
 {
     private readonly Vector2 _position;
     private readonly Size _size;
+    private readonly ITextHudElementContent _rotation;
+    private readonly Vector2 _rotationCenterOffset;
     private readonly PositioningMode _positioningMode;
 
     public IHudElementContent Content { get; init; }
 
-    public ImageHudElement(Vector2 position, Size size, IImageHudElementContent content, PositioningMode positioningMode = PositioningMode.Relative)
+    public ImageHudElement(Vector2 position, Size size, IImageHudElementContent content, ITextHudElementContent? rotation = null, Vector2 rotationCenterOffset = default, PositioningMode positioningMode = PositioningMode.Relative)
     {
         _position = position;
         _size = size;
         Content = content;
+        _rotation = rotation ?? new ConstantNumberHudElementContent(0);
+        _rotationCenterOffset = rotationCenterOffset;
         _positioningMode = positioningMode;
     }
 
@@ -115,6 +121,8 @@ public readonly struct ImageHudElement : IHudElement
             ["position"] = LuaValue.ArrayFromVector(_position),
             ["positioningMode"] = _positioningMode.ToString(),
             ["size"] = _size.ToLuaArray(),
+            ["rotation"] = _rotation.CreateLuaValue(null),
+            ["rotationOffset"] = LuaValue.ArrayFromVector(_rotationCenterOffset),
             ["content"] = content
         };
     }
@@ -221,6 +229,22 @@ public readonly struct ConstantTextHudElementContent : ITextHudElementContent
     };
 }
 
+public readonly struct ConstantNumberHudElementContent : ITextHudElementContent
+{
+    public float Content { get; }
+
+    public ConstantNumberHudElementContent(float content)
+    {
+        Content = content;
+    }
+
+    public LuaValue CreateLuaValue(object? state) => new LuaTable
+    {
+        ["type"] = HudElementContentType.ConstantNumber,
+        ["value"] = Content
+    };
+}
+
 public readonly struct ImageHudElementContent : IImageHudElementContent
 {
     private readonly IImageAsset _imageAsset;
@@ -258,7 +282,22 @@ public readonly struct CurrentVehicleSpeedTextHudElementContent : ITextHudElemen
     public LuaValue CreateLuaValue(object? state) => new LuaTable
     {
         ["type"] = HudElementContentType.Computed,
-        ["value"] = HudElementContentComputedType.VehicleSpeed
+        ["value"] = HudElementContentComputedType.VehicleSpeedText
+    };
+}
+public readonly struct CurrentVehicleSpeedNumberHudElementContent : ITextHudElementContent
+{
+    private readonly float _multiplier;
+
+    public CurrentVehicleSpeedNumberHudElementContent(float multiplier = 1)
+    {
+        _multiplier = multiplier;
+    }
+    public LuaValue CreateLuaValue(object? state) => new LuaTable
+    {
+        ["type"] = HudElementContentType.Computed,
+        ["multiplier"] = _multiplier,
+        ["value"] = HudElementContentComputedType.VehicleSpeedNummber
     };
 }
 

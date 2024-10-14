@@ -9,7 +9,7 @@ public class MapData
     public string? Metadata { get; set; }
 
     public ICollection<MapUserData> MapsUsers { get; set; } = [];
-    public UploadFileData UploadFile { get; set; }
+    public UploadFileData? UploadFile { get; set; }
 }
 
 public class MapUserData
@@ -19,4 +19,19 @@ public class MapUserData
 
     public MapData Map { get; set; }
     public UserData User { get; set; }
+}
+
+public class UserTimeBasedRewards
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public int Category { get; set; }
+    public decimal Money { get; set; }
+    public decimal Experience { get; set; }
+    public decimal MoneyPerHour { get; set; }
+    public decimal ExperiencePerHour { get; set; }
+    public DateTime? LastUpdate { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public UserData? User { get; set; }
 }

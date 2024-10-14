@@ -67,6 +67,32 @@ local function calculateElementPosition(element, offsetX, offsetY)
 	return ex, ey;
 end
 
+local function getContentValue(content)
+	local value = nil;
+	if(content.type == "constant")then
+		value = content.value;
+	elseif(content.type == "constantNumber")then
+		value = content.value;
+	elseif(content.type == "computed")then
+		if(content.value == "vehicleSpeedText")then
+			local vehicle = getPedOccupiedVehicle(localPlayer);
+			if(vehicle and getVehicleController(vehicle) == localPlayer)then
+				local speed = getElementSpeed(vehicle, "km/s");
+				value = string.format("%ikm/h", speed);
+			end
+		elseif(content.value == "vehicleSpeedNummber")then
+			local vehicle = getPedOccupiedVehicle(localPlayer);
+			if(vehicle and getVehicleController(vehicle) == localPlayer)then
+				local speed = getElementSpeed(vehicle, "km/s");
+				value = speed * content.multiplier;
+			end
+		elseif(content.value == "fps")then
+			value = string.format("FPS: %i", fps);
+		end
+	end
+	return value;
+end
+
 local function renderHud(position, elements)
 	local x,y = unpack(position);
 	local ex, ey, position;
@@ -75,28 +101,14 @@ local function renderHud(position, elements)
 		if(not element.hidden)then
 			ex, ey = calculateElementPosition(element, x, y);
 			if(element.type == "text")then
-				content = element.content;
-				local text = nil;
-				if(content.type == "constant")then
-					text = content.value;
-				elseif(content.type == "computed")then
-					if(content.value == "vehicleSpeed")then
-						local vehicle = getPedOccupiedVehicle(localPlayer);
-						if(vehicle and getVehicleController(vehicle) == localPlayer)then
-							local speed = getElementSpeed(vehicle, "km/s");
-							text = string.format("%ikm/h", speed);
-						end
-					elseif(content.value == "fps")then
-						text = string.format("FPS: %i", fps);
-					end
-				end
-
+				local text = getContentValue(element.content)
 				if(text)then
 					dxDrawText(text, ex, ey, ex + element.size[1], ey + element.size[2], element.color, element.scale[1], element.scale[2], element.font or "sans", element.align[1], element.align[2])
 				end
 			elseif(element.type == "image")then
 				if(element.image.isLoaded)then
-					dxDrawImage(ex, ey, element.size[1], element.size[2], element.image.data);
+					local rotation = getContentValue(element.rotation)
+					dxDrawImage(ex, ey, element.size[1], element.size[2], element.image.data, rotation, element.rotationOffset[1], element.rotationOffset[2]);
 				end
 			elseif(element.type == "rectangle")then
 				dxDrawRectangle(ex, ey, element.size[1], element.size[2], element.color)
