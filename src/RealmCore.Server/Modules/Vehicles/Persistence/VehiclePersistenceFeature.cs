@@ -20,28 +20,19 @@ public sealed class VehiclePersistenceFeature : IVehicleFeature
     public byte Kind
     {
         get => VehicleData.Kind;
-        internal set
-        {
-            VehicleData.Kind = value;
-        }
+        set => VehicleData.Kind = value;
     }
     
     public int Speedometer
     {
         get => VehicleData.Speedometer;
-        internal set
-        {
-            VehicleData.Speedometer = value;
-        }
+        set => VehicleData.Speedometer = value;
     }
 
     public DateTime? LastUsed
     {
         get => VehicleData.LastUsed;
-        private set
-        {
-            VehicleData.LastUsed = value;
-        }
+        set => VehicleData.LastUsed = value;
     }
 
     public event Action<VehiclePersistenceFeature, RealmVehicle>? Loaded;

@@ -134,7 +134,7 @@ public readonly struct TextHudElement : IHudElement
     private readonly Vector2 _position;
     private readonly Size _size;
     private readonly Color _color;
-    private readonly Size _scale;
+    private readonly Vector2 _scale;
     private readonly IFont _font;
     private readonly HorizontalAlign _alignX;
     private readonly VerticalAlign _alignY;
@@ -142,20 +142,20 @@ public readonly struct TextHudElement : IHudElement
 
     public IHudElementContent? Content => _content;
 
-    public TextHudElement(ITextHudElementContent text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top, PositioningMode positioningMode = PositioningMode.Relative)
+    public TextHudElement(ITextHudElementContent text, Vector2 position, Size size, Color? color = null, Vector2? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top, PositioningMode positioningMode = PositioningMode.Relative)
     {
         _content = text;
         _position = position;
         _size = size;
         _color = color ?? Color.White;
-        _scale = scale ?? new Size(1, 1);
+        _scale = scale ?? new Vector2(1.0f, 1.0f);
         _font = font ?? BuildInFonts.Default;
         _alignX = alignX;
         _alignY = alignY;
         _positioningMode = positioningMode;
     }
 
-    public TextHudElement(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top, PositioningMode positioningMode = PositioningMode.Relative) : this(new ConstantTextHudElementContent(text), position, size, color, scale, font, alignX, alignY, positioningMode) { }
+    public TextHudElement(string text, Vector2 position, Size size, Color? color = null, Vector2? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top, PositioningMode positioningMode = PositioningMode.Relative) : this(new ConstantTextHudElementContent(text), position, size, color, scale, font, alignX, alignY, positioningMode) { }
 
     public LuaValue CreateLuaValue(object? state, int id, IAssetsService assetsService)
     {
@@ -169,7 +169,7 @@ public readonly struct TextHudElement : IHudElement
             ["positioningMode"] = _positioningMode.ToString(),
             ["content"] = content,
             ["size"] = _size.ToLuaArray(),
-            ["scale"] = _scale.ToLuaArray(),
+            ["scale"] = LuaValue.ArrayFromVector(_scale),
             ["color"] = _color.ToLuaColor(),
             ["font"] = font,
             ["align"] = new LuaValue[] { _alignX.AsString(), _alignY.AsString() },
