@@ -45,7 +45,7 @@ public class PlayersTests : IClassFixture<RealmTestingServerHostingFixtureWithPl
         _player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
         worldObject.Destroy();
 
-        _player.AttachedBoneElementsCount.Should().Be(0);
+        _player.AttachedBoneElements.Where(x => x.WorldObject == worldObject).Should().HaveCount(0);
     }
 
     [Fact]
