@@ -76,6 +76,8 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
     public required GroupRoleDto[] Roles { get; init; }
     public required IReadOnlyDictionary<int, string> Settings { get; init; }
     public IEnumerable<GroupMemberDto> Members => Data != null ? Data.Members.Select(GroupMemberDto.Map) : Enumerable.Empty<GroupMemberDto>();
+    public required decimal Money { get; init; }
+
     public bool Equals(GroupDto? x, GroupDto? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] GroupDto obj) => obj.Id;
@@ -94,6 +96,7 @@ public sealed class GroupDto : IEqualityComparer<GroupDto>
             Shortcut = groupData.Shortcut,
             Kind = groupData.Kind,
             CreatedAt = groupData.CreatedAt,
+            Money = groupData.Money,
             Roles = groupData.Roles.Select(GroupRoleDto.Map).ToArray(),
             Settings = groupData.Settings.ToDictionary(x => x.SettingId, x => x.Value),
         };
