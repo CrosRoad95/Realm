@@ -292,10 +292,15 @@ public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixture
         await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 1, today, 10);
         await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 1, today, 10);
         await _groupsService.IncreaseStatistic(group!.Id, _player.UserId, 2, today, 10);
-        var statistics = await _groupsService.GetStatistics(group!.Id, _player.UserId, today);
+        var statistics1 = await _groupsService.GetStatisticsByUserId(group!.Id, _player.UserId, today);
+        var statistics2 = await _groupsService.GetStatistics(group!.Id, [1, 2], today);
 
         using var _ = new AssertionScope();
-        statistics.Should().BeEquivalentTo([
+        statistics1.Should().BeEquivalentTo([
+            new GroupMemberStatistic(today, 1, 20),
+            new GroupMemberStatistic(today, 2, 10),
+        ]);
+        statistics2.Should().BeEquivalentTo([
             new GroupMemberStatistic(today, 1, 20),
             new GroupMemberStatistic(today, 2, 10),
         ]);

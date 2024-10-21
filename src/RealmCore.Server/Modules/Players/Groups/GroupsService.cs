@@ -686,13 +686,13 @@ public sealed class GroupsService
         }
     }
 
-    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, int[]? statisticsIds = null, DateOnly? date = null, CancellationToken cancellationToken = default)
     {
         GroupMemberStatisticData[] statistics;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            statistics = await _groupRepository.GetStatistics(groupId, userId, date, cancellationToken);
+            statistics = await _groupRepository.GetStatistics(groupId, statisticsIds, date, cancellationToken);
         }
         finally
         {
@@ -702,13 +702,45 @@ public sealed class GroupsService
         return statistics.Select(x => new GroupMemberStatistic(x.Date, x.StatisticId, x.Value)).ToArray();
     }
 
-    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberStatistic[]> GetStatistics(GroupId groupId, DateOnly from, DateOnly to, int[]? statisticsIds, CancellationToken cancellationToken = default)
     {
         GroupMemberStatisticData[] statistics;
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            statistics = await _groupRepository.GetStatistics(groupId, userId, from, to, cancellationToken);
+            statistics = await _groupRepository.GetStatistics(groupId, from, to, statisticsIds, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return statistics.Select(x => new GroupMemberStatistic(x.Date, x.StatisticId, x.Value)).ToArray();
+    }
+
+    public async Task<GroupMemberStatistic[]> GetStatisticsByUserId(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    {
+        GroupMemberStatisticData[] statistics;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            statistics = await _groupRepository.GetStatisticsByUserId(groupId, userId, date, cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+
+        return statistics.Select(x => new GroupMemberStatistic(x.Date, x.StatisticId, x.Value)).ToArray();
+    }
+
+    public async Task<GroupMemberStatistic[]> GetStatisticsByUserId(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    {
+        GroupMemberStatisticData[] statistics;
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            statistics = await _groupRepository.GetStatisticsByUserId(groupId, userId, from, to, cancellationToken);
         }
         finally
         {

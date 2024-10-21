@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public record struct GroupId(int id)
 {
@@ -1112,9 +1110,70 @@ public sealed class GroupRepository
         }
     }
     
-    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, int[]? statisticsIds = null, DateOnly? date = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("StatisticsIds", statisticsIds);
+            activity.AddTag("Date", date);
+        }
+
+        var query = _db.GroupsMembers.Where(x => x.GroupId == groupId.id)
+            .Include(x => x.Statistics)
+            .SelectMany(x => x.Statistics)
+            .Where(x => (statisticsIds == null || statisticsIds.Contains(x.StatisticId)) && (date == null || x.Date == date));
+
+        try
+        {
+            return await query.ToArrayAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+    
+    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, DateOnly from, DateOnly to, int[]? statisticsIds, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetStatistics));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("StatisticsIds", statisticsIds);
+            activity.AddTag("From", from);
+            activity.AddTag("To", to);
+        }
+
+        var query = _db.GroupsMembers.Where(x => x.GroupId == groupId.id)
+            .Include(x => x.Statistics)
+            .SelectMany(x => x.Statistics)
+            .Where(x => (statisticsIds == null || statisticsIds.Contains(x.StatisticId)) && x.Date >= from && x.Date <= to);
+
+        try
+        {
+            return await query.ToArrayAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+    
+    public async Task<GroupMemberStatisticData[]> GetStatisticsByUserId(GroupId groupId, int userId, DateOnly? date = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetStatisticsByUserId));
 
         if (activity != null)
         {
@@ -1145,9 +1204,9 @@ public sealed class GroupRepository
         }
     }
     
-    public async Task<GroupMemberStatisticData[]> GetStatistics(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    public async Task<GroupMemberStatisticData[]> GetStatisticsByUserId(GroupId groupId, int userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(GetStatistics));
+        using var activity = Activity.StartActivity(nameof(GetStatisticsByUserId));
 
         if (activity != null)
         {
