@@ -297,12 +297,12 @@ public class GroupsServiceTests : IClassFixture<RealmTestingServerHostingFixture
 
         using var _ = new AssertionScope();
         statistics1.Should().BeEquivalentTo([
-            new GroupMemberStatistic(today, 1, 20),
-            new GroupMemberStatistic(today, 2, 10),
+            new GroupMemberStatistic(today, _player.UserId, 1, 20),
+            new GroupMemberStatistic(today, _player.UserId, 2, 10),
         ]);
         statistics2.Should().BeEquivalentTo([
-            new GroupMemberStatistic(today, 1, 20),
-            new GroupMemberStatistic(today, 2, 10),
+            new GroupMemberStatistic(today, _player.UserId, 1, 20),
+            new GroupMemberStatistic(today, _player.UserId, 2, 10),
         ]);
     }
 

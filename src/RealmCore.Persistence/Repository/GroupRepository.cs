@@ -1122,8 +1122,8 @@ public sealed class GroupRepository
         }
 
         var query = _db.GroupsMembers.Where(x => x.GroupId == groupId.id)
-            .Include(x => x.Statistics)
             .SelectMany(x => x.Statistics)
+            .Include(x => x.GroupMember)
             .Where(x => (statisticsIds == null || statisticsIds.Contains(x.StatisticId)) && (date == null || x.Date == date));
 
         try
@@ -1153,8 +1153,8 @@ public sealed class GroupRepository
         }
 
         var query = _db.GroupsMembers.Where(x => x.GroupId == groupId.id)
-            .Include(x => x.Statistics)
             .SelectMany(x => x.Statistics)
+            .Include(x => x.GroupMember)
             .Where(x => (statisticsIds == null || statisticsIds.Contains(x.StatisticId)) && x.Date >= from && x.Date <= to);
 
         try
