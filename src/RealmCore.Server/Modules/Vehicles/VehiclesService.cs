@@ -43,12 +43,12 @@ public sealed class VehiclesService
         }
     }
 
-    public async Task<VehicleData[]> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
+    public async Task<VehicleData[]> GetVehiclesByGroupId(int groupId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            return await _vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
+            return await _vehicleRepository.GetVehiclesByGroupId(groupId, accessTypes, cancellationToken);
         }
         finally
         {
@@ -56,12 +56,25 @@ public sealed class VehiclesService
         }
     }
     
-    public async Task<VehicleData[]> GetAllVehicles(int userId, CancellationToken cancellationToken = default)
+    public async Task<VehicleData[]> GetVehiclesByUserId(RealmPlayer player, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
         await _semaphoreSlim.WaitAsync(cancellationToken);
         try
         {
-            return await _vehicleRepository.GetVehiclesByUserId(userId, null, cancellationToken);
+            return await _vehicleRepository.GetVehiclesByUserId(player.UserId, accessTypes, cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+    
+    public async Task<VehicleData[]> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await _vehicleRepository.GetVehiclesByUserId(userId, accessTypes, cancellationToken);
         }
         finally
         {

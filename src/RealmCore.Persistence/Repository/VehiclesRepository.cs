@@ -79,6 +79,24 @@ public sealed class VehiclesRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<VehicleData[]> GetVehiclesByGroupId(int groupId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.StartActivity(nameof(GetVehiclesByGroupId));
+
+        if (activity != null)
+        {
+            activity.AddTag("GroupId", groupId);
+            activity.AddTag("AccessTypes", accessTypes);
+        }
+
+        var query = CreateQueryBase()
+            .AsNoTracking()
+            .Where(x => x.GroupAccesses.Any(y => y.GroupId == groupId && (accessTypes == null || accessTypes.Contains(y.AccessType))));
+
+        return await query.ToArrayAsync(cancellationToken);
+    }
+
     public async Task<VehicleData[]> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(GetVehiclesByUserId));
